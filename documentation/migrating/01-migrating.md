@@ -1,7 +1,7 @@
 ---
-title: Migrating from Sapper
+title: Sapperからの移行
 ---
 
-SvelteKit is the successor to Sapper and shares many elements of its design.
+SvelteKit は Sapper の後継であり、その設計の多くの要素を共有しています。
 
-If you have an existing Sapper app that you plan to migrate to SvelteKit, there are a number of changes you will need to make. You may find it helpful to view the [examples](https://github.com/sveltejs/kit/tree/master/examples) while migrating.
+もし、既存の Sapper アプリを SvelteKit に移行する予定がある場合、いくつかの変更が必要になります。移行する際には、[examples](https://github.com/sveltejs/kit/tree/master/examples)を見ていただくと参考になると思います。
