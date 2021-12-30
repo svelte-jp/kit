@@ -1,9 +1,9 @@
 ---
-question: How do I use environment variables?
+question: 環境変数を使用するにはどうしたらよいですか？
 ---
 
-Vite uses [dotenv](https://github.com/motdotla/dotenv) to load environment variables from a file named `.env` or similar. Only environment variables prefixed with `VITE_` are exposed ([you can set `envPrefix` to change this](https://vitejs.dev/config/#envprefix)). Vite will use these and statically replace them at build-time.
+Vite は [dotenv](https://github.com/motdotla/dotenv) を使用して、`.env` などのファイルから環境変数を読み込んでいます。`VITE_` というプレフィックスを持つ環境変数のみが公開されます（[これは`envPrefix` を設定することで変更可能です](https://vitejs.dev/config/#envprefix)）。Vite はこれらを使用し、ビルド時に静的に置き換えます。
 
-To use environment variables at runtime, you would need to instantiate dotenv yourself in your server-side code so that they are exposed at `process.env.YOUR_ENV_VAR`. You may also use `$session` to pass them to the client if needed.
+実行時に環境変数を使用するには、サーバーサイドのコードで dotenv をインスタンス化し、`process.env.YOUR_ENV_VAR` で環境変数が公開されるようにする必要があります。また必要であれば、`$session` を使ってクライアントに渡すこともできます。
 
-Please see [the Vite documentation](https://vitejs.dev/guide/env-and-mode.html#env-files) for more info about environment variables.
+環境変数についてのより詳しい情報は、[Viteのドキュメント](https://vitejs.dev/guide/env-and-mode.html#env-files) を参照してください。
