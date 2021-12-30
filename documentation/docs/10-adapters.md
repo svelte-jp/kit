@@ -28,9 +28,7 @@ SvelteKit は数多くの公式 Adapters を提供しています。
 +import adapter from '@sveltejs/adapter-node';
 ```
 
-<!-- FIXME: self-containedのうまい訳を考える-->
-
-加えて、 [svelte-kit build](#command-line-interface-svelte-kit-build)は`build`ディレクトリの中に self-contained した Node.js アプリを生成します。 出力先ディレクトリの設定のように、adapters にオプション設定を設定することが出来ます:
+加えて、 [svelte-kit build](#command-line-interface-svelte-kit-build)は`build`ディレクトリの中に 自己解決型の Node.js アプリを生成します。 出力先ディレクトリの設定のように、adapters にオプション設定を設定することが出来ます:
 
 ```diff
 // svelte.config.js
@@ -46,9 +44,7 @@ export default {
 
 #### Static sites
 
-<!-- FIXME: prerenderableのうまい訳 -->
-
-多くの adapters は あなたのサイトの [prerenderable](#ssr-and-javascript-prerender) ページ の静的 HTML を生成することが出来ます。一部ケースでは、あなたのアプリ全体が prerenderable であり、_all_ あなたのページの静的 HTML を生成するために`@sveltejs/adapter-static@next`を使用できる場合があります。静的サイト全体はは幅広いプラットフォームでホスト可能であり、その中には[GitHub Pages](https://pages.github.com/)のような静的ホスティングも含みます。
+殆どの adapters はサイトの [プリレンダリング可能](#ssr-and-javascript-prerender) なページに対して静的 HTML を生成することが出来ます。場合によっては、アプリ全体がプリレンダリング可能なこともあり、その場合は`@sveltejs/adapter-static@next`を使用して _all_ ページの静的 HTMl を生成できます。完全に静的サイトは幅広いプラットフォームでホスト可能であり、その中には[GitHub Pages](https://pages.github.com/)のような静的ホスティングも含みます。
 
 ```diff
 // svelte.config.js
@@ -60,9 +56,7 @@ export default {
 
 ### コミュニティ提供の adapters
 
-<!-- FIXME: your package managerのうまい訳 -->
-
-追加で [community 提供の adapters](https://sveltesociety.dev/components#adapters)が他プラットフォーム用に提供されています。パッケージ管理マネージャーに関連 adapter をインストールした後、`svelte.config.js`を更新してください:
+追加で [community 提供の adapters](https://sveltesociety.dev/components#adapters)が他プラットフォーム用に提供されています。パッケージ管理システムに関連 adapter をインストールした後、`svelte.config.js`を更新してください:
 
 ```diff
 // svelte.config.js
@@ -72,7 +66,7 @@ export default {
 
 ### カスタム adapters の作成
 
-あなたが使用しているものと似たプラットフォーム向けに starting point としてコピーするために、[looking at the source for an adapter](https://github.com/sveltejs/kit/tree/master/packages)を読むことを推奨します。
+[looking at the source for an adapter](https://github.com/sveltejs/kit/tree/master/packages)をあなたのプラットフォームと似たようなものにし、それを出発点としてコピーすることを推奨します。
 
 Adapters パッケージは必ず次の`Adapter`を作成する API を実行する必要があります:
 
