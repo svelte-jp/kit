@@ -2,12 +2,12 @@
 title: Service workers
 ---
 
-Service workers act as proxy servers that handle network requests inside your app. This makes it possible to make your app work offline, but even if you don't need offline support (or can't realistically implement it because of the type of app you're building), it's often worth using service workers to speed up navigation by precaching your built JS and CSS.
+サービスワーカーは、アプリ内部でネットワークリクエストを処理するプロキシサーバーとして機能します。これによりアプリをオフラインで動作させることが可能になります。もしオフラインサポートが不要な場合（または構築するアプリの種類によって現実的に実装できない場合）でも、ビルドした JS と CSS を事前にキャッシュしてナビゲーションを高速化するためにサービスワーカーを使用する価値はあります。
 
-In SvelteKit, if you have a `src/service-worker.js` file (or `src/service-worker.ts`, or `src/service-worker/index.js`, etc) it will be built with Vite and automatically registered.
+SvelteKit では、`src/service-worker.js` ファイル（または `src/service-worker.ts` や `src/service-worker/index.js` など）があれば、Vite でビルドされて自動的に登録されます。
 
-> You can change the location of your service worker in your [project configuration](#configuration-files).
+> サービスワーカーを設置する場所は、[プロジェクトの設定](#configuration-files)で変更することができます。
 
-Inside the service worker you have access to the [`$service-worker` module](#modules-$service-worker).
+サービスワーカーの内部では、[`$service-worker` モジュール](#modules-$service-worker) にアクセスすることができます。
 
-Because it needs to be bundled (since browsers don't yet support `import` in this context), and depends on the client-side app's build manifest, **service workers only work in the production build, not in development**. To test it locally, use [`svelte-kit preview`](#command-line-interface-svelte-kit-preview).
+サービスワーカーはバンドルする必要があり（現状はブラウザがまだ `import` をサポートしていないため）、クライアント側アプリのビルドマニフェストに依存するため、**サービスワーカーは開発時ではなく本番ビルドでのみ機能します**。ローカル環境でテストするには、[`svelte-kit preview`](#command-line-interface-svelte-kit-preview) を使用してください。
