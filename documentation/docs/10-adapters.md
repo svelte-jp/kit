@@ -2,25 +2,25 @@
 title: Adapters
 ---
 
-Before you can deploy your SvelteKit app, you need to _adapt_ it for your deployment target. Adapters are small plugins that take the built app as input and generate output for deployment.
+あなたの SvelteKit アプリをデプロイする前に、デプロイ対象となるアプリを _adapt_ する必要があります。Adapters は作成したアプリを入力し、デプロイして出力してくれる小さなプラグインです。
 
-By default, projects are configured to use `@sveltejs/adapter-auto`, which detects your production environment and selects the appropriate adapter where possible. If your platform isn't (yet) supported, you may need to [install a custom adapter](#adapters-installing-custom-adapters) or [write one](#adapters-writing-custom-adapters).
+デフォルト設定では、プロジェクトは`@sveltejs/adapter-auto`を使用するように設定されており、あなたの production 環境を探知し使用可能かつ適切な adapter を選択します。もしあなたのプラットフォームが（まだ）サポートされていなければ、 [custom adapter をインストールする](#adapters-installing-custom-adapters) もしくは [custom adapter を作成する](#adapters-writing-custom-adapters)必要があるかもしれません。
 
-> See the [adapter-auto README](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) for information on adding support for new environments.
+> 新環境サポートに関する最新情報は[adapter-auto README](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto)を確認してください。
 
-### Supported environments
+### サポート環境
 
-SvelteKit offers a number of officially-supported adapters.
+SvelteKit は数多くの公式 Adapters を提供しています。
 
-The following platforms require no additional configuration:
+以下のプラットフォームに関しては追加の設定は不要です:
 
-- [Cloudflare Pages](https://developers.cloudflare.com/pages/) via [`adapter-cloudflare`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare)
-- [Netlify](https://netlify.com) via [`adapter-netlify`](https://github.com/sveltejs/kit/tree/master/packages/adapter-netlify)
-- [Vercel](https://vercel.com) via [`adapter-vercel`](https://github.com/sveltejs/kit/tree/master/packages/adapter-vercel)
+- [Cloudflare Pages](https://developers.cloudflare.com/pages/) [`adapter-cloudflare`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare)経由
+- [Netlify](https://netlify.com) [`adapter-netlify`](https://github.com/sveltejs/kit/tree/master/packages/adapter-netlify)経由
+- [Vercel](https://vercel.com) [`adapter-vercel`](https://github.com/sveltejs/kit/tree/master/packages/adapter-vercel)経由
 
 #### Node.js
 
-To create a simple Node server, install the `@sveltejs/adapter-node@next` package and update your `svelte.config.js`:
+シンプルな Node.js サーバーを作成するには、`@sveltejs/adapter-node@next`パッケージをインストールし、`svelte.config.js`を書き換えてください:
 
 ```diff
 // svelte.config.js
@@ -28,7 +28,9 @@ To create a simple Node server, install the `@sveltejs/adapter-node@next` packag
 +import adapter from '@sveltejs/adapter-node';
 ```
 
-With this, [svelte-kit build](#command-line-interface-svelte-kit-build) will generate a self-contained Node app inside the `build` directory. You can pass options to adapters, such as customising the output directory:
+<!-- FIXME: self-containedのうまい訳を考える-->
+
+加えて、 [svelte-kit build](#command-line-interface-svelte-kit-build)は`build`ディレクトリの中に self-contained した Node.js アプリを生成します。 出力先ディレクトリの設定のように、adapters にオプション設定を設定することが出来ます:
 
 ```diff
 // svelte.config.js
@@ -54,9 +56,11 @@ Most adapters will generate static HTML for any [prerenderable](#ssr-and-javascr
 
 You can also use `adapter-static` to generate single-page apps (SPAs) by specifying a [fallback page](https://github.com/sveltejs/kit/tree/master/packages/adapter-static#spa-mode).
 
-### Community adapters
+### コミュニティ提供の adapters
 
-Additional [community-provided adapters](https://sveltesociety.dev/components#adapters) exist for other platforms. After installing the relevant adapter with your package manager, update your `svelte.config.js`:
+<!-- FIXME: your package managerのうまい訳 -->
+
+追加で [community 提供の adapters](https://sveltesociety.dev/components#adapters)が他プラットフォーム用に提供されています。パッケージ管理マネージャーに関連 adapter をインストールした後、`svelte.config.js`を更新してください:
 
 ```diff
 // svelte.config.js
@@ -99,4 +103,4 @@ Within the `adapt` method, there are a number of things that an adapter should d
 
 If possible, we recommend putting the adapter output under the `build/` directory with any intermediate output placed under `.svelte-kit/[adapter-name]`.
 
-> The adapter API may change before 1.0.
+> adapter API はバージョン 1.0 のリリース前に変更される可能性があります。
