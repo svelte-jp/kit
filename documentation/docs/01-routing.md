@@ -57,24 +57,19 @@ type ResponseHeaders = Record<string, string | string[]>;
 type RequestHeaders = Record<string, string>;
 
 export type RawBody = null | Uint8Array;
-export interface IncomingRequest {
-	method: string;
-	host: string;
-	path: string;
-	query: URLSearchParams;
-	headers: RequestHeaders;
-	rawBody: RawBody;
-}
 
 type ParameterizedBody<Body = unknown> = Body extends FormData
 	? ReadOnlyFormData
 	: (string | RawBody | ReadOnlyFormData) & Body;
-// ServerRequest is exported as Request
-export interface ServerRequest<Locals = Record<string, any>, Body = unknown>
-	extends IncomingRequest {
+
+export interface Request<Locals = Record<string, any>, Body = unknown> {
+	url: URL;
+	method: string;
+	headers: RequestHeaders;
+	rawBody: RawBody;
 	params: Record<string, string>;
 	body: ParameterizedBody<Body>;
-	locals: Locals; // populated by hooks handle
+	locals: Locals;
 }
 
 type DefaultBody = JSONResponse | Uint8Array;
@@ -89,14 +84,14 @@ export interface RequestHandler<
 	Input = unknown,
 	Output extends DefaultBody = DefaultBody
 > {
-	(request: ServerRequest<Locals, Input>):
+	(request: Request<Locals, Input>):
 		| void
 		| EndpointOutput<Output>
 		| Promise<void | EndpointOutput<Output>>;
 }
 ```
 
- 例えば、仮想的なブログページ `/blog/cool-article` が `/blog/cool-article.json` というデータをリクエストする場合は、`src/routes/blog/[slug].json.js` というエンドポイントになるかもしれません。
+例えば、仮想的なブログページ `/blog/cool-article` が `/blog/cool-article.json` というデータをリクエストする場合は、`src/routes/blog/[slug].json.js` というエンドポイントになるかもしれません。
 
 ```js
 import db from '$lib/database';

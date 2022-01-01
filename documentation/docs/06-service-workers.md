@@ -4,9 +4,9 @@ title: Service workers
 
 サービスワーカーは、アプリ内部でネットワークリクエストを処理するプロキシサーバーとして機能します。これによりアプリをオフラインで動作させることが可能になります。もしオフラインサポートが不要な場合（または構築するアプリの種類によって現実的に実装できない場合）でも、ビルドした JS と CSS を事前にキャッシュしてナビゲーションを高速化するためにサービスワーカーを使用する価値はあります。
 
-SvelteKit では、`src/service-worker.js` ファイル（または `src/service-worker.ts` や `src/service-worker/index.js` など）があれば、Vite でビルドされて自動的に登録されます。
+SvelteKit では、`src/service-worker.js` ファイル（または `src/service-worker.ts` や `src/service-worker/index.js` など）があれば、Vite でビルドされて自動的に登録されます。サービスワーカーを独自のロジックで登録する必要がある場合、自動登録を無効にすることができます (例えば、更新をユーザーに促すプロンプトや、定期的な更新の設定、`workbox` の使用、など)。
 
-> サービスワーカーを設置する場所は、[プロジェクトの設定](#configuration-files)で変更することができます。
+> サービスワーカーを設置する場所の変更、自動登録の無効化については[プロジェクトの設定](#configuration-files)で行うことができます。
 
 サービスワーカーの内部では、[`$service-worker` モジュール](#modules-$service-worker) にアクセスすることができます。
 
