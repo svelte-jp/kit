@@ -2,7 +2,7 @@
 title: Modules
 ---
 
-SvelteKit makes a number of modules available to your application.
+SvelteKit では、数多くのモジュールがアプリケーションで利用可能です。
 
 ### $app/env
 
@@ -10,11 +10,11 @@ SvelteKit makes a number of modules available to your application.
 import { amp, browser, dev, mode, prerendering } from '$app/env';
 ```
 
-- `amp` is `true` or `false` depending on the corresponding value in your [project configuration](#configuration)
-- `browser` is `true` or `false` depending on whether the app is running in the browser or on the server
-- `dev` is `true` in development mode, `false` in production
-- `mode` is the [Vite mode](https://vitejs.dev/guide/env-and-mode.html#modes), which is `development` in dev mode or `production` during build unless configured otherwise in `config.kit.vite.mode`.
-- `prerendering` is `true` when [prerendering](#ssr-and-javascript-prerender), `false` otherwise
+- `amp` は `true` か `false` です。[プロジェクト設定](#configuration) の対応する値に依存します
+- `browser` は `true` か `false` です。アプリが動作している場所がブラウザかサーバーかに依存します
+- `dev` は開発者モードの場合 `true`、プロダクションだと `false` です
+- `mode` は [Vite mode](https://vitejs.dev/guide/env-and-mode.html#modes) です。`config.kit.vite.mode` で特に設定をしない限り、開発モードでは `development`、ビルド時には `production` となります
+- `prerendering` は [プリレンダリング](#ssr-and-javascript-prerender) の場合は `true`、それ以外の場合は `false` です
 
 ### $app/navigation
 
@@ -22,14 +22,14 @@ import { amp, browser, dev, mode, prerendering } from '$app/env';
 import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 ```
 
-- `goto(href, { replaceState, noscroll, keepfocus, state })` returns a `Promise` that resolves when SvelteKit navigates (or fails to navigate, in which case the promise rejects) to the specified `href`. The second argument is optional:
-  - `replaceState` (boolean, default `false`) If `true`, will replace the current `history` entry rather than creating a new one with `pushState`
-  - `noscroll` (boolean, default `false`) If `true`, the browser will maintain its scroll position rather than scrolling to the top of the page after navigation
-  - `keepfocus` (boolean, default `false`) If `true`, the currently focused element will retain focus after navigation. Otherwise, focus will be reset to the body
-  - `state` (object, default `{}`) The state of the new/updated history entry
-- `invalidate(href)` causes any `load` functions belonging to the currently active page to re-run if they `fetch` the resource in question. It returns a `Promise` that resolves when the page is subsequently updated.
-- `prefetch(href)` programmatically prefetches the given page, which means a) ensuring that the code for the page is loaded, and b) calling the page's `load` function with the appropriate options. This is the same behaviour that SvelteKit triggers when the user taps or mouses over an `<a>` element with [sveltekit:prefetch](#anchor-options-sveltekit-prefetch). If the next navigation is to `href`, the values returned from `load` will be used, making navigation instantaneous. Returns a `Promise` that resolves when the prefetch is complete.
-- `prefetchRoutes(routes)` — programmatically prefetches the code for routes that haven't yet been fetched. Typically, you might call this to speed up subsequent navigation. If no argument is given, all routes will be fetched; otherwise, you can specify routes by any matching pathname such as `/about` (to match `src/routes/about.svelte`) or `/blog/*` (to match `src/routes/blog/[slug].svelte`). Unlike `prefetch`, this won't call `load` for individual pages. Returns a `Promise` that resolves when the routes have been prefetched.
+- `goto(href, { replaceState, noscroll, keepfocus, state })` は SvelteKit が指定された `href` にナビゲートしたときに解決するPromiseを返します(ナビゲートに失敗した場合は、そのプロミスはリジェクトされます)。第二引数はオプションです:
+  - `replaceState` (boolean, デフォルトは `false`) もし `true` にした場合、`pushState` で新しい `history` エントリを作成するのではなく、現在の `history` エントリを置き換えます
+  - `noscroll` (boolean, デフォルトは `false`) もし `true` にした場合、ブラウザはナビゲーション後にトップにスクロールせず、スクロールポジションを維持します
+  - `keepfocus` (boolean, デフォルトは `false`) もし `true` にした場合、現在フォーカスされている要素はナビゲーション後もそのフォーカスを保持します。そうでない場合は、フォーカスがボディにリセットされます
+  - `state` (object, デフォルトは `{}`) 新規作成/更新された履歴(history)エントリの状態
+- `invalidate(href)` は、現在アクティブなページに含まれる全ての `load` 関数のうち、当該のリソースを `fetch` してるものについて全て再実行します。ページがその後更新されたときに解決する `Promise` を返します
+- `prefetch(href)` はプログラムでページをプリフェッチします。つまり、a) そのページのコードがロード済か確認し、b) 適切なオプションでそのページの `load` を呼び出します。これは、SvelteKitのアプリで、ユーザーが `<a>` 要素をタップまたはマウスオーバーしたときに [sveltekit:prefetch](#anchor-options-sveltekit-prefetch) によってトリガーされる動作と同じです。次のナビゲーションがその `href` の場合、`load` から返された値が使用され、ナビゲーションが瞬時に行われます。これはプリフェッチが完了したときに解決される `Promise` を返します。
+- `prefetchRoutes(routes)` — プログラムで、まだフェッチされていないルート(routes)のコードをプリフェッチします。一般的な使われ方としては、以降のナビゲーションを高速化するためにこれを呼び出します。引数を与えない場合は、全てのルート(routes)がフェッチされます。それ以外の場合、`/about` (`src/routes/about.svelte` にマッチ) や `/blog/*` (`src/routes/blog/[slug].svelte` にマッチ) など、任意のパス名でルートを指定することができます。`prefetch` とは違い、これは個別のページの `load` を呼び出しません。これはルート(routes)がプリフェッチされたときに解決される `Promise` を返します。
 
 ### $app/paths
 
@@ -37,10 +37,10 @@ import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 import { base, assets } from '$app/paths';
 ```
 
-- `base` — a root-relative (i.e. begins with a `/`) string that matches [`config.kit.paths.base`](#configuration-paths), or the empty string if unspecified
-- `assets` — an absolute URL that matches [`config.kit.paths.assets`](#configuration-paths), if specified, otherwise equal to `base`
+- `base` — [`config.kit.paths.base`](#configuration-paths) が指定されている場合、それにマッチするルート(root)からの相対パス (つまり `/` で始まる) 文字列で、未指定の場合は空の文字列です
+- `assets` — [`config.kit.paths.assets`](#configuration-paths)が指定されている場合、それにマッチする絶対パス(URL)。指定されていない場合は `base` と同じです
 
-> If a value for `config.kit.paths.assets` is specified, it will be replaced with `'/_svelte_kit_assets'` during [`svelte-kit dev`](#command-line-interface-svelte-kit-dev) or [`svelte-kit preview`](#command-line-interface-svelte-kit-preview), since the assets don't yet live at their eventual URL.
+> `config.kit.paths.assets` に値が指定されている場合、[`svelte-kit dev`](#command-line-interface-svelte-kit-dev) または [`svelte-kit preview`](#command-line-interface-svelte-kit-preview) を実行しているときはアセットがまだ最終的なURLに存在しないため、それは `'/_svelte_kit_assets'` に置き換えられます。
 
 ### $app/stores
 
@@ -48,37 +48,37 @@ import { base, assets } from '$app/paths';
 import { getStores, navigating, page, session } from '$app/stores';
 ```
 
-Stores are _contextual_ — they are added to the [context](https://svelte.dev/tutorial/context-api) of your root component. This means that `session` and `page` are unique to each request on the server, rather than shared between multiple requests handled by the same server simultaneously, which is what makes it safe to include user-specific data in `session`.
+ストアは _コンテクスチュアル(contextual)_ です — それらはルート(root)コンポーネントの [context](https://svelte.jp/tutorial/context-api) に追加されます。つまり、`session` と `page` はサーバー上の各リクエストごとにユニークで、同じサーバー上で同時に処理される複数のリクエストで共有されません。これにより、`session` にユーザー特有のデータを含めても安全になります。
 
-Because of that, the stores are not free-floating objects: they must be accessed during component initialisation, like anything else that would be accessed with `getContext`.
+そのため、ストアはフリーフローティング(free-floating)なオブジェクトではありません。`getContext` でアクセスしなければならないものと同様に、これはコンポーネントの初期化時にアクセスしなければなりません。
 
-- `getStores` is a convenience function around `getContext` that returns `{ navigating, page, session }`. This needs to be called at the top-level or synchronously during component or page initialisation.
+- `getStores` は `getContext` に付随する便利な関数で、`{ navigating, page, session }` を返します。これはトップレベルで呼び出すか、コンポーネントまたはページの初期化時に同期的に呼び出す必要があります。
 
-The stores themselves attach to the correct context at the point of subscription, which means you can import and use them directly in components without boilerplate. However, it still needs to be called synchronously on component or page initialisation when the `$`-prefix isn't used. Use `getStores` to safely `.subscribe` asynchronously instead.
+ストア自体はサブスクリプションの時点で正しい context にアタッチします。そのため、ボイラープレートなしにコンポーネントで直接インポートして使用することができます。しかし、`$`接頭辞を使用していない場合は、コンポーネントやページの初期化時に同期的に呼び出す必要があります。代わりに `getStores` を使用して、安全に `.subscribe` を非同期で呼び出すことができます。
 
-- `navigating` is a [readable store](https://svelte.dev/tutorial/readable-stores). When navigating starts, its value is `{ from, to }`, where `from` and `to` are both [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL) instances. When navigating finishes, its value reverts to `null`.
-- `page` contains an object with the current [`url`](https://developer.mozilla.org/en-US/docs/Web/API/URL) and [`params`](#loading-input-params).
-- `session` is a [writable store](https://svelte.dev/tutorial/writable-stores) whose initial value is whatever was returned from [`getSession`](#hooks-getsession). It can be written to, but this will _not_ cause changes to persist on the server — this is something you must implement yourself.
+- `navigating` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) です。ナビゲーションを開始すると、この値は `{ from, to }` になります。`from` と `to` はどちらも [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL) のインスタンスです。ナビゲーションが終了すると、値は `null` に戻ります。
+- `page` は現在の [`url`](https://developer.mozilla.org/en-US/docs/Web/API/URL) と [`params`](#loading-input-params) を含むオブジェクトです。
+- `session` は [書き込み可能なストア(writable store)](https://svelte.jp/tutorial/writable-stores) で、初期値は [`getSession`](#hooks-getsession) の戻り値です。書き込めますが、その変更は永続化されません — それはあなた自身で実装する必要があります。
 
 ### $lib
 
-This is a simple alias to `src/lib`, or whatever directory is specified as [`config.kit.files.lib`]. It allows you to access common components and utility modules without `../../../../` nonsense.
+これは `src/lib` または [`config.kit.files.lib`] に指定されたディレクトリのシンプルなエイリアスです。これにより、`../../../../` のようなナンセンスなことをせずに、共通コンポーネントやユーティリティモジュールにアクセスすることができます。
 
 ### $service-worker
 
-This module is only available to [service workers](#service-workers).
+このモジュールは [service workers](#service-workers) でのみ使用できます。
 
 ```js
 import { build, files, timestamp } from '$service-worker';
 ```
 
-- `build` is an array of URL strings representing the files generated by Vite, suitable for caching with `cache.addAll(build)`
-- `files` is an array of URL strings representing the files in your `static` directory, or whatever directory is specified by [`config.kit.files.assets`](#configuration). You can customize which files are included from `static` directory using [`config.kit.serviceWorker.files`](#configuration)
-- `timestamp` is the result of calling `Date.now()` at build time. It's useful for generating unique cache names inside your service worker, so that a later deployment of your app can invalidate old caches
+- `build` はViteが生成するファイルを表すURL文字列の配列で、`cache.addAll(build)` を使ってキャッシュするのに適しています。
+- `files` は、`static` ディレクトリまたは [`config.kit.files.assets`](#configuration) で指定されたディレクトリにあるファイルを表すURL文字列の配列です。どのファイルを `static` ディレクトリに含めるかについては、[`config.kit.serviceWorker.files`](#configuration) でカスタマイズできます。
+- `timestamp` はビルド時に `Date.now()` を呼び出した結果です。これは、サービスワーカー内で一意なキャッシュ名を生成するのに便利で、後でアプリをデプロイしたときに古いキャッシュを無効にすることができます。
 
 ### @sveltejs/kit/hooks
 
-This module provides a helper function to sequence multiple `handle` calls.
+このモジュールは、複数の `handle` 呼び出しを順番に処理するためのヘルパー関数を提供します。
 
 ```js
 import { sequence } from '@sveltejs/kit/hooks';
