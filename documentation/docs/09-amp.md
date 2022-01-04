@@ -2,8 +2,9 @@
 title: AMP
 ---
 
-An unfortunate reality of modern web development is that it is sometimes necessary to create an [AMP](https://amp.dev/) version of your site. In SvelteKit this can be done by setting the [`amp`](#configuration-amp) config option, which has the following effects:
+現代のWeb開発における残念な現実として、サイトの [AMP](https://amp.dev/) バージョンを作成しなければならないときがある、というものがあります。SvelteKitでは [`amp`](#configuration-amp) コンフィグオプションを設定することでこれを行うことができます。これには、以下の効果があります。
 
-- Client-side JavaScript, including the router, is disabled
+- ルーターを含むクライアントサイドJavaScriptが無効になります
+- スタイルは `<style amp-custom>` に連結され、[AMP boilerplate](https://amp.dev/boilerplate/) がインジェクトされます
 - Styles are concatenated into `<style amp-custom>`, and the [AMP boilerplate](https://amp.dev/boilerplate/) is injected
-- In development, requests are checked against the [AMP validator](https://validator.ampproject.org/) so you get early warning of any errors
+- 開発時には、リクエストは [AMP validator](https://validator.ampproject.org/) でチェックされるため、エラーがあれば早い段階で警告を受け取ることができます
