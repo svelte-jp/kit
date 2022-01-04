@@ -2,10 +2,10 @@
 title: Events
 ---
 
-SvelteKit emits [CustomEvents](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent) on the `window` object when certain things happen:
+特定の事象が発生すると、SvelteKit は `window` オブジェクトに [CustomEvents](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent) を発行します。
 
-- `sveltekit:start` — fired once the app has hydrated
-- `sveltekit:navigation-start` — navigation has started
-- `sveltekit:navigation-end` — navigation has ended
+- `sveltekit:start` — アプリがハイドレートされたとき
+- `sveltekit:navigation-start` — ナビゲーションが開始されたとき
+- `sveltekit:navigation-end` — ナビゲーションが終了したとき
 
-You probably won't need to use these, but they can be useful in the context of (for example) integration tests.
+おそらくこれらを使う必要はないでしょうけれど、(例えば) インテグレーションテストの文脈では便利でしょう。
