@@ -4,27 +4,27 @@ title: Additional Resources
 
 ### FAQs
 
-Please see the [SvelteKit FAQ](/faq) for solutions to common issues and helpful tips and tricks.
+よくある問題の解決方法や役に立つ tips や tricks については、[SvelteKit FAQ](/faq) をご覧ください。
 
-The [Svelte FAQ](https://svelte.dev/faq) and [`vite-plugin-svelte` FAQ](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/faq.md) may also be helpful for questions deriving from those libraries.
+[Svelte FAQ](https://svelte.jp/faq) と [`vite-plugin-svelte` FAQ](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/faq.md) も、これらのライブラリに起因する疑問点には役立つでしょう。
 
 ### Examples
 
-We've written and published a few different SvelteKit sites as examples:
+例として、数種類 SvelteKit サイトを作成し、公開しています:
 
-- [The examples directory](https://github.com/sveltejs/kit/tree/master/examples) in the GitHub repo contains a HackerNews clone
-- [`sveltejs/realworld`](https://github.com/sveltejs/realworld) contains an example blog site
-- [`sveltejs/sites`](https://github.com/sveltejs/sites) contains the code for this site
-- [The site directory in the `sveltejs/svelte` repo](https://github.com/sveltejs/svelte/tree/master/site) contains the code for svelte.dev
+- [examples ディレクトリ](https://github.com/sveltejs/kit/tree/master/examples) (GitHubリポジトリ内) には、HackerNews のクローンがあります
+- [`sveltejs/realworld`](https://github.com/sveltejs/realworld) にはブログサイトの例があります
+- [`sveltejs/sites`](https://github.com/sveltejs/sites) にはこのサイトのコードがあります
+- [`sveltejs/svelte` リポジトリの site ディレクトリ](https://github.com/sveltejs/svelte/tree/master/site) には svelte.dev のコードが含まれています。
 
 ### Integrations
 
-[`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess) automatically transforms the code in your Svelte templates to provide support for TypeScript, PostCSS, scss/sass, Less, and many other technologies (except CoffeeScript which is [not supported](https://github.com/sveltejs/kit/issues/2920#issuecomment-996469815) by SvelteKit). The first step of setting it up is to add `svelte-preprocess` to your [`svelte.config.js`](#configuration). It is provided by the template if you're using TypeScript whereas JavaScript users will need to add it. After that, you will often only need to install the corresponding library such as `npm install -D sass` or `npm install -D less`. See the [`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess) docs for more details.
+[`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess) は Svelte テンプレート内のコードを自動的に変換し、TypeScript、PostCSS、scss/sass、Less、その他多くのテクノロジー(SvelteKitが[サポートしていない](https://github.com/sveltejs/kit/issues/2920#issuecomment-996469815) CoffeeScriptは除く)のサポートを提供します。設定の最初のステップは [`svelte.config.js`](#configuration) に `svelte-preprocess` を追加することです。これは、TypeScript を使用している場合はテンプレートで提供されていますが、JavaScriptのユーザーは追加する必要があります。その後に、`npm install -D sass` や `npm install -D less` のように、対応するライブラリをインストールするだけで良い場合が多いです。詳しくは [`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess) のドキュメントをご参照ください。
 
-[Svelte Adders](https://sveltesociety.dev/templates#adders) allow you to setup many different complex integrations like Tailwind, PostCSS, Firebase, GraphQL, mdsvex, and more with a single command. Please see [sveltesociety.dev](https://sveltesociety.dev/) for a full listing of templates, components, and tools available for use with Svelte and SvelteKit.
+[Svelte Adders](https://sveltesociety.dev/templates#adders) は、Tailwind、PostCSS、Firebase、GraphQL、mdsvexなど、様々な複雑なインテグレーションを1つのコマンドでセットアップできるようにしてくれます。Svelte と SvelteKitで利用可能なテンプレート、コンポーネント、ツールのフルの一覧については、 [sveltesociety.dev](https://sveltesociety.dev/) をご覧ください。
 
-The SvelteKit FAQ also has a [section on integrations](/faq#integrations), which may be helpful if you run into any issues.
+また、SvelteKit FAQ にも [インテグレーションの章](/faq#integrations) がありますので、何か問題が発生した場合はそちらも役立つでしょう。
 
 ### Support
 
-You can ask for help on [Discord](https://svelte.dev/chat) and [StackOverflow](https://stackoverflow.com/questions/tagged/sveltekit). Please first search for information related to your issue in the FAQ, Google or another search engine, issue tracker, and Discord chat history in order to be respectful of others' time. There are many more people asking questions than answering them, so this will help in allowing the community to grow in a scalable fashion.
+[Discord](https://svelte.dev/chat) や [StackOverflow](https://stackoverflow.com/questions/tagged/sveltekit) でヘルプを求めることができます。他の方の時間を尊重するため、まずは FAQ、Googleまたは他の検索エンジン、issue tracker、Discord のチャット履歴などから、問題に関連する情報を検索してください。回答する方より質問する方のほうが多いので、こうすることでコミュニティをスケーラブルに発展させることができると思います。
