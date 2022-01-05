@@ -1,8 +1,8 @@
 ---
-question: How do I hash asset file names for caching?
+question: キャッシュのためにアセットのファイル名をハッシュ化するには？
 ---
 
-You can have Vite process your assets by importing them as shown below:
+以下のように、アセットをインポートすることでViteに処理をさせることができます:
 
 ```html
 <script>
@@ -12,7 +12,7 @@ You can have Vite process your assets by importing them as shown below:
 <img src="{imageSrc}" />
 ```
 
-If you prefer to directly import in the markup, try [svelte-preprocess-import-assets](https://github.com/bluwy/svelte-preprocess-import-assets) and you can write this instead:
+もしマークアップに直接インポートしたければ、[svelte-preprocess-import-assets](https://github.com/bluwy/svelte-preprocess-import-assets) を使用すればこのように書くことができます:
 
 ```html
 <img src="$lib/assets/image.png" />
