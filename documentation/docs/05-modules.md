@@ -19,9 +19,10 @@ import { amp, browser, dev, mode, prerendering } from '$app/env';
 ### $app/navigation
 
 ```js
-import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+import { disableScrollHandling, goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 ```
 
+- `disableScrollHandling` は、ナビゲーションに続いてページが更新されるときに(例えば `onMount` や action で)呼び出されると、SvelteKitが通常のスクロール管理を行うのを適用しないようにします。スクロールの動作に関するユーザーの期待を裏切ることになり混乱する可能性があるため、一般的にはこれを避けるべきです。
 - `goto(href, { replaceState, noscroll, keepfocus, state })` は SvelteKit が指定された `href` にナビゲートしたときに解決するPromiseを返します(ナビゲートに失敗した場合は、そのプロミスはリジェクトされます)。第二引数はオプションです:
   - `replaceState` (boolean, デフォルトは `false`) もし `true` にした場合、`pushState` で新しい `history` エントリを作成するのではなく、現在の `history` エントリを置き換えます
   - `noscroll` (boolean, デフォルトは `false`) もし `true` にした場合、ブラウザはナビゲーション後にトップにスクロールせず、スクロールポジションを維持します
