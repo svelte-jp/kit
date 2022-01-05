@@ -1,5 +1,5 @@
 ---
-question: Why am I getting a 404?
+question: 404 になってしまうのですがなぜですか？
 ---
 
-Please make sure you're returning something from your page's `load` function. See the section about [fallthrough routes](/docs#routing-advanced-fallthrough-routes) for more details.
+ページの `load` 関数から何が返されているか確認してみてください。詳細については、[fallthrough routes](/docs#routing-advanced-fallthrough-routes) のセクションをご覧ください。

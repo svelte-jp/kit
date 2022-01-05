@@ -1,5 +1,5 @@
 ---
-question: I'm having trouble using an adapter.
+question: アダプター(adapter)の使用に問題があります。
 ---
 
-Please make sure the version of the adapter specified in your `package.json` is `"next"`.
+`package.json` で指定されているアダプター(adapter)のバージョンが `"next"` になっていることを確認してください。
