@@ -2,41 +2,41 @@
 title: Project files
 ---
 
-The bulk of your app, in `src/routes`, can be left where it is, but several project files will need to be moved or updated.
+アプリの大部分を占める `src/routes` の中はそのままで大丈夫ですが、いくつかのプロジェクトファイルを移動または更新する必要があります。
 
 ### Configuration
 
-Your `webpack.config.js` or `rollup.config.js` should be replaced with a `svelte.config.js`, as documented [here](/docs#configuration). Svelte preprocessor options should be moved to `config.preprocess`.
+[こちら](/docs#configuration)に記載されている通り、`webpack.config.js` または `rollup.config.js` を `svelte.config.js` に置き換えてください。Svelte の preprocessor オプション は `config.preprocess` に置き換えてください。
 
-You will need to add an [adapter](/docs#adapters). `sapper build` is roughly equivalent to [adapter-node](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) while `sapper export` is roughly equivalent to [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static), though you might prefer to use an adapter designed for the platform you're deploying to.
+[アダプター(adapter)](/docs#adapters) を追加する必要があります。`sapper build` は [adapter-node](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) とおおよそ同じで、`sapper export` は [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) とおおよそ同じですが、デプロイ先のプラットフォーム向けにデザインされたアダプターを使用すると良いでしょう。
 
-If you were using plugins for filetypes that are not automatically handled by [Vite](https://vitejs.dev), you will need to find Vite equivalents and add them to the [Vite config](/docs#configuration-vite).
+[Vite](https://vitejs.dev) で自動的に処理されないファイルタイプのプラグインを使用している場合は、Viteにおいて同等なことを行う方法を探し、[Vite config](/docs#configuration-vite) に追加する必要があります。
 
 ### src/client.js
 
-This file has no equivalent in SvelteKit. Any custom logic (beyond `sapper.start(...)`) should be expressed in your `__layout.svelte` file, inside an `onMount` callback.
+SvelteKit にはこのファイルに相当するものはありません。カスタムロジック(`sapper.start(...)` 以降) は、`__layout.svelte` ファイルの `onMount` コールバック内に記述してくさい。
 
 ### src/server.js
 
-This file also has no direct equivalent, since SvelteKit apps can run in serverless environments. You can, however, use the [hooks module](/docs#hooks) to implement session logic.
+SvelteKit アプリはサーバーレス環境で動作することを可能にしているため、このファイルも直接相当するものはありません。ただし、[hooks module](/docs#hooks) を使用してセッションロジックを実装することはできます。
 
 ### src/service-worker.js
 
-Most imports from `@sapper/service-worker` have equivalents in [`$service-worker`](/docs#modules-$service-worker):
+`@sapper/service-worker` からインポートするほとんどのものは、[`$service-worker`](/docs#modules-$service-worker) に同等なものがあります:
 
-- `timestamp` is unchanged
-- `files` is unchanged
-- `shell` is now `build`
-- `routes` has been removed
+- `timestamp` は変更されていません
+- `files` は変更されていません
+- `shell` は現在 `build` です
+- `routes` は削除されました
 
 ### src/template.html
 
-The `src/template.html` file should be renamed `src/app.html`.
+`src/template.html` は `src/app.html` にリネームする必要があります。
 
-Remove `%sapper.base%`, `%sapper.scripts%` and `%sapper.styles%`. Replace `%sapper.head%` with `%svelte.head%` and `%sapper.html%` with `%svelte.body%`.
+`%sapper.base%`、`%sapper.scripts%`、`%sapper.styles%` は削除してください。`%sapper.head%` は `%svelte.head%` に、`%sapper.html%` は `%svelte.body%` にそれぞれ置き換えてください。
 
-The `<div id="sapper">` is no longer necessary, though you can continue mounting the app to a wrapper element by specifying it with the [`target`](/docs#configuration-target) config option.
+`<div id="sapper">` はもう必要ありませんが、[`target`](/docs#configuration-target) コンフィグオプションでラッパー要素を指定することで、今後もそれにアプリをマウントし続けることができます。
 
 ### src/node_modules
 
-A common pattern in Sapper apps is to put your internal library in a directory inside `src/node_modules`. This doesn't work with Vite, so we use [`src/lib`](/docs#modules-$lib) instead.
+Sapper アプリでよくあるパターンとして、内部ライブラリを `src/node_modules` 内のディレクトリに配置する、というものがあります。これは Vite だと動作しないため、代わりに [`src/lib`](/docs#modules-$lib) を使用します。
