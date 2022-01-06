@@ -90,7 +90,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### url
 
-`url` は [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、 `searchParams` といったプロパティを持っています。
+`url` は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、 `searchParams` といったプロパティを持っています。
 
 > 環境によっては、サーバーサイドレンダリングのときにこれがリクエストヘッダーから取得されるので、[設定をする必要があるかもしれません](#configuration-headers)。
 

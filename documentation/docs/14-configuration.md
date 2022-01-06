@@ -111,7 +111,7 @@ Permissions-Policy: interest-cohort=()
 
 特定の環境においては、現在のページまたはエンドポイントの `url` は、リクエストのプロトコル(通常は `https`) とホスト(デフォルトでは `Host` ヘッダから取得される)から得られます。
 
-もしアプリがリバースプロキシ(ロードバランサーやCDN)の背後にある場合、`Host` ヘッダは不正確です。ほとんどの場合、基となるプロトコルとホストは [`X-Forwarded-Host`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host) ヘッダと [`X-Forwarded-Proto`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto) ヘッダ経由で公開されますが、これは設定で指定することができます:
+もしアプリがリバースプロキシ(ロードバランサーやCDN)の背後にある場合、`Host` ヘッダは不正確です。ほとんどの場合、基となるプロトコルとホストは [`X-Forwarded-Host`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Host) ヘッダと [`X-Forwarded-Proto`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Proto) ヘッダ経由で公開されますが、これは設定で指定することができます:
 
 ```js
 // svelte.config.js
@@ -237,4 +237,4 @@ URL をルート(routes)に解決する際に、末尾のスラッシュ(trailin
 
 ### vite
 
-[Vite のコンフィグオブジェクト](https://vitejs.dev/config) か、またはそれを返す関数を指定します。[Vite と Rollup のプラグイン](https://github.com/vitejs/awesome-vite#plugins)を [`plugins` オプション](https://vitejs.dev/config/#plugins) 経由で渡すことができ、イメージ最適化、Tauri、WASM、Workboxなどのサポートなど、高度な方法でビルドをカスタマイズすることができます。SvelteKit が特定の設定値に依存しているため、特定のビルドに関連しているオプションを設定することはできません。
+[Vite のコンフィグオブジェクト](https://ja.vitejs.dev/config/) か、またはそれを返す関数を指定します。[Vite と Rollup のプラグイン](https://github.com/vitejs/awesome-vite#plugins)を [`plugins` オプション](https://ja.vitejs.dev/config/#plugins) 経由で渡すことができ、イメージ最適化、Tauri、WASM、Workboxなどのサポートなど、高度な方法でビルドをカスタマイズすることができます。SvelteKit が特定の設定値に依存しているため、特定のビルドに関連しているオプションを設定することはできません。

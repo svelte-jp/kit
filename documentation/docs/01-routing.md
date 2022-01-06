@@ -153,7 +153,7 @@ POST リクエストの場合は、リクエストオブジェクトの `body` �
 
 - テキストデータ (content-type `text/plain`) は `string` に変換されます
 - JSON データ (content-type `application/json`) は `JSONValue` に変換されます (`object`、`Array`、またはプリミティブ)。
-- Form データ (content-type `application/x-www-form-urlencoded` または `multipart/form-data`) は read-only な [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) オブジェクトに変換されます。
+- Form データ (content-type `application/x-www-form-urlencoded` または `multipart/form-data`) は read-only な [`FormData`](https://developer.mozilla.org/ja/docs/Web/API/FormData) オブジェクトに変換されます。
 - それ以外のデータは全て `Uint8Array` として提供されます。
 
 ### Private modules
