@@ -13,7 +13,7 @@ import { amp, browser, dev, mode, prerendering } from '$app/env';
 - `amp` は `true` か `false` です。[プロジェクト設定](#configuration) の対応する値に依存します
 - `browser` は `true` か `false` です。アプリが動作している場所がブラウザかサーバーかに依存します
 - `dev` は開発者モードの場合 `true`、プロダクションだと `false` です
-- `mode` は [Vite mode](https://vitejs.dev/guide/env-and-mode.html#modes) です。`config.kit.vite.mode` で特に設定をしない限り、開発モードでは `development`、ビルド時には `production` となります
+- `mode` は [Vite mode](https://ja.vitejs.dev/guide/env-and-mode.html#modes) です。`config.kit.vite.mode` で特に設定をしない限り、開発モードでは `development`、ビルド時には `production` となります
 - `prerendering` は [プリレンダリング](#ssr-and-javascript-prerender) の場合は `true`、それ以外の場合は `false` です
 
 ### $app/navigation
@@ -57,8 +57,8 @@ import { getStores, navigating, page, session } from '$app/stores';
 
 ストア自体はサブスクリプションの時点で正しい context にアタッチします。そのため、ボイラープレートなしにコンポーネントで直接インポートして使用することができます。しかし、`$`接頭辞を使用していない場合は、コンポーネントやページの初期化時に同期的に呼び出す必要があります。代わりに `getStores` を使用して、安全に `.subscribe` を非同期で呼び出すことができます。
 
-- `navigating` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) です。ナビゲーションを開始すると、この値は `{ from, to }` になります。`from` と `to` はどちらも [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL) のインスタンスです。ナビゲーションが終了すると、値は `null` に戻ります。
-- `page` は現在の [`url`](https://developer.mozilla.org/en-US/docs/Web/API/URL) と [`params`](#loading-input-params) を含むオブジェクトです。
+- `navigating` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) です。ナビゲーションを開始すると、この値は `{ from, to }` になります。`from` と `to` はどちらも [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスです。ナビゲーションが終了すると、値は `null` に戻ります。
+- `page` は現在の [`url`](https://developer.mozilla.org/ja/docs/Web/API/URL) と [`params`](#loading-input-params) を含むオブジェクトです。
 - `session` は [書き込み可能なストア(writable store)](https://svelte.jp/tutorial/writable-stores) で、初期値は [`getSession`](#hooks-getsession) の戻り値です。書き込めますが、その変更は永続化されません — それはあなた自身で実装する必要があります。
 
 ### $lib

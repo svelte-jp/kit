@@ -36,7 +36,7 @@ const config = {
 export default config;
 ```
 
-順序を制御する方法など、詳しくは [Vite の `configureServer` のドキュメント](https://vitejs.dev/guide/api-plugin.html#configureserver) をご覧ください。
+順序を制御する方法など、詳しくは [Vite の `configureServer` のドキュメント](https://ja.vitejs.dev/guide/api-plugin.html#configureserver) をご覧ください。
 
 ### `document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか ？
 
@@ -87,4 +87,4 @@ onMount(() => {
 
 ### Yarn 2 で動作しますか？
 
-多少は。Plug'n'Play 機能、通称 'pnp' は動きません (Node のモジュール解決アルゴリズムから逸脱しており、SvelteKitが [数多くのライブラリ](https://blog.sindresorhus.com/get-ready-for-esm-aa53530b3f77) とともに使用している [ネイティブの JavaScript モジュールではまだ動作しません](https://github.com/yarnpkg/berry/issues/638))。[`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc#nodeLinker) ファイルで `nodeLinker: 'node-modules'` を使用して pnp を無効にできますが、おそらく npm や [pnpm](https://pnpm.io/) を使用するほうが簡単でしょう。同じように高速で効率的ですが、互換性に頭を悩ませることはありません。
+多少は。Plug'n'Play 機能、通称 'pnp' は動きません (Node のモジュール解決アルゴリズムから逸脱しており、SvelteKitが [数多くのライブラリ](https://blog.sindresorhus.com/get-ready-for-esm-aa53530b3f77) とともに使用している [ネイティブの JavaScript モジュールではまだ動作しません](https://github.com/yarnpkg/berry/issues/638))。[`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc#nodeLinker) ファイルで `nodeLinker: 'node-modules'` を使用して pnp を無効にできますが、おそらく npm や [pnpm](https://pnpm.io/ja/) を使用するほうが簡単でしょう。同じように高速で効率的ですが、互換性に頭を悩ませることはありません。

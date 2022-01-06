@@ -2,7 +2,7 @@
 question: パスのエイリアスを設定するにはどうすればよいですか？
 ---
 
-まず最初に、Vite の設定を追加する必要があります。`svelte.config.js` に [`vite.resolve.alias`](https://vitejs.dev/config/#resolve-alias) を追加しましょう:
+まず最初に、Vite の設定を追加する必要があります。`svelte.config.js` に [`vite.resolve.alias`](https://ja.vitejs.dev/config/#resolve-alias) を追加しましょう:
 
 ```js
 // svelte.config.js
