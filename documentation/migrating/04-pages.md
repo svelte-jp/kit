@@ -4,50 +4,50 @@ title: Pages and layouts
 
 ### Renamed files
 
-Your custom error page component should be renamed from `_error.svelte` to `__error.svelte`. Any `_layout.svelte` files should likewise be renamed `__layout.svelte`. The double underscore prefix is reserved for SvelteKit; your own private modules are still denoted with a single `_` prefix.
+カスタムエラーページコンポーネントを `_error.svelte` から `__error.svelte` にリネームしてください。同様に、`_layout.svelte` ファイルも `__layout.svelte` にリネームしてください。SvelteKitでは二重のアンダースコアの接頭辞をリザーブしています。プライベートモジュールはまだ接頭辞として `_` を付けます。
 
 ### Imports
 
-The `goto`, `prefetch` and `prefetchRoutes` imports from `@sapper/app` should be replaced with identical imports from [`$app/navigation`](/docs#modules-$app-navigation).
+`@sapper/app` からインポートしていた `goto`、`prefetch`、`prefetchRoutes` は [`$app/navigation`](/docs#modules-$app-navigation) からのインポートに置き換えてください。
 
-The `stores` import from `@sapper/app` should be replaced — see the [Stores](#pages-and-layouts-stores) section below.
+`@sapper/app` からインポートしていた `stores` については置き換える必要があります — 以下の [Stores](#pages-and-layouts-stores) をご覧ください。
 
-Any files you previously imported from directories in `src/node_modules` will need to be replaced with [`$lib`](/docs#modules-$lib) imports.
+`src/node_modules` にあるディレクトリからインポートしてたファイルは、[`$lib`](/docs#modules-$lib) からのインポートに置き換えてください。
 
 ### Preload
 
-As before, pages and layout components can export a function that allows data to be loaded before rendering takes place.
+従来どおり、ページやレイアウトコンポーネントは、レンダリングが行われる前にデータをロードできる関数をエクスポートすることができます。
 
-This function has been renamed from `preload` to [`load`](/docs#loading), and its API has changed. Instead of two arguments — `page` and `session` — there is a single argument that includes both, along with `fetch` (which replaces `this.fetch`) and a new `stuff` object.
+この関数は `preload` から [`load`](/docs#loading) にリネームされ、その API が変更されました。2つの引数 — `page` と `session` — の代わりに、両方を1つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
 
-There is no more `this` object, and consequently no `this.fetch`, `this.error` or `this.redirect`. Instead of returning props directly, `load` now returns an object that _contains_ `props`, alongside various other things.
+`this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。プロパティ(props)を直接返す代わりに、`load` は 他の様々なものと一緒に `props` を _含む_ オブジェクトを返すようになりました。
 
-Lastly, if your page has a `load` method, make sure to return something otherwise you will get `Not found`.
+最後に、もしページに `load` メソッドがある場合は、必ず何かを返すようにしてください。そうしないと `Not found` になります。
 
 ### Stores
 
-In Sapper, you would get references to provided stores like so:
+Sapper では、提供されるストアをこのように参照していたかと思います:
 
 ```js
 import { stores } from '@sapper/app';
 const { preloading, page, session } = stores();
 ```
 
-The `page` and `session` stores still exist; `preloading` has been replaced with a `navigating` store that contains `from` and `to` properties. `page` now has `url` and `params` properties, but no `path` or `query`.
+`page` と `session` ストアはまだ存在しています。`preloading` は、`from`、`to` プロパティを含む `navigating` ストアに置き換えられました。`page` は `url`、`params` を持つようになりましたが、`path` と `query` はありません。
 
-You access them differently in SvelteKit. `stores` is now `getStores`, but in most cases it is unnecessary since you can import `navigating`, `page` and `session` directly from [`$app/stores`](/docs#modules-$app-stores).
+SvelteKit では、それらにアクセスする方法が異なります。`stores` は `getStores` になりましたが、[`$app/stores`](/docs#modules-$app-stores) から直接 `navigating`、`page`、`session` をインポートできるので、ほとんどの場合は必要ありません。
 
 ### Routing
 
-Regex routes are no longer supported. Instead, use [fallthrough routes](/docs#routing-advanced-fallthrough-routes).
+ルート(routes) の正規表現はもうサポートされていません。代わりに、[fallthrough routes](/docs#routing-advanced-fallthrough-routes) をお使いください。
 
 ### URLs
 
-In Sapper, all relative URLs were resolved against the base URL — usually `/`, unless the `basepath` option was used — rather than against the current page.
+Sapperでは、相対 URL は、現在のページに対してではなくベース URL  — `basepath` オプションが使用されていない限り、大抵の場合は `/` — に対して解決されていました
 
-This caused problems and is no longer the case in SvelteKit. Instead, URLs are resolved against the current page (or the destination page, for `fetch` URLs in `load` functions) instead.
+このため問題が発生していましたが、SvelteKit ではもうそのようなことはありません。URL は現在のページ(または `load` 関数の `fetch` URL の場合は移動先のページ) に対して解決されるようになりました。
 
 ### &lt;a&gt; attributes
 
-- `sapper:prefetch` is now `sveltekit:prefetch`
-- `sapper:noscroll` is now `sveltekit:noscroll`
+- `sapper:prefetch` は現在 `sveltekit:prefetch` になりました
+- `sapper:noscroll` は現在 `sveltekit:noscroll` になりました
