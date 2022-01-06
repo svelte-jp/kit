@@ -30,6 +30,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://yamanoku.net/"><img src="https://avatars.githubusercontent.com/u/1996642?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Okuto Oyama</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=yamanoku" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/myLifeAsaDog"><img src="https://avatars.githubusercontent.com/u/18300178?v=4?s=100" width="100px;" alt=""/><br /><sub><b>myLifeAsaDog</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=myLifeAsaDog" title="Documentation">📖</a></td>
     <td align="center"><a href="https://katanugramer.hatenablog.com/"><img src="https://avatars.githubusercontent.com/u/42486288?v=4?s=100" width="100px;" alt=""/><br /><sub><b>miruoo</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=miily8310s" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://qiita.com/oekazuma"><img src="https://avatars.githubusercontent.com/u/29580221?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kazuma Oe</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=oekazuma" title="Documentation">📖</a></td>
   </tr>
 </table>
 
