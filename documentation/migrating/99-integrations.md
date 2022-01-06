@@ -2,11 +2,11 @@
 title: Integrations
 ---
 
-See [the FAQ](/faq#integrations) for detailed information about integrations.
+インテグレーションに関する詳細情報については [FAQ](/faq#integrations) をご参照ください。
 
 ### HTML minifier
 
-Sapper includes `html-minifier` by default. SvelteKit does not include this, but it can be added as a [hook](/docs#hooks-handle):
+Sapper はデフォルトで `html-minifier` を含んでいました。SvelteKit はこれを含まないのですが、[hook](/docs#hooks-handle) としてこれを追加することができます:
 
 ```js
 import { minify } from 'html-minifier';
@@ -42,4 +42,4 @@ export async function handle({ request, resolve }) {
 }
 ```
 
-Note that `prerendering` is `false` when using `svelte-kit preview` to test the production build of the site, so to verify the results of minifying, you'll need to inspect the built HTML files directly.
+サイトのプロダクションビルドをテストするのに `svelte-kit preview` を使用しているとき、`prerendering` が `false` となることにご注意ください。そのため、minify の結果を検証するには、ビルド済の HTML を直接確認する必要があります。

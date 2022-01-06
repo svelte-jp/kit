@@ -2,9 +2,9 @@
 title: Command Line Interface
 ---
 
-SvelteKit includes a command line interface for building and running your app.
+SvelteKit にはアプリのビルドと実行のためのコマンドラインインタフェースがあります。
 
-In the default project template `svelte-kit dev`, `svelte-kit build` and `svelte-kit preview` are aliased as `npm run dev`, `npm run build` and `npm run preview` respectively. You can also invoke the CLI with [npx](https://www.npmjs.com/package/npx):
+デフォルトのプロジェクトテンプレートでは、`svelte-kit dev`、`svelte-kit build`、`svelte-kit preview` はそれぞれ `npm run dev`、`npm run build`、`npm run preview` でエイリアスされています。また、[npx](https://www.npmjs.com/package/npx) でCLIを実行することもできます:
 
 ```bash
 npx svelte-kit dev
@@ -12,26 +12,26 @@ npx svelte-kit dev
 
 ### svelte-kit dev
 
-Starts a development server. It accepts the following options:
+開発サーバーを起動します。以下のオプションを受け付けます:
 
-- `-p`/`--port` — which port to start the server on
-- `-o`/`--open` — open a browser tab once the server starts
-- `-h`/`--host` — expose the server to the network.
-- `-H`/`--https` — launch an HTTPS server using a self-signed certificate. Useful for testing HTTPS-only features on an external device
+- `-p`/`--port` — どのポートでサーバーを起動するか
+- `-o`/`--open` — サーバーを起動したときにブラウザのタブを開くか
+- `-h`/`--host` — サーバーをネットワークに公開するか
+- `-H`/`--https` — 自己署名証明書を使用してHTTPSサーバーを起動するか。外部のデバイスでHTTPS-onlyな機能をテストするのに便利です
 
 ### svelte-kit build
 
-Builds a production version of your app, and runs your adapter if you have one specified in your [config](#configuration). It accepts the following option:
+アプリのプロダクションバージョンをビルドし、[コンフィグ](#configuration) でアダプターが指定されている場合はそれを実行します。以下のオプションを受け付けます:
 
-- `--verbose` — log more detail
+- `--verbose` — より詳細なログ
 
-After building the app, you can reference the documentation of your chosen [adapter](#adapters) and hosting platform for specific instructions on how to serve your app.
+アプリのビルド後、選択した [アダプター](#adapters) とホスティングプラットフォームのドキュメントを参照し、アプリの提供に関する具体的な方法を確認することができます。
 
 ### svelte-kit preview
 
-After you've built your app with `svelte-kit build`, you can start the production version (irrespective of any adapter that has been applied) locally with `svelte-kit preview`. This is intended for testing the production build locally, **not for serving your app**, for which you should always use an [adapter](#adapters).
+`svelte-kit build` でアプリをビルドした後、`svelte-kit preview` により、ローカルで(適用されているアダプターに関係なく)プロダクションバージョンを起動することができます。これはローカルでプロダクションビルドをテストするためのもので、**アプリを提供するためのものではありません**。その場合は常に [アダプター](#adapters) を使用する必要があります。
 
-Like `svelte-kit dev`, it accepts the following options:
+`svelte-kit dev` と同じように、以下のオプションを受け付けます:
 
 - `-p`/`--port`
 - `-o`/`--open`
@@ -40,4 +40,4 @@ Like `svelte-kit dev`, it accepts the following options:
 
 ### svelte-kit package
 
-For package authors, see [packaging](#packaging).
+パッケージ作者の方は、[packaging](#packaging) をご覧ください。

@@ -1,8 +1,8 @@
 ---
-question: How do I include details from `package.json` in my application?
+question: `package.json` の詳細をアプリケーションに含めるにはどうすればよいですか？
 ---
 
-You cannot directly require JSON files, since SvelteKit expects [`svelte.config.js`](/docs#configuration) to be an ES module. If you'd like to include your application's version number or other information from `package.json` in your application, you can load JSON like so:
+SvelteKit は [`svelte.config.js`](/docs#configuration) を ES module として想定しているため、JSON ファイルを直接要求することはできません。もしアプリケーションに `package.json` からバージョン番号またはその他の情報を含めたい場合は、このように JSON をロードすることができます:
 
 ```js
 const pkg = JSON.parse(fs.readFileSync(new URL('package.json', import.meta.url), 'utf8'));

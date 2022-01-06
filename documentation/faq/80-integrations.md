@@ -1,16 +1,16 @@
 ---
-question: How do I use X with SvelteKit?
+question: SvelteKit で X を使うにはどうすればよいですか？
 ---
 
-Make sure you've read the [documentation section on integrations](/docs#additional-resources-integrations). If you're still having trouble, solutions to common issues are listed below.
+[ドキュメントのインテグレーションのセクション](/docs#additional-resources-integrations) をしっかり読み込んでください。それでも問題が解決しない場合のために、よくある問題の解決策を以下に示します。
 
-### How do I setup a database?
+### データベースのセットアップはどう行えばよいですか？
 
-Put the code to query your database in [endpoints](/docs#routing-endpoints) - don't query the database in .svelte files. You can create a `db.js` or similar that sets up a connection immediately and makes the client accessible throughout the app as a singleton. You can execute any one-time setup code in `hooks.js` and import your database helpers into any endpoint that needs them.
+データベースに問い合わせを行うコードを [エンドポイント](/docs#routing-endpoints) に置いてください - .svelte ファイルの中でデータベースに問い合わせを行わないでください。コネクションをすぐにセットアップし、シングルトンとしてアプリ全体からクライアントにアクセスできるように `db.js` のようなものを作ることができます。`hooks.js` で1回セットアップするコードを実行し、データベースヘルパーを必要とするすべてのエンドポイントにインポートできます。
 
-### How do I use middleware?
+### ミドルウェア(middleware)を使うにはどうすればよいですか？
 
-`adapter-node` builds a middleware that you can use with your own server for production mode. In dev, you can add middleware to Vite by using a Vite plugin. For example:
+`adapter-node` は、プロダクションモードで使用するためのミドルウェアを自分のサーバで構築します。開発モードでは、Vite プラグインを使用して Vite にミドルウェア(middleware) を追加することができます。例えば:
 
 ```js
 const myPlugin = {
@@ -36,13 +36,13 @@ const config = {
 export default config;
 ```
 
-See [Vite's `configureServer` docs](https://vitejs.dev/guide/api-plugin.html#configureserver) for more details including how to control ordering.
+順序を制御する方法など、詳しくは [Vite の `configureServer` のドキュメント](https://vitejs.dev/guide/api-plugin.html#configureserver) をご覧ください。
 
-### How do I use a client-side only library that depends on `document` or `window`?
+### `document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか ？
 
-Vite will attempt to process all imported libraries and may fail when encountering a library that is not compatible with SSR. [This currently occurs even when SSR is disabled](https://github.com/sveltejs/kit/issues/754).
+Vite はインポートされたライブラリを全て処理しようとするため、SSR と互換性がないライブラリがある場合に失敗することがあります。[現在のところ、これは SSR を無効にしていても発生します](https://github.com/sveltejs/kit/issues/754)。
 
-If you need access to the `document` or `window` variables or otherwise need it to run only on the client-side you can wrap it in a `browser` check:
+`document` や `window` 変数にアクセスする必要があったり、なにかクライアントサイドだけで実行する必要がある場合は、`browser` チェックでラップすることができます:
 
 ```js
 import { browser } from '$app/env';
@@ -52,7 +52,7 @@ if (browser) {
 }
 ```
 
-You can also run code in `onMount` if you'd like to run it after the component has been first rendered to the DOM:
+コンポーネントが最初にDOMにレンダリングされた後にコードを実行したい場合は、`onMount` で実行することもできます:
 
 ```js
 import { onMount } from 'svelte';
@@ -63,7 +63,7 @@ onMount(async () => {
 });
 ```
 
-If the library you'd like to use is side-effect free you can also statically import it and it will be tree-shaken out in the server-side build where `onMount` will be automatically replaced with a no-op:
+使用したいライブラリに副作用がなければ静的にインポートすることができますし、サーバー側のビルドでツリーシェイクされ、`onMount` が自動的に no-op に置き換えられます:
 
 ```js
 import { onMount } from 'svelte';
@@ -74,7 +74,7 @@ onMount(() => {
 });
 ```
 
-Otherwise, if the library has side effects and you'd still prefer to use static imports, check out [vite-plugin-iso-import](https://github.com/bluwy/vite-plugin-iso-import) to support the `?client` import suffix. The import will be stripped out in SSR builds. However, note that you will lose the ability to use VS Code Intellisense if you use this method.
+一方、ライブラリに副作用があっても静的にインポートをしたい場合は、[vite-plugin-iso-import](https://github.com/bluwy/vite-plugin-iso-import) をチェックして `?client` インポートサフィックスをサポートしてください。このインポートは SSR ビルドでは取り除かれます。しかし、この手法を使用すると VS Code Intellisense が使用できなくなることにご注意ください。
 
 ```js
 import { onMount } from 'svelte';
@@ -85,6 +85,6 @@ onMount(() => {
 });
 ```
 
-### Does it work with Yarn 2?
+### Yarn 2 で動作しますか？
 
-Sort of. The Plug'n'Play feature, aka 'pnp', is broken (it deviates from the Node module resolution algorithm, and [doesn't yet work with native JavaScript modules](https://github.com/yarnpkg/berry/issues/638) which SvelteKit — along with an [increasing number of packages](https://blog.sindresorhus.com/get-ready-for-esm-aa53530b3f77) — uses). You can use `nodeLinker: 'node-modules'` in your [`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc#nodeLinker) file to disable pnp, but it's probably easier to just use npm or [pnpm](https://pnpm.io/), which is similarly fast and efficient but without the compatibility headaches.
+多少は。Plug'n'Play 機能、通称 'pnp' は動きません (Node のモジュール解決アルゴリズムから逸脱しており、SvelteKitが [数多くのライブラリ](https://blog.sindresorhus.com/get-ready-for-esm-aa53530b3f77) とともに使用している [ネイティブの JavaScript モジュールではまだ動作しません](https://github.com/yarnpkg/berry/issues/638))。[`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc#nodeLinker) ファイルで `nodeLinker: 'node-modules'` を使用して pnp を無効にできますが、おそらく npm や [pnpm](https://pnpm.io/) を使用するほうが簡単でしょう。同じように高速で効率的ですが、互換性に頭を悩ませることはありません。

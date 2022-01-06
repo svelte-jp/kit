@@ -13,12 +13,8 @@ export interface LoadInput<
 	Stuff extends Record<string, any> = Record<string, any>,
 	Session = any
 > {
-	page: {
-		host: string;
-		path: string;
-		params: PageParams;
-		query: URLSearchParams;
-	};
+	url: URL;
+	params: PageParams;
 	fetch(info: RequestInfo, init?: RequestInit): Promise<Response>;
 	session: Session;
 	stuff: Stuff;
@@ -42,8 +38,8 @@ export interface LoadOutput<
 ```html
 <script context="module">
 	/** @type {import('@sveltejs/kit').Load} */
-	export async function load({ page, fetch, session, stuff }) {
-		const url = `/blog/${page.params.slug}.json`;
+	export async function load({ params, fetch, session, stuff }) {
+		const url = `/blog/${params.slug}.json`;
 		const res = await fetch(url);
 
 		if (res.ok) {
@@ -88,20 +84,28 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 ### Input
 
-`load` 関数は、`page`、`fetch`、`session`、`stuff` の4つのフィールドを持つオブジェクトを受け取ります。`load` 関数はリアクティブなので、関数内でそれらのパラメータが使われている場合は、そのパラメータが変更されると再実行されます。具体的には、`page.query`、`page.path`、`session`、`stuff` が関数で使用されている場合、それらの値が変更されると再実行されます。関数宣言の中でパラメータを分割しているだけで、使用されていると見なされるのでご注意ください。上記の例の `load({ page, fetch, session, stuff })` 関数の場合、その関数のボディで `session` や `stuff` を使用していませんが、それらが変更されると再実行されます。もしこれを `load({ page, fetch })` のように書き換えれば、`page.params.slug` が変更されたときにのみ再実行されるようになります。同じリアクティビティが `page.params` にも適用されますが、実際に関数の中で使われているパラメータにのみ適用されます。もし `page.params.foo` が変更されたとしても、上記の例では `page.params.foo` にはアクセスしていないため、再実行されません。
+`load` 関数は、`url`、`params`、`fetch`、`session`、`stuff` の5つのフィールドを持つオブジェクトを受け取ります。`load` 関数はリアクティブなので、関数内でそれらのパラメータが使われている場合は、そのパラメータが変更されると再実行されます。具体的には、`url`、`session`、`stuff` が関数で使用されている場合、それらの値が変更されると再実行されます。`params`の個別のプロパティも同様です。
 
-#### page
+> 関数の宣言の中でパラメータを分割しているだけで、使用されていると見なされるのでご注意ください。
 
-`page` は `{ host, path, params, query }` というオブジェクトで、`host` には URL のホスト、`path` にはそのパス名、`params` は `path` とルート(route)のファイル名から抽出され、`query` は [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) のインスタンスです。`page` を変更しても現在のURLは更新されません。代わりに、[`goto`](#modules-$app-navigation) を使用してナビゲートする必要があります。
+#### url
 
-なので、上記の例が `src/routes/blog/[slug].svelte` であるとして、URL が `https://example.com/blog/some-post?foo=bar&baz&bizz=a&bizz=b` だったとしたら、以下は全て true になります。
+`url` は [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、 `searchParams` といったプロパティを持っています。
 
-- `page.host === 'example.com'`
-- `page.path === '/blog/some-post'`
-- `page.params.slug === 'some-post'`
-- `page.query.get('foo') === 'bar'`
-- `page.query.has('baz')`
-- `page.query.getAll('bizz') === ['a', 'b']`
+> 環境によっては、サーバーサイドレンダリングのときにこれがリクエストヘッダーから取得されるので、[設定をする必要があるかもしれません](#configuration-headers)。
+
+#### params
+
+`params` は `url.pathname` とルート(route)のファイル名から得られます。
+
+ルート(route)ファイル名が `src/routes/a/[b]/[...c]` で、`url.pathname` が `/a/x/y/z` となるような場合は、`params` オブジェクトは以下のようになります。
+
+```js
+{
+	"b": "x",
+	"c": "y/z"
+}
+```
 
 #### fetch
 

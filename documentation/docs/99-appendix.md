@@ -2,32 +2,32 @@
 title: Appendix
 ---
 
-The core of SvelteKit provides a highly configurable rendering engine. This section describes some of the terms used when discussing rendering. A reference for setting these options is provided in the documentation above.
+SvelteKitのコアは、高度に設定可能(configurable)なレンダリングエンジンを提供します。このセクションでは、レンダリングについてディスカッションする際に使用されるいくつかの用語を説明します。これらのオプションを設定するためのリファレンスは、上記のドキュメントで提供されています。
 
 ### SSR
 
-Server-side rendering (SSR) is the generation of the page contents on the server. SSR is generally preferred for SEO. While some search engines can index content that is dynamically generated on the client-side it may take longer even in these cases. It also tends to improve perceived performance and makes your app accessible to users if JavaScript fails or is disabled (which happens [more often than you probably think](https://kryogenix.org/code/browser/everyonehasjs.html)).
+サーバーサイドレンダリング(Server-side rendering (SSR))とは、サーバー上でページコンテンツを生成することです。SSR は一般的に SEO の観点で好まれます。クライアントサイドで生成される動的なコンテンツをインデックスできる検索エンジンもありますが、その場合でもそれに時間がかかることがあります。知覚的なパフォーマンスも改善される傾向にあり、もしJavaScriptが失敗したり無効になっている場合でも([あなたが思うより頻繁に](https://kryogenix.org/code/browser/everyonehasjs.html)発生しています)、ユーザーがアプリにアクセスできるようになります。
 
 ### CSR and SPA
 
-Client-side rendering (CSR) is the generation of the page contents in the web browser using JavaScript. A single-page app (SPA) is an application in which all requests to the server load a single HTML file which then does client-side rendering of the requested contents based on the requested URL. All navigation is handled on the client-side in a process called client-side routing with per-page contents being updated and common layout elements remaining largely unchanged. SPAs do not provide SSR, which has the shortcoming described above. However, some applications are not greatly impacted by these shortcomings such as a complex business application behind a login where SEO would not be important and it is known that users will be accessing the application from a consistent computing environment.
+クライアントサイドレンダリング(Client-side rendering (CSR))とは、JavaScriptを使用してWebブラウザ上でページコンテンツを生成することです。シングルページアプリ(single-page app (SPA))とは、サーバーへの全てのリクエストで単一のHTMLをロードし、コンテンツのクライアントサイドレンダリングをリクエストされたURLに基づいて行うアプリケーションのことです。全てのナビゲーションはクライアントサイドで(クライアントサイドルーティングと呼ばれるプロセスで)処理され、ページごとのコンテンツは更新されるが共通のレイアウト要素はほとんど更新されません。SPA は SSR を提供しないため、上記のような欠点があります。しかし、SEOが重要ではない、ユーザーが一貫したコンピューティング環境からアプリケーションにアクセスすることがわかっているような、ログインの背後にある複雑なビジネスアプリケーションなどの場合は、これらの欠点による大きな影響を受けません。
 
 ### Prerendering
 
-Prerendering means computing the contents of a page at build time and saving the HTML for display. This approach has the same benefits as traditional server-rendered pages, but avoids recomputing the page for each visitor and so scales nearly for free as the number of visitors increases. The tradeoff is that the build process is more expensive and prerendered content can only be updated by building and deploying a new version of the application.
+プリレンダリング(Prerendering)とは、ビルド時にページのコンテンツを計算し、表示のために HTML を保存しておくことを意味します。このアプローチはトラディショナルなサーバーレンダリングページと同じ利点を持ちつつ、訪問者ごとにページを再計算する必要がないため、訪問者数の増加に対してほぼ無償でスケールします。トレードオフとしては、ビルドプロセスのコストがより高くなり、プリレンダリングされたコンテンツはアプリケーションの新しいバージョンをデプロイすることでしか更新できなくなります。
 
-Not all pages can be prerendered. The basic rule is this: for content to be prerenderable, any two users hitting it directly must get the same content from the server. Note that you can still prerender content that is loaded based on the page's parameters as long as all users will be seeing the same prerendered content.
+全てのページがプリレンダリングできるわけではありません。基本的なルールは次の通りです: ページがプリレンダリング可能であると言うためには、そのページを直接表示する2人のユーザーが、サーバーから同じコンテンツを取得できなけれなりません。全てのユーザーが同じプリレンダリングコンテンツを見ることができるのであれば、ページのパラメータに基づいてロードされるコンテンツはプリレンダリングが可能である点にご注意ください。
 
-Pre-rendered pages are not limited to static content. You can build personalized pages if user-specific data is fetched and rendered client-side. This is subject to the caveat that you will experience the downsides of not doing SSR for that content as discussed above.
+プリレンダリングされるページは静的なコンテンツに限りません。クライアントサイドでユーザ固有のデータをフェッチしてレンダリングする場合は、パーソナライズされたページを構築することができます。ただし、前述の通り、そのコンテンツに対して SSR を行わないことによるデメリットが発生することにご注意ください。
 
 ### SSG
 
-Static Site Generation (SSG) is a term that refers to a site where every page is prerendered. This is what SvelteKit's `adapter-static` does. SvelteKit was not built to do only static site generation like some tools and so may not scale as well to efficiently render a very large number of pages as tools built specifically for that purpose. However, in contrast to most purpose-built SSGs, SvelteKit does nicely allow for mixing and matching different rendering types on different pages. One benefit of fully prerendering a site is that you do not need to maintain or pay for servers to perform SSR. Once generated, the site can be served from CDNs, leading to great "time to first byte" performance. This delivery model is often referred to as JAMstack.
+静的サイト生成(Static Site Generation (SSG))とは、全てのページがプリレンダリングされているサイトを指す用語です。SvelteKit の `adapter-static` はこれを行います。SvelteKit は 静的サイト生成だけを行うために作られたわけではないので、その目的のために特別に作られたツールが非常に多くのページを効率的にレンダリングすると同じようにはスケールしないかもしれません。しかし、目的に特化した SSG とは対照的に、SvelteKit はページごとに異なるレンダリングタイプをミックスしたりマッチさせたりすることができます。サイトを完全にプリレンダリングすることの利点の1つは、SSRを実行するためのサーバーを維持したり費用を払ったりする必要がないことです。一度生成すれば、そのサイトは CDN から提供することができ、"time to first byte" の優れたパフォーマンスにつながります。このデリバリーモデルはしばしば JAMstack と呼ばれます。
 
 ### Hydration
 
-Svelte components store some state and update the DOM when the state is updated. When fetching data during SSR, by default SvelteKit will store this data and transmit it to the client along with the server-rendered HTML. The components can then be initialized on the client with that data without having to call the same API endpoints again. Svelte will then check that the DOM is in the expected state and attach event listeners in a process called hydration. Once the components are fully hydrated, they can react to changes to their properties just like any newly created Svelte component.
+Svelte コンポーネントは、何らかの状態を保存し、状態が更新されると DOM を更新します。SSR 中にデータをフェッチするとき、デフォルトでは SvelteKit はこのデータを保存し、サーバーレンダリングされた HTML と一緒にクライアントに送信します。それからコンポーネントは、同じ API エンドポイントを再度呼び出すことなく、クライアント側でそのデータを使用して初期化されます。そして Svelte はハイドレーションと呼ばれるプロセスで DOM が想定通りの状態にあることをチェックしてイベントリスナーをアタッチします。コンポーネントが完全にハイドレートされると、新しく作成された Svelte コンポーネントと同じように、プロパティの変更に反応(react)することができます。
 
 ### Routing
 
-By default, when you navigate to a new page (by clicking on a link or using the browser's forward or back buttons), SvelteKit will intercept the attempted navigation and handle it instead of allowing the browser to send a request to the server for the destination page. SvelteKit will then update the displayed contents on the client by rendering the component for the new page, which in turn can make calls to the necessary API endpoints. This process of updating the page on the client in response to attempted navigation is called client-side routing.
+デフォルトでは、(リンクをクリックしたりブラウザの 進む または 戻る ボタンを使って)新しいページにナビゲートするとき、SvelteKit はナビゲーションをインターセプトし、ブラウザが移動先のページのリクエストをサーバーにリクエストする代わりに、それを処理します。それから SvelteKit は新しいページのコンポーネントをレンダリングし、そのときに順番に必要な API エンドポイントをコールし、クライアントの表示コンテンツを更新します。このような、ナビゲーションが行われる際にそれに応じてクライアント側でページを更新するプロセスのことを、クライアントサイドルーティングと呼びます。

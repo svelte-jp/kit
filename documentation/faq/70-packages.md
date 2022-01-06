@@ -1,11 +1,11 @@
 ---
-question: How do I fix the error I'm getting trying to include a package?
+question: パッケージをインクルードしようとするとエラーが発生するのですが、どうすれば直せますか？
 ---
 
-SSR in Vite is not yet stable. Libraries work best with Vite when they distribute both CJS and ESM in their package and you may wish to work with library authors to make this happen.
+Vite の SSR はまだ stable ではありません。ライブラリはそのパッケージが CJS と ESM の両方で配布されていると Vite で最も良く動作するので、これを実現するためのライブラリの作者たちに働きかけると良いでしょう。
 
-Svelte components must be written entirely in ESM. It is encouraged to make sure the dependencies of external Svelte components provide an ESM version. However, in order to handle CJS dependencies [`vite-plugin-svelte` will look for any CJS dependencies of external Svelte components](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/faq.md#what-is-going-on-with-vite-and-pre-bundling-dependencies) and ask Vite to pre-bundle them by automatically adding them to Vite's `optimizeDeps.include` which will use `esbuild` to convert them to ESM.
+Svelte コンポーネントは全て ESM で書かれていなければなりません。外部の Svelte コンポーネントの依存関係が ESM バージョンを提供していることを確認することが推奨されます。しかし、CJS の依存関係を処理するため、[`vite-plugin-svelte` は外部の Svelte コンポーネントの CJS の依存関係を探し出し](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/faq.md#what-is-going-on-with-vite-and-pre-bundling-dependencies)、それらを自動的に Vite の `optimizeDeps.include` に追加し、それらを ESM に変換するために `esbuild` を使用して pre-bundle するよう Vite に指示します。
 
-A side effect of the approach above is that it takes longer to load the initial page. If this becomes noticable, try setting [experimental.prebundleSvelteLibraries: true](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/config.md#prebundlesveltelibraries) in `svelte.config.js`. Note that this option is experimental.
+上記のアプローチの副作用は、初期ページのロードが長くなってしまうことです。これが気になる場合は、`svelte.config.js` で [experimental.prebundleSvelteLibraries: true](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/config.md#prebundlesveltelibraries) を設定してみてください。このオプションは experimental であることにご注意ください。
 
-If you are still encountering issues we recommend checking [the list of known Vite issues most commonly affecting SvelteKit users](https://github.com/sveltejs/kit/issues/2086) and searching both [the Vite issue tracker](https://github.com/vitejs/vite/issues) and the issue tracker of the library in question. Sometimes issues can be worked around by fiddling with the [`optimizeDeps`](https://vitejs.dev/config/#dep-optimization-options) or [`ssr`](https://vitejs.dev/config/#ssr-options) config values.
+それでもまだ問題が解消されない場合は、[SvelteKit ユーザーに影響する既知の Vite の issue 一覧](https://github.com/sveltejs/kit/issues/2086) をチェックし、[Vite の issue tracker](https://github.com/vitejs/vite/issues) と 該当のライブラリの issue tracker を検索することを推奨します。[`optimizeDeps`](https://vitejs.dev/config/#dep-optimization-options) や [`ssr`](https://vitejs.dev/config/#ssr-options) の設定値をいじることで問題を回避できる場合もあります。

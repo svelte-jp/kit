@@ -76,7 +76,7 @@ export default function (options) {
 	/** @type {import('@sveltejs/kit').Adapter} */
 	return {
 		name: 'adapter-package-name',
-		async adapt({ utils, config }) {
+		async adapt(builder) {
 			// adapter implementation
 		}
 	};
@@ -88,15 +88,15 @@ export default function (options) {
 `adapt`メソッド内では、adapter ですべきことをたくさん定義できます:
 
 - build ディレクトリの掃除
+- `builder.prerender({ dest })` をコールしてページをプリレンダリングする
 - コードの出力:
-  - `.svelte-kit/output/server/app.js`から`init` and `render`をインポート
-  - アプリを設定する`init`をコールする
-  - プラットフォームからのリクエストを呼び、[SvelteKit request](#hooks-handle)に変換し、`render`関数を呼び出して[SvelteKit response](#hooks-handle) を生成し、応答する。
-  - 必要であれば、対象プラットフォームで動作するように `fetch` をグローバルにシムします。SvelteKit は `node-fetch` を使用できるプラットフォーム向けに `@sveltejs/kit/install-fetch` ヘルパーを提供します
-- もし実行したいなら、ターゲットプラットフォームに依存ライブラリをインストールするのを避けるために出力ファイルをバンドルする
-- `utils.prerender`を呼ぶ
+  - `${builder.getServerDirectory()}/app.js` から `App` をインポートする
+  - `builder.generateManifest({ relativePath })`　で生成された manifest でアプリをインスタンス化する
+  - プラットフォームからのリクエストをリスンし、[SvelteKit request](#hooks-handle)に変換し、`render` 関数を呼び出して [SvelteKit response](#hooks-handle) を生成し、応答する
+  - 必要であれば、対象プラットフォームで動作するように `fetch` をグローバルに shim する。SvelteKit は `node-fetch` を使用できるプラットフォーム向けに `@sveltejs/kit/install-fetch` ヘルパーを提供する
+- 必要であれば、ターゲットプラットフォームに依存ライブラリをインストールするのを避けるために出力ファイルをバンドルする
 - 対象プラットフォームの正しい場所にユーザーの静的ファイルや生成した JS/CSS ファイルを設置する
 
-可能であれば、`build/ `ディレクトリ配下に` .svelte-kit/[adapter-name]`という名前の中間ディレクトリを設置し、そこに adapter を出力することを推奨します。
+可能であれば、アダプターの出力は `build/` ディレクトリに、中間出力は `.svelte-kit/[adapter-name]` に置くことを推奨します。
 
 > adapter API はバージョン 1.0 のリリース前に変更される可能性があります。

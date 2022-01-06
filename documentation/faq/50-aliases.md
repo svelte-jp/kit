@@ -1,8 +1,8 @@
 ---
-question: How do I setup a path alias?
+question: パスのエイリアスを設定するにはどうすればよいですか？
 ---
 
-First, you need to add it to the Vite configuration. In `svelte.config.js` add [`vite.resolve.alias`](https://vitejs.dev/config/#resolve-alias):
+まず最初に、Vite の設定を追加する必要があります。`svelte.config.js` に [`vite.resolve.alias`](https://vitejs.dev/config/#resolve-alias) を追加しましょう:
 
 ```js
 // svelte.config.js
@@ -21,7 +21,7 @@ export default {
 };
 ```
 
-Then, to make TypeScript aware of the alias, add it to `tsconfig.json` (for TypeScript users) or `jsconfig.json`:
+そして、TypeScript にエイリアスを認識させるために、(TypeScript ユーザーは) `tsconfig.json`、または `jsconfig.json` に、以下のように設定を追加します:
 
 ```js
 {

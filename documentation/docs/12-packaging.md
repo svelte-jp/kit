@@ -2,21 +2,22 @@
 title: Packaging
 ---
 
-You can use SvelteKit to build component libraries as well as apps.
+SvelteKit は、アプリだけでなくコンポーネントライブラリを構築するのにもお使いいただけます。
 
-When you're creating an app, the contents of `src/routes` is the public-facing stuff; [`src/lib`](#modules-$lib) contains your app's internal library.
+アプリを作成するとき、`src/routes` のコンテンツは公開される部分です。[`src/lib`](#modules-$lib) にはアプリの内部ライブラリが含まれます。
 
-A SvelteKit component library has the exact same structure as a SvelteKit app, except that `src/lib` is the public-facing bit. `src/routes` might be a documentation or demo site that accompanies the library, or it might just be a sandbox you use during development.
+SvelteKit コンポーネントライブラリは、SvelteKitアプリと全く同じ構造を持ちますが、`src/lib` も公開される点が異なります。`src/routes` はライブラリに付随するドキュメントやデモサイトにもできますし、開発中に使用できるサンドボックスにもできます。
 
-Running `svelte-kit package` will take the contents of `src/lib` and generate a `package` directory (which can be [configured](#configuration-package)) containing the following:
+`svelte-kit package` を実行すると、`src/lib` のコンテンツが使用され、以下の内容を含む `package` ディレクトリ (これは [設定で変更可能](#configuration-package)) が生成されます:
 
-- All the files in `src/lib`, unless you [configure](#configuration-package) custom `include`/`exclude` options. Svelte components will be preprocessed, TypeScript files will be transpiled to JavaScript.
-- Type definitions (`d.ts` files) which are generated for Svelte, JavaScript and TypeScript files. You need to install `typescript >= 4.0.0` and `svelte2tsx >= 0.4.1` for this. Type definitions are placed next to their implementation, hand-written `d.ts` files are copied over as is. You can [disable generation](#configuration-package), but we strongly recommend against it.
-- A `package.json` copied from the project root without the `"scripts"` field and adds a `"type": "module"`. An `"exports"` field will also be added if it's not defined in the original file.
+- カスタムで `include`/`exclude` オプションを [設定](#configuration-package) しない限り、`src/lib` にある全てのファイルが含まれます。Svelte コンポーネントはプリプロセスされ、TypeScript ファイルは JavaScript にトランスパイルされます。
+- Svelte、JavaScript、TypeScriptファイルのために生成される型定義 (`d.ts` ファイル)。これを行うためには、`typescript >= 4.0.0` と `svelte2tsx >= 0.4.1` をインストールする必要があります。型定義は実装の隣に置かれ、手書きの `d.ts` ファイルはそのままコピーされます。[生成を無効化](#configuration-package) することもできますが、あまりおすすめしません。
+- プロジェクトのルートからコピーされた `package.json` から `"scripts"` フィールドを取り除き、`"type": "module"` を追加したもの。また、`"exports"` フィールドも、オリジナルのファイルで定義されていない場合は追加されます。
+- プロジェクトのルートからコピーされた `package.json` には、`"scripts"` フィールドを除く全てのフィールドが含まれています。`"dependencies"` フィールドが含まれているため、ドキュメントやデモサイトにのみ必要なパッケージは `"devDependencies"` に追加してください。`"type": "module"` と `"exports"` フィールドは、オリジナルのファイルで定義されていない場合に追加されます。
 
-The `"exports"` field contains the package's entry points. By default, all files in `src/lib` will be treated as an entry point unless they start with (or live in a directory that starts with) an underscore, but you can [configure](#configuration-package) this behaviour. If you have a `src/lib/index.js` or `src/lib/index.svelte` file, it will be treated as the package root.
+`"exports"` フィールドにはパッケージのエントリーポイントが含まれます。デフォルトでは、アンダースコアで始まるファイル(またはアンダースコアで始まるディレクトリにあるファイル)を除いて、`src/lib` にある全てのファイルをエントリーポイントとして扱いますが、この動作は [設定可能](#configuration-package) です。もし `src/lib/index.js` や `src/lib/index.svelte` ファイルがある場合は、それがパッケージルートとして扱われます。
 
-For example, if you had a `src/lib/Foo.svelte` component and a `src/lib/index.js` module that re-exported it, a consumer of your library could do either of the following:
+例えば、`src/lib/Foo.svelte` コンポーネントと、それを再エクスポートした `src/lib/index.js` モジュールがあった場合、ライブラリの利用者は次のどちらかを行うことができます。
 
 ```js
 import { Foo } from 'your-library';
@@ -28,14 +29,14 @@ import Foo from 'your-library/Foo.svelte';
 
 ### Publishing
 
-To publish the generated package:
+生成されたパッケージをパブリッシュするには:
 
 ```sh
 npm publish ./package
 ```
 
-The `./package` above is referring to the directory name generated, change accordingly if you configure a custom [`package.dir`](#configuration-package).
+上記の `./package` は生成されるディレクトリ名を参照しています。カスタムで [`package.dir`](#configuration-package) を設定している場合は、適宜変更してください。
 
 ### Caveats
 
-This is a relatively experimental feature and is not yet fully implemented. All files except Svelte files (preprocessed) and TypeScript files (transpiled to JavaScript) are copied across as-is.
+比較的、これは実験的な機能であり、まだ完全に実装されていません。Svelte ファイル(プリプロセス済)と TypeScript ファイル(JavaScriptにトランスパイル済)を除き、全てのファイルはそのままコピーされます。
