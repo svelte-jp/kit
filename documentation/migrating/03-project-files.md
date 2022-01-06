@@ -26,7 +26,7 @@ SvelteKit アプリはサーバーレス環境で動作することを可能に�
 
 - `timestamp` は変更されていません
 - `files` は変更されていません
-- `shell` は現在 `build` です
+- `shell` は現在 `build` になりました
 - `routes` は削除されました
 
 ### src/template.html
