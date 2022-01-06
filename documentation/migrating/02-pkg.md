@@ -4,22 +4,22 @@ title: package.json
 
 ### type: "module"
 
-Add `"type": "module"` to your `package.json`. You can do this step separately from the rest as part of an incremental migration if you are using Sapper 0.29.3
-or newer.
+`package.json` に `"type": "module"` を追加します。もし Sapper 0.29.3 以降を使用している場合は、インクリメンタルマイグレーションの一部として、このステップを他のステップとは別に行うことができます。
+
 
 ### dependencies
 
-Remove `polka` or `express`, if you're using one of those, and any middleware such as `sirv` or `compression`.
+`polka` や `express` を使用している場合はそれを削除し、`sirv` や `compression` などのミドルウェア(middleware)も削除します。
 
 ### devDependencies
 
-Remove `sapper` from your `devDependencies` and replace it with `@sveltejs/kit` and whichever [adapter](/docs#adapters) you plan to use (see [next section](#project-files-configuration)).
+`devDependencies` から `sapper` を削除し、`@sveltejs/kit` と使用予定の [アダプター(adapter)](/docs#adapters)に置き換えます([次のセクション](#project-files-configuration)をご覧ください)。
 
 ### scripts
 
-Any scripts that reference `sapper` should be updated:
+`sapper` を参照しているスクリプトを全て更新します:
 
-- `sapper build` should become [`svelte-kit build`](/docs#command-line-interface-svelte-kit-build) using the Node [adapter](/docs#adapters)
-- `sapper export` should become [`svelte-kit build`](/docs#command-line-interface-svelte-kit-build) using the static [adapter](/docs#adapters)
-- `sapper dev` should become [`svelte-kit dev`](/docs#command-line-interface-svelte-kit-dev)
-- `node __sapper__/build` should become `node build`
+- `sapper build` は [`svelte-kit build`](/docs#command-line-interface-svelte-kit-build) になります。Node [adapter](/docs#adapters) を使用します。
+- `sapper export` は [`svelte-kit build`](/docs#command-line-interface-svelte-kit-build) になります。static [adapter](/docs#adapters) を使用します。
+- `sapper dev` は [`svelte-kit dev`](/docs#command-line-interface-svelte-kit-dev) になります
+- `node __sapper__/build` は `node build` になります
