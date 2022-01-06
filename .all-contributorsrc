@@ -45,6 +45,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "oekazuma",
+      "name": "Kazuma Oe",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29580221?v=4",
+      "profile": "https://qiita.com/oekazuma",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
