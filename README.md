@@ -17,6 +17,30 @@
 もしくは [Svelte 日本の Discord](https://discord.com/invite/YTXq3ZtBbx) の `#ドキュメント翻訳`チャンネルに投稿頂いても構いません。
 
 
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/tomoam"><img src="https://avatars.githubusercontent.com/u/29677552?v=4?s=100" width="100px;" alt=""/><br /><sub><b>tomoam</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=tomoam" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://yamanoku.net/"><img src="https://avatars.githubusercontent.com/u/1996642?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Okuto Oyama</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=yamanoku" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/myLifeAsaDog"><img src="https://avatars.githubusercontent.com/u/18300178?v=4?s=100" width="100px;" alt=""/><br /><sub><b>myLifeAsaDog</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=myLifeAsaDog" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://katanugramer.hatenablog.com/"><img src="https://avatars.githubusercontent.com/u/42486288?v=4?s=100" width="100px;" alt=""/><br /><sub><b>miruoo</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=miily8310s" title="Documentation">📖</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+
 以下は sveltejs/kit のREADMEの内容です。
 
 ---
