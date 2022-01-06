@@ -2,25 +2,25 @@
 title: Adapters
 ---
 
-Before you can deploy your SvelteKit app, you need to _adapt_ it for your deployment target. Adapters are small plugins that take the built app as input and generate output for deployment.
+SvelteKitアプリをデプロイする前に、それをデプロイ先の環境に _合わせる(adapt)_ 必要があります。アダプター(Adapters)は、ビルドされたアプリをインプットとして受け取り、デプロイ用のアウトプットを生成する小さなプラグインです。
 
-By default, projects are configured to use `@sveltejs/adapter-auto`, which detects your production environment and selects the appropriate adapter where possible. If your platform isn't (yet) supported, you may need to [install a custom adapter](#adapters-installing-custom-adapters) or [write one](#adapters-writing-custom-adapters).
+デフォルトでは、プロジェクトは `@sveltejs/adapter-auto` を使用するように設定されており、プロダクション環境を検出して可能な限り適切なアダプターを選択します。もし(まだ)プラットフォームがサポートされていなければ、[カスタムアダプターをインストール](#adapters-installing-custom-adapters)したり、[作成](#adapters-writing-custom-adapters)したりする必要があるかもしれません。
 
-> See the [adapter-auto README](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) for information on adding support for new environments.
+> 新しい環境のサポートを追加することに関しては、[adapter-auto の README](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) をご参照ください。
 
 ### Supported environments
 
-SvelteKit offers a number of officially-supported adapters.
+SvelteKit は、公式にサポートされているアダプターを多数提供しています。
 
-The following platforms require no additional configuration:
+以下のプラットフォームでは、追加の設定が必要ありません。
 
-- [Cloudflare Pages](https://developers.cloudflare.com/pages/) via [`adapter-cloudflare`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare)
-- [Netlify](https://netlify.com) via [`adapter-netlify`](https://github.com/sveltejs/kit/tree/master/packages/adapter-netlify)
-- [Vercel](https://vercel.com) via [`adapter-vercel`](https://github.com/sveltejs/kit/tree/master/packages/adapter-vercel)
+- [Cloudflare Pages](https://developers.cloudflare.com/pages/) — [`adapter-cloudflare`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare)
+- [Netlify](https://netlify.com) — [`adapter-netlify`](https://github.com/sveltejs/kit/tree/master/packages/adapter-netlify)
+- [Vercel](https://vercel.com) — [`adapter-vercel`](https://github.com/sveltejs/kit/tree/master/packages/adapter-vercel)
 
 #### Node.js
 
-To create a simple Node server, install the `@sveltejs/adapter-node@next` package and update your `svelte.config.js`:
+シンプルな Node サーバーを作成するには、`@sveltejs/adapter-node@next` パッケージをインストールし、`svelte.config.js` を更新します:
 
 ```diff
 // svelte.config.js
@@ -28,7 +28,7 @@ To create a simple Node server, install the `@sveltejs/adapter-node@next` packag
 +import adapter from '@sveltejs/adapter-node';
 ```
 
-With this, [svelte-kit build](#command-line-interface-svelte-kit-build) will generate a self-contained Node app inside the `build` directory. You can pass options to adapters, such as customising the output directory:
+これにより、[svelte-kit build](#command-line-interface-svelte-kit-build) は自己完結型の Node アプリを `build` ディレクトリの中に生成します。アダプターにはオプションを渡すことができ、例えば出力ディレクトリをカスタマイズできます:
 
 ```diff
 // svelte.config.js
@@ -44,7 +44,7 @@ export default {
 
 #### Static sites
 
-Most adapters will generate static HTML for any [prerenderable](#ssr-and-javascript-prerender) pages of your site. In some cases, your entire app might be prerenderable, in which case you can use `@sveltejs/adapter-static@next` to generate static HTML for _all_ your pages. A fully static site can be hosted on a wide variety of platforms, including static hosts like [GitHub Pages](https://pages.github.com/).
+ほとんどのアダプターは、サイト内のプリレンダリング可能なページに対して静的な HTML を生成します。アプリ全体がプリレンダリング可能な場合は、`@sveltejs/adapter-static@next` を使用して _全ての_ ページ に対して静的な HTML を生成することができます。完全に静的なサイトは、[GitHub Pages](https://pages.github.com/) のような静的ホストなど、さまざまなプラットフォームでホストすることができます。
 
 ```diff
 // svelte.config.js
@@ -52,11 +52,11 @@ Most adapters will generate static HTML for any [prerenderable](#ssr-and-javascr
 +import adapter from '@sveltejs/adapter-static';
 ```
 
-You can also use `adapter-static` to generate single-page apps (SPAs) by specifying a [fallback page](https://github.com/sveltejs/kit/tree/master/packages/adapter-static#spa-mode).
+[fallback page](https://github.com/sveltejs/kit/tree/master/packages/adapter-static#spa-mode) を指定すれば、`adapter-static` を使用してシングルページアプリ(SPA)を生成することができます。
 
 ### Community adapters
 
-Additional [community-provided adapters](https://sveltesociety.dev/components#adapters) exist for other platforms. After installing the relevant adapter with your package manager, update your `svelte.config.js`:
+加えて、他のプラットフォーム向けに、[コミュニティによって提供されているアダプター](https://sveltesociety.dev/components#adapters) もございます。パッケージマネージャーで該当のアダプターをインストールした後、`svelte.config.js` を更新してください:
 
 ```diff
 // svelte.config.js
@@ -66,9 +66,9 @@ Additional [community-provided adapters](https://sveltesociety.dev/components#ad
 
 ### Writing custom adapters
 
-We recommend [looking at the source for an adapter](https://github.com/sveltejs/kit/tree/master/packages) to a platform similar to yours and copying it as a starting point.
+似ているプラットフォーム向けの [アダプターのソースを探し](https://github.com/sveltejs/kit/tree/master/packages)、それをコピーするところから始めることを推奨します。
 
-Adapters packages must implement the following API, which creates an `Adapter`:
+アダプターパッケージは `Adapter` を作成する以下の API を実装する必要があります:
 
 ```js
 /** @param {AdapterSpecificOptions} options */
@@ -83,20 +83,20 @@ export default function (options) {
 }
 ```
 
-The types for `Adapter` and its parameters are available in [types/config.d.ts](https://github.com/sveltejs/kit/blob/master/packages/kit/types/config.d.ts).
+`Adapter` とそのパラメータの型は [types/config.d.ts](https://github.com/sveltejs/kit/blob/master/packages/kit/types/config.d.ts) にあります。
 
-Within the `adapt` method, there are a number of things that an adapter should do:
+`adapt` メソッドの中では、アダプターがすべきことがたくさんあります:
 
-- Clear out the build directory
-- Call `builder.prerender({ dest })` to prerender pages
-- Output code that:
-  - Imports `App` from `${builder.getServerDirectory()}/app.js`
-  - Instantiates the app with a manifest generated with `builder.generateManifest({ relativePath })`
-  - Listens for requests from the platform, converts them to a a [SvelteKit request](#hooks-handle), calls the `render` function to generate a [SvelteKit response](#hooks-handle) and responds with it
-  - Globally shims `fetch` to work on the target platform, if necessary. SvelteKit provides a `@sveltejs/kit/install-fetch` helper for platforms that can use `node-fetch`
-- Bundle the output to avoid needing to install dependencies on the target platform, if necessary
-- Put the user's static files and the generated JS/CSS in the correct location for the target platform
+- build ディレクトリの掃除
+- `builder.prerender({ dest })` をコールしてページをプリレンダリングする
+- コードの出力:
+  - `${builder.getServerDirectory()}/app.js` から `App` をインポートする
+  - `builder.generateManifest({ relativePath })`　で生成された manifest でアプリをインスタンス化する
+  - プラットフォームからのリクエストをリスンし、[SvelteKit request](#hooks-handle)に変換し、`render` 関数を呼び出して [SvelteKit response](#hooks-handle) を生成し、応答する
+  - 必要であれば、対象プラットフォームで動作するように `fetch` をグローバルに shim する。SvelteKit は `node-fetch` を使用できるプラットフォーム向けに `@sveltejs/kit/install-fetch` ヘルパーを提供しています
+- 必要であれば、ターゲットプラットフォームに依存ライブラリをインストールするのを避けるために出力ファイルをバンドルする
+- 対象プラットフォームの正しい場所にユーザーの静的ファイルや生成した JS/CSS ファイルを設置する
 
-Where possible, we recommend putting the adapter output under the `build/` directory with any intermediate output placed under `.svelte-kit/[adapter-name]`.
+可能であれば、アダプターの出力は `build/` ディレクトリに、中間出力は `.svelte-kit/[adapter-name]` に置くことを推奨します。
 
-> The adapter API may change before 1.0.
+> adapter API はバージョン 1.0 のリリース前に変更される可能性があります。
