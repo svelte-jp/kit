@@ -6,5 +6,4 @@ title: AMP
 
 - ルーターを含むクライアントサイドJavaScriptが無効になります
 - スタイルは `<style amp-custom>` に連結され、[AMP boilerplate](https://amp.dev/boilerplate/) がインジェクトされます
-- Styles are concatenated into `<style amp-custom>`, and the [AMP boilerplate](https://amp.dev/boilerplate/) is injected
 - 開発時には、リクエストは [AMP validator](https://validator.ampproject.org/) でチェックされるため、エラーがあれば早い段階で警告を受け取ることができます
