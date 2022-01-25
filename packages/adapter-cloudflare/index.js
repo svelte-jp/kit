@@ -1,5 +1,5 @@
 import { writeFileSync } from 'fs';
-import { relative } from 'path';
+import { posix } from 'path';
 import { fileURLToPath } from 'url';
 import * as esbuild from 'esbuild';
 
@@ -21,7 +21,7 @@ export default function (options = {}) {
 
 			const { paths } = await builder.prerender({ dest });
 
-			const relativePath = relative(tmp, builder.getServerDirectory());
+			const relativePath = posix.relative(tmp, builder.getServerDirectory());
 
 			writeFileSync(
 				`${tmp}/manifest.js`,
@@ -32,7 +32,8 @@ export default function (options = {}) {
 
 			builder.copy(`${files}/worker.js`, `${tmp}/_worker.js`, {
 				replace: {
-					APP: `${relativePath}/app.js`
+					APP: `${relativePath}/app.js`,
+					MANIFEST: './manifest.js'
 				}
 			});
 

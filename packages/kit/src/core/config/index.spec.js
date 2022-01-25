@@ -29,12 +29,14 @@ test('fills in defaults', () => {
 				template: 'src/app.html'
 			},
 			floc: false,
-			headers: {
-				host: null,
-				protocol: null
-			},
-			host: null,
+			headers: undefined,
+			host: undefined,
 			hydrate: true,
+			inlineStyleThreshold: 0,
+			methodOverride: {
+				parameter: '_method',
+				allowed: []
+			},
 			package: {
 				dir: 'package',
 				emitTypes: true
@@ -55,9 +57,9 @@ test('fills in defaults', () => {
 				onError: 'fail',
 				pages: undefined
 			},
-			protocol: null,
+			protocol: undefined,
 			router: true,
-			ssr: true,
+			ssr: null,
 			target: null,
 			trailingSlash: 'never'
 		}
@@ -136,12 +138,14 @@ test('fills in partial blanks', () => {
 				template: 'src/app.html'
 			},
 			floc: false,
-			headers: {
-				host: null,
-				protocol: null
-			},
-			host: null,
+			headers: undefined,
+			host: undefined,
 			hydrate: true,
+			inlineStyleThreshold: 0,
+			methodOverride: {
+				parameter: '_method',
+				allowed: []
+			},
 			package: {
 				dir: 'package',
 				emitTypes: true
@@ -162,9 +166,9 @@ test('fills in partial blanks', () => {
 				onError: 'fail',
 				pages: undefined
 			},
-			protocol: null,
+			protocol: undefined,
 			router: true,
-			ssr: true,
+			ssr: null,
 			target: null,
 			trailingSlash: 'never'
 		}

@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { relative } from 'path';
+import { posix } from 'path';
 import { execSync } from 'child_process';
 import esbuild from 'esbuild';
 import toml from '@iarna/toml';
@@ -23,7 +23,7 @@ export default function () {
 			builder.rimraf(entrypoint);
 
 			builder.log.info('Prerendering static pages...');
-			await builder.prerender({
+			const { paths } = await builder.prerender({
 				dest: bucket
 			});
 
@@ -35,11 +35,12 @@ export default function () {
 			builder.log.info(stdout.toString());
 
 			builder.log.minor('Generating worker...');
-			const relativePath = relative(tmp, builder.getServerDirectory());
+			const relativePath = posix.relative(tmp, builder.getServerDirectory());
 
 			builder.copy(`${files}/entry.js`, `${tmp}/entry.js`, {
 				replace: {
-					APP: `${relativePath}/app.js`
+					APP: `${relativePath}/app.js`,
+					MANIFEST: './manifest.js'
 				}
 			});
 
@@ -47,7 +48,7 @@ export default function () {
 				`${tmp}/manifest.js`,
 				`export const manifest = ${builder.generateManifest({
 					relativePath
-				})};\n`
+				})};\n\nexport const prerendered = new Set(${JSON.stringify(paths)});\n`
 			);
 
 			await esbuild.build({
@@ -67,6 +68,7 @@ export default function () {
 	};
 }
 
+/** @param {import('@sveltejs/kit').Builder} builder */
 function validate_config(builder) {
 	if (existsSync('wrangler.toml')) {
 		let wrangler_config;

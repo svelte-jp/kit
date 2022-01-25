@@ -10,15 +10,34 @@ export const test = base.extend({
 		use({
 			/**
 			 * @param {string} url
+			 * @param {{ replaceState?: boolean }} opts
 			 * @returns {Promise<void>}
 			 */
-			goto: (url) => page.evaluate((/** @type {string} */ url) => goto(url), url),
+			goto: (url, opts) =>
+				page.evaluate(
+					(/** @type {{ url: string, opts: { replaceState?: boolean } }} */ { url, opts }) =>
+						goto(url, opts),
+					{ url, opts }
+				),
 
 			/**
 			 * @param {string} url
 			 * @returns {Promise<void>}
 			 */
 			invalidate: (url) => page.evaluate((/** @type {string} */ url) => invalidate(url), url),
+
+			/**
+			 * @param {(url: URL) => void | boolean | Promise<void | boolean>} fn
+			 * @returns {Promise<void>}
+			 */
+			beforeNavigate: (fn) =>
+				page.evaluate((/** @type {(url: URL) => any} */ fn) => beforeNavigate(fn), fn),
+
+			/**
+			 * @param {() => void} fn
+			 * @returns {Promise<void>}
+			 */
+			afterNavigate: () => page.evaluate(() => afterNavigate(() => {})),
 
 			/**
 			 * @param {string} url
@@ -61,11 +80,9 @@ export const test = base.extend({
 	},
 
 	// @ts-expect-error
-	clicknav: async ({ page, javaScriptEnabled, started }, use) => {
+	clicknav: async ({ page, javaScriptEnabled }, use) => {
 		/** @param {string} selector */
 		async function clicknav(selector) {
-			await started();
-
 			if (javaScriptEnabled) {
 				await page.evaluate(() => {
 					window.navigated = new Promise((fulfil, reject) => {
@@ -113,22 +130,7 @@ export const test = base.extend({
 		use(in_view);
 	},
 
-	// @ts-expect-error
-	// eslint-disable-next-line
-	read_errors: ({}, use) => {
-		/** @param {string} path */
-		function read_errors(path) {
-			const errors =
-				fs.existsSync('test/errors.json') &&
-				JSON.parse(fs.readFileSync('test/errors.json', 'utf8'));
-			return errors[path];
-		}
-
-		use(read_errors);
-	},
-
-	// @ts-expect-error
-	started: async ({ page, javaScriptEnabled }, use) => {
+	page: async ({ page, javaScriptEnabled }, use) => {
 		if (javaScriptEnabled) {
 			page.addInitScript({
 				content: `
@@ -145,11 +147,34 @@ export const test = base.extend({
 			});
 		}
 
-		use(async () => {
-			if (javaScriptEnabled) {
-				await page.waitForFunction(() => window.started);
-			}
-		});
+		const goto = page.goto;
+		page.goto =
+			/**
+			 * @param {string} url
+			 * @param {object}	opts
+			 */
+			async function (url, opts) {
+				const res = await goto.call(page, url, opts);
+				if (javaScriptEnabled) {
+					await page.waitForFunction(() => window.started);
+				}
+				return res;
+			};
+		await use(page);
+	},
+
+	// @ts-expect-error
+	// eslint-disable-next-line
+	read_errors: ({}, use) => {
+		/** @param {string} path */
+		function read_errors(path) {
+			const errors =
+				fs.existsSync('test/errors.json') &&
+				JSON.parse(fs.readFileSync('test/errors.json', 'utf8'));
+			return errors[path];
+		}
+
+		use(read_errors);
 	}
 });
 
@@ -159,11 +184,10 @@ export const config = {
 	timeout: process.env.CI ? (process.platform === 'win32' ? 45000 : 30000) : 10000,
 	webServer: {
 		command: process.env.DEV ? 'npm run dev' : 'npm run build && npm run preview',
-		port: 3000,
-		timeout: 15000 // AMP validator needs a long time to get moving
+		port: 3000
 	},
 	workers: 8,
-	retries: 3,
+	retries: process.env.CI ? 5 : 0,
 	projects: [
 		{
 			name: `${process.env.DEV ? 'dev' : 'build'}+js`,
@@ -179,7 +203,8 @@ export const config = {
 		}
 	],
 	use: {
-		screenshot: 'only-on-failure'
+		screenshot: 'only-on-failure',
+		trace: 'retain-on-failure'
 	}
 };
 

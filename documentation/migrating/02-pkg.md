@@ -13,7 +13,7 @@ title: package.json
 
 ### devDependencies
 
-`devDependencies` から `sapper` を削除し、`@sveltejs/kit` と使用予定の [アダプター(adapter)](/docs#adapters)に置き換えます([次のセクション](#project-files-configuration)をご覧ください)。
+`devDependencies` から `sapper` を削除し、`@sveltejs/kit` と使用予定の [adapter](/docs#adapters)に置き換えます([次のセクション](#project-files-configuration)をご覧ください)。
 
 ### scripts
 

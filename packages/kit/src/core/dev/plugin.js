@@ -2,24 +2,31 @@ import fs from 'fs';
 import path from 'path';
 import { URL } from 'url';
 import colors from 'kleur';
+import sirv from 'sirv';
 import { respond } from '../../runtime/server/index.js';
 import { __fetch_polyfill } from '../../install-fetch.js';
 import { create_app } from '../create_app/index.js';
 import create_manifest_data from '../create_manifest_data/index.js';
-import { getRawBody } from '../node/index.js';
+import { getRequest, setResponse } from '../../node.js';
 import { SVELTE_KIT, SVELTE_KIT_ASSETS } from '../constants.js';
-import { get_mime_lookup, resolve_entry } from '../utils.js';
+import { get_mime_lookup, resolve_entry, runtime } from '../utils.js';
 import { coalesce_to_error } from '../../utils/error.js';
 import { load_template } from '../config/index.js';
 
 /**
  * @param {import('types/config').ValidatedConfig} config
- * @param {string} output
  * @param {string} cwd
- * @param {import('amphtml-validator').Validator | false} amp
- * @returns {import('vite').Plugin}
+ * @returns {Promise<import('vite').Plugin>}
  */
-export function create_plugin(config, output, cwd, amp) {
+export async function create_plugin(config, cwd) {
+	/** @type {import('amphtml-validator').Validator} */
+	let amp;
+
+	if (config.kit.amp) {
+		process.env.VITE_SVELTEKIT_AMP = 'true';
+		amp = await (await import('amphtml-validator')).getInstance();
+	}
+
 	return {
 		name: 'vite-plugin-svelte-kit',
 
@@ -30,9 +37,9 @@ export function create_plugin(config, output, cwd, amp) {
 			let manifest;
 
 			function update_manifest() {
-				const manifest_data = create_manifest_data({ config, output, cwd });
+				const manifest_data = create_manifest_data({ config, cwd });
 
-				create_app({ manifest_data, output, cwd });
+				create_app({ manifest_data, output: `${SVELTE_KIT}/generated`, cwd });
 
 				manifest = {
 					appDir: config.kit.appDir,
@@ -40,13 +47,13 @@ export function create_plugin(config, output, cwd, amp) {
 					_: {
 						mime: get_mime_lookup(manifest_data),
 						entry: {
-							file: `/${SVELTE_KIT}/dev/runtime/internal/start.js`,
+							file: `/@fs${runtime}/client/start.js`,
 							css: [],
 							js: []
 						},
 						nodes: manifest_data.components.map((id) => {
 							return async () => {
-								const url = `/${id}`;
+								const url = id.startsWith('..') ? `/@fs${path.posix.resolve(id)}` : `/${id}`;
 
 								const module = /** @type {import('types/internal').SSRComponent} */ (
 									await vite.ssrLoadModule(url)
@@ -58,7 +65,8 @@ export function create_plugin(config, output, cwd, amp) {
 								const deps = new Set();
 								find_deps(node, deps);
 
-								const styles = new Set();
+								/** @type {Record<string, string>} */
+								const styles = {};
 
 								for (const dep of deps) {
 									const parsed = new URL(dep.url, 'http://localhost/');
@@ -71,7 +79,7 @@ export function create_plugin(config, output, cwd, amp) {
 									) {
 										try {
 											const mod = await vite.ssrLoadModule(dep.url);
-											styles.add(mod.default);
+											styles[dep.url] = mod.default;
 										} catch {
 											// this can happen with dynamically imported modules, I think
 											// because the Vite module graph doesn't distinguish between
@@ -85,7 +93,7 @@ export function create_plugin(config, output, cwd, amp) {
 									entry: url.endsWith('.svelte') ? url : url + '?import',
 									css: [],
 									js: [],
-									styles: Array.from(styles)
+									styles
 								};
 							};
 						}),
@@ -119,6 +127,14 @@ export function create_plugin(config, output, cwd, amp) {
 			vite.watcher.on('add', update_manifest);
 			vite.watcher.on('remove', update_manifest);
 
+			const assets = config.kit.paths.assets ? SVELTE_KIT_ASSETS : config.kit.paths.base;
+			const asset_server = sirv(config.kit.files.assets, {
+				dev: true,
+				etag: true,
+				maxAge: 0,
+				extensions: []
+			});
+
 			return () => {
 				remove_html_middlewares(vite.middlewares);
 
@@ -127,8 +143,22 @@ export function create_plugin(config, output, cwd, amp) {
 						if (!req.url || !req.method) throw new Error('Incomplete request');
 						if (req.url === '/favicon.ico') return not_found(res);
 
-						const parsed = new URL(req.url, 'http://localhost/');
-						if (!parsed.pathname.startsWith(config.kit.paths.base)) return not_found(res);
+						const base = `${vite.config.server.https ? 'https' : 'http'}://${req.headers.host}`;
+
+						const decoded = decodeURI(new URL(base + req.url).pathname);
+
+						if (decoded.startsWith(assets)) {
+							const pathname = decoded.slice(assets.length);
+							const file = config.kit.files.assets + pathname;
+
+							if (fs.existsSync(file) && !fs.statSync(file).isDirectory()) {
+								req.url = encodeURI(pathname); // don't need query/hash
+								asset_server(req, res);
+								return;
+							}
+						}
+
+						if (!decoded.startsWith(config.kit.paths.base)) return not_found(res);
 
 						/** @type {Partial<import('types/internal').Hooks>} */
 						const user_hooks = resolve_entry(config.kit.files.hooks)
@@ -138,7 +168,7 @@ export function create_plugin(config, output, cwd, amp) {
 						/** @type {import('types/internal').Hooks} */
 						const hooks = {
 							getSession: user_hooks.getSession || (() => ({})),
-							handle: user_hooks.handle || (({ request, resolve }) => resolve(request)),
+							handle: user_hooks.handle || (({ event, resolve }) => resolve(event)),
 							handleError:
 								user_hooks.handleError ||
 								(({ /** @type {Error & { frame?: string }} */ error }) => {
@@ -165,75 +195,80 @@ export function create_plugin(config, output, cwd, amp) {
 							throw new Error('The serverFetch hook has been renamed to externalFetch.');
 						}
 
-						const root = (await vite.ssrLoadModule(`/${output}/generated/root.svelte`)).default;
-
-						const paths = await vite.ssrLoadModule(`/${SVELTE_KIT}/dev/runtime/paths.js`);
+						const root = (await vite.ssrLoadModule(`/${SVELTE_KIT}/generated/root.svelte`)).default;
+						const paths = await vite.ssrLoadModule(
+							process.env.BUNDLED ? `/${SVELTE_KIT}/runtime/paths.js` : `/@fs${runtime}/paths.js`
+						);
 
 						paths.set_paths({
 							base: config.kit.paths.base,
-							assets: config.kit.paths.assets ? SVELTE_KIT_ASSETS : config.kit.paths.base
+							assets
 						});
 
-						let body;
+						let request;
 
 						try {
-							body = await getRawBody(req);
+							request = await getRequest(base, req);
 						} catch (/** @type {any} */ err) {
 							res.statusCode = err.status || 400;
 							return res.end(err.reason || 'Invalid request body');
 						}
 
-						const rendered = await respond(
-							{
-								url: new URL(
-									`${vite.config.server.https ? 'https' : 'http'}://${req.headers.host}${req.url}`
-								),
-								headers: /** @type {import('types/helper').RequestHeaders} */ (req.headers),
-								method: req.method,
-								rawBody: body
+						const rendered = await respond(request, {
+							amp: config.kit.amp,
+							dev: true,
+							floc: config.kit.floc,
+							get_stack: (error) => {
+								vite.ssrFixStacktrace(error);
+								return error.stack;
 							},
-							{
-								amp: config.kit.amp,
-								dev: true,
-								floc: config.kit.floc,
-								get_stack: (error) => {
-									vite.ssrFixStacktrace(error);
-									return error.stack;
-								},
-								handle_error: (error, request) => {
-									vite.ssrFixStacktrace(error);
-									hooks.handleError({ error, request });
-								},
-								hooks,
-								hydrate: config.kit.hydrate,
-								manifest,
-								paths: {
-									base: config.kit.paths.base,
-									assets: config.kit.paths.assets ? SVELTE_KIT_ASSETS : config.kit.paths.base
-								},
-								prefix: '',
-								prerender: config.kit.prerender.enabled,
-								read: (file) => fs.readFileSync(path.join(config.kit.files.assets, file)),
-								root,
-								router: config.kit.router,
-								ssr: config.kit.ssr,
-								target: config.kit.target,
-								template: ({ head, body }) => {
-									let rendered = load_template(cwd, config)
-										.replace('%svelte.head%', () => head)
-										.replace('%svelte.body%', () => body);
+							handle_error: (error, event) => {
+								vite.ssrFixStacktrace(error);
+								hooks.handleError({
+									error,
+									event,
 
-									if (amp) {
-										const result = amp.validateString(rendered);
+									// TODO remove for 1.0
+									// @ts-expect-error
+									get request() {
+										throw new Error(
+											'request in handleError has been replaced with event. See https://github.com/sveltejs/kit/pull/3384 for details'
+										);
+									}
+								});
+							},
+							hooks,
+							hydrate: config.kit.hydrate,
+							manifest,
+							method_override: config.kit.methodOverride,
+							paths: {
+								base: config.kit.paths.base,
+								assets
+							},
+							prefix: '',
+							prerender: config.kit.prerender.enabled,
+							read: (file) => fs.readFileSync(path.join(config.kit.files.assets, file)),
+							root,
+							router: config.kit.router,
+							target: config.kit.target,
+							template: ({ head, body, assets }) => {
+								let rendered = load_template(cwd, config)
+									.replace(/%svelte\.assets%/g, assets)
+									// head and body must be replaced last, in case someone tries to sneak in %svelte.assets% etc
+									.replace('%svelte.head%', () => head)
+									.replace('%svelte.body%', () => body);
 
-										if (result.status !== 'PASS') {
-											const lines = rendered.split('\n');
+								if (amp) {
+									const result = amp.validateString(rendered);
 
-											/** @param {string} str */
-											const escape = (str) =>
-												str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+									if (result.status !== 'PASS') {
+										const lines = rendered.split('\n');
 
-											rendered = `<!doctype html>
+										/** @param {string} str */
+										const escape = (str) =>
+											str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+										rendered = `<!doctype html>
 										<head>
 											<meta charset="utf-8" />
 											<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -264,19 +299,16 @@ export function create_plugin(config, output, cwd, amp) {
 											)
 											.join('\n\n')}
 									`;
-										}
 									}
+								}
 
-									return rendered;
-								},
-								trailing_slash: config.kit.trailingSlash
-							}
-						);
+								return rendered;
+							},
+							trailing_slash: config.kit.trailingSlash
+						});
 
 						if (rendered) {
-							res.writeHead(rendered.status, rendered.headers);
-							if (rendered.body) res.write(rendered.body);
-							res.end();
+							setResponse(res, rendered);
 						} else {
 							not_found(res);
 						}

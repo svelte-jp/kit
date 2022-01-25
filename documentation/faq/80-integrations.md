@@ -40,9 +40,7 @@ export default config;
 
 ### `document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか ？
 
-Vite はインポートされたライブラリを全て処理しようとするため、SSR と互換性がないライブラリがある場合に失敗することがあります。[現在のところ、これは SSR を無効にしていても発生します](https://github.com/sveltejs/kit/issues/754)。
-
-`document` や `window` 変数にアクセスする必要があったり、なにかクライアントサイドだけで実行する必要がある場合は、`browser` チェックでラップすることができます:
+もし `document` や `window` 変数にアクセスする必要があったり、クライアントサイドだけで実行するコードが必要な場合は、`browser` チェックでラップしてください:
 
 ```js
 import { browser } from '$app/env';

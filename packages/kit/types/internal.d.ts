@@ -1,22 +1,14 @@
 import { OutputAsset, OutputChunk } from 'rollup';
-import { RequestHandler } from './endpoint';
 import { InternalApp, SSRManifest } from './app';
-import {
-	ExternalFetch,
-	GetSession,
-	HandleError,
-	InternalHandle,
-	ServerRequest,
-	ServerResponse
-} from './hooks';
+import { Fallthrough, RequestHandler } from './endpoint';
+import { Either } from './helper';
+import { ExternalFetch, GetSession, HandleError, InternalHandle, RequestEvent } from './hooks';
 import { Load } from './page';
-
-type PageId = string;
 
 export interface PrerenderOptions {
 	fallback?: string;
 	all: boolean;
-	dependencies: Map<string, ServerResponse>;
+	dependencies: Map<string, Response>;
 }
 
 export interface AppModule {
@@ -43,11 +35,9 @@ export interface Logger {
 }
 
 export interface SSRComponent {
-	ssr?: boolean;
 	router?: boolean;
 	hydrate?: boolean;
 	prerender?: boolean;
-	preload?: any; // TODO remove for 1.0
 	load: Load;
 	default: {
 		render(props: Record<string, any>): {
@@ -120,7 +110,7 @@ export interface SSRNode {
 	/** external JS files */
 	js: string[];
 	/** inlined styles */
-	styles: string[];
+	styles?: Record<string, string>;
 }
 
 export interface SSRRenderOptions {
@@ -128,10 +118,11 @@ export interface SSRRenderOptions {
 	dev: boolean;
 	floc: boolean;
 	get_stack: (error: Error) => string | undefined;
-	handle_error(error: Error & { frame?: string }, request: ServerRequest<any>): void;
+	handle_error(error: Error & { frame?: string }, event: RequestEvent): void;
 	hooks: Hooks;
 	hydrate: boolean;
 	manifest: SSRManifest;
+	method_override: MethodOverride;
 	paths: {
 		base: string;
 		assets: string;
@@ -142,9 +133,8 @@ export interface SSRRenderOptions {
 	root: SSRComponent['default'];
 	router: boolean;
 	service_worker?: string;
-	ssr: boolean;
 	target: string;
-	template({ head, body }: { head: string; body: string }): string;
+	template({ head, body, assets }: { head: string; body: string; assets: string }): string;
 	trailing_slash: TrailingSlash;
 }
 
@@ -219,13 +209,26 @@ export interface BuildData {
 	entries: string[];
 }
 
-export interface NormalizedLoadOutput {
-	status: number;
-	error?: Error;
-	redirect?: string;
-	props?: Record<string, any> | Promise<Record<string, any>>;
-	stuff?: Record<string, any>;
-	maxage?: number;
-}
+export type NormalizedLoadOutput = Either<
+	{
+		status: number;
+		error?: Error;
+		redirect?: string;
+		props?: Record<string, any> | Promise<Record<string, any>>;
+		stuff?: Record<string, any>;
+		maxage?: number;
+	},
+	Fallthrough
+>;
 
 export type TrailingSlash = 'never' | 'always' | 'ignore';
+export interface MethodOverride {
+	parameter: string;
+	allowed: string[];
+}
+
+export interface Respond {
+	(request: Request, options: SSRRenderOptions, state?: SSRRenderState): Promise<
+		Response | undefined
+	>;
+}

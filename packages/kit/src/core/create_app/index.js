@@ -28,11 +28,10 @@ export function write_if_changed(file, code) {
  * }} options
  */
 export function create_app({ manifest_data, output, cwd = process.cwd() }) {
-	const dir = `${output}/generated`;
-	const base = path.relative(cwd, dir);
+	const base = path.relative(cwd, output);
 
-	write_if_changed(`${dir}/manifest.js`, generate_client_manifest(manifest_data, base));
-	write_if_changed(`${dir}/root.svelte`, generate_app(manifest_data));
+	write_if_changed(`${output}/manifest.js`, generate_client_manifest(manifest_data, base));
+	write_if_changed(`${output}/root.svelte`, generate_app(manifest_data));
 }
 
 /**
@@ -89,6 +88,7 @@ function generate_client_manifest(manifest_data, base) {
 					return `// ${route.a[route.a.length - 1]}\n\t\t[${tuple.join(', ')}]`;
 				}
 			})
+			.filter(Boolean)
 			.join(',\n\n\t\t')}
 	]`.replace(/^\t/gm, '');
 
@@ -178,25 +178,11 @@ function generate_app(manifest_data) {
 		${pyramid.replace(/\n/g, '\n\t\t')}
 
 		{#if mounted}
-			<div id="svelte-announcer" aria-live="assertive" aria-atomic="true">
+			<div id="svelte-announcer" aria-live="assertive" aria-atomic="true" style="position: absolute; left: 0; top: 0; clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden; white-space: nowrap; width: 1px; height: 1px">
 				{#if navigated}
 					{title}
 				{/if}
 			</div>
 		{/if}
-
-		<style>
-			#svelte-announcer {
-				position: absolute;
-				left: 0;
-				top: 0;
-				clip: rect(0 0 0 0);
-				clip-path: inset(50%);
-				overflow: hidden;
-				white-space: nowrap;
-				width: 1px;
-				height: 1px;
-			}
-		</style>
 	`);
 }
