@@ -24,7 +24,7 @@ SvelteKit には [クライアントサイドルーター(client-side router)](#
 
 ### hydrate
 
-通常、SvelteKit はサーバーでレンダリングされたHTMLをインタラクティブなページに [ハイドレート(hydrates)](#appendix-hydration) します。JavaScriptを全く必要としないページ — 多くのブログ記事や 'about' ページがこのカテゴリに入りますが、これらの場合、アプリ全体では [`hydrate` コンフィグオプション](#configuration-hydrate)、ページレベルでは `hydrate` の export により、アプリ起動時のハイドレーションをスキップすることができます:
+通常、SvelteKit はサーバーでレンダリングされたHTMLをインタラクティブなページに [ハイドレート(hydrates)](#appendix-hydration) します。JavaScriptを全く必要としないページ — 多くのブログ記事や 'about' ページがこのカテゴリに入りますが、これらの場合、アプリ全体では [`hydrate` コンフィグオプション](#configuration-hydrate)、ページレベルでは `hydrate` を export することにより、アプリ起動時のハイドレーションをスキップすることができます:
 
 ```html
 <script context="module">
