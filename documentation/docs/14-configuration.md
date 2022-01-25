@@ -7,7 +7,7 @@ title: Configuration
 ```js
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	// options passed to svelte.compile (https://svelte.dev/docs#svelte_compile)
+	// options passed to svelte.compile (https://svelte.dev/docs#compile-time-svelte-compile)
 	compilerOptions: null,
 
 	// an array of file extensions that should be treated as Svelte components
@@ -26,12 +26,12 @@ const config = {
 			template: 'src/app.html'
 		},
 		floc: false,
-		headers: {
-			host: null,
-			protocol: null
-		},
-		host: null,
 		hydrate: true,
+		inlineStyleThreshold: 0,
+		methodOverride: {
+			parameter: '_method',
+			allowed: []
+		},
 		package: {
 			dir: 'package',
 			emitTypes: true,
@@ -50,13 +50,11 @@ const config = {
 			entries: ['*'],
 			onError: 'fail'
 		},
-		protocol: null,
 		router: true,
 		serviceWorker: {
 			register: true,
 			files: (filepath) => !/\.DS_STORE/.test(filepath)
 		},
-		ssr: true,
 		target: null,
 		trailingSlash: 'never',
 		vite: () => ({})
@@ -65,7 +63,7 @@ const config = {
 	// SvelteKit uses vite-plugin-svelte. Its options can be provided directly here.
 	// See the available options at https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/config.md
 
-	// options passed to svelte.preprocess (https://svelte.dev/docs#svelte_preprocess)
+	// options passed to svelte.preprocess (https://svelte.dev/docs#compile-time-svelte-preprocess)
 	preprocess: null
 };
 
@@ -74,7 +72,7 @@ export default config;
 
 ### adapter
 
-`svelte-kit build` を実行するのに必要で、異なるプラットフォーム向けにアウトプットがどのように変換されるかを決定します。[アダプター(Adapters)](#adapters) をご参照ください。
+`svelte-kit build` を実行するのに必要で、異なるプラットフォーム向けにアウトプットがどのように変換されるかを決定します。[Adapters](#adapters) をご参照ください。
 
 ### amp
 
@@ -92,7 +90,7 @@ export default config;
 - `hooks` — hooks モジュールのロケーション([Hooks](#hooks) をご参照ください)
 - `lib` — コードベース全体から `$lib` でアクセスできる、アプリの内部ライブラリ
 - `routes` — アプリの構造を定義するファイル([Routing](#routing) をご参照ください)
-- `serviceWorker` — サービスワーカーのエントリーポイントのロケーション([Service workers](#service-workers) をご参照ください)
+- `serviceWorker` — Service Worker のエントリーポイントのロケーション([Service workers](#service-workers) をご参照ください)
 - `template` — HTMLレスポンス用テンプレートのロケーション
 
 ### floc
@@ -107,33 +105,22 @@ Permissions-Policy: interest-cohort=()
 
 > これはサーバーレンダリングされたレスポンスにのみ適用されます — プリレンダリングされたページ(例えば [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) によって作成されたページ) のヘッダは、ホスティングプラットフォームによって決定されます。
 
-### headers
-
-特定の環境においては、現在のページまたはエンドポイントの `url` は、リクエストのプロトコル(通常は `https`) とホスト(デフォルトでは `Host` ヘッダから取得される)から得られます。
-
-もしアプリがリバースプロキシ(ロードバランサーやCDN)の背後にある場合、`Host` ヘッダは不正確です。ほとんどの場合、基となるプロトコルとホストは [`X-Forwarded-Host`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Host) ヘッダと [`X-Forwarded-Proto`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Proto) ヘッダ経由で公開されますが、これは設定で指定することができます:
-
-```js
-// svelte.config.js
-export default {
-	kit: {
-		headers: {
-			host: 'X-Forwarded-Host',
-			protocol: 'X-Forwarded-Proto'
-		}
-	}
-};
-```
-
-**リバースプロキシーを信頼できる場合にのみこれを行ってください**。これがデフォルトでない理由です。
-
-### host
-
-この値は [`config.kit.headers.host`](#configuration-headers-host) から得られる値よりも優先されます。
-
 ### hydrate
 
-サーバーでレンダリングされたHTMLをクライアントサイドのアプリで [ハイドレート(hydrate)](#ssr-and-javascript-hydrate) するかどうか (アプリ全体でこれを  `false` に設定することはごく稀でしょう)。
+サーバーでレンダリングされた HTML をクライアントサイドアプリで [ハイドレート(hydrate)](#page-options-hydrate) するかどうかを設定します。(基本的に、アプリ全体でこれを `false` にすることはごく稀でしょう)
+
+### inlineStyleThreshold
+
+CSS を HTML の先頭の `<style>` ブロック内にインライン化するかどうか。このオプションでは、インライン化するCSSファイルの最大長を数値で指定します。ページに必要な CSS ファイルで、このオプションの値より小さいものはマージされ、`<style>` ブロックにインライン化されます。
+
+> この結果、最初のリクエストが少なくなり、[First Contentful Paint](https://web.dev/first-contentful-paint) スコアを改善することができます。しかし、HTML 出力が大きくなり、ブラウザキャッシュの効果が低下します。慎重に使用してください。
+
+### methodOverride
+
+[HTTP Method Overrides](#routing-endpoints-http-method-overrides) をご参照ください。以下のうち、0個以上を含むオブジェクトです:
+
+- `parameter` — 使いたいメソッドの値を渡すのに使用するクエリパラメーター名
+- `allowed` - オリジナルのリクエストメソッドを上書きするときに使用することができる HTTP メソッドの配列
 
 ### package
 
@@ -172,7 +159,7 @@ export default {
 
 ### prerender
 
-[プリレンダリング(Prerendering)](#ssr-and-javascript-prerender) をご参照ください。以下の `string` 値のうち、0個以上を含むオブジェクトです:
+[プリレンダリング(Prerendering)](#page-options-prerender) をご参照ください。以下のうち、0個以上を含むオブジェクトです:
 
 - `concurrency` — 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートのCMSからコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます
 - `crawl` — SvelteKitがシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
@@ -203,23 +190,16 @@ export default {
     };
     ```
 
-### protocol
-
-[`config.kit.headers.protocol`](#configuration-headers-protocol) が設定されていない限り、プロトコルは `'https'` であると仮定されます(ローカルで `--https` フラグなしで開発していない限り)。必要であれば、ここでオーバーライドできます。
-
 ### router
 
-アプリ全体で、クライアントサイドの [ルーター(router)](#ssr-and-javascript-router) を有効または無効にします。
+アプリ全体で、クライアントサイドの [ルーター(router)](#page-options-router) を有効または無効にします。
 
 ### serviceWorker
 
 以下の値のうち、0個以上を含むオブジェクトです:
 
+- `register` - `false` を設定した場合、service worker の自動登録を無効にします。
 - `files` - `(filepath: string) => boolean` という型を持つ関数。`true` の場合、与えられたファイルが `$service-worker.files` で利用可能になります。それ以外の場合は除外されます。
-
-### ssr
-
-アプリ全体で、[サーバーサイドレンダリング(server-side rendering)](#ssr-and-javascript-ssr) を有効または無効にします。
 
 ### target
 

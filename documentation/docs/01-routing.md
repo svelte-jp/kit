@@ -10,7 +10,7 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 
 ページは通常、ユーザーに表示するHTML(及びページに必要なCSSやJavaScript)を生成します。デフォルトでは、ページはクライアントとサーバーの両方でレンダリングされますが、この動作は設定によって変更可能です。
 
-エンドポイントは、サーバー上でのみ実行されます(もしくはサイトをビルドするときに[プリレンダリング](#ssr-and-javascript-prerender)している場合)。これは、プライベートな認証情報を必要とするデータベースやAPIにアクセスする場合や、本番環境ネットワーク上のマシンにあるデータを返す場合などに使用されます。ページはエンドポイントにデータをリクエストすることができます。エンドポイントはデフォルトではJSONを返しますが、他のフォーマットでもデータを返すことができます。
+エンドポイントは、サーバー上でのみ実行されます(もしくはサイトをビルドするときに[プリレンダリング](#page-options-prerender)している場合)。これは、プライベートな認証情報を必要とするデータベースやAPIにアクセスする場合や、本番環境ネットワーク上のマシンにあるデータを返す場合などに使用されます。ページはエンドポイントにデータをリクエストすることができます。エンドポイントはデフォルトではJSONを返しますが、他のフォーマットでもデータを返すことができます。
 
 ### Pages
 
@@ -51,43 +51,26 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 // Declaration types for Endpoints
 // * declarations that are not exported are for internal use
 
-// type of string[] is only for set-cookie
-// everything else must be a type of string
-type ResponseHeaders = Record<string, string | string[]>;
-type RequestHeaders = Record<string, string>;
-
-export type RawBody = null | Uint8Array;
-
-type ParameterizedBody<Body = unknown> = Body extends FormData
-	? ReadOnlyFormData
-	: (string | RawBody | ReadOnlyFormData) & Body;
-
-export interface Request<Locals = Record<string, any>, Body = unknown> {
+export interface RequestEvent<Locals = Record<string, any>> {
+	request: Request;
 	url: URL;
-	method: string;
-	headers: RequestHeaders;
-	rawBody: RawBody;
 	params: Record<string, string>;
-	body: ParameterizedBody<Body>;
 	locals: Locals;
 }
 
-type DefaultBody = JSONResponse | Uint8Array;
-export interface EndpointOutput<Body extends DefaultBody = DefaultBody> {
+type Body = JSONString | Uint8Array | ReadableStream | stream.Readable;
+export interface EndpointOutput {
 	status?: number;
-	headers?: ResponseHeaders;
+	headers?: HeadersInit;
 	body?: Body;
 }
 
-export interface RequestHandler<
-	Locals = Record<string, any>,
-	Input = unknown,
-	Output extends DefaultBody = DefaultBody
-> {
-	(request: Request<Locals, Input>):
-		| void
-		| EndpointOutput<Output>
-		| Promise<void | EndpointOutput<Output>>;
+type MaybePromise<T> = T | Promise<T>;
+interface Fallthrough {
+	fallthrough: true;
+}
+export interface RequestHandler<Locals = Record<string, any>> {
+	(event: RequestEvent<Locals>): MaybePromise<Either<Response | EndpointOutput, Fallthrough>>;
 }
 ```
 
@@ -100,9 +83,7 @@ import db from '$lib/database';
 export async function get({ params }) {
 	// the `slug` parameter is available because this file
 	// is called [slug].json.js
-	const { slug } = params;
-
-	const article = await db.get(slug);
+	const article = await db.get(params.slug);
 
 	if (article) {
 		return {
@@ -111,6 +92,10 @@ export async function get({ params }) {
 			}
 		};
 	}
+
+	return {
+		status: 404
+	};
 }
 ```
 
@@ -125,12 +110,12 @@ export async function get({ params }) {
 
 もし返された `body` がオブジェクトで、かつ `content-type` ヘッダーが無い場合は、自動的に JSON レスポンスとなります。(`$lib` については心配無用です、[後ほど](#modules-$lib) 説明します)
 
-> 何も返さない場合は、明示的な404レスポンスと同じです。
+> `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー](#routing-advanced-fallthrough-routes) し続けるか、一般的な 404 で応答します。
 
 例えば POST のような HTTP メソッドを処理するエンドポイントは、これに相当する関数をエクスポートします。
 
 ```js
-export function post(request) {...}
+export function post(event) {...}
 ```
 
 `delete` は JavaScript の予約語であるため、DELETE リクエストは`del` 関数によって処理されます。
@@ -149,12 +134,36 @@ return {
 
 #### Body parsing
 
-POST リクエストの場合は、リクエストオブジェクトの `body` プロパティが提供されます。
+`request` オブジェクトは標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) クラスのインスタンスです。そのため、request の body にアクセスするのは簡単です:
 
-- テキストデータ (content-type `text/plain`) は `string` に変換されます
-- JSON データ (content-type `application/json`) は `JSONValue` に変換されます (`object`、`Array`、またはプリミティブ)。
-- Form データ (content-type `application/x-www-form-urlencoded` または `multipart/form-data`) は read-only な [`FormData`](https://developer.mozilla.org/ja/docs/Web/API/FormData) オブジェクトに変換されます。
-- それ以外のデータは全て `Uint8Array` として提供されます。
+```js
+export async function post({ request }) {
+	const data = await request.formData(); // or .json(), or .text(), etc
+}
+```
+
+#### HTTP Method Overrides
+
+HTML `<form>` 要素は、ネイティブでは `GET` と `POST` メソッドのみをサポートしています。例えば `PUT` や `DELETE` などのその他のメソッドを許可するには、それを [configuration](#configuration-methodoverride) で指定し、`_method=VERB` パラメーター (パラメーター名は設定で変更できます) を form の `action` に追加してください:
+
+```js
+// svelte.config.js
+export default {
+	kit: {
+		methodOverride: {
+			allowed: ['PUT', 'PATCH', 'DELETE']
+		}
+	}
+};
+```
+
+```html
+<form method="post" action="/todos/{id}?_method=PUT">
+	<!-- form elements -->
+</form>
+```
+
+> ネイティブの `<form>` の挙動を利用することで、JavaScript が失敗したり無効になっている場合でもアプリが動作し続けられます。
 
 ### Private modules
 
@@ -194,6 +203,6 @@ src/routes/[qux].svelte
 src/routes/foo-[bar].svelte
 ```
 
-…`/foo-xyz` にアクセスすると、SvelteKit は最初に `foo-[bar].svelte` を試行します、なぜならベストマッチだからです。次に、`[baz].js` (マッチするが、`/foo-xyz` よりも具体的でないため)、それからアルファベット順で `[baz].svelte` と `[qux].svelte` (エンドポイントはページより優先度が高いため)を試行します。最初に応答するルート(route)、例えば [`load`](#loading) から何かを返すページ、`load` 関数がないページ、または何かを返すエンドポイントが、リクエストを処理します。
+…`/foo-xyz` にアクセスすると、SvelteKit は最初に `foo-[bar].svelte` を試行します、なぜならベストマッチだからです。その後レスポンスがなければ、SvelteKit は `/foo-xyz` に有効にマッチする他のルートを試行します。エンドポイントはページより優先順位が高いため、次に試行されるのは `[baz].js` です。次にアルファベット順で優先順位が決まるので、`[baz].svelte` は `[qux].svelte` より先に試行されます。最初に応答するルート(route) — [`load`](#loading) から何かを返すページ、`load` 関数を持たないページ、または何かを返すエンドポイント — がリクエストを処理します。
 
 どのページやエンドポイントもリクエストに応答しない場合、SvelteKitは一般的な404で応答します。

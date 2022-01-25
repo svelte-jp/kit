@@ -29,13 +29,13 @@ const create = (dir, extensions = ['.svelte']) => {
 
 	return create_manifest_data({
 		config: /** @type {import('types/config').ValidatedConfig} */ (initial),
-		cwd,
-		output: cwd
+		fallback: cwd,
+		cwd
 	});
 };
 
-const layout = 'components/layout.svelte';
-const error = 'components/error.svelte';
+const layout = 'layout.svelte';
+const error = 'error.svelte';
 
 test('creates routes', () => {
 	const { components, routes } = create('samples/basic');
@@ -215,18 +215,38 @@ test('sorts routes with rest correctly', () => {
 });
 
 test('disallows rest parameters inside segments', () => {
-	assert.throws(
-		() => {
-			create('samples/invalid-rest');
+	const { routes } = create('samples/rest-prefix-suffix');
+
+	assert.equal(routes, [
+		{
+			type: 'page',
+			segments: [
+				{
+					dynamic: true,
+					rest: true,
+					content: 'prefix-[...rest]'
+				}
+			],
+			pattern: /^\/prefix-(.*?)\/?$/,
+			params: ['...rest'],
+			path: '',
+			a: [layout, 'samples/rest-prefix-suffix/prefix-[...rest].svelte'],
+			b: [error]
 		},
-		/** @param {Error} e */
-		(e) => {
-			return (
-				e.message ===
-				'Invalid route samples/invalid-rest/foo-[...rest]-bar.svelte — rest parameter must be a standalone segment'
-			);
+		{
+			type: 'endpoint',
+			segments: [
+				{
+					dynamic: true,
+					rest: true,
+					content: '[...rest].json'
+				}
+			],
+			pattern: /^\/(.*?)\.json$/,
+			file: 'samples/rest-prefix-suffix/[...rest].json.js',
+			params: ['...rest']
 		}
-	);
+	]);
 });
 
 test('ignores files and directories with leading underscores', () => {

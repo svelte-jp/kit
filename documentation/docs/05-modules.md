@@ -14,14 +14,24 @@ import { amp, browser, dev, mode, prerendering } from '$app/env';
 - `browser` は `true` か `false` です。アプリが動作している場所がブラウザかサーバーかに依存します
 - `dev` は開発者モードの場合 `true`、プロダクションだと `false` です
 - `mode` は [Vite mode](https://ja.vitejs.dev/guide/env-and-mode.html#modes) です。`config.kit.vite.mode` で特に設定をしない限り、開発モードでは `development`、ビルド時には `production` となります
-- `prerendering` は [プリレンダリング](#ssr-and-javascript-prerender) の場合は `true`、それ以外の場合は `false` です
+- `prerendering` は [プリレンダリング](#page-options-prerender) の場合は `true`、それ以外の場合は `false` です
 
 ### $app/navigation
 
 ```js
-import { disableScrollHandling, goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+import {
+	disableScrollHandling,
+	goto,
+	invalidate,
+	prefetch,
+	prefetchRoutes,
+	beforeNavigate,
+	afterNavigate
+} from '$app/navigation';
 ```
 
+- `afterNavigate(({ from, to }: { from: URL, to: URL }) => void)` - コンポーネントがマウントされたとき、およびコンポーネントがマウントされたままナビゲーションされたあとに実行されるライフサイクル関数です。
+- `beforeNavigate(({ from, to, cancel }: { from: URL, to: URL | null, cancel: () => void }) => void)` — リンクをクリックしたり、`goto` を呼び出したり、ブラウザの 戻る/進む を使ったりして、ナビゲーションがトリガーされたときに実行される関数です。これには外部サイトへのナビゲーションも含まれます。ユーザーがページを閉じる場合、`to` は `null` になります。`cancel` を呼び出すと、ナビゲーションの進行を止めます。
 - `disableScrollHandling` は、ナビゲーションに続いてページが更新されるときに(例えば `onMount` や action で)呼び出されると、SvelteKitが通常のスクロール管理を行うのを適用しないようにします。スクロールの動作に関するユーザーの期待を裏切ることになり混乱する可能性があるため、一般的にはこれを避けるべきです。
 - `goto(href, { replaceState, noscroll, keepfocus, state })` は SvelteKit が指定された `href` にナビゲートしたときに解決するPromiseを返します(ナビゲートに失敗した場合は、そのプロミスはリジェクトされます)。第二引数はオプションです:
   - `replaceState` (boolean, デフォルトは `false`) もし `true` にした場合、`pushState` で新しい `history` エントリを作成するのではなく、現在の `history` エントリを置き換えます
@@ -58,7 +68,7 @@ import { getStores, navigating, page, session } from '$app/stores';
 ストア自体はサブスクリプションの時点で正しい context にアタッチします。そのため、ボイラープレートなしにコンポーネントで直接インポートして使用することができます。しかし、`$`接頭辞を使用していない場合は、コンポーネントやページの初期化時に同期的に呼び出す必要があります。代わりに `getStores` を使用して、安全に `.subscribe` を非同期で呼び出すことができます。
 
 - `navigating` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) です。ナビゲーションを開始すると、この値は `{ from, to }` になります。`from` と `to` はどちらも [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスです。ナビゲーションが終了すると、値は `null` に戻ります。
-- `page` は現在の [`url`](https://developer.mozilla.org/ja/docs/Web/API/URL) と [`params`](#loading-input-params) を含むオブジェクトです。
+- `page` は現在の [`url`](https://developer.mozilla.org/ja/docs/Web/API/URL)、[`params`](#loading-input-params)、[`stuff`](#loading-output-stuff) を含むオブジェクトです。
 - `session` は [書き込み可能なストア(writable store)](https://svelte.jp/tutorial/writable-stores) で、初期値は [`getSession`](#hooks-getsession) の戻り値です。書き込めますが、その変更は永続化されません — それはあなた自身で実装する必要があります。
 
 ### $lib
@@ -75,7 +85,7 @@ import { build, files, timestamp } from '$service-worker';
 
 - `build` はViteが生成するファイルを表すURL文字列の配列で、`cache.addAll(build)` を使ってキャッシュするのに適しています。
 - `files` は、`static` ディレクトリまたは [`config.kit.files.assets`](#configuration) で指定されたディレクトリにあるファイルを表すURL文字列の配列です。どのファイルを `static` ディレクトリに含めるかについては、[`config.kit.serviceWorker.files`](#configuration) でカスタマイズできます。
-- `timestamp` はビルド時に `Date.now()` を呼び出した結果です。これは、サービスワーカー内で一意なキャッシュ名を生成するのに便利で、後でアプリをデプロイしたときに古いキャッシュを無効にすることができます。
+- `timestamp` はビルド時に `Date.now()` を呼び出した結果です。これは、Service Worker 内で一意なキャッシュ名を生成するのに便利で、後でアプリをデプロイしたときに古いキャッシュを無効にすることができます。
 
 ### @sveltejs/kit/hooks
 
@@ -84,13 +94,13 @@ import { build, files, timestamp } from '$service-worker';
 ```js
 import { sequence } from '@sveltejs/kit/hooks';
 
-async function first({ request, resolve }) {
+async function first({ event, resolve }) {
 	console.log('first');
-	return await resolve(request);
+	return await resolve(event);
 }
-async function second({ request, resolve }) {
+async function second({ event, resolve }) {
 	console.log('second');
-	return await resolve(request);
+	return await resolve(event);
 }
 
 export const handle = sequence(first, second);

@@ -12,10 +12,10 @@ title: Additional Resources
 
 例として、数種類 SvelteKit サイトを作成し、公開しています:
 
-- [examples ディレクトリ](https://github.com/sveltejs/kit/tree/master/examples) (GitHubリポジトリ内) には、HackerNews のクローンがあります
 - [`sveltejs/realworld`](https://github.com/sveltejs/realworld) にはブログサイトの例があります
-- [`sveltejs/sites`](https://github.com/sveltejs/sites) にはこのサイトのコードがあります
-- [`sveltejs/svelte` リポジトリの site ディレクトリ](https://github.com/sveltejs/svelte/tree/master/site) には svelte.dev のコードが含まれています。
+- [`sveltejs/sites`](https://github.com/sveltejs/sites) には [このサイトのコード](https://github.com/sveltejs/sites/tree/master/sites/kit.svelte.dev)、[svelte.dev のコード](https://github.com/sveltejs/sites/tree/master/sites/svelte.dev)、[HackerNews のクローン](https://github.com/sveltejs/sites/tree/master/sites/hn.svelte.dev) があります
+
+また、SvelteKit ユーザーが GitHub で [#sveltekit](https://github.com/topics/sveltekit) や [#sveltekit-template](https://github.com/topics/sveltekit-template) というトピックを付けて多くの例を公開しており、[Svelte Society のサイト](https://sveltesociety.dev/templates#svelte-kit) にも例が公開されています。なお、これらはメンテナーによって検証されておらず、最新ではない可能性もありますのでご注意ください。
 
 ### Integrations
 

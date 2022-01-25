@@ -1,3 +1,4 @@
+import { CompileOptions } from 'svelte/types/compiler/interfaces';
 import { UserConfig as ViteConfig } from 'vite';
 import { RecursiveRequired } from './helper';
 import { HttpMethod, Logger, RouteSegment, TrailingSlash } from './internal';
@@ -37,6 +38,8 @@ export interface Builder {
 	log: Logger;
 	rimraf(dir: string): void;
 	mkdirp(dir: string): void;
+
+	appDir: string;
 
 	/**
 	 * Create entry points that map to individual functions
@@ -108,7 +111,7 @@ export interface PrerenderErrorHandler {
 export type PrerenderOnErrorValue = 'fail' | 'continue' | PrerenderErrorHandler;
 
 export interface Config {
-	compilerOptions?: any;
+	compilerOptions?: CompileOptions;
 	extensions?: string[];
 	kit?: {
 		adapter?: Adapter;
@@ -123,12 +126,12 @@ export interface Config {
 			template?: string;
 		};
 		floc?: boolean;
-		headers?: {
-			host?: string;
-			protocol?: string;
-		};
-		host?: string;
 		hydrate?: boolean;
+		inlineStyleThreshold?: number;
+		methodOverride?: {
+			parameter?: string;
+			allowed?: string[];
+		};
 		package?: {
 			dir?: string;
 			emitTypes?: boolean;
@@ -146,13 +149,11 @@ export interface Config {
 			entries?: string[];
 			onError?: PrerenderOnErrorValue;
 		};
-		protocol?: string;
 		router?: boolean;
 		serviceWorker?: {
 			register?: boolean;
 			files?: (filepath: string) => boolean;
 		};
-		ssr?: boolean;
 		target?: string;
 		trailingSlash?: TrailingSlash;
 		vite?: ViteConfig | (() => ViteConfig);

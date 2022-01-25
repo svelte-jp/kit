@@ -2,15 +2,15 @@
 title: Adapters
 ---
 
-SvelteKitアプリをデプロイする前に、それをデプロイ先の環境に _合わせる(adapt)_ 必要があります。アダプター(Adapters)は、ビルドされたアプリをインプットとして受け取り、デプロイ用のアウトプットを生成する小さなプラグインです。
+SvelteKitアプリをデプロイする前に、それをデプロイ先の環境に _合わせる(adapt)_ 必要があります。adapter は、ビルドされたアプリをインプットとして受け取り、デプロイ用のアウトプットを生成する小さなプラグインです。
 
-デフォルトでは、プロジェクトは `@sveltejs/adapter-auto` を使用するように設定されており、プロダクション環境を検出して可能な限り適切なアダプターを選択します。もし(まだ)プラットフォームがサポートされていなければ、[カスタムアダプターをインストール](#adapters-installing-custom-adapters)したり、[作成](#adapters-writing-custom-adapters)したりする必要があるかもしれません。
+デフォルトでは、プロジェクトは `@sveltejs/adapter-auto` を使用するように設定されており、プロダクション環境を検出して可能な限り適切な adapter を選択します。もし(まだ)プラットフォームがサポートされていなければ、[custom adapter をインストール](#adapters-community-adapters)したり、[作成](#adapters-writing-custom-adapters)したりする必要があるかもしれません。
 
 > 新しい環境のサポートを追加することに関しては、[adapter-auto の README](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) をご参照ください。
 
 ### Supported environments
 
-SvelteKit は、公式にサポートされているアダプターを多数提供しています。
+SvelteKit は、公式にサポートされている adapter を多数提供しています。
 
 以下のプラットフォームでは、追加の設定が必要ありません。
 
@@ -28,7 +28,7 @@ SvelteKit は、公式にサポートされているアダプターを多数提�
 +import adapter from '@sveltejs/adapter-node';
 ```
 
-これにより、[svelte-kit build](#command-line-interface-svelte-kit-build) は自己完結型の Node アプリを `build` ディレクトリの中に生成します。アダプターにはオプションを渡すことができ、例えば出力ディレクトリをカスタマイズできます:
+これにより、[svelte-kit build](#command-line-interface-svelte-kit-build) は自己完結型の Node アプリを `build` ディレクトリの中に生成します。adapter にはオプションを渡すことができ、例えば出力ディレクトリをカスタマイズできます:
 
 ```diff
 // svelte.config.js
@@ -44,7 +44,7 @@ export default {
 
 #### Static sites
 
-ほとんどのアダプターは、サイト内のプリレンダリング可能なページに対して静的な HTML を生成します。アプリ全体がプリレンダリング可能な場合は、`@sveltejs/adapter-static@next` を使用して _全ての_ ページ に対して静的な HTML を生成することができます。完全に静的なサイトは、[GitHub Pages](https://pages.github.com/) のような静的ホストなど、さまざまなプラットフォームでホストすることができます。
+ほとんどの adapter は、サイト内の [プリレンダリング可能な](#page-options-prerender) ページに対して静的な HTML を生成します。アプリ全体がプリレンダリング可能な場合は、`@sveltejs/adapter-static@next` を使用して _全ての_ ページ に対して静的な HTML を生成することができます。完全に静的なサイトは、[GitHub Pages](https://pages.github.com/) のような静的ホストなど、さまざまなプラットフォームでホストすることができます。
 
 ```diff
 // svelte.config.js
@@ -56,7 +56,7 @@ export default {
 
 ### Community adapters
 
-加えて、他のプラットフォーム向けに、[コミュニティによって提供されているアダプター](https://sveltesociety.dev/components#adapters) もございます。パッケージマネージャーで該当のアダプターをインストールした後、`svelte.config.js` を更新してください:
+加えて、他のプラットフォーム向けに、[コミュニティによって提供されている adapter](https://sveltesociety.dev/components#adapters) もございます。パッケージマネージャーで該当の adapter をインストールした後、`svelte.config.js` を更新してください:
 
 ```diff
 // svelte.config.js
@@ -66,9 +66,9 @@ export default {
 
 ### Writing custom adapters
 
-似ているプラットフォーム向けの [アダプターのソースを探し](https://github.com/sveltejs/kit/tree/master/packages)、それをコピーするところから始めることを推奨します。
+似ているプラットフォーム向けの [adapter のソースを探し](https://github.com/sveltejs/kit/tree/master/packages)、それをコピーするところから始めることを推奨します。
 
-アダプターパッケージは `Adapter` を作成する以下の API を実装する必要があります:
+Adapter Package は `Adapter` を作成する以下の API を実装する必要があります:
 
 ```js
 /** @param {AdapterSpecificOptions} options */
@@ -85,18 +85,18 @@ export default function (options) {
 
 `Adapter` とそのパラメータの型は [types/config.d.ts](https://github.com/sveltejs/kit/blob/master/packages/kit/types/config.d.ts) にあります。
 
-`adapt` メソッドの中では、アダプターがすべきことがたくさんあります:
+`adapt` メソッドの中では、adapter がすべきことがたくさんあります:
 
 - build ディレクトリの掃除
 - `builder.prerender({ dest })` をコールしてページをプリレンダリングする
 - コードの出力:
   - `${builder.getServerDirectory()}/app.js` から `App` をインポートする
-  - `builder.generateManifest({ relativePath })`　で生成された manifest でアプリをインスタンス化する
-  - プラットフォームからのリクエストをリスンし、[SvelteKit request](#hooks-handle)に変換し、`render` 関数を呼び出して [SvelteKit response](#hooks-handle) を生成し、応答する
+  - `builder.generateManifest({ relativePath })` で生成された manifest でアプリをインスタンス化する
+  - プラットフォームからのリクエストをリスンし、必要に応じて標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) に変換し、`render` 関数を呼び出して [Response](https://developer.mozilla.org/ja/docs/Web/API/Response) を生成し、応答する
   - 必要であれば、対象プラットフォームで動作するように `fetch` をグローバルに shim する。SvelteKit は `node-fetch` を使用できるプラットフォーム向けに `@sveltejs/kit/install-fetch` ヘルパーを提供しています
 - 必要であれば、ターゲットプラットフォームに依存ライブラリをインストールするのを避けるために出力ファイルをバンドルする
 - 対象プラットフォームの正しい場所にユーザーの静的ファイルや生成した JS/CSS ファイルを設置する
 
-可能であれば、アダプターの出力は `build/` ディレクトリに、中間出力は `.svelte-kit/[adapter-name]` に置くことを推奨します。
+可能であれば、adapter の出力は `build/` ディレクトリに、中間出力は `.svelte-kit/[adapter-name]` に置くことを推奨します。
 
 > adapter API はバージョン 1.0 のリリース前に変更される可能性があります。

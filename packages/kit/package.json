@@ -1,6 +1,6 @@
 {
 	"name": "@sveltejs/kit",
-	"version": "1.0.0-next.216",
+	"version": "1.0.0-next.240",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/sveltejs/kit",
@@ -35,10 +35,11 @@
 		"node-fetch": "^3.1.0",
 		"port-authority": "^1.1.2",
 		"rollup": "^2.60.2",
-		"selfsigned": "^1.10.11",
-		"sirv": "^1.0.19",
+		"selfsigned": "^2.0.0",
+		"sirv": "^2.0.0",
 		"svelte": "^3.44.2",
 		"svelte-check": "^2.2.10",
+		"svelte-preprocess": "^4.9.8",
 		"svelte2tsx": "~0.4.10",
 		"tiny-glob": "^0.2.9",
 		"uvu": "^0.5.2"
@@ -56,15 +57,17 @@
 		"svelte-kit.js"
 	],
 	"scripts": {
-		"build": "rollup -c",
+		"build": "rollup -c && node scripts/cp.js src/runtime/components assets/components",
 		"dev": "rollup -cw",
 		"lint": "eslint --ignore-path .gitignore --ignore-pattern \"src/packaging/test/**\" \"{src,test}/**/*.{ts,mjs,js,svelte}\" && npm run check-format",
-		"check": "tsc && svelte-check --ignore \"src/packaging/test\"",
+		"check": "tsc && svelte-check --ignore test/prerendering,src/packaging/test",
 		"format": "npm run check-format -- --write",
 		"check-format": "prettier --check . --config ../../.prettierrc --ignore-path .gitignore",
 		"prepublishOnly": "npm run build",
-		"test": "npm run test:unit && npm run test:packaging && npm run test:integration",
+		"test": "npm run test:unit && npm run test:packaging && npm run test:prerendering && npm run test:integration",
 		"test:unit": "uvu src \"(spec\\.js|test[\\\\/]index\\.js)\" -i packaging",
+		"test:prerendering": "pnpm test:prerendering:basics",
+		"test:prerendering:basics": "cd test/prerendering/basics && pnpm test",
 		"test:packaging": "uvu src/packaging \"(spec\\.js|test[\\\\/]index\\.js)\"",
 		"test:integration": "pnpm test:integration:amp && pnpm test:integration:basics && pnpm test:integration:options && pnpm test:integration:options-2",
 		"test:integration:amp": "cd test/apps/amp && pnpm test",
@@ -76,9 +79,6 @@
 		"./package.json": "./package.json",
 		".": {
 			"types": "./types/index.d.ts"
-		},
-		"./ssr": {
-			"import": "./dist/ssr.js"
 		},
 		"./node": {
 			"import": "./dist/node.js"

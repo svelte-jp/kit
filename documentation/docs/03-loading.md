@@ -31,6 +31,41 @@ export interface LoadOutput<
 	stuff?: Stuff;
 	maxage?: number;
 }
+
+interface LoadInputExtends {
+	stuff?: Record<string, any>;
+	pageParams?: Record<string, string>;
+	session?: any;
+}
+interface LoadOutputExtends {
+	stuff?: Record<string, any>;
+	props?: Record<string, any>;
+}
+
+type MaybePromise<T> = T | Promise<T>;
+interface Fallthrough {
+	fallthrough: true;
+}
+export interface Load<
+	Input extends LoadInputExtends = Required<LoadInputExtends>,
+	Output extends LoadOutputExtends = Required<LoadOutputExtends>
+> {
+	(
+		input: LoadInput<
+			InferValue<Input, 'pageParams', Record<string, string>>,
+			InferValue<Input, 'stuff', Record<string, any>>,
+			InferValue<Input, 'session', any>
+		>
+	): MaybePromise<
+		Either<
+			Fallthrough,
+			LoadOutput<
+				InferValue<Output, 'props', Record<string, any>>,
+				InferValue<Output, 'stuff', Record<string, any>>
+			>
+		>
+	>;
+}
 ```
 
 ブログページの例では、以下のような `load` 関数が含まれています。
@@ -62,7 +97,7 @@ export interface LoadOutput<
 
 `load` は Next.js の `getStaticProps` や `getServerSideProps` に似ていますが、サーバーとクライアントの両方で動作する点が異なります。
 
-`load` が何も返さない場合、SvelteKitは応答が返るまで他のルート(routes)に[フォールスルー](#routing-advanced-fallthrough-routes)するか、もしくは一般的な404で応答します。
+`load` が `{fallthrough: true}` を返す場合、SvelteKitは応答が返るまで他のルート(routes)に[フォールスルー](#routing-advanced-fallthrough-routes)するか、もしくは一般的な404で応答します。
 
 SvelteKitの `load` は、以下のような特別なプロパティを持つ `fetch` の実装を受け取ります。
 
@@ -139,6 +174,8 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 (ページが非推奨であるとか、もしくはログインが必要であるなどの理由で) ページがリダイレクトされるべきなら、`3xx` のステータスコードとともにリダイレクト先となる location を含む `string` を返しましょう。
 
+`redirect` 文字列は [適切にエンコードされた](https://developer.mozilla.org/ja/docs/Glossary/percent-encoding) URI である必要があります。絶対 URI と 相対 URI の両方が許容されます。
+
 #### maxage
 
 ページをキャッシュさせるには、ページの max age を秒単位で表した `number` を返します。レンダリングページにユーザーデータが含まれる場合(`session`経由か、`load` 関数内のクレデンシャル付きの `fetch` など)、結果のキャッシュヘッダには `private` が含まれます。それ以外の場合は、CDN でキャッシュできるように `public` が含まれます。
@@ -153,4 +190,4 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 これは既存の `stuff` とマージされ、後続のレイアウトコンポーネントやページコンポーネントの `load` 関数に渡されます。
 
-これはレイアウトコンポーネントにのみ適用され、ページコンポーネントには適用されません。
+マージされた `stuff` は、`$page.stuff` のように [page store](#modules-$app-stores) を使用するコンポーネントから利用可能で、ページがレイアウトに対してデータを '上向きに' 渡すためのメカニズムを提供します。

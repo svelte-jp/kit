@@ -4,9 +4,8 @@ import { test } from '../../../utils.js';
 /** @typedef {import('@playwright/test').Response} Response */
 
 test.describe.parallel('base path', () => {
-	test('serves /', async ({ page, started, javaScriptEnabled }) => {
+	test('serves /', async ({ page, javaScriptEnabled }) => {
 		await page.goto('/path-base/');
-		await started();
 
 		expect(await page.textContent('h1')).toBe('I am in the template');
 		expect(await page.textContent('h2')).toBe("We're on index.svelte");
@@ -41,6 +40,32 @@ test.describe.parallel('base path', () => {
 				return el && getComputedStyle(el).color;
 			})
 		).toBe('rgb(255, 0, 0)');
+	});
+
+	test('inlines CSS', async ({ page, javaScriptEnabled }) => {
+		await page.goto('/path-base/base/');
+		if (process.env.DEV) {
+			const ssr_style = await page.evaluate(() => document.querySelector('style[data-svelte]'));
+
+			if (javaScriptEnabled) {
+				// <style data-svelte> is removed upon hydration
+				expect(ssr_style).toBeNull();
+			} else {
+				expect(ssr_style).not.toBeNull();
+			}
+
+			expect(
+				await page.evaluate(() => document.querySelector('link[rel="stylesheet"]'))
+			).toBeNull();
+		} else {
+			expect(await page.evaluate(() => document.querySelector('style'))).not.toBeNull();
+			expect(
+				await page.evaluate(() => document.querySelector('link[rel="stylesheet"][disabled]'))
+			).not.toBeNull();
+			expect(
+				await page.evaluate(() => document.querySelector('link[rel="stylesheet"]:not([disabled])'))
+			).not.toBeNull();
+		}
 	});
 
 	test('sets params correctly', async ({ page, clicknav }) => {
@@ -82,18 +107,6 @@ test.describe.parallel('Headers', () => {
 		const response = await page.goto('/path-base');
 		const headers = /** @type {Response} */ (response).headers();
 		expect(headers['permissions-policy']).toBeUndefined();
-	});
-});
-
-test.describe.parallel('Origin', () => {
-	test('sets origin', async ({ baseURL, page }) => {
-		await page.goto('/path-base/origin/');
-
-		const origin = process.env.DEV ? baseURL : 'https://example.com';
-
-		expect(await page.textContent('[data-source="load"]')).toBe(origin);
-		expect(await page.textContent('[data-source="store"]')).toBe(origin);
-		expect(await page.textContent('[data-source="endpoint"]')).toBe(origin);
 	});
 });
 

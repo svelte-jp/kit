@@ -50,8 +50,12 @@ export default function ({ split = false } = {}) {
 			/** @type {string[]} */
 			const redirects = [];
 
+			const replace = {
+				APP: './server/app.js'
+			};
+
 			if (esm) {
-				builder.copy(`${files}/esm`, '.netlify');
+				builder.copy(`${files}/esm`, '.netlify', { replace });
 			} else {
 				glob('**/*.js', { cwd: '.netlify/server' }).forEach((file) => {
 					const filepath = `.netlify/server/${file}`;
@@ -60,7 +64,7 @@ export default function ({ split = false } = {}) {
 					writeFileSync(filepath, output);
 				});
 
-				builder.copy(`${files}/cjs`, '.netlify');
+				builder.copy(`${files}/cjs`, '.netlify', { replace });
 				writeFileSync(join('.netlify', 'package.json'), JSON.stringify({ type: 'commonjs' }));
 			}
 
@@ -129,7 +133,13 @@ export default function ({ split = false } = {}) {
 			builder.copy('_redirects', redirect_file);
 			appendFileSync(redirect_file, `\n\n${redirects.join('\n')}`);
 
-			// TODO write a _headers file that makes client-side assets immutable
+			builder.log.minor('Writing custom headers...');
+			const headers_file = join(publish, '_headers');
+			builder.copy('_headers', headers_file);
+			appendFileSync(
+				headers_file,
+				`\n\n/${builder.appDir}/*\n  cache-control: public\n  cache-control: immutable\n  cache-control: max-age=31536000\n`
+			);
 		}
 	};
 }

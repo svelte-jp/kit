@@ -12,8 +12,10 @@ export const test: TestType<
 	PlaywrightTestArgs &
 		PlaywrightTestOptions & {
 			app: {
-				goto: (url: string) => Promise<void>;
+				goto: (url: string, opts?: { replaceState?: boolean }) => Promise<void>;
 				invalidate: (url: string) => Promise<void>;
+				beforeNavigate: (url: URL) => void | boolean;
+				afterNavigate: (url: URL) => void;
 				prefetch: (url: string) => Promise<void>;
 				prefetchRoutes: (urls: string[]) => Promise<void>;
 			};
@@ -21,7 +23,6 @@ export const test: TestType<
 			clicknav: (selector: string) => Promise<void>;
 			in_view: (selector: string) => Promise<boolean>;
 			read_errors: (href: string) => string;
-			started: () => Promise<void>;
 		},
 	PlaywrightWorkerArgs & PlaywrightWorkerOptions
 >;

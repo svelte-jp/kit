@@ -1,5 +1,35 @@
 # @sveltejs/adapter-netlify
 
+## 1.0.0-next.42
+
+### Patch Changes
+
+- Avoid setting the body of the request when the request method is GET or HEAD ([#3459](https://github.com/sveltejs/kit/pull/3459))
+
+## 1.0.0-next.41
+
+### Patch Changes
+
+- Breaking: change app.render signature to (request: Request) => Promise<Response> ([#3384](https://github.com/sveltejs/kit/pull/3384))
+
+## 1.0.0-next.40
+
+### Patch Changes
+
+- Polyfill fetch before running any app code ([#3400](https://github.com/sveltejs/kit/pull/3400))
+
+## 1.0.0-next.39
+
+### Patch Changes
+
+- Allow `__fetchPolyfill()` to run several times ([#3377](https://github.com/sveltejs/kit/pull/3377))
+
+## 1.0.0-next.38
+
+### Patch Changes
+
+- Add immutable cache headers to generated assets ([#3222](https://github.com/sveltejs/kit/pull/3222))
+
 ## 1.0.0-next.37
 
 ### Patch Changes

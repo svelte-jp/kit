@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { mkdirp } from '../../utils/filesystem.js';
+import { mkdirp, posixify } from '../../utils/filesystem.js';
 import { deep_merge } from '../../utils/object.js';
 import { load_template, print_config_conflicts } from '../config/index.js';
-import { posixify, resolve_entry } from '../utils.js';
+import { get_aliases, resolve_entry, runtime } from '../utils.js';
 import { create_build, find_deps } from './utils.js';
 import { SVELTE_KIT } from '../constants.js';
 import { s } from '../../utils/misc.js';
@@ -12,23 +12,23 @@ import { s } from '../../utils/misc.js';
 /**
  * @param {{
  *   cwd: string;
- *   runtime: string;
  *   hooks: string;
  *   config: import('types/config').ValidatedConfig;
  *   has_service_worker: boolean;
  * }} opts
  * @returns
  */
-const template = ({ cwd, config, hooks, runtime, has_service_worker }) => `
-import { respond } from '${runtime}';
-import root from './generated/root.svelte';
-import { set_paths, assets, base } from './runtime/paths.js';
-import { set_prerendering } from './runtime/env.js';
+const template = ({ cwd, config, hooks, has_service_worker }) => `
+import root from '__GENERATED__/root.svelte';
+import { respond } from '${runtime}/server/index.js';
+import { set_paths, assets, base } from '${runtime}/paths.js';
+import { set_prerendering } from '${runtime}/env.js';
 import * as user_hooks from ${s(hooks)};
 
-const template = ({ head, body }) => ${s(load_template(cwd, config))
+const template = ({ head, body, assets }) => ${s(load_template(cwd, config))
 	.replace('%svelte.head%', '" + head + "')
-	.replace('%svelte.body%', '" + body + "')};
+	.replace('%svelte.body%', '" + body + "')
+	.replace(/%svelte\.assets%/g, '" + assets + "')};
 
 let read = null;
 
@@ -38,7 +38,7 @@ set_paths(${s(config.kit.paths)});
 // named imports without triggering Rollup's missing import detection
 const get_hooks = hooks => ({
 	getSession: hooks.getSession || (() => ({})),
-	handle: hooks.handle || (({ request, resolve }) => resolve(request)),
+	handle: hooks.handle || (({ event, resolve }) => resolve(event)),
 	handleError: hooks.handleError || (({ error }) => console.error(error.stack)),
 	externalFetch: hooks.externalFetch || fetch
 });
@@ -63,21 +63,30 @@ export class App {
 			dev: false,
 			floc: ${config.kit.floc},
 			get_stack: error => String(error), // for security
-			handle_error: (error, request) => {
-				hooks.handleError({ error, request });
+			handle_error: (error, event) => {
+				hooks.handleError({
+					error,
+					event,
+
+					// TODO remove for 1.0
+					// @ts-expect-error
+					get request() {
+						throw new Error('request in handleError has been replaced with event. See https://github.com/sveltejs/kit/pull/3384 for details');
+					}
+				});
 				error.stack = this.options.get_stack(error);
 			},
 			hooks,
 			hydrate: ${s(config.kit.hydrate)},
 			manifest,
+			method_override: ${s(config.kit.methodOverride)},
 			paths: { base, assets },
 			prefix: assets + '/${config.kit.appDir}/',
 			prerender: ${config.kit.prerender.enabled},
 			read,
 			root,
-			service_worker: ${has_service_worker ? "'/service-worker.js'" : 'null'},
+			service_worker: ${has_service_worker ? "base + '/service-worker.js'" : 'null'},
 			router: ${s(config.kit.router)},
-			ssr: ${s(config.kit.ssr)},
 			target: ${s(config.kit.target)},
 			template,
 			trailing_slash: ${s(config.kit.trailingSlash)}
@@ -87,25 +96,11 @@ export class App {
 	render(request, {
 		prerender
 	} = {}) {
-		// TODO remove this for 1.0
-		if (Object.keys(request).sort().join() !== 'headers,method,rawBody,url') {
-			throw new Error('Adapters should call app.render({ url, method, headers, rawBody })');
+		if (!(request instanceof Request)) {
+			throw new Error('The first argument to app.render must be a Request object. See https://github.com/sveltejs/kit/pull/3384 for details');
 		}
 
-		const host = ${
-			config.kit.host
-				? s(config.kit.host)
-				: `request.headers[${s(config.kit.headers.host || 'host')}]`
-		};
-		const protocol = ${
-			config.kit.protocol
-				? s(config.kit.protocol)
-				: config.kit.headers.protocol
-				? `request.headers[${s(config.kit.headers.protocol)}] || default_protocol`
-				: 'default_protocol'
-		};
-
-		return respond({ ...request, url: new URL(request.url, protocol + '://' + host) }, this.options, { prerender });
+		return respond(request, this.options, { prerender });
 	}
 }
 `;
@@ -121,7 +116,6 @@ export class App {
  *   service_worker_entry_file: string | null;
  *   service_worker_register: boolean;
  * }} options
- * @param {string} runtime
  * @param {{ vite_manifest: import('vite').Manifest, assets: import('rollup').OutputAsset[] }} client
  */
 export async function build_server(
@@ -135,7 +129,6 @@ export async function build_server(
 		service_worker_entry_file,
 		service_worker_register
 	},
-	runtime,
 	client
 ) {
 	let hooks_file = resolve_entry(config.kit.files.hooks);
@@ -183,7 +176,6 @@ export async function build_server(
 			cwd,
 			config,
 			hooks: app_relative(hooks_file),
-			runtime,
 			has_service_worker: service_worker_register && !!service_worker_entry_file
 		})
 	);
@@ -230,10 +222,7 @@ export async function build_server(
 			})
 		],
 		resolve: {
-			alias: {
-				$app: path.resolve(`${build_dir}/runtime/app`),
-				$lib: config.kit.files.lib
-			}
+			alias: get_aliases(config)
 		}
 	});
 
@@ -262,16 +251,23 @@ export async function build_server(
 	/** @type {import('vite').Manifest} */
 	const vite_manifest = JSON.parse(fs.readFileSync(`${output_dir}/server/manifest.json`, 'utf-8'));
 
-	const styles_lookup = new Map();
-	if (config.kit.amp) {
-		client.assets.forEach((asset) => {
-			if (asset.fileName.endsWith('.css')) {
-				styles_lookup.set(asset.fileName, asset.source);
-			}
-		});
-	}
-
 	mkdirp(`${output_dir}/server/nodes`);
+	mkdirp(`${output_dir}/server/stylesheets`);
+
+	const stylesheet_lookup = new Map();
+
+	client.assets.forEach((asset) => {
+		if (asset.fileName.endsWith('.css')) {
+			if (config.kit.amp || asset.source.length < config.kit.inlineStyleThreshold) {
+				const index = stylesheet_lookup.size;
+				const file = `${output_dir}/server/stylesheets/${index}.js`;
+
+				fs.writeFileSync(file, `// ${asset.fileName}\nexport default ${s(asset.source)};`);
+				stylesheet_lookup.set(asset.fileName, index);
+			}
+		}
+	});
+
 	manifest_data.components.forEach((component, i) => {
 		const file = `${output_dir}/server/nodes/${i}.js`;
 
@@ -279,17 +275,32 @@ export async function build_server(
 		const css = new Set();
 		find_deps(component, client.vite_manifest, js, css);
 
-		const styles = config.kit.amp && Array.from(css).map((file) => styles_lookup.get(file));
+		const imports = [`import * as module from '../${vite_manifest[component].file}';`];
 
-		const node = `import * as module from '../${vite_manifest[component].file}';
-			export { module };
-			export const entry = '${client.vite_manifest[component].file}';
-			export const js = ${JSON.stringify(Array.from(js))};
-			export const css = ${JSON.stringify(Array.from(css))};
-			${styles ? `export const styles = ${s(styles)}` : ''}
-			`.replace(/^\t\t\t/gm, '');
+		const exports = [
+			'export { module };',
+			`export const entry = '${client.vite_manifest[component].file}';`,
+			`export const js = ${s(Array.from(js))};`,
+			`export const css = ${s(Array.from(css))};`
+		];
 
-		fs.writeFileSync(file, node);
+		/** @type {string[]} */
+		const styles = [];
+
+		css.forEach((file) => {
+			if (stylesheet_lookup.has(file)) {
+				const index = stylesheet_lookup.get(file);
+				const name = `stylesheet_${index}`;
+				imports.push(`import ${name} from '../stylesheets/${index}.js';`);
+				styles.push(`\t${s(file)}: ${name}`);
+			}
+		});
+
+		if (styles.length > 0) {
+			exports.push(`export const styles = {\n${styles.join(',\n')}\n};`);
+		}
+
+		fs.writeFileSync(file, `${imports.join('\n')}\n\n${exports.join('\n')}\n`);
 	});
 
 	return {

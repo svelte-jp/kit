@@ -8,7 +8,7 @@ title: Project files
 
 [こちら](/docs#configuration)に記載されている通り、`webpack.config.js` または `rollup.config.js` を `svelte.config.js` に置き換えてください。Svelte の preprocessor オプション は `config.preprocess` に置き換えてください。
 
-[アダプター(adapter)](/docs#adapters) を追加する必要があります。`sapper build` は [adapter-node](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) とおおよそ同じで、`sapper export` は [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) とおおよそ同じですが、デプロイ先のプラットフォーム向けにデザインされたアダプターを使用すると良いでしょう。
+[adapter](/docs#adapters) を追加する必要があります。`sapper build` は [adapter-node](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) とおおよそ同じで、`sapper export` は [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) とおおよそ同じですが、デプロイ先のプラットフォーム向けにデザインされた adapter を使用すると良いでしょう。
 
 [Vite](https://vitejs.dev) で自動的に処理されないファイルタイプのプラグインを使用している場合は、Viteにおいて同等なことを行う方法を探し、[Vite config](/docs#configuration-vite) に追加する必要があります。
 

@@ -3,9 +3,8 @@ import path from 'path';
 import http from 'http';
 import * as ports from 'port-authority';
 import { expect } from '@playwright/test';
-import { test } from '../../../utils.js';
 import { fileURLToPath } from 'url';
-import { start_server } from '../../../utils.js';
+import { start_server, test } from '../../../utils.js';
 
 /** @typedef {import('@playwright/test').Response} Response */
 
@@ -88,11 +87,69 @@ test.describe.parallel('a11y', () => {
 	});
 });
 
+test.describe.parallel('afterNavigate', () => {
+	test.skip(({ javaScriptEnabled }) => !javaScriptEnabled);
+
+	test('calls callback', async ({ page, clicknav }) => {
+		await page.goto('/after-navigate/a');
+		expect(await page.textContent('h1')).toBe('undefined -> /after-navigate/a');
+
+		await clicknav('[href="/after-navigate/b"]');
+		expect(await page.textContent('h1')).toBe('/after-navigate/a -> /after-navigate/b');
+	});
+});
+
+test.describe.parallel('beforeNavigate', () => {
+	test.skip(({ javaScriptEnabled }) => !javaScriptEnabled);
+
+	test('prevents navigation triggered by link click', async ({ clicknav, page, baseURL }) => {
+		await page.goto('/before-navigate/prevent-navigation');
+
+		try {
+			await clicknav('[href="/before-navigate/a"]');
+			expect(false).toBe(true);
+		} catch (/** @type {any} */ e) {
+			expect(e.message).toMatch('Timed out');
+		}
+
+		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
+		expect(await page.innerHTML('pre')).toBe('true');
+	});
+
+	test('prevents navigation triggered by goto', async ({ page, app, baseURL }) => {
+		await page.goto('/before-navigate/prevent-navigation');
+		await app.goto('/before-navigate/a');
+		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
+		expect(await page.innerHTML('pre')).toBe('true');
+	});
+
+	test('prevents navigation triggered by back button', async ({ page, app, baseURL }) => {
+		await page.goto('/before-navigate/a');
+
+		await app.goto('/before-navigate/prevent-navigation');
+		await page.goBack();
+		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
+		expect(await page.innerHTML('pre')).toBe('true');
+	});
+
+	test('prevents unload', async ({ page }) => {
+		await page.goto('/before-navigate/prevent-navigation');
+
+		const type = new Promise((fulfil) => {
+			page.on('dialog', async (dialog) => {
+				fulfil(dialog.type());
+				await dialog.dismiss();
+			});
+		});
+
+		await page.close({ runBeforeUnload: true });
+		expect(await type).toBe('beforeunload');
+	});
+});
+
 test.describe('Scrolling', () => {
-	// skip these tests if
-	// a) JS is disabled, since we're testing client-side behaviour, or
-	// b) we're in CI, because for unknown reasons the tests are flaky as hell there
-	test.skip(({ javaScriptEnabled }) => !javaScriptEnabled || !!process.env.CI);
+	// skip these tests if JS is disabled, since we're testing client-side behaviour
+	test.skip(({ javaScriptEnabled }) => !javaScriptEnabled);
 
 	test('url-supplied anchor works on direct page load', async ({ page, in_view }) => {
 		await page.goto('/anchor/anchor#go-to-element');
@@ -145,11 +202,9 @@ test.describe('Scrolling', () => {
 
 	test('url-supplied anchor is ignored with onMount() scrolling on direct page load', async ({
 		page,
-		in_view,
-		started
+		in_view
 	}) => {
 		await page.goto('/anchor-with-manual-scroll/anchor#go-to-element');
-		await started();
 		expect(await in_view('#abcde')).toBe(true);
 	});
 
@@ -364,6 +419,46 @@ test.describe.parallel('Endpoints', () => {
 
 		expect(await page.textContent('h1')).toBe(random);
 	});
+
+	test('allows headers to be a Headers object', async ({ request }) => {
+		const response = await request.get('/endpoint-output/headers-object');
+
+		expect(response.headers()['x-foo']).toBe('bar');
+	});
+
+	test('allows return value to be a Response', async ({ request }) => {
+		const { server, port } = await start_server((req, res) => {
+			res.writeHead(200, {
+				'X-Foo': 'bar'
+			});
+
+			res.end('ok');
+		});
+
+		try {
+			const response = await request.get(`/endpoint-output/proxy?port=${port}`);
+
+			expect(await response.text()).toBe('ok');
+			expect(response.headers()['x-foo']).toBe('bar');
+		} finally {
+			server.close();
+		}
+	});
+
+	test('multiple set-cookie on endpoints using GET', async ({ request }) => {
+		const response = await request.get('/set-cookie');
+
+		const cookies = response
+			.headersArray()
+			.filter((obj) => obj.name === 'set-cookie')
+			.map((obj) => obj.value);
+
+		expect(cookies).toEqual([
+			'answer=42; HttpOnly',
+			'problem=comma, separated, values; HttpOnly',
+			'name=SvelteKit; path=/; HttpOnly'
+		]);
+	});
 });
 
 test.describe.parallel('Encoded paths', () => {
@@ -415,6 +510,22 @@ test.describe.parallel('Encoded paths', () => {
 		expect(await page.innerHTML('h1')).toBe('static');
 		expect(decodeURI(await page.innerHTML('h2'))).toBe('/encoded/苗条');
 		expect(decodeURI(await page.innerHTML('h3'))).toBe('/encoded/苗条');
+	});
+
+	test('redirects do not re-encode the redirect string', async ({ page, clicknav }) => {
+		await page.goto('/encoded');
+
+		await clicknav('[href="/encoded/redirect"]');
+
+		// check innerText instead of innerHTML because innerHTML would return the '&amp;' character reference instead of '&' character.
+		expect(await page.innerText('pre')).toBe('/苗条?foo=bar&fizz=buzz');
+	});
+
+	test('redirects do not re-encode the redirect string during ssr', async ({ page }) => {
+		await page.goto('/encoded/redirect');
+
+		// check innerText instead of innerHTML because innerHTML would return the '&amp;' character reference instead of '&' character.
+		expect(await page.innerText('pre')).toBe('/苗条?foo=bar&fizz=buzz');
 	});
 
 	test('sets charset on JSON Content-Type', async ({ request }) => {
@@ -620,6 +731,16 @@ test.describe.parallel('Errors', () => {
 			expect(await page.innerHTML('h1')).toBe('401');
 		}
 	});
+
+	test('error thrown in handle results in a rendered error page', async ({ page }) => {
+		await page.goto('/errors/error-in-handle');
+
+		expect(await page.textContent('footer')).toBe('Custom layout');
+		expect(await page.textContent('#message')).toBe(
+			'This is your custom error page saying: "Error in handle"'
+		);
+		expect(await page.innerHTML('h1')).toBe('500');
+	});
 });
 
 test.describe.parallel('ETags', () => {
@@ -637,6 +758,7 @@ test.describe.parallel('ETags', () => {
 		});
 
 		expect(r2.status()).toBe(304);
+		expect(r2.headers()['expires']).toBe('yesterday');
 	});
 
 	test('generates etag/304 for binary body', async ({ request }) => {
@@ -661,6 +783,20 @@ test.describe.parallel('ETags', () => {
 		const r2 = await request.get('/etag/text', {
 			headers: {
 				'if-none-match': `W/${etag}`
+			}
+		});
+
+		expect(r2.status()).toBe(304);
+	});
+
+	test('custom etag', async ({ request }) => {
+		const r1 = await request.get('/etag/custom');
+		const etag = r1.headers()['etag'];
+		expect(etag).toBe('@1234@');
+
+		const r2 = await request.get('/etag/custom', {
+			headers: {
+				'if-none-match': '@1234@'
 			}
 		});
 
@@ -918,6 +1054,52 @@ test.describe.parallel('Load', () => {
 	});
 });
 
+test.describe.parallel('Method overrides', () => {
+	test('http method is overridden via URL parameter', async ({ page }) => {
+		await page.goto('/method-override');
+
+		let val;
+
+		// Check initial value
+		val = await page.textContent('h1');
+		expect('').toBe(val);
+
+		await page.click('"PATCH"');
+		val = await page.textContent('h1');
+		expect('PATCH').toBe(val);
+
+		await page.click('"DELETE"');
+		val = await page.textContent('h1');
+		expect('DELETE').toBe(val);
+	});
+
+	test('GET method is not overridden', async ({ page }) => {
+		await page.goto('/method-override');
+		await page.click('"No Override From GET"');
+
+		const val = await page.textContent('h1');
+		expect('GET').toBe(val);
+	});
+
+	test('400 response when trying to override POST with GET', async ({ page }) => {
+		await page.goto('/method-override');
+		await page.click('"No Override To GET"');
+
+		expect(await page.innerHTML('pre')).toBe(
+			'_method=GET is not allowed. See https://kit.svelte.dev/docs#configuration-methodoverride'
+		);
+	});
+
+	test('400 response when override method not in allowed methods', async ({ page }) => {
+		await page.goto('/method-override');
+		await page.click('"No Override To CONNECT"');
+
+		expect(await page.innerHTML('pre')).toBe(
+			'_method=CONNECT is not allowed. See https://kit.svelte.dev/docs#configuration-methodoverride'
+		);
+	});
+});
+
 test.describe.parallel('Nested layouts', () => {
 	test('renders a nested layout', async ({ page }) => {
 		await page.goto('/nested-layout');
@@ -1077,6 +1259,17 @@ test.describe.parallel('$app/paths', () => {
 			})
 		);
 	});
+
+	test('replaces %svelte.assets% in template with relative path', async ({ page }) => {
+		await page.goto('/');
+		expect(await page.getAttribute('link[rel=icon]', 'href')).toBe('./favicon.png');
+
+		await page.goto('/routing');
+		expect(await page.getAttribute('link[rel=icon]', 'href')).toBe('./favicon.png');
+
+		await page.goto('/routing/rest/foo/bar/baz');
+		expect(await page.getAttribute('link[rel=icon]', 'href')).toBe('../../../../favicon.png');
+	});
 });
 
 test.describe.parallel('$app/stores', () => {
@@ -1097,6 +1290,29 @@ test.describe.parallel('$app/stores', () => {
 
 		const oops = await page.evaluate(() => window.oops);
 		expect(oops).toBeUndefined();
+	});
+
+	test('page store contains stuff', async ({ page, clicknav }) => {
+		await page.goto('/store/stuff/www');
+
+		expect(await page.textContent('#store-stuff')).toBe(
+			JSON.stringify({ name: 'SvelteKit', value: 456, page: 'www' })
+		);
+
+		await clicknav('a[href="/store/stuff/zzz"]');
+		expect(await page.textContent('#store-stuff')).toBe(
+			JSON.stringify({ name: 'SvelteKit', value: 456, page: 'zzz' })
+		);
+
+		await clicknav('a[href="/store/stuff/xxx"]');
+		expect(await page.textContent('#store-stuff')).toBe(
+			JSON.stringify({ name: 'SvelteKit', value: 789, error: 'Params = xxx' })
+		);
+
+		await clicknav('a[href="/store/stuff/yyy"]');
+		expect(await page.textContent('#store-stuff')).toBe(
+			JSON.stringify({ name: 'SvelteKit', value: 789, error: 'Params = yyy' })
+		);
 	});
 
 	test('navigating store contains from and to', async ({ app, page, javaScriptEnabled }) => {
@@ -1219,11 +1435,10 @@ test.describe.parallel('Redirects', () => {
 		);
 	});
 
-	test('redirect-on-load', async ({ baseURL, page, javaScriptEnabled, started }) => {
+	test('redirect-on-load', async ({ baseURL, page, javaScriptEnabled }) => {
 		await page.goto('/redirect-on-load');
 
 		if (javaScriptEnabled) {
-			await started();
 			await page.waitForTimeout(50); // TODO investigate why this test is flaky
 			expect(page.url()).toBe(`${baseURL}/redirect-on-load/redirected`);
 			expect(await page.textContent('h1')).toBe('Hazaa!');
@@ -1239,8 +1454,7 @@ test.describe.parallel('Routing', () => {
 		page,
 		clicknav,
 		app,
-		javaScriptEnabled,
-		started
+		javaScriptEnabled
 	}) => {
 		await page.goto('/routing/slashes');
 
@@ -1250,7 +1464,6 @@ test.describe.parallel('Routing', () => {
 
 		if (javaScriptEnabled) {
 			await page.goto(`${baseURL}/routing/slashes`);
-			await started();
 			await app.goto('/routing/');
 			expect(page.url()).toBe(`${baseURL}/routing`);
 			expect(await page.textContent('h1')).toBe('Great success!');
@@ -1262,8 +1475,7 @@ test.describe.parallel('Routing', () => {
 		page,
 		clicknav,
 		app,
-		javaScriptEnabled,
-		started
+		javaScriptEnabled
 	}) => {
 		await page.goto('/routing/slashes');
 
@@ -1273,7 +1485,6 @@ test.describe.parallel('Routing', () => {
 
 		if (javaScriptEnabled) {
 			await page.goto(`${baseURL}/routing/slashes`);
-			await started();
 			await app.goto('/routing/?');
 			expect(page.url()).toBe(`${baseURL}/routing`);
 			expect(await page.textContent('h1')).toBe('Great success!');
@@ -1285,8 +1496,7 @@ test.describe.parallel('Routing', () => {
 		page,
 		clicknav,
 		app,
-		javaScriptEnabled,
-		started
+		javaScriptEnabled
 	}) => {
 		await page.goto('/routing/slashes');
 
@@ -1296,7 +1506,6 @@ test.describe.parallel('Routing', () => {
 
 		if (javaScriptEnabled) {
 			await page.goto(`${baseURL}/routing/slashes`);
-			await started();
 			await app.goto('/routing/?foo=bar');
 			expect(page.url()).toBe(`${baseURL}/routing?foo=bar`);
 			expect(await page.textContent('h1')).toBe('Great success!');
@@ -1334,13 +1543,11 @@ test.describe.parallel('Routing', () => {
 		app,
 		page,
 		clicknav,
-		javaScriptEnabled,
-		started
+		javaScriptEnabled
 	}) => {
 		if (javaScriptEnabled) {
 			await page.goto('/routing');
 
-			await started();
 			await app.prefetchRoutes(['/routing/a']).catch((e) => {
 				// from error handler tests; ignore
 				if (!e.message.includes('Crashing now')) throw e;
@@ -1357,25 +1564,17 @@ test.describe.parallel('Routing', () => {
 		}
 	});
 
-	test('navigates programmatically', async ({ page, app, javaScriptEnabled, started }) => {
+	test('navigates programmatically', async ({ page, app, javaScriptEnabled }) => {
 		if (javaScriptEnabled) {
 			await page.goto('/routing/a');
-			await started();
 			await app.goto('/routing/b');
 			expect(await page.textContent('h1')).toBe('b');
 		}
 	});
 
-	test('prefetches programmatically', async ({
-		baseURL,
-		page,
-		app,
-		javaScriptEnabled,
-		started
-	}) => {
+	test('prefetches programmatically', async ({ baseURL, page, app, javaScriptEnabled }) => {
 		if (javaScriptEnabled) {
 			await page.goto('/routing/a');
-			await started();
 
 			/** @type {string[]} */
 			let requests = [];
@@ -1500,6 +1699,25 @@ test.describe.parallel('Routing', () => {
 		).toBe('rgb(255, 0, 0)');
 	});
 
+	test('$page.url.hash is correctly set on page load', async ({ page, javaScriptEnabled }) => {
+		if (javaScriptEnabled) {
+			await page.goto('/routing/hashes/pagestore#target');
+			expect(await page.textContent('#window-hash')).toBe('#target');
+			expect(await page.textContent('#page-url-hash')).toBe('#target');
+		}
+	});
+
+	test('$page.url.hash is correctly set on navigation', async ({ page, javaScriptEnabled }) => {
+		if (javaScriptEnabled) {
+			await page.goto('/routing/hashes/pagestore');
+			expect(await page.textContent('#window-hash')).toBe('');
+			expect(await page.textContent('#page-url-hash')).toBe('');
+			await page.click('[href="#target"]');
+			expect(await page.textContent('#window-hash')).toBe('#target');
+			expect(await page.textContent('#page-url-hash')).toBe('#target');
+		}
+	});
+
 	test('fallthrough', async ({ page }) => {
 		await page.goto('/routing/fallthrough-simple/invalid');
 		expect(await page.textContent('h1')).toBe('Page');
@@ -1513,6 +1731,17 @@ test.describe.parallel('Routing', () => {
 		expect(await page.textContent('h1')).toBe('camel is an animal');
 
 		await clicknav('[href="/routing/fallthrough-advanced/potato"]');
+		expect(await page.textContent('h1')).toBe('404');
+	});
+
+	test('dynamic fallthrough of layout', async ({ page, clicknav }) => {
+		await page.goto('/routing/fallthrough-layout/okay');
+		expect(await page.textContent('h1')).toBe('foo is okay');
+
+		await clicknav('[href="/routing/fallthrough-layout/ok"]');
+		expect(await page.textContent('h1')).toBe('xyz is ok');
+
+		await clicknav('[href="/routing/fallthrough-layout/notok"]');
 		expect(await page.textContent('h1')).toBe('404');
 	});
 
@@ -1619,6 +1848,11 @@ test.describe.parallel('Routing', () => {
 		await clicknav('[href="/routing/rest/path/three"]');
 		expect(await page.textContent('h1')).toBe('path: /routing/rest/path/three');
 	});
+
+	test('allows rest routes to have prefixes and suffixes', async ({ page }) => {
+		await page.goto('/routing/rest/complex/prefix-one/two/three');
+		expect(await page.textContent('h1')).toBe('parts: one/two/three');
+	});
 });
 
 test.describe.parallel('Session', () => {
@@ -1641,13 +1875,11 @@ test.describe.parallel('Shadow DOM', () => {
 		app,
 		page,
 		clicknav,
-		javaScriptEnabled,
-		started
+		javaScriptEnabled
 	}) => {
 		await page.goto('/routing/shadow-dom');
 
 		if (javaScriptEnabled) {
-			await started();
 			await app.prefetchRoutes(['/routing/a']).catch((e) => {
 				// from error handler tests; ignore
 				if (!e.message.includes('Crashing now')) throw e;

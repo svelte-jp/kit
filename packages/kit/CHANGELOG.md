@@ -1,5 +1,183 @@
 # @sveltejs/kit
 
+## 1.0.0-next.240
+
+### Patch Changes
+
+- Error if handle hook returns something other than a Response ([#3496](https://github.com/sveltejs/kit/pull/3496))
+
+* allow setting multiple set-cookie headers ([#3502](https://github.com/sveltejs/kit/pull/3502))
+
+- fixed prerendering with base path configured ([#3500](https://github.com/sveltejs/kit/pull/3500))
+
+## 1.0.0-next.239
+
+### Patch Changes
+
+- Insert <meta http-equiv> cache-control header when prerendering ([#3493](https://github.com/sveltejs/kit/pull/3493))
+
+## 1.0.0-next.238
+
+### Patch Changes
+
+- Escape prerendered redirect locations, instead of encoding them ([#3456](https://github.com/sveltejs/kit/pull/3456))
+
+## 1.0.0-next.237
+
+### Patch Changes
+
+- Type compilerOptions as CompileOptions instead of any ([#3486](https://github.com/sveltejs/kit/pull/3486))
+
+## 1.0.0-next.236
+
+### Patch Changes
+
+- The redirect property returned from a module's load function must now be a properly encoded URI string value. ([#3404](https://github.com/sveltejs/kit/pull/3404))
+
+## 1.0.0-next.235
+
+### Patch Changes
+
+- register service worker regardless of hydrate/router option ([#3435](https://github.com/sveltejs/kit/pull/3435))
+
+## 1.0.0-next.234
+
+### Patch Changes
+
+- Allow endpoints to return a Response, or an object with Headers ([#3384](https://github.com/sveltejs/kit/pull/3384))
+
+* Breaking: Expose standard Request object to endpoints and hooks ([#3384](https://github.com/sveltejs/kit/pull/3384))
+
+- Breaking: change app.render signature to (request: Request) => Promise<Response> ([#3384](https://github.com/sveltejs/kit/pull/3384))
+
+* Breaking: Remove protocol/host configuration options from Kit to adapter-node ([#3384](https://github.com/sveltejs/kit/pull/3384))
+
+## 1.0.0-next.233
+
+### Patch Changes
+
+- [fix] refactor navigation singletons to avoid storing undefined reference ([#3374](https://github.com/sveltejs/kit/pull/3374))
+
+* [fix] add media="(max-width: 0)" to prevent stylesheets from downloading ([#3396](https://github.com/sveltejs/kit/pull/3396))
+
+## 1.0.0-next.232
+
+### Patch Changes
+
+- Preserve explicit ETag header ([#3348](https://github.com/sveltejs/kit/pull/3348))
+
+* [fix] ignore hash links during prerendering (again) ([#3367](https://github.com/sveltejs/kit/pull/3367))
+
+## 1.0.0-next.231
+
+### Patch Changes
+
+- Handle requests for /basepath ([#3345](https://github.com/sveltejs/kit/pull/3345))
+
+* Allow \_\_fetch_polyfill() to run several times ([#3357](https://github.com/sveltejs/kit/pull/3357))
+
+- Handle static assets with /basepath in svelte-kit dev ([#3346](https://github.com/sveltejs/kit/pull/3346))
+
+## 1.0.0-next.230
+
+### Patch Changes
+
+- Log errors to stderr rather than stdout ([#3328](https://github.com/sveltejs/kit/pull/3328))
+
+## 1.0.0-next.229
+
+### Patch Changes
+
+- The path to a service worker is now rebased to the app's base path ([#3319](https://github.com/sveltejs/kit/pull/3319))
+
+## 1.0.0-next.228
+
+### Patch Changes
+
+- Throw on accessing url.search/searchParams from page store during prerendering ([#3314](https://github.com/sveltejs/kit/pull/3314))
+
+* Preserve relevant headers when serving 304s ([#3313](https://github.com/sveltejs/kit/pull/3313))
+
+## 1.0.0-next.227
+
+### Patch Changes
+
+- Adds beforeNavigate/afterNavigate lifecycle functions ([#3293](https://github.com/sveltejs/kit/pull/3293))
+
+## 1.0.0-next.226
+
+### Patch Changes
+
+- Fix srcset parsing ([#3301](https://github.com/sveltejs/kit/pull/3301))
+
+* Change ReadOnlyFormData behavior to mimic the spec's FormData interface ([#3302](https://github.com/sveltejs/kit/pull/3302))
+
+## 1.0.0-next.225
+
+### Patch Changes
+
+- add inlineStyleThreshold option, below which stylesheets are inlined into the page ([#2620](https://github.com/sveltejs/kit/pull/2620))
+
+## 1.0.0-next.224
+
+### Patch Changes
+
+- More robust crawling of prerendered pages ([#3288](https://github.com/sveltejs/kit/pull/3288))
+
+## 1.0.0-next.223
+
+### Patch Changes
+
+- Add methodOverride option for submitting PUT/PATCH/DELETE/etc with <form> elements ([#2989](https://github.com/sveltejs/kit/pull/2989))
+
+## 1.0.0-next.222
+
+### Patch Changes
+
+- Remove `config.kit.ssr` and `export const ssr` in favour of `ssr` parameter for `resolve` function in `handle` ([#2804](https://github.com/sveltejs/kit/pull/2804))
+
+## 1.0.0-next.221
+
+### Patch Changes
+
+- Add returned stuff from pages into \$page store ([#3252](https://github.com/sveltejs/kit/pull/3252))
+
+* Fallthrough is now explicit and layout components now also support fallthrough ([#3217](https://github.com/sveltejs/kit/pull/3217))
+
+## 1.0.0-next.220
+
+### Patch Changes
+
+- url hash is now properly reflected in page store ([#3273](https://github.com/sveltejs/kit/pull/3273))
+
+* Strip hash fragments from URLs during prerendering ([#3251](https://github.com/sveltejs/kit/pull/3251))
+
+- Allow prefixes and suffixes around rest parameters ([#3240](https://github.com/sveltejs/kit/pull/3240))
+
+## 1.0.0-next.219
+
+### Patch Changes
+
+- Render error page if error happens in handle hook ([#3239](https://github.com/sveltejs/kit/pull/3239))
+
+* [chore] update dependency sirv to v2 ([#3263](https://github.com/sveltejs/kit/pull/3263))
+
+## 1.0.0-next.218
+
+### Patch Changes
+
+- Expose appDir to adapters ([#3222](https://github.com/sveltejs/kit/pull/3222))
+
+* Replace %svelte.assets% with relative path ([#3234](https://github.com/sveltejs/kit/pull/3234))
+
+## 1.0.0-next.217
+
+### Patch Changes
+
+- Improve error message when svelte.config.js is not found ([#3219](https://github.com/sveltejs/kit/pull/3219))
+
+* Support more text content types ([#2781](https://github.com/sveltejs/kit/pull/2781))
+
 ## 1.0.0-next.216
 
 ### Patch Changes
