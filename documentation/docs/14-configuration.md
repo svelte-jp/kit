@@ -17,6 +17,13 @@ const config = {
 		adapter: null,
 		amp: false,
 		appDir: '_app',
+		csp: {
+			mode: 'auto',
+			directives: {
+				'default-src': undefined
+				// ...
+			}
+		},
 		files: {
 			assets: 'static',
 			hooks: 'src/hooks',
@@ -47,10 +54,12 @@ const config = {
 			concurrency: 1,
 			crawl: true,
 			enabled: true,
+			subfolders: true,
 			entries: ['*'],
 			onError: 'fail'
 		},
 		router: true,
+		routes: (filepath) => !/(?:(?:^_|\/_)|(?:^\.|\/\.)(?!well-known))/.test(filepath),
 		serviceWorker: {
 			register: true,
 			files: (filepath) => !/\.DS_STORE/.test(filepath)
@@ -81,6 +90,29 @@ export default config;
 ### appDir
 
 ビルドされたJSとCSS(およびインポートされたアセット)が提供される `paths.assets` からの相対ディレクトリ(ファイル名にはコンテンツベースのハッシュが含まれており、つまり、無期限にキャッシュすることができます)。先頭または末尾が `/` であってはいけません。
+
+### csp
+
+An object containing zero or more of the following values:
+
+- `mode` — 'hash', 'nonce' or 'auto'
+- `directives` — an object of `[directive]: value[]` pairs.
+
+[Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) configuration. CSP helps to protect your users against cross-site scripting (XSS) attacks, by limiting the places resources can be loaded from. For example, a configuration like this...
+
+```js
+{
+	directives: {
+		'script-src': ['self']
+	}
+}
+```
+
+...would prevent scripts loading from external sites. SvelteKit will augment the specified directives with nonces or hashes (depending on `mode`) for any inline styles and scripts it generates.
+
+When pages are prerendered, the CSP header is added via a `<meta http-equiv>` tag (note that in this case, `frame-ancestors`, `report-uri` and `sandbox` directives will be ignored).
+
+> When `mode` is `'auto'`, SvelteKit will use nonces for dynamically rendered pages and hashes for prerendered pages. Using nonces with prerendered pages is insecure and therefore forbiddem.
 
 ### files
 
@@ -165,6 +197,7 @@ export default {
 - `crawl` — SvelteKitがシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
 - `enabled` — `false` に設定すると、プリレンダリングを完全に無効化できます
 - `entries` — プリレンダリングするページ、またはクロールを開始するページ(`crawl: true` の場合)の配列。`*` 文字列には、全ての動的ではないルート(routes)(すなわち `[parameters]` を含まないページ) が含まれます
+- `subfolders` - `false` に設定すると、ルートのサブフォルダを無効にすることができます: `about/index.html` の代わりに `about.html` をレンダリングします
 - `onError`
 
   - `'fail'` — (デフォルト) リンクをたどったときにルーティングエラーが発生した場合、ビルドを失敗させます
@@ -193,6 +226,10 @@ export default {
 ### router
 
 アプリ全体で、クライアントサイドの [ルーター(router)](#page-options-router) を有効または無効にします。
+
+### routes
+
+A `(filepath: string) => boolean` function that determines which files create routes and which are treated as [private modules](#routing-private-modules).
 
 ### serviceWorker
 

@@ -60,7 +60,8 @@ export async function respond(request, options, state = {}) {
 		request,
 		url,
 		params: {},
-		locals: {}
+		locals: {},
+		platform: state.platform
 	};
 
 	// TODO remove this for 1.0
@@ -122,7 +123,9 @@ export async function respond(request, options, state = {}) {
 				let decoded = decodeURI(event.url.pathname);
 
 				if (options.paths.base) {
-					if (!decoded.startsWith(options.paths.base)) return;
+					if (!decoded.startsWith(options.paths.base)) {
+						return new Response(undefined, { status: 404 });
+					}
 					decoded = decoded.slice(options.paths.base.length) || '/';
 				}
 
@@ -187,6 +190,10 @@ export async function respond(request, options, state = {}) {
 						ssr
 					});
 				}
+
+				// we can't load the endpoint from our own manifest,
+				// so we need to make an actual HTTP request
+				return await fetch(request);
 			},
 
 			// TODO remove for 1.0

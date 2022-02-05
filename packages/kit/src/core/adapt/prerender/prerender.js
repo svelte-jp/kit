@@ -112,6 +112,25 @@ export async function prerender({ cwd, out, log, config, build_data, fallback, a
 	const q = queue(config.kit.prerender.concurrency);
 
 	/**
+	 * @param {string} path
+	 * @param {boolean} is_html
+	 */
+	function output_filename(path, is_html) {
+		if (path === '/') {
+			return '/index.html';
+		}
+		const parts = path.split('/');
+		if (is_html && parts[parts.length - 1] !== 'index.html') {
+			if (config.kit.prerender.createIndexFiles) {
+				parts.push('index.html');
+			} else {
+				parts[parts.length - 1] += '.html';
+			}
+		}
+		return parts.join('/');
+	}
+
+	/**
 	 * @param {string} decoded_path
 	 * @param {string?} referrer
 	 */
@@ -130,8 +149,9 @@ export async function prerender({ cwd, out, log, config, build_data, fallback, a
 	 * @param {string?} referrer
 	 */
 	async function visit(path, decoded_path, referrer) {
-		/** @type {Map<string, Response>} */
+		/** @type {Map<string, import('types/internal').PrerenderDependency>} */
 		const dependencies = new Map();
+
 		const render_path = config.kit.paths?.base
 			? `http://sveltekit-prerender${config.kit.paths.base}${path === '/' ? '' : path}`
 			: `http://sveltekit-prerender${path}`;
@@ -148,12 +168,7 @@ export async function prerender({ cwd, out, log, config, build_data, fallback, a
 			const type = rendered.headers.get('content-type');
 			const is_html = response_type === REDIRECT || type === 'text/html';
 
-			const parts = decoded_path.split('/');
-			if (is_html && parts[parts.length - 1] !== 'index.html') {
-				parts.push('index.html');
-			}
-
-			const file = `${out}${parts.join('/')}`;
+			const file = `${out}${output_filename(decoded_path, is_html)}`;
 
 			if (response_type === REDIRECT) {
 				const location = rendered.headers.get('location');
@@ -192,28 +207,26 @@ export async function prerender({ cwd, out, log, config, build_data, fallback, a
 			}
 
 			for (const [dependency_path, result] of dependencies) {
-				const response_type = Math.floor(result.status / 100);
+				const { status, headers } = result.response;
 
-				const is_html = result.headers.get('content-type') === 'text/html';
+				const response_type = Math.floor(status / 100);
 
-				const parts = dependency_path.split('/');
-				if (is_html && parts[parts.length - 1] !== 'index.html') {
-					parts.push('index.html');
-				}
+				const is_html = headers.get('content-type') === 'text/html';
 
-				const file = `${out}${parts.join('/')}`;
+				const file = `${out}${output_filename(dependency_path, is_html)}`;
 				mkdirp(dirname(file));
 
-				if (result.body) {
-					writeFileSync(file, await result.text());
-					paths.push(dependency_path);
-				}
+				writeFileSync(
+					file,
+					result.body === null ? new Uint8Array(await result.response.arrayBuffer()) : result.body
+				);
+				paths.push(dependency_path);
 
 				if (response_type === OK) {
-					log.info(`${result.status} ${dependency_path}`);
+					log.info(`${status} ${dependency_path}`);
 				} else {
 					error({
-						status: result.status,
+						status,
 						path: dependency_path,
 						referrer: path,
 						referenceType: 'fetched'

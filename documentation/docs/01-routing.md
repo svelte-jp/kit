@@ -51,26 +51,34 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 // Declaration types for Endpoints
 // * declarations that are not exported are for internal use
 
-export interface RequestEvent<Locals = Record<string, any>> {
+export interface RequestEvent<Locals = Record<string, any>, Platform = Record<string, any>> {
 	request: Request;
 	url: URL;
 	params: Record<string, string>;
 	locals: Locals;
+	platform: Platform;
 }
 
 type Body = JSONString | Uint8Array | ReadableStream | stream.Readable;
-export interface EndpointOutput {
+export interface EndpointOutput<Output extends Body = Body> {
 	status?: number;
-	headers?: HeadersInit;
-	body?: Body;
+	headers?: Headers | Partial<ResponseHeaders>;
+	body?: Output;
 }
 
 type MaybePromise<T> = T | Promise<T>;
 interface Fallthrough {
 	fallthrough: true;
 }
-export interface RequestHandler<Locals = Record<string, any>> {
-	(event: RequestEvent<Locals>): MaybePromise<Either<Response | EndpointOutput, Fallthrough>>;
+
+export interface RequestHandler<
+	Locals = Record<string, any>,
+	Platform = Record<string, any>,
+	Output extends Body = Body
+> {
+	(event: RequestEvent<Locals, Platform>): MaybePromise<
+		Either<Response | EndpointOutput<Output>, Fallthrough>
+	>;
 }
 ```
 
@@ -142,7 +150,7 @@ export async function post({ request }) {
 }
 ```
 
-#### HTTP Method Overrides
+#### HTTP method overrides
 
 HTML `<form>` 要素は、ネイティブでは `GET` と `POST` メソッドのみをサポートしています。例えば `PUT` や `DELETE` などのその他のメソッドを許可するには、それを [configuration](#configuration-methodoverride) で指定し、`_method=VERB` パラメーター (パラメーター名は設定で変更できます) を form の `action` に追加してください:
 
@@ -167,7 +175,7 @@ export default {
 
 ### Private modules
 
-`src/routes/foo/_Private.svelte` や `src/routes/bar/_utils/cool-util.js` のように、先頭にアンダースコアが付くファイル名はルーターから隠されますが、そうではないファイルからインポートすることは可能です。
+名前が `_` や `.` で始まるファイルやディレクトリ([`.well-known`](https://en.wikipedia.org/wiki/Well-known_URI) は除く) はデフォルトでプライベートで、ルート(routes)を作成しません(ルートを作成するファイルからインポートすることは可能です)。どのモジュールをパブリックまたはプライベートとみなすかについては [`ルート(routes)`](#configuration-routes) 設定で設定することができます。
 
 ### Advanced
 

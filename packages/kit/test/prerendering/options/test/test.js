@@ -15,9 +15,18 @@ test('prerenders /path-base', () => {
 });
 
 test('prerenders nested /path-base', () => {
-	const content = read('/nested/index.html');
+	const content = read('/nested.html');
 	assert.ok(content.includes('<h1>nested hello</h1>'));
 	assert.ok(content.includes('http://sveltekit-prerender/path-base/nested'));
+});
+
+test('adds CSP headers via meta tag', () => {
+	const content = read('index.html');
+	assert.ok(
+		content.includes(
+			'<meta http-equiv="content-security-policy" content="script-src \'self\' \'sha256-'
+		)
+	);
 });
 
 test.run();

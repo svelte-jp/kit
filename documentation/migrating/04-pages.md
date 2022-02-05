@@ -4,7 +4,7 @@ title: Pages and layouts
 
 ### Renamed files
 
-カスタムエラーページコンポーネントを `_error.svelte` から `__error.svelte` にリネームしてください。同様に、`_layout.svelte` ファイルも `__layout.svelte` にリネームしてください。SvelteKitでは二重のアンダースコアの接頭辞をリザーブしています。プライベートモジュールはまだ接頭辞として `_` を付けます。
+カスタムエラーページコンポーネントを `_error.svelte` から `__error.svelte` にリネームしてください。同様に、`_layout.svelte` ファイルも `__layout.svelte` にリネームしてください。SvelteKitでは二重のアンダースコアの接頭辞をリザーブしています。[プライベートモジュール](#routing-private-modules)にはまだ接頭辞として `_` を付けます([`ルート(routes)`](docs#configuration-routes)設定で変更可能です)。
 
 ### Imports
 

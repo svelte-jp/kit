@@ -1,5 +1,83 @@
 # create-svelte
 
+## 2.0.0-next.113
+
+### Patch Changes
+
+- Bump version ([#3610](https://github.com/sveltejs/kit/pull/3610))
+
+## 2.0.0-next.112
+
+### Patch Changes
+
+- Try this ([#3608](https://github.com/sveltejs/kit/pull/3608))
+
+## 2.0.0-next.111
+
+### Patch Changes
+
+- I think this might be it ([#3606](https://github.com/sveltejs/kit/pull/3606))
+
+## 2.0.0-next.110
+
+### Patch Changes
+
+- And again ([#3604](https://github.com/sveltejs/kit/pull/3604))
+
+## 2.0.0-next.109
+
+### Patch Changes
+
+- Bump version ([#3602](https://github.com/sveltejs/kit/pull/3602))
+
+## 2.0.0-next.108
+
+### Patch Changes
+
+- And again ([#3600](https://github.com/sveltejs/kit/pull/3600))
+
+## 2.0.0-next.107
+
+### Patch Changes
+
+- Trying something ([#3598](https://github.com/sveltejs/kit/pull/3598))
+
+## 2.0.0-next.105
+
+### Patch Changes
+
+- Another meaningless change ([#3596](https://github.com/sveltejs/kit/pull/3596))
+
+## 2.0.0-next.104
+
+### Patch Changes
+
+- typo ([#3593](https://github.com/sveltejs/kit/pull/3593))
+
+## 2.0.0-next.103
+
+### Patch Changes
+
+- Tweak README ([#3591](https://github.com/sveltejs/kit/pull/3591))
+
+## 2.0.0-next.102
+
+### Patch Changes
+
+- Fix typo ([#3583](https://github.com/sveltejs/kit/pull/3583))
+
+## 2.0.0-next.101
+
+### Patch Changes
+
+- bump eslint plugin and parser in template ([#3544](https://github.com/sveltejs/kit/pull/3544))
+
+## 2.0.0-next.100
+
+### Patch Changes
+
+- add ESLint configuration for mixed JS/TS codebase ([#3536](https://github.com/sveltejs/kit/pull/3536))
+
 ## 2.0.0-next.99
 
 ### Patch Changes
