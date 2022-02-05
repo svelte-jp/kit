@@ -68,7 +68,7 @@ import { getStores, navigating, page, session } from '$app/stores';
 ストア自体はサブスクリプションの時点で正しい context にアタッチします。そのため、ボイラープレートなしにコンポーネントで直接インポートして使用することができます。しかし、`$`接頭辞を使用していない場合は、コンポーネントやページの初期化時に同期的に呼び出す必要があります。代わりに `getStores` を使用して、安全に `.subscribe` を非同期で呼び出すことができます。
 
 - `navigating` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) です。ナビゲーションを開始すると、この値は `{ from, to }` になります。`from` と `to` はどちらも [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスです。ナビゲーションが終了すると、値は `null` に戻ります。
-- `page` は現在の [`url`](https://developer.mozilla.org/ja/docs/Web/API/URL)、[`params`](#loading-input-params)、[`stuff`](#loading-output-stuff) を含むオブジェクトです。
+- `page` は、現在の [`url`](https://developer.mozilla.org/ja/docs/Web/API/URL)、[`params`](#loading-input-params)、[`stuff`](#loading-output-stuff) 、[`status`](#loading-output-status)、[`error`](#loading-output-error) を含むオブジェクトです。
 - `session` は [書き込み可能なストア(writable store)](https://svelte.jp/tutorial/writable-stores) で、初期値は [`getSession`](#hooks-getsession) の戻り値です。書き込めますが、その変更は永続化されません — それはあなた自身で実装する必要があります。
 
 ### $lib
@@ -95,13 +95,23 @@ import { build, files, timestamp } from '$service-worker';
 import { sequence } from '@sveltejs/kit/hooks';
 
 async function first({ event, resolve }) {
-	console.log('first');
-	return await resolve(event);
+	console.log('first pre-processing');
+	const result = await resolve(event);
+	console.log('first post-processing');
+	return result;
 }
 async function second({ event, resolve }) {
-	console.log('second');
-	return await resolve(event);
+	console.log('second pre-processing');
+	const result = await resolve(event);
+	console.log('second post-processing');
+	return result;
 }
 
 export const handle = sequence(first, second);
 ```
+
+上記の例ではこのようにプリントされます:
+>first pre-processing
+>second pre-processing
+>second post-processing
+>first post-processing

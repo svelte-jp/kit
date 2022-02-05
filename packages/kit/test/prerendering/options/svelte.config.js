@@ -5,10 +5,22 @@ import adapter from '../../../../adapter-static/index.js';
 const config = {
 	kit: {
 		adapter: adapter(),
+
+		csp: {
+			directives: {
+				'script-src': ['self']
+			}
+		},
+
 		paths: {
 			base: '/path-base',
 			assets: 'https://cdn.example.com/stuff'
 		},
+
+		prerender: {
+			createIndexFiles: false
+		},
+
 		vite: {
 			build: {
 				minify: false

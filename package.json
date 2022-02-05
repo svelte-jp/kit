@@ -9,10 +9,9 @@
 		"check": "pnpm -r check",
 		"lint": "pnpm -r lint",
 		"format": "pnpm -r format",
-		"release": "pnpm publish --tag=next --filter=\"@sveltejs/*\" --filter=\"create-svelte\"",
-		"preview:docs": "action-deploy-docs --project=kit",
+		"release": "changeset publish",
 		"textlint": "node -e \"var shell=require('shelljs');var files=shell.find(['./CONTRIBUTING_ja.md','./documentation/**/*.md']).join(' ');if(shell.exec('textlint -f pretty-error '+files).code!==0){shell.exit(1)};\"",
-		"changeset:version": "changeset version && pnpm i --lockfile-only"
+		"preview:docs": "action-deploy-docs --project=kit"
 	},
 	"repository": {
 		"type": "git",

@@ -111,4 +111,6 @@ export interface ErrorLoadInput<
 <h1>{title}</h1>
 ```
 
+> レイアウトコンポーネントから [page store](#modules-$app-stores) を使って `error` と `status` にアクセスすることもできます。  
+>
 > ユーザーに特権的な情報が公開されないようにするため、本番環境では `error` からサーバーサイドのスタックトレースが取り除かれます。
