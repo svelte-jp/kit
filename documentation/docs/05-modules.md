@@ -56,20 +56,21 @@ import { base, assets } from '$app/paths';
 ### $app/stores
 
 ```js
-import { getStores, navigating, page, session } from '$app/stores';
+import { getStores, navigating, page, session, updated } from '$app/stores';
 ```
 
 ストアは _コンテクスチュアル(contextual)_ です — それらはルート(root)コンポーネントの [context](https://svelte.jp/tutorial/context-api) に追加されます。つまり、`session` と `page` はサーバー上の各リクエストごとにユニークで、同じサーバー上で同時に処理される複数のリクエストで共有されません。これにより、`session` にユーザー特有のデータを含めても安全になります。
 
 そのため、ストアはフリーフローティング(free-floating)なオブジェクトではありません。`getContext` でアクセスしなければならないものと同様に、これはコンポーネントの初期化時にアクセスしなければなりません。
 
-- `getStores` は `getContext` に付随する便利な関数で、`{ navigating, page, session }` を返します。これはトップレベルで呼び出すか、コンポーネントまたはページの初期化時に同期的に呼び出す必要があります。
+- `getStores` は `getContext` に付随する便利な関数で、`{ navigating, page, session, updated }` を返します。これはトップレベルで呼び出すか、コンポーネントまたはページの初期化時に同期的に呼び出す必要があります。
 
 ストア自体はサブスクリプションの時点で正しい context にアタッチします。そのため、ボイラープレートなしにコンポーネントで直接インポートして使用することができます。しかし、`$`接頭辞を使用していない場合は、コンポーネントやページの初期化時に同期的に呼び出す必要があります。代わりに `getStores` を使用して、安全に `.subscribe` を非同期で呼び出すことができます。
 
 - `navigating` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) です。ナビゲーションを開始すると、この値は `{ from, to }` になります。`from` と `to` はどちらも [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスです。ナビゲーションが終了すると、値は `null` に戻ります。
 - `page` は、現在の [`url`](https://developer.mozilla.org/ja/docs/Web/API/URL)、[`params`](#loading-input-params)、[`stuff`](#loading-output-stuff) 、[`status`](#loading-output-status)、[`error`](#loading-output-error) を含むオブジェクトです。
 - `session` は [書き込み可能なストア(writable store)](https://svelte.jp/tutorial/writable-stores) で、初期値は [`getSession`](#hooks-getsession) の戻り値です。書き込めますが、その変更は永続化されません — それはあなた自身で実装する必要があります。
+- `updated` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) で、初期値は false です。もし [`version.pollInterval`](#configuration-version) が0以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` にします。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
 
 ### $lib
 

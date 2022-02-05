@@ -1,6 +1,8 @@
 # adapter-vercel
 
-Adapter for Svelte apps that creates a Vercel app, using a function for dynamic server rendering.
+A SvelteKit adapter that creates a Vercel app.
+
+If you're using [adapter-auto](../adapter-auto), you don't need to install this unless you need to specify Vercel-specific options, since it's already included.
 
 ## Usage
 
@@ -14,10 +16,16 @@ import vercel from '@sveltejs/adapter-vercel';
 export default {
 	kit: {
 		...
-		adapter: vercel()
+		adapter: vercel(options)
 	}
 };
 ```
+
+## Options
+
+You can pass an `options` argument, if necessary, with the following:
+
+- `external` — an array of dependencies that [esbuild](https://esbuild.github.io/api/#external) should treat as external
 
 ## Changelog
 

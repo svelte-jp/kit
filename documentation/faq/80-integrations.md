@@ -1,5 +1,5 @@
 ---
-question: SvelteKit で X を使うにはどうすればよいですか？
+title: SvelteKit で X を使うにはどうすればよいですか？
 ---
 
 [ドキュメントのインテグレーションのセクション](/docs#additional-resources-integrations) をしっかり読み込んでください。それでも問題が解決しない場合のために、よくある問題の解決策を以下に示します。
@@ -14,21 +14,20 @@ question: SvelteKit で X を使うにはどうすればよいですか？
 
 ```js
 const myPlugin = {
-  name: 'log-request-middleware',
-  configureServer(server) {
-    server.middlewares.use((req, res, next) => {
-      console.log(`Got request ${req.url}`);
-      next();
-    })
-  }
-}
+	name: 'log-request-middleware',
+	configureServer(server) {
+		server.middlewares.use((req, res, next) => {
+			console.log(`Got request ${req.url}`);
+			next();
+		});
+	}
+};
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		target: '#svelte',
 		vite: {
-			plugins: [ myPlugin ]
+			plugins: [myPlugin]
 		}
 	}
 };

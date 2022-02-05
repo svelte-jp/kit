@@ -17,6 +17,10 @@ const config = {
 		adapter: null,
 		amp: false,
 		appDir: '_app',
+		browser: {
+			hydrate: true,
+			router: true
+		},
 		csp: {
 			mode: 'auto',
 			directives: {
@@ -33,7 +37,6 @@ const config = {
 			template: 'src/app.html'
 		},
 		floc: false,
-		hydrate: true,
 		inlineStyleThreshold: 0,
 		methodOverride: {
 			parameter: '_method',
@@ -53,19 +56,21 @@ const config = {
 		prerender: {
 			concurrency: 1,
 			crawl: true,
+			createIndexFiles: true,
 			enabled: true,
-			subfolders: true,
 			entries: ['*'],
 			onError: 'fail'
 		},
-		router: true,
 		routes: (filepath) => !/(?:(?:^_|\/_)|(?:^\.|\/\.)(?!well-known))/.test(filepath),
 		serviceWorker: {
 			register: true,
 			files: (filepath) => !/\.DS_STORE/.test(filepath)
 		},
-		target: null,
 		trailingSlash: 'never',
+		version: {
+			name: Date.now().toString(),
+			pollInterval: 0
+		},
 		vite: () => ({})
 	},
 
@@ -91,14 +96,21 @@ export default config;
 
 ビルドされたJSとCSS(およびインポートされたアセット)が提供される `paths.assets` からの相対ディレクトリ(ファイル名にはコンテンツベースのハッシュが含まれており、つまり、無期限にキャッシュすることができます)。先頭または末尾が `/` であってはいけません。
 
+### browser
+
+以下の `boolean` 値のうち、0個以上を含むオブジェクトです:
+
+- `hydrate` — サーバーでレンダリングされた HTML をクライアントサイドのアプリで [ハイドレート(hydrate)](#page-options-hydrate) するかどうかを指定します。(アプリ全体でこれを `false` に設定することはめったにありません。)
+- `router` — クライアントサイドの[ルーター(router)](#page-options-router)をアプリ全体で有効または無効にします。
+
 ### csp
 
-An object containing zero or more of the following values:
+以下の値のうち、0個以上を含むオブジェクトです:
 
-- `mode` — 'hash', 'nonce' or 'auto'
-- `directives` — an object of `[directive]: value[]` pairs.
+- `mode` — 'hash'、'nonce'、または 'auto'
+- `directives` — `[directive]: value[]` ペアのオブジェクト
 
-[Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) configuration. CSP helps to protect your users against cross-site scripting (XSS) attacks, by limiting the places resources can be loaded from. For example, a configuration like this...
+[Content Security Policy](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Content-Security-Policy) の設定です。CSP は、リソースの読み込み元を制限することにより、クロスサイトスクリプティング (XSS) 攻撃からユーザーを守るのに役立ちます。例えば、このような設定では…
 
 ```js
 {
@@ -108,11 +120,11 @@ An object containing zero or more of the following values:
 }
 ```
 
-...would prevent scripts loading from external sites. SvelteKit will augment the specified directives with nonces or hashes (depending on `mode`) for any inline styles and scripts it generates.
+…外部サイトからのスクリプト読み込みを防止します。SvelteKit は、生成されるインラインスタイルとスクリプトに対して、指定されたディレクティブを nonce か hash (`mode` の設定による) で補強します。
 
-When pages are prerendered, the CSP header is added via a `<meta http-equiv>` tag (note that in this case, `frame-ancestors`, `report-uri` and `sandbox` directives will be ignored).
+ページがプリレンダリングされる場合、CSP ヘッダーは `<meta http-equiv>` タグ経由で追加されます (この場合、`frame-ancestors`、`report-uri`、`sandbox` ディレクティブは無視されることにご注意ください)。
 
-> When `mode` is `'auto'`, SvelteKit will use nonces for dynamically rendered pages and hashes for prerendered pages. Using nonces with prerendered pages is insecure and therefore forbiddem.
+> `mode` が `'auto'` の場合、SvelteKit は動的にレンダリングされたページには nonce を、プリレンダリングされたページには hash を使用します。プリレンダリングされたページで nonce を使用するのは安全でないため、禁止されています。
 
 ### files
 
@@ -136,10 +148,6 @@ Permissions-Policy: interest-cohort=()
 ```
 
 > これはサーバーレンダリングされたレスポンスにのみ適用されます — プリレンダリングされたページ(例えば [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) によって作成されたページ) のヘッダは、ホスティングプラットフォームによって決定されます。
-
-### hydrate
-
-サーバーでレンダリングされた HTML をクライアントサイドアプリで [ハイドレート(hydrate)](#page-options-hydrate) するかどうかを設定します。(基本的に、アプリ全体でこれを `false` にすることはごく稀でしょう)
 
 ### inlineStyleThreshold
 
@@ -195,9 +203,9 @@ export default {
 
 - `concurrency` — 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートのCMSからコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます
 - `crawl` — SvelteKitがシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
+- `createIndexFiles` - `false` に設定すると、`about/index.html` の代わりに `about.html` をレンダリングします
 - `enabled` — `false` に設定すると、プリレンダリングを完全に無効化できます
 - `entries` — プリレンダリングするページ、またはクロールを開始するページ(`crawl: true` の場合)の配列。`*` 文字列には、全ての動的ではないルート(routes)(すなわち `[parameters]` を含まないページ) が含まれます
-- `subfolders` - `false` に設定すると、ルートのサブフォルダを無効にすることができます: `about/index.html` の代わりに `about.html` をレンダリングします
 - `onError`
 
   - `'fail'` — (デフォルト) リンクをたどったときにルーティングエラーが発生した場合、ビルドを失敗させます
@@ -215,7 +223,6 @@ export default {
     export default {
     	kit: {
     		adapter: adapter(),
-    		target: '#svelte',
     		prerender: {
     			onError: handleError
     		}
@@ -223,13 +230,9 @@ export default {
     };
     ```
 
-### router
-
-アプリ全体で、クライアントサイドの [ルーター(router)](#page-options-router) を有効または無効にします。
-
 ### routes
 
-A `(filepath: string) => boolean` function that determines which files create routes and which are treated as [private modules](#routing-private-modules).
+`(filepath: string) => boolean` という関数で、どのファイルがルート(routes)を作成し、どれが [プライベートモジュール](#routing-private-modules) として扱われるか決定します。
 
 ### serviceWorker
 
@@ -237,10 +240,6 @@ A `(filepath: string) => boolean` function that determines which files create ro
 
 - `register` - `false` を設定した場合、service worker の自動登録を無効にします。
 - `files` - `(filepath: string) => boolean` という型を持つ関数。`true` の場合、与えられたファイルが `$service-worker.files` で利用可能になります。それ以外の場合は除外されます。
-
-### target
-
-アプリをマウントする要素を指定します。テンプレートファイルに存在する要素を一意に指定する DOM セレクタでなければなりません。未指定の場合、アプリは `document.body` にマウントされます。
 
 ### trailingSlash
 
@@ -251,6 +250,17 @@ URL をルート(routes)に解決する際に、末尾のスラッシュ(trailin
 - `"ignore"` — 末尾のスラッシュを自動で追加したり削除したりしません。`/x` と `/x/` は同等に扱われます
 
 > 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別のURLとして扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](#hooks-handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
+
+### version
+
+以下の値のうち、0個以上を含むオブジェクトです:
+
+- `name` - 現在のアプリのバージョン文字列
+- `pollInterval` - バージョンの変更をポーリングするインターバル(ミリ秒)
+
+アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、古いコンテンツがある可能性があります; そうでなくとも、アプリのルートマニフェストがもう存在しない JavaScript ファイルを指している可能性があります。SvelteKit は、ここで指定された `name` (デフォルトではビルドのタイムスタンプ) を使用して新しいバージョンがデプロイされたことを検知すると、従来のフルページナビゲーションにフォールバックすることにより、この問題を解決しています。
+
+`pollInterval` を0以外の値に設定した場合、SvelteKit はバックグラウンドで新しいバージョンをポーリングし、それを検知すると [`updated`](#modules-$app-stores) ストアの値を `true` にします。
 
 ### vite
 

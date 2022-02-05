@@ -2,92 +2,59 @@
 title: Loading
 ---
 
-ページやレイアウトを定義するコンポーネントは、コンポーネントが作成される前に実行される `load` 関数をエクスポートすることができます。この関数はサーバーサイドレンダリングとクライアントの両方で実行され、(例えば)ローディングスピナーを表示して `onMount` でデータをフェッチするといったような作業をすることなく、ページのデータを取得することができます。
+ページやレイアウトを定義するコンポーネントは、コンポーネントが作成される前に実行される `load` 関数をエクスポートすることができます。この関数はサーバーサイドレンダリングとクライアントの両方で実行され、ページがレンダリングされる前にデータを取得して操作することができるので、ローディングスピナーを防止することができます。
+
+もしページのデータがエンドポイント(endpoint)から取得されるのであれば、`load` 関数は不要かもしれません。これは、もっと柔軟性が必要なとき、例えば外部の API からデータをロードする場合などに便利です。
 
 ```ts
-// Declaration types for Loading
-// * declarations that are not exported are for internal use
+// Type declarations for `load` (declarations marked with
+// an `export` keyword can be imported from `@sveltejs/kit`)
 
-export interface LoadInput<
-	PageParams extends Record<string, string> = Record<string, string>,
-	Stuff extends Record<string, any> = Record<string, any>,
-	Session = any
-> {
-	url: URL;
-	params: PageParams;
-	fetch(info: RequestInfo, init?: RequestInit): Promise<Response>;
-	session: Session;
-	stuff: Stuff;
+export interface Load<Params = Record<string, string>, Props = Record<string, any>> {
+	(input: LoadInput<Params>): MaybePromise<Either<Fallthrough, LoadOutput<Props>>>;
 }
 
-export interface LoadOutput<
-	Props extends Record<string, any> = Record<string, any>,
-	Stuff extends Record<string, any> = Record<string, any>
-> {
+export interface LoadInput<Params extends Record<string, string> = Record<string, string>> {
+	url: URL;
+	params: Params;
+	props: Record<string, any>;
+	fetch(info: RequestInfo, init?: RequestInit): Promise<Response>;
+	session: App.Session;
+	stuff: Partial<App.Stuff>;
+}
+
+export interface LoadOutput<Props extends Record<string, any> = Record<string, any>> {
 	status?: number;
 	error?: string | Error;
 	redirect?: string;
 	props?: Props;
-	stuff?: Stuff;
+	stuff?: Partial<App.Stuff>;
 	maxage?: number;
 }
 
-interface LoadInputExtends {
-	stuff?: Record<string, any>;
-	pageParams?: Record<string, string>;
-	session?: any;
-}
-interface LoadOutputExtends {
-	stuff?: Record<string, any>;
-	props?: Record<string, any>;
-}
-
 type MaybePromise<T> = T | Promise<T>;
+
 interface Fallthrough {
 	fallthrough: true;
 }
-export interface Load<
-	Input extends LoadInputExtends = Required<LoadInputExtends>,
-	Output extends LoadOutputExtends = Required<LoadOutputExtends>
-> {
-	(
-		input: LoadInput<
-			InferValue<Input, 'pageParams', Record<string, string>>,
-			InferValue<Input, 'stuff', Record<string, any>>,
-			InferValue<Input, 'session', any>
-		>
-	): MaybePromise<
-		Either<
-			Fallthrough,
-			LoadOutput<
-				InferValue<Output, 'props', Record<string, any>>,
-				InferValue<Output, 'stuff', Record<string, any>>
-			>
-		>
-	>;
-}
 ```
 
-ブログページの例では、以下のような `load` 関数が含まれています。
+> `App.Session` と `App.Stuff` については [TypeScript](#typescript) セクションをご参照ください。
+
+外部の API からデータをロードするページではこのようになるでしょう:
 
 ```html
+<!-- src/routes/blog/[slug].svelte -->
 <script context="module">
 	/** @type {import('@sveltejs/kit').Load} */
 	export async function load({ params, fetch, session, stuff }) {
-		const url = `/blog/${params.slug}.json`;
-		const res = await fetch(url);
-
-		if (res.ok) {
-			return {
-				props: {
-					article: await res.json()
-				}
-			};
-		}
+		const response = await fetch(`https://cms.example.com/article/${params.slug}.json`);
 
 		return {
-			status: res.status,
-			error: new Error(`Could not load ${url}`)
+			status: response.status,
+			props: {
+				article: response.ok && (await response.json())
+			}
 		};
 	}
 </script>
@@ -95,9 +62,9 @@ export interface Load<
 
 > `<script context="module">` であることにご注意ください。これは、コンポーネントがレンダリングされる前に `load` が実行されるのに必要なものです。コンポーネントインスタンスごとのコードは2つ目の `<script>` タグに記述する必要があります。
 
-`load` は Next.js の `getStaticProps` や `getServerSideProps` に似ていますが、サーバーとクライアントの両方で動作する点が異なります。
+`load` は Next.js の `getStaticProps` や `getServerSideProps` に似ていますが、サーバーとクライアントの両方で動作する点が異なります。上記の例では、もしユーザーがこのページへのリンクをクリックした場合、データは私たちのサーバーを経由せずに `cms.example.com` から取得されます。
 
-`load` が `{fallthrough: true}` を返す場合、SvelteKitは応答が返るまで他のルート(routes)に[フォールスルー](#routing-advanced-fallthrough-routes)するか、もしくは一般的な404で応答します。
+`load` が `{fallthrough: true}` を返す場合、SvelteKitは応答が返るまで他のルート(routes)に[フォールスルー](#routing-advanced-routing-fallthrough-routes)するか、もしくは一般的な404で応答します。
 
 SvelteKitの `load` は、以下のような特別なプロパティを持つ `fetch` の実装を受け取ります。
 
@@ -119,7 +86,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 ### Input
 
-`load` 関数は、`url`、`params`、`fetch`、`session`、`stuff` の5つのフィールドを持つオブジェクトを受け取ります。`load` 関数はリアクティブなので、関数内でそれらのパラメータが使われている場合は、そのパラメータが変更されると再実行されます。具体的には、`url`、`session`、`stuff` が関数で使用されている場合、それらの値が変更されると再実行されます。`params`の個別のプロパティも同様です。
+`load` 関数は、`url`、`params`、`props`、`fetch`、`session`、`stuff` の6つのフィールドを持つオブジェクトを受け取ります。`load` 関数はリアクティブなので、関数内でそれらのパラメータが使われている場合は、そのパラメータが変更されると再実行されます。具体的には、`url`、`session`、`stuff` が関数で使用されている場合、それらの値が変更されると再実行されます。`params`の個別のプロパティも同様です。
 
 > 関数の宣言の中でパラメータを分割しているだけで、使用されていると見なされるのでご注意ください。
 
@@ -141,6 +108,10 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 	"c": "y/z"
 }
 ```
+
+#### props
+
+If the page you're loading has an endpoint, the data returned from it is accessible inside the leaf component's `load` function as `props`. For layout components and pages without endpoints, `props` will be an empty object.
 
 #### fetch
 

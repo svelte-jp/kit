@@ -39,65 +39,60 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 <p>TODO...</p>
 ```
 
-動的なパラメータは `[括弧]` を使用してエンコードされます。例えば、ブログ記事は `src/routes/blog/[slug].svelte` のように定義することがあるでしょう。後ほど、[load function](#loading) や [page store](#modules-$app-stores) でそのパラメータにアクセスする方法をご覧いただけます。
+動的なパラメータは `[括弧]` を使用してエンコードされます。例えば、ブログ記事は `src/routes/blog/[slug].svelte` のように定義することがあるでしょう。
 
 ファイルやディレクトリは、`[id]-[category].svelte` のように、動的なパーツを複数持つことができます。(パラメータは 'non-greedy' です。`x-y-z` のようにあいまいなケースでは、`id` は `x` 、 `category` は `y-z` となります)
 
 ### Endpoints
 
-エンドポイント(Endpoints)は `.js` (または `.ts`) ファイルで書かれたモジュールで、HTTPメソッドに対応した関数をエクスポートします。
+エンドポイント(Endpoints)は `.js` (または `.ts`) ファイルに記述されるモジュールで、HTTPメソッドに対応した関数をエクスポートします。エンドポイントの役割は、サーバー上でしか利用できないデータ (例えば、データベースやファイルシステムにあるデータ) をページで読み書きできるようにすることです。
 
 ```ts
-// Declaration types for Endpoints
-// * declarations that are not exported are for internal use
+// Type declarations for endpoints (declarations marked with
+// an `export` keyword can be imported from `@sveltejs/kit`)
 
-export interface RequestEvent<Locals = Record<string, any>, Platform = Record<string, any>> {
+export interface RequestHandler<Output = Record<string, any>> {
+	(event: RequestEvent): MaybePromise<
+		Either<Output extends Response ? Response : EndpointOutput<Output>, Fallthrough>
+	>;
+}
+
+export interface RequestEvent {
 	request: Request;
 	url: URL;
 	params: Record<string, string>;
-	locals: Locals;
-	platform: Platform;
+	locals: App.Locals;
+	platform: App.Platform;
 }
 
-type Body = JSONString | Uint8Array | ReadableStream | stream.Readable;
-export interface EndpointOutput<Output extends Body = Body> {
+export interface EndpointOutput<Output = Record<string, any>> {
 	status?: number;
 	headers?: Headers | Partial<ResponseHeaders>;
-	body?: Output;
+	body?: Record<string, any>;
 }
 
 type MaybePromise<T> = T | Promise<T>;
+
 interface Fallthrough {
 	fallthrough: true;
 }
-
-export interface RequestHandler<
-	Locals = Record<string, any>,
-	Platform = Record<string, any>,
-	Output extends Body = Body
-> {
-	(event: RequestEvent<Locals, Platform>): MaybePromise<
-		Either<Response | EndpointOutput<Output>, Fallthrough>
-	>;
-}
 ```
 
-例えば、仮想的なブログページ `/blog/cool-article` が `/blog/cool-article.json` というデータをリクエストする場合は、`src/routes/blog/[slug].json.js` というエンドポイントになるかもしれません。
+> `App.Locals` と `App.Platform` については [TypeScript](#typescript) セクションをご参照ください。
+
+`src/routes/items/[id].svelte` のようなページは、`src/routes/items/[id].js` からデータを取得することができます:
 
 ```js
 import db from '$lib/database';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get({ params }) {
-	// the `slug` parameter is available because this file
-	// is called [slug].json.js
-	const article = await db.get(params.slug);
+	// `params.id` comes from [id].js
+	const item = await db.get(params.id);
 
-	if (article) {
+	if (item) {
 		return {
-			body: {
-				article
-			}
+			body: { item }
 		};
 	}
 
@@ -107,7 +102,7 @@ export async function get({ params }) {
 }
 ```
 
-> エンドポイントを含む全てのサーバーサイドのコードは、外部のAPIにデータをリクエストする場合に備えて、`fetch` にアクセスすることができます。
+> エンドポイントを含む全てのサーバーサイドのコードは、外部のAPIにデータをリクエストする場合に備えて、`fetch` にアクセスすることができます。`$lib` のインポートについては心配無用です、それについては[後ほど](#modules-$lib)。
 
 この関数の仕事は、レスポンスを表す `{ status, headers, body }` オブジェクトを返すことです。`status` は [HTTPステータスコード](https://httpstatusdogs.com)です。
 
@@ -116,29 +111,93 @@ export async function get({ params }) {
 - `4xx` — クライアントエラー
 - `5xx` — サーバーエラー
 
-もし返された `body` がオブジェクトで、かつ `content-type` ヘッダーが無い場合は、自動的に JSON レスポンスとなります。(`$lib` については心配無用です、[後ほど](#modules-$lib) 説明します)
-
 > `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー](#routing-advanced-fallthrough-routes) し続けるか、一般的な 404 で応答します。
 
-例えば POST のような HTTP メソッドを処理するエンドポイントは、これに相当する関数をエクスポートします。
+返される `body` は、ページのプロパティに対応します:
+
+```svelte
+<script>
+	// エンドポイント(endpoint)からのデータが入力される
+	export let item;
+</script>
+
+<h1>{item.title}</h1>
+```
+
+#### POST, PUT, PATCH, DELETE
+
+エンドポイント(Endpoints)は、HTTP メソッドに対応する関数をエクスポートすることで、`GET` だけでなく任意の HTTP メソッドを扱うことができます:
 
 ```js
 export function post(event) {...}
+export function put(event) {...}
+export function patch(event) {...}
+export function del(event) {...} // `delete` は予約語 
 ```
 
-`delete` は JavaScript の予約語であるため、DELETE リクエストは`del` 関数によって処理されます。
-
-> Node の `http` モジュールや Express などのフレームワークでおなじみの `req`/`res` オブジェクトは、特定のプラットフォームでしか利用できないため使用しません。代わりに、SvelteKitでは返却されるオブジェクトを、アプリがデプロイされるプラットフォームで要求されるものに変換します。
-
-複数のクッキーを1つのレスポンスヘッダーにセットする場合は、配列で返します。
+`get` と同様、これらの関数は `body` を返すことができ、それをページにプロパティとして渡されます。`get` からの 4xx/5xx レスポンスはエラーページのレンダリングとなりますが、GET 以外のリクエストに対する同様のレスポンスはそうならないので、フォームのバリデーションエラーのレンダリングのようなことを行うことができます:
 
 ```js
-return {
-	headers: {
-		'set-cookie': [cookie1, cookie2]
+// src/routes/items.js
+import * as db from '$lib/database';
+
+export async function get() {
+	const items = await db.list();
+
+	return {
+		body: { items }
+	};
+}
+
+export async function post({ request }) {
+	const [errors, item] = await db.create(request);
+
+	if (errors) {
+		// バリデーションエラーを返します
+		return {
+			status: 400,
+			body: { errors }
+		};
 	}
-};
+
+	// 新たに作成された item にリダイレクトします
+	return {
+		status: 303,
+		headers: {
+			location: `/items/${item.id}`
+		}
+	};
+}
 ```
+
+```svelte
+<!-- src/routes/items.svelte -->
+<script>
+	// このページでは常に `get` で取得したプロパティにアクセスします…
+	export let items;
+
+	// …それに加えて、POST リクエストに応答してページがレンダリングされるときに
+	// `post` からプロパティを取得します
+	// 例えば、以下のようなフォームを送信したあとです
+	export let errors;
+</script>
+
+{#each items as item}
+	<Preview item={item}/>
+{/each}
+
+<form method="post">
+	<input name="title">
+
+	{#if errors?.title}
+		<p class="error">{errors.title}</p>
+	{/if}
+
+	<button type="submit">Create item</button>
+</form>
+```
+
+もし `accept: application/json` header を付けてルート(route)をリクエストすると、SvelteKit は HTML のページではなく エンドポイントのデータを JSON としてレンダリングします。
 
 #### Body parsing
 
@@ -148,6 +207,18 @@ return {
 export async function post({ request }) {
 	const data = await request.formData(); // or .json(), or .text(), etc
 }
+```
+
+#### Setting cookies
+
+エンドポイント(Endpoints) は `set-cookie` を含む `headers` オブジェクトを返すことで、Cookie を設定することができます。複数の Cookie を同時に設定するには、配列を返します:
+
+```js
+return {
+	headers: {
+		'set-cookie': [cookie1, cookie2]
+	}
+};
 ```
 
 #### HTTP method overrides
@@ -173,15 +244,21 @@ export default {
 
 > ネイティブの `<form>` の挙動を利用することで、JavaScript が失敗したり無効になっている場合でもアプリが動作し続けられます。
 
+### Standalone endpoints
+
+ほとんどの場合、エンドポイント(endpoints)はペアとなるページにデータを提供するために存在します。しかし、ページとは別に存在することもできます。独立したエンドポイント(Standalone endpoints)は、返される `body` の型について少し柔軟です。オブジェクトに加え、文字列や `Uint8Array` を返すことができます。
+
+> streaming request body、response body については[サポートされる予定](https://github.com/sveltejs/kit/issues/3419)です。
+
 ### Private modules
 
 名前が `_` や `.` で始まるファイルやディレクトリ([`.well-known`](https://en.wikipedia.org/wiki/Well-known_URI) は除く) はデフォルトでプライベートで、ルート(routes)を作成しません(ルートを作成するファイルからインポートすることは可能です)。どのモジュールをパブリックまたはプライベートとみなすかについては [`ルート(routes)`](#configuration-routes) 設定で設定することができます。
 
-### Advanced
+### Advanced routing
 
 #### Rest parameters
 
-例えば `src/routes/[category]/[item].svelte` や `src/routes/[category]-[item].svelte` のように、ルート(route)は動的なパラメータを複数持つことができます。ルートセグメント(route segments)の数が不明な場合は、rest 構文を使用することができます。例えば、GitHubのファイルビューアは次のように実装することができます…
+例えば `src/routes/[category]/[item].svelte` や `src/routes/[category]-[item].svelte` のように、ルート(route)は動的なパラメータを複数持つことができます。(パラメータは 'non-greedy' です。`/x-y-z` のようにあいまいなケースでは、`category` は `x` 、 `item` は `y-z` となります) ルートセグメント(route segments)の数が不明な場合は、rest 構文を使用することができます。例えば、GitHubのファイルビューアは次のように実装することができます…
 
 ```bash
 /[org]/[repo]/tree/[branch]/[...file]
