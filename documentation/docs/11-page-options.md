@@ -12,7 +12,7 @@ title: Page options
 
 SvelteKit には [クライアントサイドルーター(client-side router)](#appendix-routing) があり、(ユーザーがリンクをクリックしたり、戻る/進むボタンを操作したときの)ナビゲーションをインターセプトし、リロードによるブラウザのナビゲーション処理をさせることなく、ページコンテンツを更新したりします。
 
-特定の状況においては、アプリ全体では [`router` コンフィグオプション](#configuration-router) またはページレベルでは `router` の export によって、[クライアントサイドルーティング(client-side routing)](#appendix-routing) を無効にする必要があるかもしれません。
+特定の状況においては、アプリ全体では [`browser.router` コンフィグオプション](#configuration-browser) またはページレベルでは `router` の export によって、[クライアントサイドルーティング(client-side routing)](#appendix-routing) を無効にする必要があるかもしれません。
 
 ```html
 <script context="module">
@@ -24,7 +24,7 @@ SvelteKit には [クライアントサイドルーター(client-side router)](#
 
 ### hydrate
 
-通常、SvelteKit はサーバーでレンダリングされたHTMLをインタラクティブなページに [ハイドレート(hydrates)](#appendix-hydration) します。JavaScriptを全く必要としないページ — 多くのブログ記事や 'about' ページがこのカテゴリに入りますが、これらの場合、アプリ全体では [`hydrate` コンフィグオプション](#configuration-hydrate)、ページレベルでは `hydrate` を export することにより、アプリ起動時のハイドレーションをスキップすることができます:
+通常、SvelteKit はサーバーでレンダリングされたHTMLをインタラクティブなページに [ハイドレート(hydrates)](#appendix-hydration) します。JavaScriptを全く必要としないページ — 多くのブログ記事や 'about' ページがこのカテゴリに入りますが、これらの場合、アプリ全体では [`browser.hydrate` コンフィグオプション](#configuration-browser)、ページレベルでは `hydrate` を export することにより、アプリ起動時のハイドレーションをスキップすることができます:
 
 ```html
 <script context="module">

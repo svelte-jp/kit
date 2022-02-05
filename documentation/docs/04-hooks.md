@@ -15,32 +15,30 @@ title: Hooks
 未実装の場合、デフォルトでは `({ event, resolve }) => resolve(event)` となります。
 
 ```ts
-// Declaration types for Hooks
-// * declarations that are not exported are for internal use
+// Type declarations for `handle` (declarations marked with
+// an `export` keyword can be imported from `@sveltejs/kit`)
 
-// type of string[] is only for set-cookie
-// everything else must be a type of string
-type ResponseHeaders = Record<string, string | string[]>;
-
-export interface RequestEvent<Locals = Record<string, any>, Platform = Record<string, any>> {
+export interface RequestEvent {
 	request: Request;
 	url: URL;
 	params: Record<string, string>;
-	locals: Locals;
-	platform: Platform;
+	locals: App.Locals;
+	platform: App.Platform;
 }
 
 export interface ResolveOpts {
 	ssr?: boolean;
 }
 
-export interface Handle<Locals = Record<string, any>, Platform = Record<string, any>> {
+export interface Handle {
 	(input: {
-		event: RequestEvent<Locals, Platform>;
-		resolve(event: RequestEvent<Locals, Platform>, opts?: ResolveOpts): MaybePromise<Response>;
+		event: RequestEvent;
+		resolve(event: RequestEvent, opts?: ResolveOpts): MaybePromise<Response>;
 	}): MaybePromise<Response>;
 }
 ```
+
+> `App.Locals` と `App.Platform` について [TypeScript](#typescript) セクションをご参照ください。
 
 エンドポイントに渡されるリクエストにカスタムデータを追加するには、以下のように `event.locals` オブジェクトにデータを投入します。
 
@@ -77,16 +75,15 @@ export async function handle({ event, resolve }) {
 
 ### handleError
 
-もしレンダリング中にエラーがスローされたら、`error` とそれを引き起こした `request` を引数にこの関数が呼び出されます。これによってデータをエラートラッキングサービスに送ったり、エラーをコンソールに出力する前にフォーマットをカスタマイズしたりすることができます。
+もしレンダリング中にエラーがスローされたら、`error` とそれを引き起こした `event` を引数にこの関数が呼び出されます。これによってデータをエラートラッキングサービスに送ったり、エラーをコンソールに出力する前にフォーマットをカスタマイズしたりすることができます。
 
 開発中、もし Svelte コードで構文エラーが発生した場合、エラー場所をハイライトする `frame` プロパティが追加されます。
 
 未実装の場合、SvelteKitはデフォルトのフォーマットでエラーをログ出力します。
 
 ```ts
-// Declaration types for handleError hook
-export interface HandleError<Locals = Record<string, any>, Platform = Record<string, any>> {
-	(input: { error: Error & { frame?: string }; event: RequestEvent<Locals, Platform> }): void;
+export interface HandleError {
+	(input: { error: Error & { frame?: string }; event: RequestEvent }): void;
 }
 ```
 
@@ -107,13 +104,8 @@ export async function handleError({ error, event }) {
 未実装の場合、session は `{}` です。
 
 ```ts
-// Declaration types for getSession hook
-export interface GetSession<
-	Locals = Record<string, any>,
-	Platform = Record<string, any>,
-	Session = any
-> {
-	(event: RequestEvent<Locals, Platform>): MaybePromise<Session>;
+export interface GetSession {
+	(event: RequestEvent): MaybePromise<App.Session>;
 }
 ```
 
@@ -130,7 +122,7 @@ export function getSession(event) {
 					email: event.locals.user.email,
 					avatar: event.locals.user.avatar
 				}
-			}
+		  }
 		: {};
 }
 ```
@@ -144,8 +136,6 @@ export function getSession(event) {
 例えば、ユーザーがクライアントサイドで `https://api.yourapp.com` のようなパブリックなURLに移動をするときには、`load` 関数でそのURLにリクエストを行うかもしれません。しかしSSRでは、(パブリックなインターネットとの間にあるプロキシーやロードバランサーをバイパスして) 直接 API にアクセスするほうが理にかなっている場合があります。
 
 ```ts
-// Declaration types for externalFetch hook
-
 export interface ExternalFetch {
 	(req: Request): Promise<Response>;
 }

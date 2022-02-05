@@ -39,7 +39,7 @@ SvelteKit では、それらにアクセスする方法が異なります。`sto
 
 ### Routing
 
-ルート(routes) の正規表現はもうサポートされていません。代わりに、[fallthrough routes](/docs#routing-advanced-fallthrough-routes) をお使いください。
+ルート(routes) の正規表現はもうサポートされていません。代わりに、[fallthrough routes](/docs#routing-advanced-routing-fallthrough-routes) をお使いください。
 
 ### URLs
 
