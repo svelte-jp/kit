@@ -2,7 +2,7 @@
 title: TypeScript
 ---
 
-All APIs in SvelteKit are fully typed. Additionally, it's possible to tell SvelteKit how to type objects inside your app by declaring the `App` namespace. By default, a new project will have a file called `src/app.d.ts` containing the following:
+SvelteKit の全ての API は完全に型付けされています。さらに、`App` namespace を宣言することで、アプリ内のオブジェクトに型を付ける方法を SvelteKit に伝えることができます。デフォルトでは、新しいプロジェクトには以下の内容を含む `src/app.d.ts` というファイルがあります:
 
 ```ts
 /// <reference types="@sveltejs/kit" />
@@ -18,20 +18,20 @@ declare namespace App {
 }
 ```
 
-By populating these interfaces, you will gain type safety when using `event.locals`, `event.platform`, `session` and `stuff`:
+これらの interface を作成することで、`event.locals`、`event.platform`、`session`、`stuff` を使用する際に型の安全性を確保することができます。
 
 ### App.Locals
 
-The interface that defines `event.locals`, which can be accessed in [hooks](#hooks) (`handle`, `handleError` and `getSession`) and [endpoints](#routing-endpoints).
+[hooks](#hooks) (`handle`、`handleError`、`getSession`) と [エンドポイント(endpoints)](#routing-endpoints) からアクセスされる `event.locals` を定義する interface です。
 
 ### App.Platform
 
-If your adapter provides [platform-specific context](#adapters-supported-environments-platform-specific-context) via `event.platform`, you can specify it here.
+adapter が `event.platform` を通して [プラットフォーム固有の context](#adapters-supported-environments-platform-specific-context) を提供する場合、ここでそれを指定します。
 
 ### App.Session
 
-The interface that defines `session`, both as an argument to [`load`](#loading) functions and the value of the [session store](#modules-$app-stores).
+`session` を定義する interface です。[`load`](#loading) 関数の引数として、かつ [session store](#modules-$app-stores) の値として定義します。
 
 ### App.Stuff
 
-The interface that defines `stuff`, as input or output to [`load`](#loading) or as the value of the `stuff` property of the [page store](#modules-$app-stores).
+`stuff` を定義する interface です。[`load`](#loading) のインプットもしくはアウトプットとして、または [page store](#modules-$app-stores) の `stuff` プロパティの値として定義します。

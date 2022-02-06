@@ -111,7 +111,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### props
 
-If the page you're loading has an endpoint, the data returned from it is accessible inside the leaf component's `load` function as `props`. For layout components and pages without endpoints, `props` will be an empty object.
+もし読み込むページにエンドポイントがある場合、そこから返されるデータはリーフコンポーネント(leaf component)の `load` 関数内で `props` としてアクセスすることができます。エンドポイントがないレイアウトコンポーネントやページでは、`props` は空のオブジェクトとなります。
 
 #### fetch
 
