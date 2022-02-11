@@ -1,9 +1,86 @@
-import { writeFileSync } from 'fs';
+import { existsSync, writeFileSync } from 'fs';
 import { posix } from 'path';
 import { fileURLToPath } from 'url';
 import esbuild from 'esbuild';
 
 const dir = '.vercel_build_output';
+
+// rules for clean URLs and trailing slash handling,
+// generated with @vercel/routing-utils
+const redirects = {
+	always: [
+		{
+			src: '^/(?:(.+)/)?index(?:\\.html)?/?$',
+			headers: {
+				Location: '/$1/'
+			},
+			status: 308
+		},
+		{
+			src: '^/(.*)\\.html/?$',
+			headers: {
+				Location: '/$1/'
+			},
+			status: 308
+		},
+		{
+			src: '^/\\.well-known(?:/.*)?$'
+		},
+		{
+			src: '^/((?:[^/]+/)*[^/\\.]+)$',
+			headers: {
+				Location: '/$1/'
+			},
+			status: 308
+		},
+		{
+			src: '^/((?:[^/]+/)*[^/]+\\.\\w+)/$',
+			headers: {
+				Location: '/$1'
+			},
+			status: 308
+		}
+	],
+	never: [
+		{
+			src: '^/(?:(.+)/)?index(?:\\.html)?/?$',
+			headers: {
+				Location: '/$1'
+			},
+			status: 308
+		},
+		{
+			src: '^/(.*)\\.html/?$',
+			headers: {
+				Location: '/$1'
+			},
+			status: 308
+		},
+		{
+			src: '^/(.*)/$',
+			headers: {
+				Location: '/$1'
+			},
+			status: 308
+		}
+	],
+	ignore: [
+		{
+			src: '^/(?:(.+)/)?index(?:\\.html)?/?$',
+			headers: {
+				Location: '/$1'
+			},
+			status: 308
+		},
+		{
+			src: '^/(.*)\\.html/?$',
+			headers: {
+				Location: '/$1'
+			},
+			status: 308
+		}
+	]
+};
 
 /** @type {import('.')} **/
 export default function ({ external = [] } = {}) {
@@ -25,7 +102,7 @@ export default function ({ external = [] } = {}) {
 
 			builder.log.minor('Prerendering static pages...');
 
-			await builder.prerender({
+			const prerendered = await builder.prerender({
 				dest: `${dir}/static`
 			});
 
@@ -66,9 +143,28 @@ export default function ({ external = [] } = {}) {
 			builder.log.minor('Writing routes...');
 
 			builder.mkdirp(`${dir}/config`);
+
+			const prerendered_routes = prerendered.paths
+				.map((path) => {
+					const file =
+						path === '/'
+							? '/index.html'
+							: path + (builder.trailingSlash === 'always' ? '/index.html' : '.html');
+
+					if (existsSync(`${dir}/static${file}`)) {
+						return {
+							src: path,
+							dest: file
+						};
+					}
+				})
+				.filter(Boolean);
+
 			writeFileSync(
 				`${dir}/config/routes.json`,
 				JSON.stringify([
+					...redirects[builder.trailingSlash],
+					...prerendered_routes,
 					{
 						src: `/${builder.appDir}/.+`,
 						headers: {

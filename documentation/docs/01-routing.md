@@ -4,17 +4,17 @@ title: Routing
 
 Sveltekitの核心は、 _ファイルシステムベースのルーター_ です。これは、アプリケーション構造がコードベースの構造(具体的には `src/routes` のコンテンツ)によって定義されることを意味します。
 
-> [プロジェクトのコンフィグ](#configuration) を編集することで、これを異なるディレクトリに変更できます。
+> [プロジェクトのコンフィグ](/docs/configuration) を編集することで、これを異なるディレクトリに変更できます。
 
 ルートには、**ページ(pages)** と **エンドポイント(endpoints)** の2つのタイプがあります。
 
 ページは通常、ユーザーに表示するHTML(及びページに必要なCSSやJavaScript)を生成します。デフォルトでは、ページはクライアントとサーバーの両方でレンダリングされますが、この動作は設定によって変更可能です。
 
-エンドポイントは、サーバー上でのみ実行されます(もしくはサイトをビルドするときに[プリレンダリング](#page-options-prerender)している場合)。これは、プライベートな認証情報を必要とするデータベースやAPIにアクセスする場合や、本番環境ネットワーク上のマシンにあるデータを返す場合などに使用されます。ページはエンドポイントにデータをリクエストすることができます。エンドポイントはデフォルトではJSONを返しますが、他のフォーマットでもデータを返すことができます。
+エンドポイントは、サーバー上でのみ実行されます(もしくはサイトをビルドするときに[プリレンダリング](/docs/page-options#prerender)している場合)。これは、プライベートな認証情報を必要とするデータベースやAPIにアクセスする場合や、本番環境ネットワーク上のマシンにあるデータを返す場合などに使用されます。ページはエンドポイントにデータをリクエストすることができます。エンドポイントはデフォルトではJSONを返しますが、他のフォーマットでもデータを返すことができます。
 
 ### Pages
 
-ページ(Pages)は `.svelte` ファイル (または[`config.extensions`](#configuration) に記載されている拡張子のファイル) に書かれているSvelteコンポーネントです。デフォルトでは、ユーザーが初めてアプリにアクセスすると、サーバーレンダリングバージョンのページと、そのページを'ハイドレート(hydrate)'しクライアントサイドルーターを初期化するJavaScriptが提供されます。それ以降、他のページへのナビゲーションは全てクライアント側で処理され、ページの共通部分を再レンダリングする必要がなくなるため、高速でアプリのような操作感になります。
+ページ(Pages)は `.svelte` ファイル (または[`config.extensions`](/docs/configuration) に記載されている拡張子のファイル) に書かれているSvelteコンポーネントです。デフォルトでは、ユーザーが初めてアプリにアクセスすると、サーバーレンダリングバージョンのページと、そのページを'ハイドレート(hydrate)'しクライアントサイドルーターを初期化するJavaScriptが提供されます。それ以降、他のページへのナビゲーションは全てクライアント側で処理され、ページの共通部分を再レンダリングする必要がなくなるため、高速でアプリのような操作感になります。
 
 ファイル名でルート(**route**)が決まります。例えば、`src/routes/index.svelte` はサイトのルート(**root**)になります。
 
@@ -78,9 +78,9 @@ interface Fallthrough {
 }
 ```
 
-> `App.Locals` と `App.Platform` については [TypeScript](#typescript) セクションをご参照ください。
+> `App.Locals` と `App.Platform` については [TypeScript](/docs/typescript) セクションをご参照ください。
 
-`src/routes/items/[id].svelte` のようなページは、`src/routes/items/[id].js` からデータを取得することができます:
+エンドポイント(endpoint)とページ(page)が同じファイル名(拡張子を除く)の場合、ページはそのエンドポイントからプロパティ(props)を取得します。つまり、`src/routes/items/[id].svelte` のようなページは、`src/routes/items/[id].js` からプロパティを取得することができるのです:
 
 ```js
 import db from '$lib/database';
@@ -102,7 +102,7 @@ export async function get({ params }) {
 }
 ```
 
-> エンドポイントを含む全てのサーバーサイドのコードは、外部のAPIにデータをリクエストする場合に備えて、`fetch` にアクセスすることができます。`$lib` のインポートについては心配無用です、それについては[後ほど](#modules-$lib)。
+> エンドポイントを含む全てのサーバーサイドのコードは、外部のAPIにデータをリクエストする場合に備えて、`fetch` にアクセスすることができます。`$lib` のインポートについては心配無用です、それについては[後ほど](/docs/modules#$lib)触れます。
 
 この関数の仕事は、レスポンスを表す `{ status, headers, body }` オブジェクトを返すことです。`status` は [HTTPステータスコード](https://httpstatusdogs.com)です。
 
@@ -111,7 +111,7 @@ export async function get({ params }) {
 - `4xx` — クライアントエラー
 - `5xx` — サーバーエラー
 
-> `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー](#routing-advanced-fallthrough-routes) し続けるか、一般的な 404 で応答します。
+> `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー(fall through)](/docs/routing#advanced-routing-fallthrough-routes) し続けるか、一般的な 404 で応答します。
 
 返される `body` は、ページのプロパティに対応します:
 
@@ -223,7 +223,7 @@ return {
 
 #### HTTP method overrides
 
-HTML `<form>` 要素は、ネイティブでは `GET` と `POST` メソッドのみをサポートしています。例えば `PUT` や `DELETE` などのその他のメソッドを許可するには、それを [configuration](#configuration-methodoverride) で指定し、`_method=VERB` パラメーター (パラメーター名は設定で変更できます) を form の `action` に追加してください:
+HTML `<form>` 要素は、ネイティブでは `GET` と `POST` メソッドのみをサポートしています。例えば `PUT` や `DELETE` などのその他のメソッドを許可するには、それを [configuration](/docs/configuration#methodoverride) で指定し、`_method=VERB` パラメーター (パラメーター名は設定で変更できます) を form の `action` に追加してください:
 
 ```js
 // svelte.config.js
@@ -252,7 +252,7 @@ export default {
 
 ### Private modules
 
-名前が `_` や `.` で始まるファイルやディレクトリ([`.well-known`](https://en.wikipedia.org/wiki/Well-known_URI) は除く) はデフォルトでプライベートで、ルート(routes)を作成しません(ルートを作成するファイルからインポートすることは可能です)。どのモジュールをパブリックまたはプライベートとみなすかについては [`ルート(routes)`](#configuration-routes) 設定で設定することができます。
+名前が `_` や `.` で始まるファイルやディレクトリ([`.well-known`](https://en.wikipedia.org/wiki/Well-known_URI) は除く) はデフォルトでプライベートで、ルート(routes)を作成しません(ルートを作成するファイルからインポートすることは可能です)。どのモジュールをパブリックまたはプライベートとみなすかについては [`ルート(routes)`](/docs/configuration#routes) 設定で設定することができます。
 
 ### Advanced routing
 
@@ -288,6 +288,6 @@ src/routes/[qux].svelte
 src/routes/foo-[bar].svelte
 ```
 
-…`/foo-xyz` にアクセスすると、SvelteKit は最初に `foo-[bar].svelte` を試行します、なぜならベストマッチだからです。その後レスポンスがなければ、SvelteKit は `/foo-xyz` に有効にマッチする他のルートを試行します。エンドポイントはページより優先順位が高いため、次に試行されるのは `[baz].js` です。次にアルファベット順で優先順位が決まるので、`[baz].svelte` は `[qux].svelte` より先に試行されます。最初に応答するルート(route) — [`load`](#loading) から何かを返すページ、`load` 関数を持たないページ、または何かを返すエンドポイント — がリクエストを処理します。
+…`/foo-xyz` にアクセスすると、SvelteKit は最初に `foo-[bar].svelte` を試行します、なぜならベストマッチだからです。その後レスポンスがなければ、SvelteKit は `/foo-xyz` に有効にマッチする他のルートを試行します。エンドポイントはページより優先順位が高いため、次に試行されるのは `[baz].js` です。次にアルファベット順で優先順位が決まるので、`[baz].svelte` は `[qux].svelte` より先に試行されます。最初に応答するルート(route) — [`load`](/docs/loading) から何かを返すページ、`load` 関数を持たないページ、または何かを返すエンドポイント — がリクエストを処理します。
 
 どのページやエンドポイントもリクエストに応答しない場合、SvelteKitは一般的な404で応答します。

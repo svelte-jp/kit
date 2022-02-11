@@ -4,7 +4,7 @@ title: Adapters
 
 SvelteKitアプリをデプロイする前に、それをデプロイ先の環境に _合わせる(adapt)_ 必要があります。adapter は、ビルドされたアプリをインプットとして受け取り、デプロイ用のアウトプットを生成する小さなプラグインです。
 
-デフォルトでは、プロジェクトは `@sveltejs/adapter-auto` を使用するように設定されており、プロダクション環境を検出して可能な限り適切な adapter を選択します。もし(まだ)プラットフォームがサポートされていなければ、[custom adapter をインストール](#adapters-community-adapters)したり、[作成](#adapters-writing-custom-adapters)したりする必要があるかもしれません。
+デフォルトでは、プロジェクトは `@sveltejs/adapter-auto` を使用するように設定されており、プロダクション環境を検出して可能な限り適切な adapter を選択します。もし(まだ)プラットフォームがサポートされていなければ、[custom adapter をインストール](/docs/adapters#community-adapters)するか、[custom adapter を作成](/docs/adapters#writing-custom-adapters)する必要があるかもしれません。
 
 > 新しい環境のサポートを追加することに関しては、[adapter-auto の README](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) をご参照ください。
 
@@ -28,7 +28,7 @@ SvelteKit は、公式にサポートされている adapter を多数提供し�
 +import adapter from '@sveltejs/adapter-node';
 ```
 
-これにより、[svelte-kit build](#command-line-interface-svelte-kit-build) は自己完結型の Node アプリを `build` ディレクトリの中に生成します。adapter にはオプションを渡すことができ、例えば出力ディレクトリをカスタマイズできます:
+これにより、[svelte-kit build](/docs/cli#svelte-kit-build) は自己完結型の Node アプリを `build` ディレクトリの中に生成します。adapter にはオプションを渡すことができ、例えば出力ディレクトリをカスタマイズできます:
 
 ```diff
 // svelte.config.js
@@ -44,7 +44,7 @@ export default {
 
 #### Static sites
 
-ほとんどの adapter は、サイト内の [プリレンダリング可能な](#page-options-prerender) ページに対して静的な HTML を生成します。アプリ全体がプリレンダリング可能な場合は、`@sveltejs/adapter-static@next` を使用して _全ての_ ページ に対して静的な HTML を生成することができます。完全に静的なサイトは、[GitHub Pages](https://pages.github.com/) のような静的ホストなど、さまざまなプラットフォームでホストすることができます。
+ほとんどの adapter は、サイト内の [プリレンダリング可能な](/docs/page-options#prerender) ページに対して静的な HTML を生成します。アプリ全体がプリレンダリング可能な場合は、`@sveltejs/adapter-static@next` を使用して _全ての_ ページ に対して静的な HTML を生成することができます。完全に静的なサイトは、[GitHub Pages](https://pages.github.com/) のような静的ホストなど、さまざまなプラットフォームでホストすることができます。
 
 ```diff
 // svelte.config.js
@@ -56,7 +56,7 @@ export default {
 
 #### Platform-specific context
 
-adapter によっては、リクエストに関する追加情報にアクセスすることができます。例えば、Cloudflare Workers の場合は KV namespaces などを含む `env` オブジェクトにアクセスできます。これは [hooks](#hooks) や [エンドポイント(endpoints)](#routing-endpoints) で使用される `RequestEvent` に、`platform` プロパティとして渡されます — 詳しくは、各 adapter のドキュメントをご参照ください。
+adapter によっては、リクエストに関する追加情報にアクセスすることができます。例えば、Cloudflare Workers の場合は KV namespaces などを含む `env` オブジェクトにアクセスできます。これは [hooks](/docs/hooks) や [エンドポイント(endpoints)](/docs/routing#endpoints) で使用される `RequestEvent` に、`platform` プロパティとして渡されます — 詳しくは、各 adapter のドキュメントをご参照ください。
 
 ### Community adapters
 

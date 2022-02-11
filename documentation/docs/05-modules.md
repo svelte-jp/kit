@@ -10,11 +10,11 @@ SvelteKit では、数多くのモジュールがアプリケーションで利�
 import { amp, browser, dev, mode, prerendering } from '$app/env';
 ```
 
-- `amp` は `true` か `false` です。[プロジェクト設定](#configuration) の対応する値に依存します
+- `amp` は `true` か `false` です。[プロジェクト設定](/docs/configuration) の対応する値に依存します
 - `browser` は `true` か `false` です。アプリが動作している場所がブラウザかサーバーかに依存します
 - `dev` は開発者モードの場合 `true`、プロダクションだと `false` です
 - `mode` は [Vite mode](https://ja.vitejs.dev/guide/env-and-mode.html#modes) です。`config.kit.vite.mode` で特に設定をしない限り、開発モードでは `development`、ビルド時には `production` となります
-- `prerendering` は [プリレンダリング](#page-options-prerender) の場合は `true`、それ以外の場合は `false` です
+- `prerendering` は [プリレンダリング](/docs/page-options#prerender) の場合は `true`、それ以外の場合は `false` です
 
 ### $app/navigation
 
@@ -39,7 +39,7 @@ import {
   - `keepfocus` (boolean, デフォルトは `false`) もし `true` にした場合、現在フォーカスされている要素はナビゲーション後もそのフォーカスを保持します。そうでない場合は、フォーカスがボディにリセットされます
   - `state` (object, デフォルトは `{}`) 新規作成/更新された履歴(history)エントリの状態
 - `invalidate(href)` は、現在アクティブなページに含まれる全ての `load` 関数のうち、当該のリソースを `fetch` してるものについて全て再実行します。ページがその後更新されたときに解決する `Promise` を返します
-- `prefetch(href)` はプログラムでページをプリフェッチします。つまり、a) そのページのコードがロード済か確認し、b) 適切なオプションでそのページの `load` を呼び出します。これは、SvelteKitのアプリで、ユーザーが `<a>` 要素をタップまたはマウスオーバーしたときに [sveltekit:prefetch](#anchor-options-sveltekit-prefetch) によってトリガーされる動作と同じです。次のナビゲーションがその `href` の場合、`load` から返された値が使用され、ナビゲーションが瞬時に行われます。これはプリフェッチが完了したときに解決される `Promise` を返します。
+- `prefetch(href)` はプログラムでページをプリフェッチします。つまり、a) そのページのコードがロード済か確認し、b) 適切なオプションでそのページの `load` を呼び出します。これは、SvelteKitのアプリで、ユーザーが `<a>` 要素をタップまたはマウスオーバーしたときに [sveltekit:prefetch](/docs/a-options#sveltekit-prefetch) によってトリガーされる動作と同じです。次のナビゲーションがその `href` の場合、`load` から返された値が使用され、ナビゲーションが瞬時に行われます。これはプリフェッチが完了したときに解決される `Promise` を返します。
 - `prefetchRoutes(routes)` — プログラムで、まだフェッチされていないルート(routes)のコードをプリフェッチします。一般的な使われ方としては、以降のナビゲーションを高速化するためにこれを呼び出します。引数を与えない場合は、全てのルート(routes)がフェッチされます。それ以外の場合、`/about` (`src/routes/about.svelte` にマッチ) や `/blog/*` (`src/routes/blog/[slug].svelte` にマッチ) など、任意のパス名でルートを指定することができます。`prefetch` とは違い、これは個別のページの `load` を呼び出しません。これはルート(routes)がプリフェッチされたときに解決される `Promise` を返します。
 
 ### $app/paths
@@ -48,10 +48,10 @@ import {
 import { base, assets } from '$app/paths';
 ```
 
-- `base` — [`config.kit.paths.base`](#configuration-paths) が指定されている場合、それにマッチするルート(root)からの相対パス (つまり `/` で始まる) 文字列で、未指定の場合は空の文字列です
-- `assets` — [`config.kit.paths.assets`](#configuration-paths)が指定されている場合、それにマッチする絶対パス(URL)。指定されていない場合は `base` と同じです
+- `base` — [`config.kit.paths.base`](/docs/configuration#paths) が指定されている場合、それにマッチするルート(root)からの相対パス (つまり `/` で始まる) 文字列で、未指定の場合は空の文字列です
+- `assets` — [`config.kit.paths.assets`](/docs/configuration#paths)が指定されている場合、それにマッチする絶対パス(URL)。指定されていない場合は `base` と同じです
 
-> `config.kit.paths.assets` に値が指定されている場合、[`svelte-kit dev`](#command-line-interface-svelte-kit-dev) または [`svelte-kit preview`](#command-line-interface-svelte-kit-preview) を実行しているときはアセットがまだ最終的なURLに存在しないため、それは `'/_svelte_kit_assets'` に置き換えられます。
+> `config.kit.paths.assets` に値が指定されている場合、[`svelte-kit dev`](/docs/cli#svelte-kit-dev) または [`svelte-kit preview`](/docs/cli#svelte-kit-preview) を実行しているときはアセットがまだ最終的なURLに存在しないため、それは `'/_svelte_kit_assets'` に置き換えられます。
 
 ### $app/stores
 
@@ -68,9 +68,9 @@ import { getStores, navigating, page, session, updated } from '$app/stores';
 ストア自体はサブスクリプションの時点で正しい context にアタッチします。そのため、ボイラープレートなしにコンポーネントで直接インポートして使用することができます。しかし、`$`接頭辞を使用していない場合は、コンポーネントやページの初期化時に同期的に呼び出す必要があります。代わりに `getStores` を使用して、安全に `.subscribe` を非同期で呼び出すことができます。
 
 - `navigating` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) です。ナビゲーションを開始すると、この値は `{ from, to }` になります。`from` と `to` はどちらも [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスです。ナビゲーションが終了すると、値は `null` に戻ります。
-- `page` は、現在の [`url`](https://developer.mozilla.org/ja/docs/Web/API/URL)、[`params`](#loading-input-params)、[`stuff`](#loading-output-stuff) 、[`status`](#loading-output-status)、[`error`](#loading-output-error) を含むオブジェクトです。
-- `session` は [書き込み可能なストア(writable store)](https://svelte.jp/tutorial/writable-stores) で、初期値は [`getSession`](#hooks-getsession) の戻り値です。書き込めますが、その変更は永続化されません — それはあなた自身で実装する必要があります。
-- `updated` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) で、初期値は false です。もし [`version.pollInterval`](#configuration-version) が0以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` にします。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
+- `page` は、現在の [`url`](https://developer.mozilla.org/ja/docs/Web/API/URL)、[`params`](/docs/loading#input-params)、[`stuff`](/docs/loading#output-stuff) 、[`status`](/docs/loading#output-status)、[`error`](/docs/loading#output-error) を含むオブジェクトです。
+- `session` は [書き込み可能なストア(writable store)](https://svelte.jp/tutorial/writable-stores) で、初期値は [`getSession`](/docs/hooks#getsession) の戻り値です。書き込めますが、その変更は永続化されません — それはあなた自身で実装する必要があります。
+- `updated` は [読み取り専用のストア(readable store)](https://svelte.jp/tutorial/readable-stores) で、初期値は false です。もし [`version.pollInterval`](/docs/configuration#version) が0以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` にします。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
 
 ### $lib
 
@@ -78,14 +78,14 @@ import { getStores, navigating, page, session, updated } from '$app/stores';
 
 ### $service-worker
 
-このモジュールは [service workers](#service-workers) でのみ使用できます。
+このモジュールは [service workers](/docs/service-workers) でのみ使用できます。
 
 ```js
 import { build, files, timestamp } from '$service-worker';
 ```
 
 - `build` はViteが生成するファイルを表すURL文字列の配列で、`cache.addAll(build)` を使ってキャッシュするのに適しています。
-- `files` は、`static` ディレクトリまたは [`config.kit.files.assets`](#configuration) で指定されたディレクトリにあるファイルを表すURL文字列の配列です。どのファイルを `static` ディレクトリに含めるかについては、[`config.kit.serviceWorker.files`](#configuration) でカスタマイズできます。
+- `files` は、`static` ディレクトリまたは [`config.kit.files.assets`](/docs/configuration) で指定されたディレクトリにあるファイルを表すURL文字列の配列です。どのファイルを `static` ディレクトリに含めるかについては、[`config.kit.serviceWorker.files`](/docs/configuration) でカスタマイズできます。
 - `timestamp` はビルド時に `Date.now()` を呼び出した結果です。これは、Service Worker 内で一意なキャッシュ名を生成するのに便利で、後でアプリをデプロイしたときに古いキャッシュを無効にすることができます。
 
 ### @sveltejs/kit/hooks

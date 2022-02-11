@@ -22,16 +22,16 @@ declare namespace App {
 
 ### App.Locals
 
-[hooks](#hooks) (`handle`、`handleError`、`getSession`) と [エンドポイント(endpoints)](#routing-endpoints) からアクセスされる `event.locals` を定義する interface です。
+[hooks](/docs/hooks) (`handle`、`handleError`、`getSession`) と [エンドポイント(endpoints)](/docs/routing#endpoints) からアクセスされる `event.locals` を定義する interface です。
 
 ### App.Platform
 
-adapter が `event.platform` を通して [プラットフォーム固有の context](#adapters-supported-environments-platform-specific-context) を提供する場合、ここでそれを指定します。
+adapter が `event.platform` を通して [プラットフォーム固有の context](/docs/adapters#supported-environments-platform-specific-context) を提供する場合、ここでそれを指定します。
 
 ### App.Session
 
-`session` を定義する interface です。[`load`](#loading) 関数の引数として、かつ [session store](#modules-$app-stores) の値として定義します。
+`session` を定義する interface です。[`load`](/docs/loading) 関数の引数として、かつ [session store](/docs/modules#$app-stores) の値として定義します。
 
 ### App.Stuff
 
-`stuff` を定義する interface です。[`load`](#loading) のインプットもしくはアウトプットとして、または [page store](#modules-$app-stores) の `stuff` プロパティの値として定義します。
+`stuff` を定義する interface です。[`load`](/docs/loading) のインプットもしくはアウトプットとして、または [page store](/docs/modules#$app-stores) の `stuff` プロパティの値として定義します。

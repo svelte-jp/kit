@@ -39,7 +39,7 @@ interface Fallthrough {
 }
 ```
 
-> `App.Session` と `App.Stuff` については [TypeScript](#typescript) セクションをご参照ください。
+> `App.Session` と `App.Stuff` については [TypeScript](/docs/typescript) セクションをご参照ください。
 
 外部の API からデータをロードするページではこのようになるでしょう:
 
@@ -64,7 +64,7 @@ interface Fallthrough {
 
 `load` は Next.js の `getStaticProps` や `getServerSideProps` に似ていますが、サーバーとクライアントの両方で動作する点が異なります。上記の例では、もしユーザーがこのページへのリンクをクリックした場合、データは私たちのサーバーを経由せずに `cms.example.com` から取得されます。
 
-`load` が `{fallthrough: true}` を返す場合、SvelteKitは応答が返るまで他のルート(routes)に[フォールスルー](#routing-advanced-routing-fallthrough-routes)するか、もしくは一般的な404で応答します。
+`load` が `{fallthrough: true}` を返す場合、SvelteKitは応答が返るまで他のルート(routes)に[フォールスルー(fall through)](/docs/routing#advanced-routing-fallthrough-routes)するか、もしくは一般的な404で応答します。
 
 SvelteKitの `load` は、以下のような特別なプロパティを持つ `fetch` の実装を受け取ります。
 
@@ -72,11 +72,11 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 - HTTPコールを発行することなく、アプリ自身のエンドポイントに対してリクエストを行うことができます
 - 使用時にレスポンスのコピーを作成し、ハイドレーション(hydration)のために最初のページロードに埋め込んで送信します
 
-`load` は [ページ](#routing-pages)、[レイアウト](#layouts)コンポーネントにのみ適用され (インポートされるコンポーネントには適用できません)、デフォルトのレンダリング設定ではサーバーとクライアントの両方で実行されます。
+`load` は [ページ](/docs/routing#pages)、[レイアウト](/docs/layouts)コンポーネントにのみ適用され (インポートされるコンポーネントには適用できません)、デフォルトのレンダリング設定ではサーバーとクライアントの両方で実行されます。
 
-> `load` の中で呼び出されるコードについて:
+> `load` ブロックの中で呼び出されるコードについて:
 >
-> - ネイティブの `fetch` ではなく Sveltekitが提供する [`fetch`](#loading-input-fetch) ラッパーを使用する必要があります
+> - ネイティブの `fetch` ではなく Sveltekitが提供する [`fetch`](/docs/loading#input-fetch) ラッパーを使用する必要があります
 > - `window` や `document` などの、ブラウザ固有のオブジェクトを参照してはいけません
 > - クライアントに公開されるAPIキーやシークレットを直接参照するのではなく、必要なシークレットを使用するエンドポイントを呼び出す必要があります。
 
@@ -94,7 +94,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 `url` は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、 `searchParams` といったプロパティを持っています。
 
-> 環境によっては、サーバーサイドレンダリングのときにこれがリクエストヘッダーから取得されるので、[設定をする必要があるかもしれません](#configuration-headers)。
+> 環境によっては、サーバーサイドレンダリングのときにこれがリクエストヘッダーから導き出される場合もあります。例えば、[adapter-node](/docs/adapters#supported-environments-node-js) を使用している場合、URL を正確にするために adapter-node に設定が必要かもしれません。
 
 #### params
 
@@ -123,7 +123,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### session
 
-`session` は現在のリクエストに関連するサーバーからのデータ(例えば現在のユーザー情報)の受け渡しに使用することができます。デフォルトでは `undefined` です。使い方を学ぶには [`getSession`](#hooks-getsession) をご参照ください。
+`session` は現在のリクエストに関連するサーバーからのデータ(例えば現在のユーザー情報)の受け渡しに使用することができます。デフォルトでは `undefined` です。使い方を学ぶには [`getSession`](/docs/hooks#getsession) をご参照ください。
 
 #### stuff
 
@@ -161,4 +161,4 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 これは既存の `stuff` とマージされ、後続のレイアウトコンポーネントやページコンポーネントの `load` 関数に渡されます。
 
-マージされた `stuff` は、`$page.stuff` のように [page store](#modules-$app-stores) を使用するコンポーネントから利用可能で、ページがレイアウトに対してデータを '上向きに' 渡すためのメカニズムを提供します。
+マージされた `stuff` は、`$page.stuff` のように [page store](/docs/modules#$app-stores) を使用するコンポーネントから利用可能で、ページがレイアウトに対してデータを '上向きに' 渡すためのメカニズムを提供します。
