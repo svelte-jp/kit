@@ -4,11 +4,11 @@ title: Hooks
 
 オプションの `src/hooks.js` (または `src/hooks.ts`、または `src/hooks/index.js`) ファイルはサーバー上で実行される4つの関数 — **handle**、**handleError**、**getSession**、**externalFetch** — をエクスポートできます。それらは全てオプションです。
 
-> このファイルの配置場所は [コンフィグ](#configuration) の `config.kit.files.hooks` で変更することができます。
+> このファイルの配置場所は [コンフィグ](/docs/configuration) の `config.kit.files.hooks` で変更することができます。
 
 ### handle
 
-この関数は SvelteKit がリクエストを受けるたびに (アプリの実行中であろうと、[プリレンダリング](#ssr-and-javascript-prerender)であろうと) 実行され、レスポンスを決定します。リクエストを表す `event` オブジェクトと、SvelteKitのルーターを呼び出しそれに応じて(ページをレンダリングしたり、エンドポイントを呼び出したりして)レスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでエンドポイントを実装する場合など)。
+この関数は SvelteKit がリクエストを受けるたびに (アプリの実行中であろうと、[プリレンダリング](/docs/page-options#prerender)であろうと) 実行され、レスポンスを決定します。リクエストを表す `event` オブジェクトと、SvelteKitのルーターを呼び出しそれに応じて(ページをレンダリングしたり、エンドポイントを呼び出したりして)レスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでエンドポイントを実装する場合など)。
 
 > (プリレンダリング済みのページを含む) 静的アセットに対するリクエストは SvelteKit では処理されません。
 
@@ -38,7 +38,7 @@ export interface Handle {
 }
 ```
 
-> `App.Locals` と `App.Platform` について [TypeScript](#typescript) セクションをご参照ください。
+> `App.Locals` と `App.Platform` については [TypeScript](/docs/typescript) セクションをご参照ください。
 
 エンドポイントに渡されるリクエストにカスタムデータを追加するには、以下のように `event.locals` オブジェクトにデータを投入します。
 
@@ -54,11 +54,11 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-[`sequence` ヘルパー関数](#modules-sveltejs-kit-hooks)を使用すると、複数の `handle` 関数呼び出しを追加することができます。
+[`sequence` ヘルパー関数](/docs/modules#sveltejs-kit-hooks)を使用すると、複数の `handle` 関数呼び出しを追加することができます。
 
 `resolve` はオプションの第2引数をサポートしており、レスポンスのレンダリング方法をより詳細にコントロールすることができます。そのパラメーターは、以下のフィールドを持つオブジェクトです:
 
-- `ssr` — サーバーでページをロードしてレンダリングするかどうかを指定します。
+- `ssr` (boolean, default `true`) — サーバーでページをロードしてレンダリングするかどうかを指定します。
 
 ```js
 /** @type {import('@sveltejs/kit').Handle} */
@@ -71,7 +71,7 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-> [サーバーサイドレンダリング](#appendix-ssr) を無効にすると、SvelteKit アプリは事実上 [**シングルページアプリ** または SPA](#appendix-csr-and-spa) になります。ほとんどの場合、これは推奨されません ([appendix を参照](#appendix-ssr))。無効にすることが本当に適切化どうかを検討し、すべてのリクエストに対して無効にするのではなく、選択的に無効にしてください。
+> [サーバーサイドレンダリング](/docs/appendix#ssr) を無効にすると、SvelteKit アプリは事実上 [**シングルページアプリ** または SPA](/docs/appendix#csr-and-spa) になります。ほとんどの場合、これは推奨されません ([appendix を参照](/docs/appendix#ssr))。無効にすることが本当に適切かどうかを検討し、すべてのリクエストに対して無効にするのではなく、選択的に無効にしてください。
 
 ### handleError
 
@@ -99,7 +99,7 @@ export async function handleError({ error, event }) {
 
 ### getSession
 
-この関数は、`event` オブジェクトを引数に取り、[クライアントからアクセス可能](#modules-$app-stores)な `session` オブジェクトを返します。つまり `session` オブジェクトはユーザーに公開しても安全でなければなりません。この関数はSvelteKitがページをサーバーレンダリングする際に実行されます。
+この関数は、`event` オブジェクトを引数に取り、[クライアントからアクセス可能](/docs/modules#$app-stores)な `session` オブジェクトを返します。つまり `session` オブジェクトはユーザーに公開しても安全なものでなければなりません。この関数はSvelteKitがページをサーバーレンダリングする際に実行されます。
 
 未実装の場合、session は `{}` です。
 

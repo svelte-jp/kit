@@ -56,7 +56,6 @@ const config = {
 		prerender: {
 			concurrency: 1,
 			crawl: true,
-			createIndexFiles: true,
 			enabled: true,
 			entries: ['*'],
 			onError: 'fail'
@@ -64,7 +63,7 @@ const config = {
 		routes: (filepath) => !/(?:(?:^_|\/_)|(?:^\.|\/\.)(?!well-known))/.test(filepath),
 		serviceWorker: {
 			register: true,
-			files: (filepath) => !/\.DS_STORE/.test(filepath)
+			files: (filepath) => !/\.DS_Store/.test(filepath)
 		},
 		trailingSlash: 'never',
 		version: {
@@ -86,11 +85,11 @@ export default config;
 
 ### adapter
 
-`svelte-kit build` を実行するのに必要で、異なるプラットフォーム向けにアウトプットがどのように変換されるかを決定します。[Adapters](#adapters) をご参照ください。
+`svelte-kit build` を実行するのに必要で、異なるプラットフォーム向けにアウトプットがどのように変換されるかを決定します。[Adapters](/docs/adapters) をご参照ください。
 
 ### amp
 
-[AMP](#amp) モードを有効にします。
+[AMP](/docs/amp) モードを有効にします。
 
 ### appDir
 
@@ -100,8 +99,8 @@ export default config;
 
 以下の `boolean` 値のうち、0個以上を含むオブジェクトです:
 
-- `hydrate` — サーバーでレンダリングされた HTML をクライアントサイドのアプリで [ハイドレート(hydrate)](#page-options-hydrate) するかどうかを指定します。(アプリ全体でこれを `false` に設定することはめったにありません。)
-- `router` — クライアントサイドの[ルーター(router)](#page-options-router)をアプリ全体で有効または無効にします。
+- `hydrate` — サーバーでレンダリングされた HTML をクライアントサイドのアプリで [ハイドレート(hydrate)](/docs/page-options#hydrate) するかどうかを指定します。(アプリ全体でこれを `false` に設定することはめったにありません。)
+- `router` — クライアントサイドの[ルーター(router)](/docs/page-options#router)をアプリ全体で有効または無効にします。
 
 ### csp
 
@@ -131,10 +130,10 @@ export default config;
 以下の `string` 値のうち、0個以上を含むオブジェクトです:
 
 - `assets` — `favicon.ico` or `manifest.json` のような、何も処理する必要もなく、安定したURLを持つべき静的ファイルを配置する場所
-- `hooks` — hooks モジュールのロケーション([Hooks](#hooks) をご参照ください)
+- `hooks` — hooks モジュールのロケーション([Hooks](/docs/hooks) をご参照ください)
 - `lib` — コードベース全体から `$lib` でアクセスできる、アプリの内部ライブラリ
-- `routes` — アプリの構造を定義するファイル([Routing](#routing) をご参照ください)
-- `serviceWorker` — Service Worker のエントリーポイントのロケーション([Service workers](#service-workers) をご参照ください)
+- `routes` — アプリの構造を定義するファイル([Routing](/docs/routing) をご参照ください)
+- `serviceWorker` — Service Worker のエントリーポイントのロケーション([Service workers](/docs/service-workers) をご参照ください)
 - `template` — HTMLレスポンス用テンプレートのロケーション
 
 ### floc
@@ -157,14 +156,14 @@ CSS を HTML の先頭の `<style>` ブロック内にインライン化する�
 
 ### methodOverride
 
-[HTTP Method Overrides](#routing-endpoints-http-method-overrides) をご参照ください。以下のうち、0個以上を含むオブジェクトです:
+[HTTP Method Overrides](/docs/routing#endpoints-http-method-overrides) をご参照ください。以下のうち、0個以上を含むオブジェクトです:
 
 - `parameter` — 使いたいメソッドの値を渡すのに使用するクエリパラメーター名
 - `allowed` - オリジナルのリクエストメソッドを上書きするときに使用することができる HTTP メソッドの配列
 
 ### package
 
-[パッケージ作成](#packaging) に関連するオプションです。
+[パッケージ作成](/docs/packaging) に関連するオプションです。
 
 - `dir` - 出力ディレクトリ
 - `emitTypes` - デフォルトでは、`svelte-kit package` は自動的にパッケージの型を `.d.ts` ファイル形式で生成します。型の生成は設定で変更できますが、常に型を生成することがエコシステムの品質にとってベストであると私たちは信じています。`false` に設定するときは、十分な理由があることを確認してください(例えば、代わりに手書きの型定義を提供したい場合など)
@@ -199,11 +198,10 @@ export default {
 
 ### prerender
 
-[プリレンダリング(Prerendering)](#page-options-prerender) をご参照ください。以下のうち、0個以上を含むオブジェクトです:
+[プリレンダリング(Prerendering)](/docs/page-options#prerender) をご参照ください。以下のうち、0個以上を含むオブジェクトです:
 
 - `concurrency` — 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートのCMSからコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます
 - `crawl` — SvelteKitがシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
-- `createIndexFiles` - `false` に設定すると、`about/index.html` の代わりに `about.html` をレンダリングします
 - `enabled` — `false` に設定すると、プリレンダリングを完全に無効化できます
 - `entries` — プリレンダリングするページ、またはクロールを開始するページ(`crawl: true` の場合)の配列。`*` 文字列には、全ての動的ではないルート(routes)(すなわち `[parameters]` を含まないページ) が含まれます
 - `onError`
@@ -232,7 +230,7 @@ export default {
 
 ### routes
 
-`(filepath: string) => boolean` という関数で、どのファイルがルート(routes)を作成し、どれが [プライベートモジュール](#routing-private-modules) として扱われるか決定します。
+`(filepath: string) => boolean` という関数で、どのファイルがルート(routes)を作成し、どれが [プライベートモジュール](/docs/routing#private-modules) として扱われるか決定します。
 
 ### serviceWorker
 
@@ -249,7 +247,9 @@ URL をルート(routes)に解決する際に、末尾のスラッシュ(trailin
 - `"always"` — `/x` を `/x/` にリダイレクトします
 - `"ignore"` — 末尾のスラッシュを自動で追加したり削除したりしません。`/x` と `/x/` は同等に扱われます
 
-> 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別のURLとして扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](#hooks-handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
+このオプションは [プリレンダリング](/docs/page-options#prerender) にも影響します。もし `trailingSlash` が `always` なら、`/about` のようなルートは `about/index.html` ファイルを生成し、それ以外の場合は `about.html` を生成し、静的な web サーバーの規約に従います。
+
+> 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別のURLとして扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](/docs/hooks#handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
 
 ### version
 
@@ -260,7 +260,7 @@ URL をルート(routes)に解決する際に、末尾のスラッシュ(trailin
 
 アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、古いコンテンツがある可能性があります; そうでなくとも、アプリのルートマニフェストがもう存在しない JavaScript ファイルを指している可能性があります。SvelteKit は、ここで指定された `name` (デフォルトではビルドのタイムスタンプ) を使用して新しいバージョンがデプロイされたことを検知すると、従来のフルページナビゲーションにフォールバックすることにより、この問題を解決しています。
 
-`pollInterval` を0以外の値に設定した場合、SvelteKit はバックグラウンドで新しいバージョンをポーリングし、それを検知すると [`updated`](#modules-$app-stores) ストアの値を `true` にします。
+`pollInterval` を0以外の値に設定した場合、SvelteKit はバックグラウンドで新しいバージョンをポーリングし、それを検知すると [`updated`](/docs/modules#$app-stores) ストアの値を `true` にします。
 
 ### vite
 

@@ -70,7 +70,7 @@ title: Layouts
 
 ### Error pages
 
-ページがロード([Loading](#loading)を参照)に失敗した場合、SvelteKitはエラーページをレンダリングします。レイアウトやページコンポーネントと一緒に `__error.svelte` コンポーネントを作ることで、このページをカスタマイズすることができます。
+ページがロード([Loading](/docs/loading)を参照)に失敗した場合、SvelteKitはエラーページをレンダリングします。レイアウトやページコンポーネントと一緒に `__error.svelte` コンポーネントを作ることで、このページをカスタマイズすることができます。
 
 例えば、`src/routes/settings/notifications/index.svelte` でロードに失敗した場合、`src/routes/settings/notifications/__error.svelte` が存在すればSveltekitはそれを同じレイアウトでレンダリングします。もし存在しなければ、`src/routes/settings/__error.svelte` を親のレイアウトでレンダリングします。もしそれも存在しなければ、 `src/routes/__error.svelte` をルートレイアウト(root layout) でレンダリングします。
 
@@ -87,7 +87,7 @@ export interface ErrorLoadInput<Params extends Record<string, string> = Record<s
 }
 ```
 
-エラーコンポーネントに [`load`](#loading) 関数がある場合、`error` プロパティと `status` プロパティが引数に渡されて呼び出されます。
+エラーコンポーネントに [`load`](/docs/loading) 関数がある場合、`error` プロパティと `status` プロパティが引数に渡されて呼び出されます。
 
 ```html
 <script context="module">
@@ -108,6 +108,6 @@ export interface ErrorLoadInput<Params extends Record<string, string> = Record<s
 <h1>{title}</h1>
 ```
 
-> レイアウトコンポーネントから [page store](#modules-$app-stores) を使って `error` と `status` にアクセスすることもできます。  
+> レイアウトコンポーネントから [page store](/docs/modules#$app-stores) を使って `error` と `status` にアクセスすることもできます。  
 >
 > ユーザーに特権的な情報が公開されないようにするため、本番環境では `error` からサーバーサイドのスタックトレースが取り除かれます。
