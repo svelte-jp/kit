@@ -37,7 +37,7 @@ export default config;
 
 順序を制御する方法など、詳しくは [Vite の `configureServer` のドキュメント](https://ja.vitejs.dev/guide/api-plugin.html#configureserver) をご覧ください。
 
-### `document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか ？
+### `document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？
 
 もし `document` や `window` 変数にアクセスする必要があったり、クライアントサイドだけで実行するコードが必要な場合は、`browser` チェックでラップしてください:
 

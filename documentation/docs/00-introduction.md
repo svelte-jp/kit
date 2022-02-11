@@ -2,13 +2,13 @@
 title: Introduction
 ---
 
-### Before we begin
+### 始める前に
 
 > SvelteKitはまだ開発早期段階で、1.0に到達するまでに変更される可能性があります。このドキュメントは作業途中のものです。もし行き詰まったら、[Discord チャットルーム](https://svelte.dev/chat)にどうぞ。
 >
 > Sapper からのアップグレードについては [migration guides(移行ガイド)](/docs/migrating) をご覧ください。
 
-### What is SvelteKit?
+### SvelteKitとは
 
 SvelteKitはとてもハイパフォーマンスなWebアプリを構築するためのフレームワークです。
 
@@ -39,6 +39,6 @@ npm run dev
 
 ファイルを編集して、どのように動作するのか確かめてみてください。もしかしたら、もうこれ以降のガイドを読む必要はないかもしれません！
 
-#### Editor setup
+#### エディターのセットアップ
 
 [Visual Studio Code (通称 VS Code)](https://code.visualstudio.com/download) と [Svelte extension](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) のご使用をおすすめしていますが、[他にも数多くのエディタをサポートしています](https://sveltesociety.dev/tools#editor-support)。

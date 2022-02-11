@@ -5,6 +5,7 @@ import 'prismjs/components/prism-diff.js';
 import 'prismjs/components/prism-typescript.js';
 import 'prism-svelte';
 import { extract_frontmatter, transform } from './markdown';
+import { convert_heading } from './fixlink';
 
 const languages = {
 	bash: 'bash',
@@ -93,7 +94,7 @@ function parse(markdown, file, main_slug) {
 				.replace(/&lt;/g, '<')
 				.replace(/&gt;/g, '>');
 
-			const normalized = slugify(title);
+			const normalized = slugify(convert_heading(title));
 
 			headings[level - 1] = normalized;
 			headings.length = level;
