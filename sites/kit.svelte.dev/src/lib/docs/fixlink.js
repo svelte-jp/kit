@@ -1,8 +1,11 @@
-const map = new Map([
+const docs = new Map([
 	['始める前に', 'Before we begin'],
 	['SvelteKitとは', 'What is SvelteKit?'],
 	['エディターのセットアップ', 'Editor setup'],
-	['プリレンダリングしない場合', 'When not to prerender'],
+	['プリレンダリングしない場合', 'When not to prerender']
+]);
+
+const faq = new Map([
 	['データベースのセットアップはどう行えばよいですか？', 'How do I setup a database?'],
 	['ミドルウェア(middleware)を使うにはどうすればよいですか？', 'How do I use middleware?'],
 	[
@@ -12,9 +15,11 @@ const map = new Map([
 	['Yarn 2 で動作しますか？', 'Does it work with Yarn 2?']
 ]);
 
+const map = new Map([...docs, ...faq]);
+
 /**
  * @param {string} heading
  */
-export function convert_heading(heading) {
+export function convert_link(heading) {
 	return map.get(heading) || heading;
 }

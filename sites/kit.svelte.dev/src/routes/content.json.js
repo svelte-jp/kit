@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { extract_frontmatter, transform } from '$lib/docs/markdown';
 import { slugify } from '../lib/docs';
-import { convert_heading } from '$lib/docs/fixlink';
+import { convert_link } from '$lib/docs/fixlink';
 
 const categories = [
 	{
@@ -47,7 +47,7 @@ export function get() {
 			for (const section of sections) {
 				const lines = section.split('\n');
 				const h3 = lines.shift();
-				const h3link = convert_heading(h3);
+				const h3link = convert_link(h3);
 				const content = lines.join('\n');
 
 				const subsections = content.trim().split('#### ');
@@ -63,7 +63,7 @@ export function get() {
 				for (const subsection of subsections) {
 					const lines = subsection.split('\n');
 					const h4 = lines.shift();
-					const h4link = convert_heading(h4);
+					const h4link = convert_link(h4);
 
 					blocks.push({
 						breadcrumbs: [...breadcrumbs, metadata.title, h3, h4],
