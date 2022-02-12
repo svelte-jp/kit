@@ -1,5 +1,5 @@
 ---
-title: Migrating from Sapper
+title: Sapper からの移行
 ---
 
 SvelteKit は Sapper の後継であり、その設計の多くの要素を共有しています。
@@ -30,7 +30,7 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 - `sapper dev` は [`svelte-kit dev`](/docs/cli#svelte-kit-dev) にします
 - `node __sapper__/build` は `node build` にします
 
-### Project files
+### プロジェクトファイル
 
 アプリの大部分を占める `src/routes` の中はそのままで大丈夫ですが、いくつかのプロジェクトファイルを移動または更新する必要があります。
 
@@ -69,9 +69,9 @@ SvelteKit アプリはサーバーレス環境で動作することを可能に�
 
 Sapper アプリでよくあるパターンとして、内部ライブラリを `src/node_modules` 内のディレクトリに配置する、というものがあります。これは Vite だと動作しないため、代わりに [`src/lib`](/docs/modules#$lib) を使用します。
 
-### Pages and layouts
+### ページとレイアウト
 
-#### Renamed files
+#### 名前が変わったファイル
 
 カスタムエラーページコンポーネントを `_error.svelte` から `__error.svelte` にリネームしてください。同様に、`_layout.svelte` ファイルも `__layout.svelte` にリネームしてください。SvelteKitでは二重のアンダースコアの接頭辞をリザーブしています。[プライベートモジュール](/docs/routing#private-modules)にはまだ接頭辞として `_` を1つ付けます([`ルート(routes)`](/docs/configuration#routes)コンフィグで変更可能です)。
 
@@ -106,9 +106,9 @@ const { preloading, page, session } = stores();
 
 SvelteKit では、それらにアクセスする方法が異なります。`stores` は `getStores` になりましたが、[`$app/stores`](/docs/modules#$app-stores) から直接 `navigating`、`page`、`session` をインポートできるので、ほとんどの場合は必要ありません。
 
-#### Routing
+#### ルーティング
 
-ルート(routes) の正規表現はもうサポートされていません。代わりに、[fallthrough routes](/docs/routing#advanced-routing-fallthrough-routes) をお使いください。
+ルート(routes) の正規表現はもうサポートされていません。代わりに、[フォールスルールート](/docs/routing#advanced-routing-fallthrough-routes) をお使いください。
 
 #### URLs
 
@@ -129,7 +129,7 @@ SvelteKit は、アプリが動作する場所に依存しないように設計�
 
 環境非依存な動作をサポートするため、グローバルコンテキストで `fetch` が利用できるようになり、`node-fetch` や `cross-fetch` などのサーバーサイドの fetch 実装をインポートする必要がなくなりました。
 
-### Integrations
+### インテグレーション
 
 インテグレーションに関する詳細情報については [FAQ](/faq#integrations) をご参照ください。
 

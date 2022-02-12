@@ -19,7 +19,7 @@
 		const { blocks } = await response.json();
 
 		index = new flexsearch.Index({
-			tokenize: 'forward'
+			tokenize: 'reverse'
 		});
 
 		lookup = new Map();
@@ -145,7 +145,7 @@
 			<input
 				autofocus
 				on:keydown={(e) => {
-					if (e.key === 'Enter') {
+					if (!e.isComposing && e.key === 'Enter') {
 						if (results.length > 0) {
 							modal.querySelector('a').click();
 						}

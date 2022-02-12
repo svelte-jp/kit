@@ -94,7 +94,7 @@ function parse(markdown, file, main_slug) {
 				.replace(/&lt;/g, '<')
 				.replace(/&gt;/g, '>');
 
-			const normalized = slugify(convert_link(title));
+			const normalized = slugify(convert_link(main_slug, metadata.title, title));
 
 			headings[level - 1] = normalized;
 			headings.length = level;

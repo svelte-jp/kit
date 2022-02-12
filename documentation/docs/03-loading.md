@@ -64,7 +64,7 @@ interface Fallthrough {
 
 `load` は Next.js の `getStaticProps` や `getServerSideProps` に似ていますが、サーバーとクライアントの両方で動作する点が異なります。上記の例では、もしユーザーがこのページへのリンクをクリックした場合、データは私たちのサーバーを経由せずに `cms.example.com` から取得されます。
 
-`load` が `{fallthrough: true}` を返す場合、SvelteKitは応答が返るまで他のルート(routes)に[フォールスルー(fall through)](/docs/routing#advanced-routing-fallthrough-routes)するか、もしくは一般的な404で応答します。
+`load` が `{fallthrough: true}` を返す場合、SvelteKitは応答が返るまで他のルート(routes)に[フォールスルー](/docs/routing#advanced-routing-fallthrough-routes)するか、もしくは一般的な404で応答します。
 
 SvelteKitの `load` は、以下のような特別なプロパティを持つ `fetch` の実装を受け取ります。
 

@@ -1,5 +1,5 @@
 ---
-title: Layouts
+title: レイアウト
 ---
 
 ここまで、ページを完全に独立したコンポーネントとして扱ってきました — ナビゲーションを行うと、既存のコンポーネントは破棄され、新しいコンポーネントがその場所を引き継ぎます。
@@ -44,9 +44,9 @@ title: Layouts
 
 ...nav は常に表示され、3つのページリンクをそれぞれクリックすると、`<h1>` が置き換えられるだけです。
 
-### Nested layouts
+### ネストレイアウト
 
-単一の `/settings` ページを持つのではなく、`/settings/profile` や `/settings/notifications` といったページを入れ子にしてサブメニューを共有するとします (実例としては、[github.com/settings](https://github.com/settings) をご覧ください)。
+単一の `/settings` ページを持つのではなく、`/settings/profile` や `/settings/notifications` といったページをネストして(※入れ子にして)サブメニューを共有するとします (実例としては、[github.com/settings](https://github.com/settings) をご覧ください)。
 
 (Topレベルの nav を持つルートレイアウト(root layout)を継承しつつ) `/settings` 以下のページにのみ適用されるレイアウトを作成することができます。
 
@@ -62,15 +62,15 @@ title: Layouts
 <slot></slot>
 ```
 
-### Resets
+### リセット
 
-レイアウトスタックをリセットするには、`__layout.svelte` の代わりに、`__layout.reset.svelte` ファイルを作成します。例えば、`/admin/*` ページにはルートレイアウト(root layout)を継承させたくない場合は、`src/routes/admin/__layout.reset.svelte` というファイルを作成します。
+レイアウトスタックをリセットするには、`__layout.svelte` の代わりに、`__layout.reset.svelte` ファイルを作成します。例えば、`/admin/*` ページにルートレイアウト(root layout)を継承させたくない場合は、`src/routes/admin/__layout.reset.svelte` というファイルを作成します。
 
 レイアウトリセットは、それ以外は通常のレイアウトコンポーネントと同じです。
 
-### Error pages
+### エラーページ
 
-ページがロード([Loading](/docs/loading)を参照)に失敗した場合、SvelteKitはエラーページをレンダリングします。レイアウトやページコンポーネントと一緒に `__error.svelte` コンポーネントを作ることで、このページをカスタマイズすることができます。
+ページがロード([Loading](/docs/loading)を参照)に失敗した場合、SvelteKitはエラーページ(error page)をレンダリングします。レイアウトやページコンポーネントと一緒に `__error.svelte` コンポーネントを作ることで、このページをカスタマイズすることができます。
 
 例えば、`src/routes/settings/notifications/index.svelte` でロードに失敗した場合、`src/routes/settings/notifications/__error.svelte` が存在すればSveltekitはそれを同じレイアウトでレンダリングします。もし存在しなければ、`src/routes/settings/__error.svelte` を親のレイアウトでレンダリングします。もしそれも存在しなければ、 `src/routes/__error.svelte` をルートレイアウト(root layout) でレンダリングします。
 
