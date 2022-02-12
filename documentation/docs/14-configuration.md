@@ -132,7 +132,7 @@ export default config;
 - `assets` — `favicon.ico` or `manifest.json` のような、何も処理する必要もなく、安定したURLを持つべき静的ファイルを配置する場所
 - `hooks` — hooks モジュールのロケーション([Hooks](/docs/hooks) をご参照ください)
 - `lib` — コードベース全体から `$lib` でアクセスできる、アプリの内部ライブラリ
-- `routes` — アプリの構造を定義するファイル([Routing](/docs/routing) をご参照ください)
+- `routes` — アプリの構造を定義するファイル([ルーティング](/docs/routing) をご参照ください)
 - `serviceWorker` — Service Worker のエントリーポイントのロケーション([Service workers](/docs/service-workers) をご参照ください)
 - `template` — HTMLレスポンス用テンプレートのロケーション
 
@@ -158,7 +158,7 @@ CSS を HTML の先頭の `<style>` ブロック内にインライン化する�
 
 [HTTP Method Overrides](/docs/routing#endpoints-http-method-overrides) をご参照ください。以下のうち、0個以上を含むオブジェクトです:
 
-- `parameter` — 使いたいメソッドの値を渡すのに使用するクエリパラメーター名
+- `parameter` — 使いたいメソッドの値を渡すのに使用するクエリパラメータ名
 - `allowed` - オリジナルのリクエストメソッドを上書きするときに使用することができる HTTP メソッドの配列
 
 ### package

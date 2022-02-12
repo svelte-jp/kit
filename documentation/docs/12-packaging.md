@@ -37,6 +37,6 @@ npm publish ./package
 
 上記の `./package` は生成されるディレクトリ名を参照しています。カスタムで [`package.dir`](/docs/configuration#package) を設定している場合は、適宜変更してください。
 
-### Caveats
+### 注意事項
 
 比較的、これは実験的な機能であり、まだ完全に実装されていません。Svelte ファイル(プリプロセス済)と TypeScript ファイル(JavaScriptにトランスパイル済)を除き、全てのファイルはそのままコピーされます。

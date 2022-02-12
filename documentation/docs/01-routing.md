@@ -1,5 +1,5 @@
 ---
-title: Routing
+title: ルーティング
 ---
 
 Sveltekitの核心は、 _ファイルシステムベースのルーター_ です。これは、アプリケーション構造がコードベースの構造(具体的には `src/routes` のコンテンツ)によって定義されることを意味します。
@@ -111,7 +111,7 @@ export async function get({ params }) {
 - `4xx` — クライアントエラー
 - `5xx` — サーバーエラー
 
-> `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー(fall through)](/docs/routing#advanced-routing-fallthrough-routes) し続けるか、一般的な 404 で応答します。
+> `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー](/docs/routing#advanced-routing-fallthrough-routes) し続けるか、一般的な 404 で応答します。
 
 返される `body` は、ページのプロパティに対応します:
 
@@ -223,7 +223,7 @@ return {
 
 #### HTTP method overrides
 
-HTML `<form>` 要素は、ネイティブでは `GET` と `POST` メソッドのみをサポートしています。例えば `PUT` や `DELETE` などのその他のメソッドを許可するには、それを [configuration](/docs/configuration#methodoverride) で指定し、`_method=VERB` パラメーター (パラメーター名は設定で変更できます) を form の `action` に追加してください:
+HTML `<form>` 要素は、ネイティブでは `GET` と `POST` メソッドのみをサポートしています。例えば `PUT` や `DELETE` などのその他のメソッドを許可するには、それを [configuration](/docs/configuration#methodoverride) で指定し、`_method=VERB` パラメータ (パラメータ名は設定で変更できます) を form の `action` に追加してください:
 
 ```js
 // svelte.config.js
@@ -250,13 +250,13 @@ export default {
 
 > streaming request body、response body については[サポートされる予定](https://github.com/sveltejs/kit/issues/3419)です。
 
-### Private modules
+### プライベートモジュール
 
 名前が `_` や `.` で始まるファイルやディレクトリ([`.well-known`](https://en.wikipedia.org/wiki/Well-known_URI) は除く) はデフォルトでプライベートで、ルート(routes)を作成しません(ルートを作成するファイルからインポートすることは可能です)。どのモジュールをパブリックまたはプライベートとみなすかについては [`ルート(routes)`](/docs/configuration#routes) 設定で設定することができます。
 
-### Advanced routing
+### 高度なルーティング
 
-#### Rest parameters
+#### Restパラメータ
 
 例えば `src/routes/[category]/[item].svelte` や `src/routes/[category]-[item].svelte` のように、ルート(route)は動的なパラメータを複数持つことができます。(パラメータは 'non-greedy' です。`/x-y-z` のようにあいまいなケースでは、`category` は `x` 、 `item` は `y-z` となります) ルートセグメント(route segments)の数が不明な場合は、rest 構文を使用することができます。例えば、GitHubのファイルビューアは次のように実装することができます…
 
@@ -277,7 +277,7 @@ export default {
 
 > `src/routes/a/[...rest]/z.svelte` は `/a/z` だけでなく、`/a/b/z` と `/a/b/c/z` にもマッチします。rest パラメータの値が有効であることを必ず確かめてください。
 
-#### Fallthrough routes
+#### フォールスルールート
 
 パスに一致するルート(routes)が複数ある場合、Sveltekit は応答があるまでそれぞれのルート(routes)を試行します。例えば、このようなルート(routes)がある場合…
 
