@@ -5,7 +5,7 @@ import 'prismjs/components/prism-diff.js';
 import 'prismjs/components/prism-typescript.js';
 import 'prism-svelte';
 import { extract_frontmatter, transform } from './markdown';
-import { convert_link } from './fixlink';
+import { convert_link } from './convertlink';
 
 const languages = {
 	bash: 'bash',
