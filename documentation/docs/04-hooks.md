@@ -28,6 +28,7 @@ export interface RequestEvent {
 
 export interface ResolveOpts {
 	ssr?: boolean;
+	transformPage?: ({ html }: { html: string }) => string;
 }
 
 export interface Handle {
@@ -58,13 +59,15 @@ export async function handle({ event, resolve }) {
 
 `resolve` はオプションの第2引数をサポートしており、レスポンスのレンダリング方法をより詳細にコントロールすることができます。そのパラメータは、以下のフィールドを持つオブジェクトです:
 
-- `ssr` (boolean, default `true`) — サーバーでページをロードしてレンダリングするかどうかを指定します。
+- `ssr: boolean` (default `true`) — `false` の場合、サーバーサイドレンダリングする代わりに空の 'shell' ページをレンダリングします
+- `transformPage(opts: { html: string }): string` — カスタムの変換を HTML に適用します
 
 ```js
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	const response = await resolve(event, {
-		ssr: !event.url.pathname.startsWith('/admin')
+		ssr: !event.url.pathname.startsWith('/admin'),
+		transformPage: ({ html }) => html.replace('old', 'new')
 	});
 
 	return response;

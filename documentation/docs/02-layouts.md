@@ -6,7 +6,7 @@ title: レイアウト
 
 しかし、多くのアプリでは、トップレベルのナビゲーションやフッターなど、全てのページで表示されるべき要素が存在します。それらを全てのページで繰り返し書くのではなく、_レイアウト(layout)_ コンポーネントを使うことができます。
 
-全てのページに適用されるレイアウトコンポーネントを作るには、`src/routes/__layout.svelte` というファイルを作成します。(自分で作成していない場合に使用される)デフォルトのレイアウトコンポーネントは、以下のようなものです…
+全てのページに適用されるレイアウトを作るには、`src/routes/__layout.svelte` というファイルを作成します。(自分で作成していない場合に使用される)デフォルトのレイアウトは、以下のようなものです…
 
 ```html
 <slot></slot>
@@ -70,7 +70,7 @@ title: レイアウト
 
 ### エラーページ
 
-ページがロード([Loading](/docs/loading)を参照)に失敗した場合、SvelteKitはエラーページ(error page)をレンダリングします。レイアウトやページコンポーネントと一緒に `__error.svelte` コンポーネントを作ることで、このページをカスタマイズすることができます。
+ページがロード([Loading](/docs/loading)を参照)に失敗した場合、SvelteKitはエラーページ(error page)をレンダリングします。レイアウトやページと一緒に `__error.svelte` コンポーネントを作ることで、このページをカスタマイズすることができます。
 
 例えば、`src/routes/settings/notifications/index.svelte` でロードに失敗した場合、`src/routes/settings/notifications/__error.svelte` が存在すればSveltekitはそれを同じレイアウトでレンダリングします。もし存在しなければ、`src/routes/settings/__error.svelte` を親のレイアウトでレンダリングします。もしそれも存在しなければ、 `src/routes/__error.svelte` をルートレイアウト(root layout) でレンダリングします。
 
@@ -108,6 +108,6 @@ export interface ErrorLoadInput<Params extends Record<string, string> = Record<s
 <h1>{title}</h1>
 ```
 
-> レイアウトコンポーネントから [page store](/docs/modules#$app-stores) を使って `error` と `status` にアクセスすることもできます。  
+> レイアウトでは、[page store](/docs/modules#$app-stores) を使って `error` と `status` にアクセスすることもできます。  
 >
 > ユーザーに特権的な情報が公開されないようにするため、本番環境では `error` からサーバーサイドのスタックトレースが取り除かれます。

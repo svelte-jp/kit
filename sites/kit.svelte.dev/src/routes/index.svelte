@@ -7,7 +7,7 @@
 </script>
 
 <script>
-	import Machine from '$img/svelte-kit-machine.webp?w=1440;800&format=avif;webp;png&meta'
+	import Machine from '$img/svelte-kit-machine.webp?w=1440;800&format=avif;webp;png&meta';
 	import { Hero, Blurb } from '@sveltejs/site-kit';
 </script>
 
@@ -91,11 +91,11 @@ npm run dev -- --open
 
 <style>
 	:global(.hero-container:dir(rtl)) {
-		max-inline-size: 116rem;
+		max-width: 116rem;
 	}
 
 	pre {
-		block-size: 100%;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 		color: var(--second-text);
@@ -106,12 +106,12 @@ npm run dev -- --open
 	}
 
 	.blurb-shifter {
-		margin-block-start: calc(-10rem + var(--side-nav));
+		margin-top: calc(-10rem + var(--side-nav));
 	}
 
 	@media (min-width: 900px) {
 		.blurb-shifter {
-			margin-block-start: -12em;
+			margin-top: -12em;
 		}
 	}
 </style>

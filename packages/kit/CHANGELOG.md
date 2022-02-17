@@ -1,5 +1,79 @@
 # @sveltejs/kit
 
+## 1.0.0-next.276
+
+### Patch Changes
+
+- Track scroll position without scroll listener, and recover on reload ([#3938](https://github.com/sveltejs/kit/pull/3938))
+
+## 1.0.0-next.275
+
+### Patch Changes
+
+- Invalidate shadow endpoint data when URL changes ([#3925](https://github.com/sveltejs/kit/pull/3925))
+
+## 1.0.0-next.274
+
+### Patch Changes
+
+- Set `$page.url` to current URL in browser ([#3942](https://github.com/sveltejs/kit/pull/3942))
+
+## 1.0.0-next.273
+
+### Patch Changes
+
+- Correctly identify readable node streams ([#3941](https://github.com/sveltejs/kit/pull/3941))
+
+* remove 'Shadow' from error message ([#3943](https://github.com/sveltejs/kit/pull/3943))
+
+## 1.0.0-next.272
+
+### Patch Changes
+
+- Make shadow endpoint `event.url` consistent between server and client navigation ([#3780](https://github.com/sveltejs/kit/pull/3780))
+
+* Prevent duplicated history when navigating via hash link ([#3931](https://github.com/sveltejs/kit/pull/3931))
+
+## 1.0.0-next.271
+
+### Patch Changes
+
+- Add `transformPage` option to `resolve` ([#3914](https://github.com/sveltejs/kit/pull/3914))
+
+## 1.0.0-next.270
+
+### Patch Changes
+
+- handle HEAD requests in endpoints ([#3903](https://github.com/sveltejs/kit/pull/3903))
+
+* Use shadow endpoint without defining a `get` endpoint ([#3816](https://github.com/sveltejs/kit/pull/3816))
+
+## 1.0.0-next.269
+
+### Patch Changes
+
+- Ensure handleError hook is called for shadow endpoint errors ([#3879](https://github.com/sveltejs/kit/pull/3879))
+
+## 1.0.0-next.268
+
+### Patch Changes
+
+- refactor: use one escape function for json in html script body instead of two slightly different ([#3804](https://github.com/sveltejs/kit/pull/3804))
+
+## 1.0.0-next.267
+
+### Patch Changes
+
+- Set cookies when redirecting from shadow endpoint ([#3874](https://github.com/sveltejs/kit/pull/3874))
+
+## 1.0.0-next.266
+
+### Patch Changes
+
+- fix casing of `.DS_Store` in the default config for `serviceWorker` ([#3823](https://github.com/sveltejs/kit/pull/3823))
+
+* [fix] avoid mutating response `Headers` ([#3829](https://github.com/sveltejs/kit/pull/3829))
+
 ## 1.0.0-next.265
 
 ### Patch Changes

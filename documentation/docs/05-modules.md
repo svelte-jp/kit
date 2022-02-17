@@ -74,7 +74,7 @@ import { getStores, navigating, page, session, updated } from '$app/stores';
 
 ### $lib
 
-これは `src/lib` または [`config.kit.files.lib`] に指定されたディレクトリのシンプルなエイリアスです。これにより、`../../../../` のようなナンセンスなことをせずに、共通コンポーネントやユーティリティモジュールにアクセスすることができます。
+これは `src/lib` または [`config.kit.files.lib`](/docs/configuration#files) に指定されたディレクトリのシンプルなエイリアスです。これにより、`../../../../` のようなナンセンスなことをせずに、共通コンポーネントやユーティリティモジュールにアクセスすることができます。
 
 ### $service-worker
 
@@ -112,7 +112,10 @@ export const handle = sequence(first, second);
 ```
 
 上記の例ではこのようにプリントされます:
->first pre-processing
->second pre-processing
->second post-processing
->first post-processing
+
+```
+first pre-processing
+second pre-processing
+second post-processing
+first post-processing
+```
