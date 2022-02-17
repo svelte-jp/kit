@@ -41,11 +41,19 @@ export function is_pojo(body) {
 
 		// body could be a node Readable, but we don't want to import
 		// node built-ins, so we use duck typing
-		if (body._readableState && body._writableState && body._events) return false;
+		if (body._readableState && typeof body.pipe === 'function') return false;
 
 		// similarly, it could be a web ReadableStream
 		if (typeof ReadableStream !== 'undefined' && body instanceof ReadableStream) return false;
 	}
 
 	return true;
+}
+/**
+ * @param {import('types/hooks').RequestEvent} event
+ * @returns string
+ */
+export function normalize_request_method(event) {
+	const method = event.request.method.toLowerCase();
+	return method === 'delete' ? 'del' : method; // 'delete' is a reserved word
 }

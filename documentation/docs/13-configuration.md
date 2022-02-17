@@ -89,7 +89,7 @@ export default config;
 
 ### amp
 
-[AMP](/docs/amp) モードを有効にします。
+[AMP](/docs/seo#amp) モードを有効にします。
 
 ### appDir
 

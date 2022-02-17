@@ -195,11 +195,12 @@ export class Renderer {
 	 *   status: number;
 	 *   error: Error;
 	 *   nodes: Array<Promise<CSRComponent>>;
-	 *   url: URL;
 	 *   params: Record<string, string>;
 	 * }} selected
 	 */
-	async start({ status, error, nodes, url, params }) {
+	async start({ status, error, nodes, params }) {
+		const url = new URL(location.href);
+
 		/** @type {Array<import('./types').BranchNode | undefined>} */
 		const branch = [];
 
@@ -210,9 +211,6 @@ export class Renderer {
 		let result;
 
 		let error_args;
-
-		// url.hash is empty when coming from the server
-		url.hash = window.location.hash;
 
 		try {
 			for (let i = 0; i < nodes.length; i += 1) {
@@ -239,6 +237,7 @@ export class Renderer {
 
 				if (props) {
 					node.uses.dependencies.add(url.href);
+					node.uses.url = true;
 				}
 
 				branch.push(node);
@@ -752,12 +751,14 @@ export class Renderer {
 					/** @type {Record<string, any>} */
 					let props = {};
 
-					if (has_shadow && i === a.length - 1) {
+					const is_shadow_page = has_shadow && i === a.length - 1;
+
+					if (is_shadow_page) {
 						const res = await fetch(
-							`${url.pathname}${url.pathname.endsWith('/') ? '' : '/'}__data.json`,
+							`${url.pathname}${url.pathname.endsWith('/') ? '' : '/'}__data.json${url.search}`,
 							{
 								headers: {
-									'x-sveltekit-noredirect': 'true'
+									'x-sveltekit-load': 'true'
 								}
 							}
 						);
@@ -790,25 +791,31 @@ export class Renderer {
 						});
 					}
 
-					if (node && node.loaded) {
-						if (node.loaded.fallthrough) {
-							return;
-						}
-						if (node.loaded.error) {
-							status = node.loaded.status;
-							error = node.loaded.error;
+					if (node) {
+						if (is_shadow_page) {
+							node.uses.url = true;
 						}
 
-						if (node.loaded.redirect) {
-							return {
-								redirect: node.loaded.redirect,
-								props: {},
-								state: this.current
-							};
-						}
+						if (node.loaded) {
+							if (node.loaded.fallthrough) {
+								return;
+							}
+							if (node.loaded.error) {
+								status = node.loaded.status;
+								error = node.loaded.error;
+							}
 
-						if (node.loaded.stuff) {
-							stuff_changed = true;
+							if (node.loaded.redirect) {
+								return {
+									redirect: node.loaded.redirect,
+									props: {},
+									state: this.current
+								};
+							}
+
+							if (node.loaded.stuff) {
+								stuff_changed = true;
+							}
 						}
 					}
 				} else {
