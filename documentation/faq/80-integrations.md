@@ -13,6 +13,7 @@ title: SvelteKit で X を使うにはどうすればよいですか？
 `adapter-node` は、プロダクションモードで使用するためのミドルウェアを自分のサーバで構築します。開発モードでは、Vite プラグインを使用して Vite にミドルウェア(middleware) を追加することができます。例えば:
 
 ```js
+/** @type {import('vite').Plugin} */
 const myPlugin = {
 	name: 'log-request-middleware',
 	configureServer(server) {
@@ -42,6 +43,8 @@ export default config;
 もし `document` や `window` 変数にアクセスする必要があったり、クライアントサイドだけで実行するコードが必要な場合は、`browser` チェックでラップしてください:
 
 ```js
+/// <reference types="@sveltejs/kit" />
+// ---cut---
 import { browser } from '$app/env';
 
 if (browser) {
@@ -52,6 +55,12 @@ if (browser) {
 コンポーネントが最初にDOMにレンダリングされた後にコードを実行したい場合は、`onMount` で実行することもできます:
 
 ```js
+// @filename: ambient.d.ts
+// @lib: ES2015
+declare module 'some-browser-only-library';
+
+// @filename: index.js
+// ---cut---
 import { onMount } from 'svelte';
 
 onMount(async () => {
@@ -63,6 +72,12 @@ onMount(async () => {
 使用したいライブラリに副作用がなければ静的にインポートすることができますし、サーバー側のビルドでツリーシェイクされ、`onMount` が自動的に no-op に置き換えられます:
 
 ```js
+// @filename: ambient.d.ts
+// @lib: ES2015
+declare module 'some-browser-only-library';
+
+// @filename: index.js
+// ---cut---
 import { onMount } from 'svelte';
 import { method } from 'some-browser-only-library';
 
@@ -74,6 +89,12 @@ onMount(() => {
 一方、ライブラリに副作用があっても静的にインポートをしたい場合は、[vite-plugin-iso-import](https://github.com/bluwy/vite-plugin-iso-import) をチェックして `?client` インポートサフィックスをサポートしてください。このインポートは SSR ビルドでは取り除かれます。しかし、この手法を使用すると VS Code Intellisense が使用できなくなることにご注意ください。
 
 ```js
+// @filename: ambient.d.ts
+// @lib: ES2015
+declare module 'some-browser-only-library?client';
+
+// @filename: index.js
+// ---cut---
 import { onMount } from 'svelte';
 import { method } from 'some-browser-only-library?client';
 

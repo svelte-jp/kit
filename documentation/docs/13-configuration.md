@@ -5,16 +5,17 @@ title: Configuration
 プロジェクトの設定は `svelte.config.js` ファイルにあります。全ての値はオプションです。オプションのデフォルトと完全なリストはこちらです:
 
 ```js
+/// file: svelte.config.js
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	// options passed to svelte.compile (https://svelte.dev/docs#compile-time-svelte-compile)
-	compilerOptions: null,
+	compilerOptions: {},
 
 	// an array of file extensions that should be treated as Svelte components
 	extensions: ['.svelte'],
 
 	kit: {
-		adapter: null,
+		adapter: undefined,
 		amp: false,
 		appDir: '_app',
 		browser: {
@@ -112,11 +113,19 @@ export default config;
 [Content Security Policy](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Content-Security-Policy) の設定です。CSP は、リソースの読み込み元を制限することにより、クロスサイトスクリプティング (XSS) 攻撃からユーザーを守るのに役立ちます。例えば、このような設定では…
 
 ```js
-{
-	directives: {
-		'script-src': ['self']
+/// file: svelte.config.js
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+	kit: {
+		csp: {
+			directives: {
+				'script-src': ['self']
+			}
+		}
 	}
-}
+};
+
+export default config;
 ```
 
 …外部サイトからのスクリプト読み込みを防止します。SvelteKit は、生成されるインラインスタイルとスクリプトに対して、指定されたディレクティブを nonce か hash (`mode` の設定による) で補強します。
@@ -173,10 +182,16 @@ CSS を HTML の先頭の `<style>` ブロック内にインライン化する�
 高度な `filepath` マッチングには、`exports` と `files` オプションを globbing ライブラリと組み合わせて使用することができます:
 
 ```js
-// svelte.config.js
+// @filename: ambient.d.ts
+declare module 'micromatch';
+
+/// file: svelte.config.js
+// @filename: index.js
+// ---cut---
 import mm from 'micromatch';
 
-export default {
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
 	kit: {
 		package: {
 			exports: (filepath) => {
@@ -187,6 +202,8 @@ export default {
 		}
 	}
 };
+
+export default config;
 ```
 
 ### paths
@@ -210,15 +227,17 @@ export default {
   - `'continue'` — ルーティングエラーが発生しても、ビルドを継続させます
   - `function` — カスタムエラーハンドラにより、ログを記録したり、`throw` してビルドを失敗させたり、クロールの詳細に基づいて任意の他のアクションを実行したりすることができます
 
-    ```ts
+    ```js
     import adapter from '@sveltejs/adapter-static';
+
     /** @type {import('@sveltejs/kit').PrerenderErrorHandler} */
     const handleError = ({ status, path, referrer, referenceType }) => {
     	if (path.startsWith('/blog')) throw new Error('Missing a blog page!');
     	console.warn(`${status} ${path}${referrer ? ` (${referenceType} from ${referrer})` : ''}`);
     };
 
-    export default {
+    /** @type {import('@sveltejs/kit').Config} */
+    const config = {
     	kit: {
     		adapter: adapter(),
     		prerender: {
@@ -226,6 +245,8 @@ export default {
     		}
     	}
     };
+
+    export default config;
     ```
 
 ### routes

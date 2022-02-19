@@ -7,6 +7,18 @@ title: Loading
 もしページのデータがエンドポイント(endpoint)から取得されるのであれば、`load` 関数は不要かもしれません。これは、もっと柔軟性が必要なとき、例えば外部の API からデータをロードする場合などに便利です。
 
 ```ts
+// @filename: ambient.d.ts
+declare namespace App {
+	interface Locals {}
+	interface Platform {}
+	interface Session {}
+	interface Stuff {}
+}
+
+type Either<T, U> = Only<T, U> | Only<U, T>;
+
+// @filename: index.ts
+// ---cut---
 // Type declarations for `load` (declarations marked with
 // an `export` keyword can be imported from `@sveltejs/kit`)
 
@@ -14,7 +26,7 @@ export interface Load<Params = Record<string, string>, Props = Record<string, an
 	(input: LoadInput<Params>): MaybePromise<Either<Fallthrough, LoadOutput<Props>>>;
 }
 
-export interface LoadInput<Params extends Record<string, string> = Record<string, string>> {
+export interface LoadInput<Params = Record<string, string>> {
 	url: URL;
 	params: Params;
 	props: Record<string, any>;
@@ -23,7 +35,7 @@ export interface LoadInput<Params extends Record<string, string> = Record<string
 	stuff: Partial<App.Stuff>;
 }
 
-export interface LoadOutput<Props extends Record<string, any> = Record<string, any>> {
+export interface LoadOutput<Props = Record<string, any>> {
 	status?: number;
 	error?: string | Error;
 	redirect?: string;
@@ -44,7 +56,7 @@ interface Fallthrough {
 外部の API からデータをロードするページではこのようになるでしょう:
 
 ```html
-<!-- src/routes/blog/[slug].svelte -->
+/// file: src/routes/blog/[slug].svelte
 <script context="module">
 	/** @type {import('@sveltejs/kit').Load} */
 	export async function load({ params, fetch, session, stuff }) {
@@ -102,7 +114,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 ルート(route)ファイル名が `src/routes/a/[b]/[...c]` で、`url.pathname` が `/a/x/y/z` となるような場合は、`params` オブジェクトは以下のようになります。
 
-```js
+```json
 {
 	"b": "x",
 	"c": "y/z"

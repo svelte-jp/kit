@@ -20,10 +20,20 @@ SvelteKit コンポーネントライブラリは、SvelteKitアプリと全く�
 例えば、`src/lib/Foo.svelte` コンポーネントと、それを再エクスポートした `src/lib/index.js` モジュールがあった場合、ライブラリの利用者は次のどちらかを行うことができます。
 
 ```js
+// @filename: ambient.d.ts
+declare module 'your-library';
+
+// @filename: index.js
+// ---cut---
 import { Foo } from 'your-library';
 ```
 
 ```js
+// @filename: ambient.d.ts
+declare module 'your-library/Foo.svelte';
+
+// @filename: index.js
+// ---cut---
 import Foo from 'your-library/Foo.svelte';
 ```
 

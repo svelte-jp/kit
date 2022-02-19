@@ -10,40 +10,47 @@ title: Hooks
 
 この関数は SvelteKit がリクエストを受けるたびに (アプリの実行中であろうと、[プリレンダリング](/docs/page-options#prerender)であろうと) 実行され、レスポンスを決定します。リクエストを表す `event` オブジェクトと、SvelteKitのルーターを呼び出しそれに応じて(ページをレンダリングしたり、エンドポイントを呼び出したりして)レスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでエンドポイントを実装する場合など)。
 
-> (プリレンダリング済みのページを含む) 静的アセットに対するリクエストは SvelteKit では処理されません。
+```js
+/// file: src/hooks.js
+/** @type {import('@sveltejs/kit').Handle} */
+export async function handle({ event, resolve }) {
+	if (event.request.url.startsWith('/custom')) {
+		return new Response('custom response');
+	}
 
-未実装の場合、デフォルトでは `({ event, resolve }) => resolve(event)` となります。
-
-```ts
-// Type declarations for `handle` (declarations marked with
-// an `export` keyword can be imported from `@sveltejs/kit`)
-
-export interface RequestEvent {
-	request: Request;
-	url: URL;
-	params: Record<string, string>;
-	locals: App.Locals;
-	platform: App.Platform;
-}
-
-export interface ResolveOpts {
-	ssr?: boolean;
-	transformPage?: ({ html }: { html: string }) => string;
-}
-
-export interface Handle {
-	(input: {
-		event: RequestEvent;
-		resolve(event: RequestEvent, opts?: ResolveOpts): MaybePromise<Response>;
-	}): MaybePromise<Response>;
+	const response = await resolve(event);
+	return response;
 }
 ```
 
-> `App.Locals` と `App.Platform` については [TypeScript](/docs/typescript) セクションをご参照ください。
+> 静的アセット(プリレンダリング済みのページを含む)に対するリクエストは SvelteKit では処理されません。
 
-エンドポイントに渡されるリクエストにカスタムデータを追加するには、以下のように `event.locals` オブジェクトにデータを投入します。
+未実装の場合、デフォルトでは `({ event, resolve }) => resolve(event)` となります。カスタムデータをリクエストに追加してエンドポイントに渡すには、以下のように `event.locals` オブジェクトにデータを追加します。
 
 ```js
+/// file: src/hooks.js
+// @filename: ambient.d.ts
+type User = {
+	name: string;
+}
+
+declare namespace App {
+	interface Locals {
+		user: User;
+	}
+	interface Platform {}
+	interface Session {}
+	interface Stuff {}
+}
+
+const getUserInformation: (cookie: string | null) => Promise<User>;
+
+// declare global {
+// 	const getUserInformation: (cookie: string) => Promise<User>;
+// }
+
+// @filename: index.js
+// ---cut---
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	event.locals.user = await getUserInformation(event.request.headers.get('cookie'));
@@ -63,6 +70,7 @@ export async function handle({ event, resolve }) {
 - `transformPage(opts: { html: string }): string` — カスタムの変換を HTML に適用します
 
 ```js
+/// file: src/hooks.js
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	const response = await resolve(event, {
@@ -84,13 +92,13 @@ export async function handle({ event, resolve }) {
 
 未実装の場合、SvelteKitはデフォルトのフォーマットでエラーをログ出力します。
 
-```ts
-export interface HandleError {
-	(input: { error: Error & { frame?: string }; event: RequestEvent }): void;
-}
-```
-
 ```js
+/// file: src/hooks.js
+// @filename: ambient.d.ts
+const Sentry: any;
+
+// @filename: index.js
+// ---cut---
 /** @type {import('@sveltejs/kit').HandleError} */
 export async function handleError({ error, event }) {
 	// example integration with https://sentry.io/
@@ -106,13 +114,31 @@ export async function handleError({ error, event }) {
 
 未実装の場合、session は `{}` です。
 
-```ts
-export interface GetSession {
-	(event: RequestEvent): MaybePromise<App.Session>;
-}
-```
-
 ```js
+/// file: src/hooks.js
+// @filename: ambient.d.ts
+declare namespace App {
+	interface Locals {
+		user: {
+			name: string;
+			email: string;
+			avatar: string;
+			token: string;
+		}
+	}
+	interface Session {
+		user?: {
+			name: string;
+			email: string;
+			avatar: string;
+		}
+	}
+}
+
+type MaybePromise<T> = T | Promise<T>;
+
+// @filename: index.js
+// ---cut---
 /** @type {import('@sveltejs/kit').GetSession} */
 export function getSession(event) {
 	return event.locals.user
@@ -137,12 +163,6 @@ export function getSession(event) {
 この関数によって、サーバー上で (またはプリレンダリング中に) 実行される `load` 関数の中で発生する、外部リソースへの `fetch` リクエストを変更 (または置換) することができます。
 
 例えば、ユーザーがクライアントサイドで `https://api.yourapp.com` のようなパブリックなURLに移動をするときには、`load` 関数でそのURLにリクエストを行うかもしれません。しかしSSRでは、(パブリックなインターネットとの間にあるプロキシーやロードバランサーをバイパスして) 直接 API にアクセスするほうが理にかなっている場合があります。
-
-```ts
-export interface ExternalFetch {
-	(req: Request): Promise<Response>;
-}
-```
 
 ```js
 /** @type {import('@sveltejs/kit').ExternalFetch} */

@@ -1,7 +1,7 @@
 import fs from 'fs';
-import { extract_frontmatter, transform } from '$lib/docs/markdown';
-import { slugify } from '../lib/docs';
-import { convert_link } from '$lib/docs/convertlink';
+import { extract_frontmatter, transform } from '$lib/docs/server/markdown';
+import { slugify } from '../lib/docs/server';
+import { convert_link } from '$lib/docs/server/convertlink';
 
 const categories = [
 	{

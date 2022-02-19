@@ -43,3 +43,5 @@ _動的_ なルートにとって、例えば `src/routes/blog/[slug].svelte` �
 ```
 
 …これにより、リンクがクリックされたときにブラウザのナビゲーションがトリガーされます。
+
+> SvelteKit does not exclude root-relative external links from prerendering, which will cause 404s if these URLs are intended to be served by a separate app. Use a custom [`prerender.onError`](/docs/configuration#prerender) handler if you need to ignore them.
