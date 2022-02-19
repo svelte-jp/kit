@@ -23,7 +23,7 @@ SvelteKit は、公式にサポートされている adapter を多数提供し�
 シンプルな Node サーバーを作成するには、[`@sveltejs/adapter-node@next`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) パッケージをインストールし、`svelte.config.js` を更新します:
 
 ```diff
-// svelte.config.js
+/// file: svelte.config.js
 -import adapter from '@sveltejs/adapter-auto';
 +import adapter from '@sveltejs/adapter-node';
 ```
@@ -31,7 +31,7 @@ SvelteKit は、公式にサポートされている adapter を多数提供し�
 これにより、[svelte-kit build](/docs/cli#svelte-kit-build) は自己完結型の Node アプリを `build` ディレクトリの中に生成します。adapter にはオプションを渡すことができ、例えば出力ディレクトリをカスタマイズできます:
 
 ```diff
-// svelte.config.js
+/// file: svelte.config.js
 import adapter from '@sveltejs/adapter-node';
 
 export default {
@@ -47,7 +47,7 @@ export default {
 ほとんどの adapter は、サイト内の [プリレンダリング可能な](/docs/page-options#prerender) ページについて、静的な HTML を生成します。アプリ全体がプリレンダリング可能な場合は、[`@sveltejs/adapter-static@next`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使用して _全ての_ ページ について静的な HTML を生成することができます。完全に静的なサイトは、[GitHub Pages](https://pages.github.com/) のような静的ホストなど、さまざまなプラットフォームでホストすることができます。
 
 ```diff
-// svelte.config.js
+/// file: svelte.config.js
 -import adapter from '@sveltejs/adapter-auto';
 +import adapter from '@sveltejs/adapter-static';
 ```
@@ -63,7 +63,7 @@ adapter によっては、リクエストに関する追加情報にアクセス
 加えて、他のプラットフォーム向けに、[コミュニティによって提供されている adapter](https://sveltesociety.dev/components#adapters) もございます。パッケージマネージャーで該当の adapter をインストールした後、`svelte.config.js` を更新してください:
 
 ```diff
-// svelte.config.js
+/// file: svelte.config.js
 -import adapter from '@sveltejs/adapter-auto';
 +import adapter from 'svelte-adapter-[x]';
 ```
@@ -75,15 +75,22 @@ adapter によっては、リクエストに関する追加情報にアクセス
 Adapter Package は `Adapter` を作成する以下の API を実装する必要があります:
 
 ```js
+// @filename: ambient.d.ts
+const AdapterSpecificOptions = any;
+
+// @filename: index.js
+// ---cut---
 /** @param {AdapterSpecificOptions} options */
 export default function (options) {
 	/** @type {import('@sveltejs/kit').Adapter} */
-	return {
+	const adapter = {
 		name: 'adapter-package-name',
 		async adapt(builder) {
 			// adapter implementation
 		}
 	};
+
+	return adapter;
 }
 ```
 

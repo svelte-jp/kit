@@ -98,6 +98,11 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 Sapper では、提供されるストアをこのように参照していたかと思います:
 
 ```js
+// @filename: ambient.d.ts
+declare module '@sapper/app';
+
+// @filename: index.js
+// ---cut---
 import { stores } from '@sapper/app';
 const { preloading, page, session } = stores();
 ```
@@ -138,6 +143,12 @@ SvelteKit は、アプリが動作する場所に依存しないように設計�
 Sapper はデフォルトで `html-minifier` を含んでいました。SvelteKit はこれを含まないのですが、[hook](/docs/hooks#handle) としてこれを追加することができます:
 
 ```js
+// @filename: ambient.d.ts
+/// <reference types="@sveltejs/kit" />
+declare module 'html-minifier';
+
+// @filename: index.js
+// ---cut---
 import { minify } from 'html-minifier';
 import { prerendering } from '$app/env';
 
@@ -160,6 +171,7 @@ const minification_options = {
 	sortClassName: true
 };
 
+/** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	const response = await resolve(event);
 

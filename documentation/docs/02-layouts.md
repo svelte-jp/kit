@@ -15,7 +15,7 @@ title: レイアウト
 …ですが、お好みのマークアップ、スタイル、動作を追加できます。ただし、コンポーネントがページコンテンツ用の `<slot>` を含んでいる必要があります。例えば、ナビゲーションバー(nav bar)を追加してみるとしましょう。
 
 ```html
-<!-- src/routes/__layout.svelte -->
+/// file: src/routes/__layout.svelte
 <nav>
 	<a href="/">Home</a>
 	<a href="/about">About</a>
@@ -28,17 +28,17 @@ title: レイアウト
 `/`、`/about`、`/settings` 用のページを作成してみます…
 
 ```html
-<!-- src/routes/index.svelte -->
+/// file: src/routes/index.svelte
 <h1>Home</h1>
 ```
 
 ```html
-<!-- src/routes/about.svelte -->
+/// file: src/routes/about.svelte
 <h1>About</h1>
 ```
 
 ```html
-<!-- src/routes/settings.svelte -->
+/// file: src/routes/settings.svelte
 <h1>Settings</h1>
 ```
 
@@ -51,7 +51,7 @@ title: レイアウト
 (Topレベルの nav を持つルートレイアウト(root layout)を継承しつつ) `/settings` 以下のページにのみ適用されるレイアウトを作成することができます。
 
 ```html
-<!-- src/routes/settings/__layout.svelte -->
+/// file: src/routes/settings/__layout.svelte
 <h1>Settings</h1>
 
 <div class="submenu">
@@ -75,17 +75,6 @@ title: レイアウト
 例えば、`src/routes/settings/notifications/index.svelte` でロードに失敗した場合、`src/routes/settings/notifications/__error.svelte` が存在すればSveltekitはそれを同じレイアウトでレンダリングします。もし存在しなければ、`src/routes/settings/__error.svelte` を親のレイアウトでレンダリングします。もしそれも存在しなければ、 `src/routes/__error.svelte` をルートレイアウト(root layout) でレンダリングします。
 
 > SvelteKit はデフォルトのエラーページを提供してますが、ご自身で `src/routes/__error.svelte` を用意することを推奨します。
-
-```ts
-// declaration type
-// * also see type for `LoadOutput` in the Loading section
-
-export interface ErrorLoadInput<Params extends Record<string, string> = Record<string, string>>
-	extends LoadInput<Params> {
-	status?: number;
-	error?: Error;
-}
-```
 
 エラーコンポーネントに [`load`](/docs/loading) 関数がある場合、`error` プロパティと `status` プロパティが引数に渡されて呼び出されます。
 

@@ -7,6 +7,8 @@ SvelteKit では、数多くのモジュールがアプリケーションで利�
 ### $app/env
 
 ```js
+/// <reference types="@sveltejs/kit" />
+// ---cut---
 import { amp, browser, dev, mode, prerendering } from '$app/env';
 ```
 
@@ -19,14 +21,16 @@ import { amp, browser, dev, mode, prerendering } from '$app/env';
 ### $app/navigation
 
 ```js
+/// <reference types="@sveltejs/kit" />
+// ---cut---
 import {
+	afterNavigate,
+	beforeNavigate,
 	disableScrollHandling,
 	goto,
 	invalidate,
 	prefetch,
-	prefetchRoutes,
-	beforeNavigate,
-	afterNavigate
+	prefetchRoutes
 } from '$app/navigation';
 ```
 
@@ -45,6 +49,8 @@ import {
 ### $app/paths
 
 ```js
+/// <reference types="@sveltejs/kit" />
+// ---cut---
 import { base, assets } from '$app/paths';
 ```
 
@@ -56,6 +62,8 @@ import { base, assets } from '$app/paths';
 ### $app/stores
 
 ```js
+/// <reference types="@sveltejs/kit" />
+// ---cut---
 import { getStores, navigating, page, session, updated } from '$app/stores';
 ```
 
@@ -81,6 +89,8 @@ import { getStores, navigating, page, session, updated } from '$app/stores';
 このモジュールは [service workers](/docs/service-workers) でのみ使用できます。
 
 ```js
+/// <reference types="@sveltejs/kit" />
+// ---cut---
 import { build, files, timestamp } from '$service-worker';
 ```
 
@@ -93,14 +103,20 @@ import { build, files, timestamp } from '$service-worker';
 このモジュールは、複数の `handle` 呼び出しを順番に処理するためのヘルパー関数を提供します。
 
 ```js
+/// file: src/hooks.js
+/// <reference types="@sveltejs/kit" />
+// ---cut---
 import { sequence } from '@sveltejs/kit/hooks';
 
+/** @type {import('@sveltejs/kit').Handle} */
 async function first({ event, resolve }) {
 	console.log('first pre-processing');
 	const result = await resolve(event);
 	console.log('first post-processing');
 	return result;
 }
+
+/** @type {import('@sveltejs/kit').Handle} */
 async function second({ event, resolve }) {
 	console.log('second pre-processing');
 	const result = await resolve(event);
