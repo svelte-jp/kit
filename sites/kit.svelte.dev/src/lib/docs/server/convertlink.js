@@ -8,6 +8,7 @@ const docs_routing = new Map([
 	['プライベートモジュール', 'Private modules'],
 	['高度なルーティング', 'Advanced routing'],
 	['Restパラメータ', 'Rest parameters'],
+	['ソート', 'Sorting'],
 	['フォールスルールート', 'Fallthrough routes']
 ]);
 
@@ -27,6 +28,19 @@ const docs_adapters = new Map([
 const docs_packaging = new Map([['注意事項', 'Caveats']]);
 
 const docs_page_options = new Map([['プリレンダリングしない場合', 'When not to prerender']]);
+
+const docs_seo = new Map([
+	['パフォーマンス', 'Performance'],
+	['URLの正規化', 'Normalized URLs'],
+	['`title` と `meta`', '`title` and `meta`'],
+	['構造化データ', 'Structured data'],
+	['サイトマップ', 'Sitemaps']
+]);
+
+const docs_assets = new Map([
+	['ハッシュ化', 'Hashing'],
+	['最適化', 'Optimization']
+]);
 
 const docs_migrating = new Map([
 	['プロジェクトファイル', 'Project files'],
@@ -80,6 +94,10 @@ export function convert_link(label, title, heading) {
 				return docs_page_options.get(heading) || heading;
 			case 'Packaging':
 				return docs_packaging.get(heading) || heading;
+			case 'SEO':
+				return docs_seo.get(heading) || heading;
+			case 'アセットハンドリング':
+				return docs_assets.get(heading) || heading;
 			case 'Sapper からの移行':
 				return docs_migrating.get(heading) || heading;
 			case 'Additional Resources':
