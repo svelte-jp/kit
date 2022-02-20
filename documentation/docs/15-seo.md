@@ -2,35 +2,35 @@
 title: SEO
 ---
 
-The most important aspect of SEO is to create high-quality content that is widely linked to from around the web. However, there are a few technical considerations for building sites that rank well.
+SEO で最も重要なのは、高品質なコンテンツを作ること、そしてそれが web 上で広くリンクされることです。しかし、ランクが高いサイトを構築するためにいくつか技術的に考慮すべきこともあります。
 
 ### Out of the box
 
 #### SSR
 
-While search engines have got better in recent years at indexing content that was rendered with client-side JavaScript, server-side rendered content is indexed more frequently and reliably. SvelteKit employs SSR by default, and while you can disable it in [`handle`](/docs/hooks#handle), you should leave it on unless you have a good reason not to.
+近年、検索エンジンはクライアントサイドの JavaScript でレンダリングされたコンテンツのインデックスを改善してきましたが、サーバーサイドレンダリングされたコンテンツのほうがより頻繁に、より確実にインデックスされます。SvelteKit はデフォルトで SSR を採用しています。[`handle`](/docs/hooks#handle) で無効にすることもできますが、適切な理由がない場合はそのままにしておきましょう。
 
-> SvelteKit's rendering is highly configurable and you can implement [dynamic rendering](https://developers.google.com/search/docs/advanced/javascript/dynamic-rendering) if necessary. It's not generally recommended, since SSR has other benefits beyond SEO.
+> SvelteKit のレンダリングは高度な設定が可能です。必要であれば、[動的なレンダリング(dynamic rendering)](https://developers.google.com/search/docs/advanced/javascript/dynamic-rendering) を実装することも可能です。一般的には推奨されません、SSR には SEO 以外のメリットもあるからです。
 
-#### Performance
+#### パフォーマンス
 
-Signals such as [Core Web Vitals](https://web.dev/vitals/#core-web-vitals) impact search engine ranking. Because Svelte and SvelteKit introduce minimal overhead, it's easier to build high performance sites. You can test your site's performance using Google's [PageSpeed Insights](https://pagespeed.web.dev/) or [Lighthouse](https://developers.google.com/web/tools/lighthouse).
+[Core Web Vitals](https://web.dev/vitals/#core-web-vitals) のような指標は検索エンジンのランクに影響を与えます。Svelte と SvelteKit はオーバーヘッドが最小限であるため、ハイパフォーマンスなサイトを簡単に構築できです。Google の [PageSpeed Insights](https://pagespeed.web.dev/) や [Lighthouse](https://developers.google.com/web/tools/lighthouse) で、ご自身のサイトをテストすることができます。
 
-#### Normalized URLs
+#### URLの正規化
 
-SvelteKit redirects pathnames with trailing slashes to ones without (or vice versa depending on your [configuration](configuration#trailingslash)), as duplicate URLs are bad for SEO.
+SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から、末尾のスラッシュが無いパス名にリダイレクトします ([設定](configuration#trailingslash) で逆にできます)。URLの重複は、SEOに悪影響を与えます。
 
 ### Manual setup
 
-#### `title` and `meta`
+#### `title` と `meta`
 
-Every page should have well-written and unique `<title>` and `<meta name="description">` elements inside a [`<svelte:head>`](https://svelte.dev/docs#template-syntax-svelte-head). Guidance on how to write descriptive titles and descriptions, along with other suggestions on making content understandable by search engines, can be found on Google's [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) documentation.
+全てのページで、よく練られたユニークな `<title>` と `<meta name="description">` を [`<svelte:head>`](https://svelte.dev/docs#template-syntax-svelte-head) の内側に置くべきです。説明的な title と description の書き方に関するガイダンスと、検索エンジンにとってわかりやすいコンテンツを作るためのその他の方法については、Google の [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) のドキュメントで見つけることができます。
 
-> A common pattern is to return SEO-related [`stuff`](/docs/loading#output-stuff) from page `load` functions, then use it (as [`$page.stuff`](/docs/modules#$app-stores)) in a `<svelte:head>` in your root [layout](/docs/layouts).
+> SEO に関する [`stuff`](/docs/loading#output-stuff) をページの `load` 関数から返し、それを ([`$page.stuff`](/docs/modules#$app-stores) という形で) ルート(root)[レイアウト](/docs/layouts) の `<svelte:head>` の中で使うのが一般的なパターンです。
 
-#### Structured data
+#### 構造化データ
 
-[Structured data](https://developers.google.com/search/docs/advanced/structured-data/intro-structured-data) helps search engines understand the content of a page. If you're using structured data alongside [`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess), you will need to explicitly preserve `ld+json` data (this [may change in future](https://github.com/sveltejs/svelte-preprocess/issues/305)):
+[構造化データ](https://developers.google.com/search/docs/advanced/structured-data/intro-structured-data) は、検索エンジンがページのコンテンツを理解するのに役立ちます。[`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess) と一緒に構造化データを使用している場合は、明示的に `ld+json` データを保持する必要があります (これは [将来変更される可能性があります](https://github.com/sveltejs/svelte-preprocess/issues/305)):
 
 ```js
 /// file: svelte.config.js
@@ -52,9 +52,9 @@ const config = {
 export default config;
 ```
 
-#### Sitemaps
+#### サイトマップ
 
-[Sitemaps](https://developers.google.com/search/docs/advanced/sitemaps/build-sitemap) help search engines prioritize pages within your site, particularly when you have a large amount of content. You can create a sitemap dynamically using an endpoint:
+[サイトマップ](https://developers.google.com/search/docs/advanced/sitemaps/build-sitemap) は、検索エンジンがサイト内のページの優先順位付けをするのに役立ちます、特にコンテンツの量が多い場合は。エンドポイントを使用してサイトマップを動的に作成できます:
 
 ```js
 /// file: src/routes/sitemap.xml.js
@@ -82,8 +82,8 @@ export async function get() {
 
 #### AMP
 
-An unfortunate reality of modern web development is that it is sometimes necessary to create an [Accelerated Mobile Pages (AMP)](https://amp.dev/) version of your site. In SvelteKit this can be done by setting the [`amp`](/docs/configuration#amp) config option, which has the following effects:
+現代のWeb開発における残念な現実として、サイトの [Accelerated Mobile Pages (AMP)](https://amp.dev/ja/) バージョンを作成しなければならないときがある、というものがあります。SvelteKitでは [`amp`](/docs/configuration#amp) コンフィグオプションを設定することでこれを行うことができます。これには、以下の効果があります。
 
-- Client-side JavaScript, including the router, is disabled
-- Styles are concatenated into `<style amp-custom>`, and the [AMP boilerplate](https://amp.dev/boilerplate/) is injected
-- In development, requests are checked against the [AMP validator](https://validator.ampproject.org/) so you get early warning of any errors
+- ルーターを含むクライアントサイドJavaScriptが無効になります
+- スタイルは `<style amp-custom>` に連結され、[AMP boilerplate](https://amp.dev/boilerplate/) がインジェクトされます
+- 開発時には、リクエストは [AMP validator](https://validator.ampproject.org/) でチェックされるため、エラーがあれば早い段階で警告を受け取ることができます

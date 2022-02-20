@@ -297,9 +297,9 @@ export default config;
 
 > `src/routes/a/[...rest]/z.svelte` は `/a/z` だけでなく、`/a/b/z` と `/a/b/c/z` にもマッチします。rest パラメータの値が有効であることを必ず確かめてください。
 
-#### Sorting
+#### ソート
 
-It's possible for multiple routes to match a given path. For example each of these routes would match `/foo-abc`:
+あるパスに対し、マッチするルート(routes)は複数でも構いません。例えば、これらのルート(routes)はどれも `/foo-abc` にマッチします:
 
 ```bash
 src/routes/[a].js
@@ -309,14 +309,14 @@ src/routes/[...catchall].svelte
 src/routes/foo-[bar].svelte
 ```
 
-SvelteKit needs to know which route is being requested. To do so, it sorts them according to the following rules...
+SvelteKit は、どのルート(route)に対してリクエストされているのかを判断しなければなりません。そのため、以下のルールに従ってこれらをソートします…
 
-- More specific routes are higher priority
-- Standalone endpoints have higher priority than pages with the same specificity
-- Rest parameters have lowest priority
-- Ties are resolved alphabetically
+- より詳細・明確(specific)なルート(routes)ほど、より優先度が高い
+- Standalone endpoints は、同じ詳細度(specificity)のページよりも優先度が高い
+- Restパラメータは最も優先度が低い
+- 優先度が同じ場合はアルファベット順で解決される
 
-...resulting in this ordering, meaning that `/foo-abc` will invoke `src/routes/foo-[bar].svelte` rather than a less specific route:
+…この順序で並べると、`/foo-abc` の場合は `src/routes/foo-[bar].svelte` を呼び出すことになります:
 
 ```bash
 src/routes/foo-[bar].svelte
@@ -326,11 +326,11 @@ src/routes/[c].svelte
 src/routes/[...catchall].svelte
 ```
 
-#### Fallthrough routes
+#### フォールスルールート
 
-In rare cases, the ordering above might not be want you want for a given path. For example, perhaps `/foo-abc` should resolve to `src/routes/foo-[bar].svelte`, but `/foo-def` should resolve to `src/routes/[b].svelte`.
+まれに、上記の順序では、パスに対してお望みの動きにならないことがあるでしょう。例えば、`/foo-abc` は `src/routes/foo-[bar].svelte` で解決したいけれど `/foo-def` は `src/routes/[b].svelte` で解決したい、というような場合です。
 
-Higher priority routes can _fall through_ to lower priority routes by returning `{ fallthrough: true }`, either from `load` (for pages) or a request handler (for endpoints):
+優先度が高いルート(routes)では、`{ fallthrough: true }` を返すことによって優先度が低いルート(routes)に _フォールスルー_ することができます。ページの場合は `load`から、エンドポイントの場合は request handler から `{ fallthrough: true }` を返します:
 
 ```svelte
 /// file: src/routes/foo-[bar].svelte
