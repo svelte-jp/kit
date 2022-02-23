@@ -56,7 +56,7 @@ export function get() {
 			for (const section of sections) {
 				const lines = section.split('\n');
 				const h3 = lines.shift();
-				const h3link = convert_link(category.label, metadata.title, h3);
+				const h3link = convert_link(category.label, file, h3);
 				const content = lines.join('\n');
 
 				const subsections = content.trim().split('#### ');
@@ -72,7 +72,7 @@ export function get() {
 				for (const subsection of subsections) {
 					const lines = subsection.split('\n');
 					const h4 = lines.shift();
-					const h4link = convert_link(category.label, metadata.title, h4);
+					const h4link = convert_link(category.label, file, h4);
 
 					blocks.push({
 						breadcrumbs: [...breadcrumbs, metadata.title, h3, h4],

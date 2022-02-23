@@ -74,35 +74,35 @@ const faq = new Map([
 
 /**
  * @param {string | undefined} label
- * @param {string} title
+ * @param {string} file
  * @param {string} heading
  */
-export function convert_link(label, title, heading) {
+export function convert_link(label, file, heading) {
 	if (label) {
 		return faq.get(heading) || heading;
 	} else {
-		switch (title) {
-			case 'Introduction':
+		switch (file) {
+			case '00-introduction.md':
 				return docs_introduction.get(heading) || heading;
-			case 'ルーティング':
+			case '01-routing.md':
 				return docs_routing.get(heading) || heading;
-			case 'レイアウト':
+			case '02-layouts.md':
 				return docs_layouts.get(heading) || heading;
-			case 'Adapters':
+			case '09-adapters.md':
 				return docs_adapters.get(heading) || heading;
-			case 'Page options':
+			case '10-page-options.md':
 				return docs_page_options.get(heading) || heading;
-			case 'Packaging':
+			case '11-packaging.md':
 				return docs_packaging.get(heading) || heading;
-			case 'SEO':
+			case '15-seo.md':
 				return docs_seo.get(heading) || heading;
-			case 'アセットハンドリング':
+			case '16-assets.md':
 				return docs_assets.get(heading) || heading;
-			case 'Sapper からの移行':
+			case '80-migrating.md':
 				return docs_migrating.get(heading) || heading;
-			case 'Additional Resources':
+			case '90-additional-resources.md':
 				return docs_additional_resources.get(heading) || heading;
-			case 'Appendix':
+			case '99-appendix.md':
 				return docs_appendix.get(heading) || heading;
 			default:
 				return heading;

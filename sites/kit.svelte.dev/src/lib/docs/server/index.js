@@ -260,13 +260,9 @@ function parse({ body, file, slug, code }) {
 				.replace(/&lt;/g, '<')
 				.replace(/&gt;/g, '>');
 
-<<<<<<< HEAD
-			const normalized = slugify(convert_link(main_slug, metadata.title, title));
-=======
 			current = title;
 
-			const normalized = slugify(title);
->>>>>>> sveltejs/master
+			const normalized = slugify(convert_link(headings[0], file, title));
 
 			headings[level - 1] = normalized;
 			headings.length = level;
