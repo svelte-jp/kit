@@ -4,63 +4,15 @@ title: Loading
 
 ページやレイアウトを定義するコンポーネントは、コンポーネントが作成される前に実行される `load` 関数をエクスポートすることができます。この関数はサーバーサイドレンダリングとクライアントの両方で実行され、ページがレンダリングされる前にデータを取得して操作することができるので、ローディングスピナーを防止することができます。
 
-もしページのデータがエンドポイント(endpoint)から取得されるのであれば、`load` 関数は不要かもしれません。これは、もっと柔軟性が必要なとき、例えば外部の API からデータをロードする場合などに便利です。
-
-```ts
-// @filename: ambient.d.ts
-declare namespace App {
-	interface Locals {}
-	interface Platform {}
-	interface Session {}
-	interface Stuff {}
-}
-
-type Either<T, U> = Only<T, U> | Only<U, T>;
-
-// @filename: index.ts
-// ---cut---
-// Type declarations for `load` (declarations marked with
-// an `export` keyword can be imported from `@sveltejs/kit`)
-
-export interface Load<Params = Record<string, string>, Props = Record<string, any>> {
-	(input: LoadInput<Params>): MaybePromise<Either<Fallthrough, LoadOutput<Props>>>;
-}
-
-export interface LoadInput<Params = Record<string, string>> {
-	url: URL;
-	params: Params;
-	props: Record<string, any>;
-	fetch(info: RequestInfo, init?: RequestInit): Promise<Response>;
-	session: App.Session;
-	stuff: Partial<App.Stuff>;
-}
-
-export interface LoadOutput<Props = Record<string, any>> {
-	status?: number;
-	error?: string | Error;
-	redirect?: string;
-	props?: Props;
-	stuff?: Partial<App.Stuff>;
-	maxage?: number;
-}
-
-type MaybePromise<T> = T | Promise<T>;
-
-interface Fallthrough {
-	fallthrough: true;
-}
-```
-
-> `App.Session` と `App.Stuff` については [TypeScript](/docs/typescript) セクションをご参照ください。
-
-外部の API からデータをロードするページではこのようになるでしょう:
+もしページのデータがエンドポイント(endpoint)から取得されるのであれば、`load` 関数は不要かもしれません。これは、もっと柔軟性が必要なとき、例えば外部の API からデータをロードする場合などに便利で、例えばこのように使います。
 
 ```html
 /// file: src/routes/blog/[slug].svelte
 <script context="module">
 	/** @type {import('@sveltejs/kit').Load} */
 	export async function load({ params, fetch, session, stuff }) {
-		const response = await fetch(`https://cms.example.com/article/${params.slug}.json`);
+		const url = `https://cms.example.com/article/${params.slug}.json`;
+		const response = await fetch(url);
 
 		return {
 			status: response.status,

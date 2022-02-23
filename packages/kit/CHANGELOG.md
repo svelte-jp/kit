@@ -1,5 +1,31 @@
 # @sveltejs/kit
 
+## 1.0.0-next.282
+
+### Patch Changes
+
+- [fix] remove private methods to make Safari 14.1 work ([#4054](https://github.com/sveltejs/kit/pull/4054))
+
+## 1.0.0-next.281
+
+### Patch Changes
+
+- Allow the `transformPage` resolve option to return a promise ([#4036](https://github.com/sveltejs/kit/pull/4036))
+
+## 1.0.0-next.280
+
+### Patch Changes
+
+- [breaking] rename `app.render` to `server.respond` ([#4034](https://github.com/sveltejs/kit/pull/4034))
+
+* [breaking] allow providing `Params` type argument for `RequestHandler` ([#3989](https://github.com/sveltejs/kit/pull/3989))
+
+## 1.0.0-next.279
+
+### Patch Changes
+
+- Fix escaped html attributes ([#4015](https://github.com/sveltejs/kit/pull/4015))
+
 ## 1.0.0-next.278
 
 ### Patch Changes

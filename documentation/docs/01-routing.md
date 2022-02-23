@@ -12,7 +12,7 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 
 エンドポイントは、サーバー上でのみ実行されます(もしくはサイトをビルドするときに[プリレンダリング](/docs/page-options#prerender)している場合)。これは、プライベートな認証情報を必要とするデータベースやAPIにアクセスする場合や、本番環境ネットワーク上のマシンにあるデータを返す場合などに使用されます。ページはエンドポイントにデータをリクエストすることができます。エンドポイントはデフォルトではJSONを返しますが、他のフォーマットでもデータを返すことができます。
 
-### Pages
+### ページ(Pages)
 
 ページ(Pages)は `.svelte` ファイル (または[`config.extensions`](/docs/configuration) に記載されている拡張子のファイル) に書かれているSvelteコンポーネントです。デフォルトでは、ユーザーが初めてアプリにアクセスすると、サーバーレンダリングバージョンのページと、そのページを'ハイドレート(hydrate)'しクライアントサイドルーターを初期化するJavaScriptが提供されます。それ以降、他のページへのナビゲーションは全てクライアント側で処理され、ページの共通部分を再レンダリングする必要がなくなるため、高速でアプリのような操作感になります。
 
@@ -43,11 +43,9 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 
 ファイルやディレクトリは、`[id]-[category].svelte` のように、動的なパーツを複数持つことができます。(パラメータは 'non-greedy' です。`x-y-z` のようにあいまいなケースでは、`id` は `x` 、 `category` は `y-z` となります)
 
-### Endpoints
+### エンドポイント(Endpoints)
 
-エンドポイント(Endpoints)は `.js` (または `.ts`) ファイルに記述されるモジュールで、HTTPメソッドに対応した関数をエクスポートします。エンドポイントの役割は、サーバー上でしか利用できないデータ (例えば、データベースやファイルシステムにあるデータ) をページで読み書きできるようにすることです。
-
-ページと同じファイル名(拡張子を除く)のエンドポイントがある場合、そのページはそのエンドポイントからプロパティ(props)を取得します。つまり、`src/routes/items/[id].svelte` というページは、下記のファイルからプロパティを取得します:
+エンドポイント(Endpoints)は `.js` (または `.ts`) ファイルに記述されるモジュールで、HTTP メソッドに対応する [request handler](/docs/types#sveltejs-kit-requesthandler) 関数をエクスポートします。サーバー上でのみ利用可能なデータ(例えば、データベースやファイルシステムにあるデータ) を読み書きできるようにするという役割があります。
 
 ```js
 /// file: src/routes/items/[id].js
@@ -81,7 +79,7 @@ export async function get({ params }) {
 
 > エンドポイントを含む全てのサーバーサイドのコードは、外部のAPIにデータをリクエストする場合に備えて、`fetch` にアクセスすることができます。`$lib` のインポートについては心配無用です、それについては[後ほど](/docs/modules#$lib)触れます。
 
-この関数の仕事は、レスポンスを表す `{ status, headers, body }` オブジェクトを返すことです。`status` は [HTTPステータスコード](https://httpstatusdogs.com)です。
+この [request handler](/docs/types#sveltejs-kit-requesthandler) の役割は、レスポンスを表す `{ status, headers, body }` オブジェクトを返すことです。`status` は [HTTPステータスコード](https://httpstatusdogs.com)です。
 
 - `2xx` — 成功レスポンス (デフォルトは `200`)
 - `3xx` — リダイレクション (`location` ヘッダーが必要です)
@@ -90,17 +88,38 @@ export async function get({ params }) {
 
 > `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー](/docs/routing#advanced-routing-fallthrough-routes) し続けるか、一般的な 404 で応答します。
 
-返される `body` は、ページのプロパティに対応します:
+#### ページエンドポイント(Page endpoints)
+
+エンドポイントとページのファイル名が(拡張子以外)同一である場合、そのページはその同名のファイルを持つエンドポイントからプロパティ(props)を取得します (クライアントサイドナビゲーションの時は `fetch` が使用され、SSRの時には直接その関数を呼び出します)。
+
+`src/routes/items/[id].svelte` というページの場合は、上記のエンドポイント(`src/routes/items/[id].js`)の `body` からプロパティを取得します:
 
 ```svelte
 /// file: src/routes/items/[id].svelte
 <script>
-	// エンドポイント(endpoint)からのデータが入力される
+	// エンドポイント(endpoint)からデータが取得される
 	export let item;
 </script>
 
 <h1>{item.title}</h1>
 ```
+
+ページとエンドポイントが同じURLになるため、ページから HTML を取得するのではなくエンドポイントから JSON を取得するときは `accept: application/json` ヘッダーを付ける必要があります。また、URL に `/__data.json` を追加することで(例: `/items/__data.json`)、生データ(raw data)を取得できます。
+
+#### スタンドアロンエンドポイント(Standalone endpoints)
+
+通常、エンドポイントはペアとなるページにデータを提供するために置きます。しかし、ページとは独立して置くこともできます。スタンドアロンエンドポイント(Standalone endpoints)は、返す `body` の型について少し柔軟で、オブジェクトに加えて、`Uint8Array` を返すこともできます。
+
+スタンドアロンエンドポイントには必要に応じてファイル拡張子を付けることができますし、付けなければ直接アクセスすることができます:
+
+| ファイル名                      | エンドポイント |
+| ----------------------------- | ---------- |
+| src/routes/data/index.json.js | /data.json |
+| src/routes/data.json.js       | /data.json |
+| src/routes/data/index.js      | /data      |
+| src/routes/data.js            | /data      |
+
+> streaming request body、response body については[今後サポートされる予定](https://github.com/sveltejs/kit/issues/3419)です。
 
 #### POST, PUT, PATCH, DELETE
 
@@ -191,11 +210,9 @@ export async function post({ request }) {
 </form>
 ```
 
-もし `accept: application/json` header を付けてルート(route)をリクエストすると、SvelteKit は HTML のページではなく エンドポイントのデータを JSON としてレンダリングします。
-
 #### Body parsing
 
-`request` オブジェクトは標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) クラスのインスタンスです。そのため、request の body にアクセスするのは簡単です:
+`request` オブジェクトは標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) クラスのインスタンスです。そのため、簡単に request の body にアクセスできます:
 
 ```js
 // @filename: ambient.d.ts
@@ -262,12 +279,6 @@ export default config;
 ```
 
 > ネイティブの `<form>` の挙動を利用することで、JavaScript が失敗したり無効になっている場合でもアプリが動作し続けられます。
-
-### Standalone endpoints
-
-ほとんどの場合、エンドポイント(endpoints)はペアとなるページにデータを提供するために存在します。しかし、ページとは別に存在することもできます。独立したエンドポイント(Standalone endpoints)は、返される `body` の型について少し柔軟です。オブジェクトに加え、文字列や `Uint8Array` を返すことができます。
-
-> streaming request body、response body については[サポートされる予定](https://github.com/sveltejs/kit/issues/3419)です。
 
 ### プライベートモジュール
 

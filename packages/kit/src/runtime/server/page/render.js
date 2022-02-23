@@ -17,15 +17,15 @@ const updated = {
 /**
  * @param {{
  *   branch: Array<import('./types').Loaded>;
- *   options: import('types/internal').SSROptions;
- *   state: import('types/internal').SSRState;
+ *   options: import('types').SSROptions;
+ *   state: import('types').SSRState;
  *   $session: any;
  *   page_config: { hydrate: boolean, router: boolean };
  *   status: number;
  *   error?: Error;
  *   url: URL;
  *   params: Record<string, string>;
- *   resolve_opts: import('types/hooks').RequiredResolveOptions;
+ *   resolve_opts: import('types').RequiredResolveOptions;
  *   stuff: Record<string, any>;
  * }} opts
  */
@@ -299,7 +299,7 @@ export async function render_response({
 	const assets =
 		options.paths.assets || (segments.length > 0 ? segments.map(() => '..').join('/') : '.');
 
-	const html = resolve_opts.transformPage({
+	const html = await resolve_opts.transformPage({
 		html: options.template({ head, body, assets, nonce: /** @type {string} */ (csp.nonce) })
 	});
 

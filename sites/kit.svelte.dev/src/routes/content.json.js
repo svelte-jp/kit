@@ -2,6 +2,9 @@ import fs from 'fs';
 import { extract_frontmatter, transform } from '$lib/docs/server/markdown';
 import { slugify } from '../lib/docs/server';
 import { convert_link } from '$lib/docs/server/convertlink';
+import { types } from '../../../../documentation/types.js';
+
+// TODO need to take generated type summaries into account when building index
 
 const categories = [
 	{
@@ -30,7 +33,13 @@ export function get() {
 			const slug = match[1];
 
 			const filepath = `../../documentation/${category.slug}/${file}`;
-			const markdown = fs.readFileSync(filepath, 'utf-8');
+			const markdown = fs.readFileSync(filepath, 'utf-8').replace('**TYPES**', () => {
+				return types
+					.map(
+						(type) => `#### ${type.name}\n\n${type.comment}\n\n\`\`\`ts\n${type.snippet}\n\`\`\``
+					)
+					.join('\n\n');
+			});
 
 			const { body, metadata } = extract_frontmatter(markdown);
 
@@ -47,7 +56,7 @@ export function get() {
 			for (const section of sections) {
 				const lines = section.split('\n');
 				const h3 = lines.shift();
-				const h3link = convert_link(category.label, metadata.title, h3);
+				const h3link = convert_link(category.label, file, h3);
 				const content = lines.join('\n');
 
 				const subsections = content.trim().split('#### ');
@@ -63,7 +72,7 @@ export function get() {
 				for (const subsection of subsections) {
 					const lines = subsection.split('\n');
 					const h4 = lines.shift();
-					const h4link = convert_link(category.label, metadata.title, h4);
+					const h4link = convert_link(category.label, file, h4);
 
 					blocks.push({
 						breadcrumbs: [...breadcrumbs, metadata.title, h3, h4],
@@ -97,14 +106,10 @@ function plaintext(markdown) {
 		listitem: block,
 		checkbox: block,
 		paragraph: (text) => `${text}\n\n`,
-		table: () => {
-			throw new Error('TODO implement tables');
-		},
-		tablerow: () => {
-			throw new Error('TODO implement tables');
-		},
-		tablecell: () => {
-			throw new Error('TODO implement tables');
+		table: block,
+		tablerow: block,
+		tablecell: (text, opts) => {
+			return text + ' ';
 		},
 		strong: inline,
 		em: inline,
