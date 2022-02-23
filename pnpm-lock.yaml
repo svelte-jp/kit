@@ -231,7 +231,7 @@ importers:
   packages/kit:
     specifiers:
       '@playwright/test': ^1.17.1
-      '@rollup/plugin-replace': ^3.0.0
+      '@rollup/plugin-replace': ^4.0.0
       '@sveltejs/vite-plugin-svelte': ^1.0.0-next.32
       '@types/amphtml-validator': ^1.0.1
       '@types/cookie': ^0.4.1
@@ -267,7 +267,7 @@ importers:
       vite: 2.8.0
     devDependencies:
       '@playwright/test': 1.17.1
-      '@rollup/plugin-replace': 3.0.0_rollup@2.60.2
+      '@rollup/plugin-replace': 4.0.0_rollup@2.60.2
       '@types/amphtml-validator': 1.0.1
       '@types/cookie': 0.4.1
       '@types/marked': 4.0.1
@@ -324,7 +324,7 @@ importers:
       '@types/node': ^16.11.11
       flexsearch: ^0.7.21
       marked: ^4.0.5
-      prism-svelte: ^0.4.7
+      prism-svelte: ^0.5.0
       prismjs: ^1.26.0
       shiki-twoslash: ^3.0.2
       svelte: ^3.43.0
@@ -339,7 +339,7 @@ importers:
       '@types/node': 16.11.11
       flexsearch: 0.7.21
       marked: 4.0.5
-      prism-svelte: 0.4.7
+      prism-svelte: 0.5.0
       prismjs: 1.26.0
       shiki-twoslash: 3.0.2
       svelte: 3.44.2
@@ -1412,8 +1412,8 @@ packages:
       rollup: 2.60.2
     dev: true
 
-  /@rollup/plugin-replace/3.0.0_rollup@2.60.2:
-    resolution: {integrity: sha512-3c7JCbMuYXM4PbPWT4+m/4Y6U60SgsnDT/cCyAyUKwFHg7pTSfsSQzIpETha3a3ig6OdOKzZz87D9ZXIK3qsDg==}
+  /@rollup/plugin-replace/4.0.0_rollup@2.60.2:
+    resolution: {integrity: sha512-+rumQFiaNac9y64OHtkHGmdjm7us9bo1PlbgQfdihQtuNxzjpaB064HbRnewUOggLQxVCCyINfStkgmBeQpv1g==}
     peerDependencies:
       rollup: ^1.20.0 || ^2.0.0
     dependencies:
@@ -5422,8 +5422,8 @@ packages:
       js-yaml: 3.14.1
     dev: true
 
-  /prism-svelte/0.4.7:
-    resolution: {integrity: sha512-yABh19CYbM24V7aS7TuPYRNMqthxwbvx6FF/Rw920YbyBWO3tnyPIqRMgHuSVsLmuHkkBS1Akyof463FVdkeDQ==}
+  /prism-svelte/0.5.0:
+    resolution: {integrity: sha512-db91Bf3pRGKDPz1lAqLFSJXeW13mulUJxhycysFpfXV5MIK7RgWWK2E5aPAa71s8TCzQUXxF5JOV42/iOs6QkA==}
     dev: true
 
   /prismjs/1.26.0:

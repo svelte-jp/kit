@@ -45,9 +45,7 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 
 ### Endpoints
 
-エンドポイント(Endpoints)は `.js` (または `.ts`) ファイルに記述されるモジュールで、HTTPメソッドに対応した関数をエクスポートします。エンドポイントの役割は、サーバー上でしか利用できないデータ (例えば、データベースやファイルシステムにあるデータ) をページで読み書きできるようにすることです。
-
-ページと同じファイル名(拡張子を除く)のエンドポイントがある場合、そのページはそのエンドポイントからプロパティ(props)を取得します。つまり、`src/routes/items/[id].svelte` というページは、下記のファイルからプロパティを取得します:
+エンドポイント(Endpoints)は `.js` (または `.ts`) ファイルに記述されるモジュールで、HTTP メソッドに対応する [request handler](/docs/types#sveltejs-kit-requesthandler) 関数をエクスポートします。サーバー上でのみ利用可能なデータ(例えば、データベースやファイルシステムにあるデータ) を読み書きできるようにするという役割があります。
 
 ```js
 /// file: src/routes/items/[id].js
@@ -81,7 +79,7 @@ export async function get({ params }) {
 
 > エンドポイントを含む全てのサーバーサイドのコードは、外部のAPIにデータをリクエストする場合に備えて、`fetch` にアクセスすることができます。`$lib` のインポートについては心配無用です、それについては[後ほど](/docs/modules#$lib)触れます。
 
-この関数の仕事は、レスポンスを表す `{ status, headers, body }` オブジェクトを返すことです。`status` は [HTTPステータスコード](https://httpstatusdogs.com)です。
+この [request handler](/docs/types#sveltejs-kit-requesthandler) の役割は、レスポンスを表す `{ status, headers, body }` オブジェクトを返すことです。`status` は [HTTPステータスコード](https://httpstatusdogs.com)です。
 
 - `2xx` — 成功レスポンス (デフォルトは `200`)
 - `3xx` — リダイレクション (`location` ヘッダーが必要です)
@@ -90,7 +88,11 @@ export async function get({ params }) {
 
 > `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー](/docs/routing#advanced-routing-fallthrough-routes) し続けるか、一般的な 404 で応答します。
 
-返される `body` は、ページのプロパティに対応します:
+#### Page endpoints
+
+If an endpoint has the same filename as a page (except for the extension), the page gets its props from the endpoint — via `fetch` during client-side navigation, or via direct function call during SSR.
+
+A page like `src/routes/items/[id].svelte` could get its props from the `body` in the endpoint above:
 
 ```svelte
 /// file: src/routes/items/[id].svelte
@@ -101,6 +103,23 @@ export async function get({ params }) {
 
 <h1>{item.title}</h1>
 ```
+
+Because the page and route have the same URL, you will need to include an `accept: application/json` header to get JSON from the endpoint rather than HTML from the page. You can also get the raw data by appending `/__data.json` to the URL, e.g. `/items/__data.json`.
+
+#### Standalone endpoints
+
+Most commonly, endpoints exist to provide data to the page with which they're paired. They can, however, exist separately from pages. Standalone endpoints have slightly more flexibility over the returned `body` type — in addition to objects, they can return a `Uint8Array`.
+
+Standalone endpoints can be given a file extension if desired, or accessed directly if not:
+
+| filename                      | endpoint   |
+| ----------------------------- | ---------- |
+| src/routes/data/index.json.js | /data.json |
+| src/routes/data.json.js       | /data.json |
+| src/routes/data/index.js      | /data      |
+| src/routes/data.js            | /data      |
+
+> Support for streaming request and response bodies is [coming soon](https://github.com/sveltejs/kit/issues/3419).
 
 #### POST, PUT, PATCH, DELETE
 
@@ -191,11 +210,9 @@ export async function post({ request }) {
 </form>
 ```
 
-もし `accept: application/json` header を付けてルート(route)をリクエストすると、SvelteKit は HTML のページではなく エンドポイントのデータを JSON としてレンダリングします。
-
 #### Body parsing
 
-`request` オブジェクトは標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) クラスのインスタンスです。そのため、request の body にアクセスするのは簡単です:
+`request` オブジェクトは標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) クラスのインスタンスです。そのため、簡単に request の body にアクセスできます:
 
 ```js
 // @filename: ambient.d.ts
@@ -262,12 +279,6 @@ export default config;
 ```
 
 > ネイティブの `<form>` の挙動を利用することで、JavaScript が失敗したり無効になっている場合でもアプリが動作し続けられます。
-
-### Standalone endpoints
-
-ほとんどの場合、エンドポイント(endpoints)はペアとなるページにデータを提供するために存在します。しかし、ページとは別に存在することもできます。独立したエンドポイント(Standalone endpoints)は、返される `body` の型について少し柔軟です。オブジェクトに加え、文字列や `Uint8Array` を返すことができます。
-
-> streaming request body、response body については[サポートされる予定](https://github.com/sveltejs/kit/issues/3419)です。
 
 ### プライベートモジュール
 

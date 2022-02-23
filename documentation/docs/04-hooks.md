@@ -2,7 +2,7 @@
 title: Hooks
 ---
 
-オプションの `src/hooks.js` (または `src/hooks.ts`、または `src/hooks/index.js`) ファイルはサーバー上で実行される4つの関数 — **handle**、**handleError**、**getSession**、**externalFetch** — をエクスポートできます。それらは全てオプションです。
+オプションの `src/hooks.js` (または `src/hooks.ts`、または `src/hooks/index.js`) ファイルはサーバー上で実行される4つの関数 — `handle`、`handleError`、`getSession`、`externalFetch` — をエクスポートできます。全てオプションです。
 
 > このファイルの配置場所は [コンフィグ](/docs/configuration) の `config.kit.files.hooks` で変更することができます。
 

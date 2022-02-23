@@ -10,9 +10,9 @@ import { crawl } from './crawl.js';
 import { escape_html_attr } from '../../../utils/escape.js';
 
 /**
- * @typedef {import('types/config').PrerenderErrorHandler} PrerenderErrorHandler
- * @typedef {import('types/config').PrerenderOnErrorValue} OnError
- * @typedef {import('types/internal').Logger} Logger
+ * @typedef {import('types').PrerenderErrorHandler} PrerenderErrorHandler
+ * @typedef {import('types').PrerenderOnErrorValue} OnError
+ * @typedef {import('types').Logger} Logger
  */
 
 /** @type {(details: Parameters<PrerenderErrorHandler>[0] ) => string} */
@@ -44,14 +44,14 @@ const REDIRECT = 3;
  *   cwd: string;
  *   out: string;
  *   log: Logger;
- *   config: import('types/config').ValidatedConfig;
- *   build_data: import('types/internal').BuildData;
+ *   config: import('types').ValidatedConfig;
+ *   build_data: import('types').BuildData;
  *   fallback?: string;
  *   all: boolean; // disregard `export const prerender = true`
  * }} opts
  */
 export async function prerender({ cwd, out, log, config, build_data, fallback, all }) {
-	/** @type {import('types/config').Prerendered} */
+	/** @type {import('types').Prerendered} */
 	const prerendered = {
 		pages: new Map(),
 		assets: new Map(),
@@ -67,8 +67,8 @@ export async function prerender({ cwd, out, log, config, build_data, fallback, a
 
 	const server_root = resolve_path(cwd, `${SVELTE_KIT}/output`);
 
-	/** @type {import('types/internal').AppModule} */
-	const { App, override } = await import(pathToFileURL(`${server_root}/server/app.js`).href);
+	/** @type {import('types').ServerModule} */
+	const { Server, override } = await import(pathToFileURL(`${server_root}/server/index.js`).href);
 	const { manifest } = await import(pathToFileURL(`${server_root}/server/manifest.js`).href);
 
 	override({
@@ -77,7 +77,7 @@ export async function prerender({ cwd, out, log, config, build_data, fallback, a
 		read: (file) => readFileSync(join(config.kit.files.assets, file))
 	});
 
-	const app = new App(manifest);
+	const server = new Server(manifest);
 
 	const error = normalise_error_handler(log, config.kit.prerender.onError);
 
@@ -142,10 +142,10 @@ export async function prerender({ cwd, out, log, config, build_data, fallback, a
 			return;
 		}
 
-		/** @type {Map<string, import('types/internal').PrerenderDependency>} */
+		/** @type {Map<string, import('types').PrerenderDependency>} */
 		const dependencies = new Map();
 
-		const response = await app.render(new Request(`http://sveltekit-prerender${encoded}`), {
+		const response = await server.respond(new Request(`http://sveltekit-prerender${encoded}`), {
 			prerender: {
 				all,
 				dependencies
@@ -282,7 +282,7 @@ export async function prerender({ cwd, out, log, config, build_data, fallback, a
 	}
 
 	if (fallback) {
-		const rendered = await app.render(new Request('http://sveltekit-prerender/[fallback]'), {
+		const rendered = await server.respond(new Request('http://sveltekit-prerender/[fallback]'), {
 			prerender: {
 				fallback,
 				all: false,

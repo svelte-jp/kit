@@ -12,13 +12,13 @@ import { s } from '../../utils/misc.js';
 /**
  * @param {{
  *   hooks: string;
- *   config: import('types/config').ValidatedConfig;
+ *   config: import('types').ValidatedConfig;
  *   has_service_worker: boolean;
  *   template: string;
  * }} opts
  * @returns
  */
-const app_template = ({ config, hooks, has_service_worker, template }) => `
+const server_template = ({ config, hooks, has_service_worker, template }) => `
 import root from '__GENERATED__/root.svelte';
 import { respond } from '${runtime}/server/index.js';
 import { set_paths, assets, base } from '${runtime}/paths.js';
@@ -55,7 +55,7 @@ export function override(settings) {
 	read = settings.read;
 }
 
-export class App {
+export class Server {
 	constructor(manifest) {
 		const hooks = get_hooks(user_hooks);
 
@@ -95,7 +95,7 @@ export class App {
 		};
 	}
 
-	render(request, options = {}) {
+	respond(request, options = {}) {
 		if (!(request instanceof Request)) {
 			throw new Error('The first argument to app.render must be a Request object. See https://github.com/sveltejs/kit/pull/3384 for details');
 		}
@@ -109,8 +109,8 @@ export class App {
  * @param {{
  *   cwd: string;
  *   assets_base: string;
- *   config: import('types/config').ValidatedConfig
- *   manifest_data: import('types/internal').ManifestData
+ *   config: import('types').ValidatedConfig
+ *   manifest_data: import('types').ManifestData
  *   build_dir: string;
  *   output_dir: string;
  *   service_worker_entry_file: string | null;
@@ -139,7 +139,7 @@ export async function build_server(
 
 	/** @type {Record<string, string>} */
 	const input = {
-		app: `${build_dir}/app.js`
+		index: `${build_dir}/index.js`
 	};
 
 	// add entry points for every endpoint...
@@ -172,8 +172,8 @@ export async function build_server(
 	};
 
 	fs.writeFileSync(
-		input.app,
-		app_template({
+		input.index,
+		server_template({
 			config,
 			hooks: app_relative(hooks_file),
 			has_service_worker: service_worker_register && !!service_worker_entry_file,
@@ -307,7 +307,7 @@ const method_names = {
  *
  * @param {string} cwd
  * @param {import('rollup').OutputChunk[]} output
- * @param {import('types/internal').ManifestData} manifest_data
+ * @param {import('types').ManifestData} manifest_data
  */
 function get_methods(cwd, output, manifest_data) {
 	/** @type {Record<string, string[]>} */
@@ -318,14 +318,14 @@ function get_methods(cwd, output, manifest_data) {
 		lookup[id] = chunk.exports;
 	});
 
-	/** @type {Record<string, import('types/internal').HttpMethod[]>} */
+	/** @type {Record<string, import('types').HttpMethod[]>} */
 	const methods = {};
 	manifest_data.routes.forEach((route) => {
 		const file = route.type === 'endpoint' ? route.file : route.shadow;
 
 		if (file && lookup[file]) {
 			methods[file] = lookup[file]
-				.map((x) => /** @type {import('types/internal').HttpMethod} */ (method_names[x]))
+				.map((x) => /** @type {import('types').HttpMethod} */ (method_names[x]))
 				.filter(Boolean);
 		}
 	});
