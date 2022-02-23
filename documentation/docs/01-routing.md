@@ -12,7 +12,7 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 
 エンドポイントは、サーバー上でのみ実行されます(もしくはサイトをビルドするときに[プリレンダリング](/docs/page-options#prerender)している場合)。これは、プライベートな認証情報を必要とするデータベースやAPIにアクセスする場合や、本番環境ネットワーク上のマシンにあるデータを返す場合などに使用されます。ページはエンドポイントにデータをリクエストすることができます。エンドポイントはデフォルトではJSONを返しますが、他のフォーマットでもデータを返すことができます。
 
-### Pages
+### ページ(Pages)
 
 ページ(Pages)は `.svelte` ファイル (または[`config.extensions`](/docs/configuration) に記載されている拡張子のファイル) に書かれているSvelteコンポーネントです。デフォルトでは、ユーザーが初めてアプリにアクセスすると、サーバーレンダリングバージョンのページと、そのページを'ハイドレート(hydrate)'しクライアントサイドルーターを初期化するJavaScriptが提供されます。それ以降、他のページへのナビゲーションは全てクライアント側で処理され、ページの共通部分を再レンダリングする必要がなくなるため、高速でアプリのような操作感になります。
 
@@ -43,7 +43,7 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 
 ファイルやディレクトリは、`[id]-[category].svelte` のように、動的なパーツを複数持つことができます。(パラメータは 'non-greedy' です。`x-y-z` のようにあいまいなケースでは、`id` は `x` 、 `category` は `y-z` となります)
 
-### Endpoints
+### エンドポイント(Endpoints)
 
 エンドポイント(Endpoints)は `.js` (または `.ts`) ファイルに記述されるモジュールで、HTTP メソッドに対応する [request handler](/docs/types#sveltejs-kit-requesthandler) 関数をエクスポートします。サーバー上でのみ利用可能なデータ(例えば、データベースやファイルシステムにあるデータ) を読み書きできるようにするという役割があります。
 
@@ -88,38 +88,38 @@ export async function get({ params }) {
 
 > `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー](/docs/routing#advanced-routing-fallthrough-routes) し続けるか、一般的な 404 で応答します。
 
-#### Page endpoints
+#### ページエンドポイント(Page endpoints)
 
-If an endpoint has the same filename as a page (except for the extension), the page gets its props from the endpoint — via `fetch` during client-side navigation, or via direct function call during SSR.
+エンドポイントとページのファイル名が(拡張子以外)同一である場合、そのページはその同名のファイルを持つエンドポイントからプロパティ(props)を取得します (クライアントサイドナビゲーションの時は `fetch` が使用され、SSRの時には直接その関数を呼び出します)。
 
-A page like `src/routes/items/[id].svelte` could get its props from the `body` in the endpoint above:
+`src/routes/items/[id].svelte` というページの場合は、上記のエンドポイント(`src/routes/items/[id].js`)の `body` からプロパティを取得します:
 
 ```svelte
 /// file: src/routes/items/[id].svelte
 <script>
-	// エンドポイント(endpoint)からのデータが入力される
+	// エンドポイント(endpoint)からデータが取得される
 	export let item;
 </script>
 
 <h1>{item.title}</h1>
 ```
 
-Because the page and route have the same URL, you will need to include an `accept: application/json` header to get JSON from the endpoint rather than HTML from the page. You can also get the raw data by appending `/__data.json` to the URL, e.g. `/items/__data.json`.
+ページとエンドポイントが同じURLになるため、ページから HTML を取得するのではなくエンドポイントから JSON を取得するときは `accept: application/json` ヘッダーを付ける必要があります。また、URL に `/__data.json` を追加することで(例: `/items/__data.json`)、生データ(raw data)を取得できます。
 
-#### Standalone endpoints
+#### スタンドアロンエンドポイント(Standalone endpoints)
 
-Most commonly, endpoints exist to provide data to the page with which they're paired. They can, however, exist separately from pages. Standalone endpoints have slightly more flexibility over the returned `body` type — in addition to objects, they can return a `Uint8Array`.
+通常、エンドポイントはペアとなるページにデータを提供するために置きます。しかし、ページとは独立して置くこともできます。スタンドアロンエンドポイント(Standalone endpoints)は、返す `body` の型について少し柔軟で、オブジェクトに加えて、`Uint8Array` を返すこともできます。
 
-Standalone endpoints can be given a file extension if desired, or accessed directly if not:
+スタンドアロンエンドポイントには必要に応じてファイル拡張子を付けることができますし、付けなければ直接アクセスすることができます:
 
-| filename                      | endpoint   |
+| ファイル名                      | エンドポイント |
 | ----------------------------- | ---------- |
 | src/routes/data/index.json.js | /data.json |
 | src/routes/data.json.js       | /data.json |
 | src/routes/data/index.js      | /data      |
 | src/routes/data.js            | /data      |
 
-> Support for streaming request and response bodies is [coming soon](https://github.com/sveltejs/kit/issues/3419).
+> streaming request body、response body については[今後サポートされる予定](https://github.com/sveltejs/kit/issues/3419)です。
 
 #### POST, PUT, PATCH, DELETE
 

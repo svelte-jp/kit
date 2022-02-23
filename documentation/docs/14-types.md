@@ -4,13 +4,13 @@ title: Types
 
 ### @sveltejs/kit
 
-All APIs in SvelteKit are fully typed. The following types can be imported from `@sveltejs/kit`:
+SvelteKit の API は全て完全に型付けされています。下記の型は `@sveltejs/kit` からインポートできます:
 
 **TYPES**
 
 ### The `App` namespace
 
-It's possible to tell SvelteKit how to type objects inside your app by declaring the `App` namespace. By default, a new project will have a file called `src/app.d.ts` containing the following:
+`App` namespace を宣言することで、アプリ内のオブジェクトに型を付ける方法を SvelteKit に伝えることができます。デフォルトでは、新しいプロジェクトには `src/app.d.ts` というファイルがあり、下記が含まれています:
 
 ```ts
 /// <reference types="@sveltejs/kit" />
