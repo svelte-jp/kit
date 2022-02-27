@@ -77,7 +77,7 @@ function get_types(code, statements) {
 
 	modules.push({
 		name: '@sveltejs/kit',
-		comment: 'The following types can be imported from `@sveltejs/kit`:',
+		comment: '下記の型を `@sveltejs/kit` からインポートすることができます:',
 		...get_types(code, node.statements)
 	});
 }
@@ -89,7 +89,7 @@ function get_types(code, statements) {
 	modules.push({
 		name: 'Additional types',
 		comment:
-			'The following are referenced by the public types documented above, but cannot be imported directly:',
+			'下記は、上記のパブリックな型から参照されていますが、直接インポートすることはできません:',
 		...get_types(code, node.statements)
 	});
 }
