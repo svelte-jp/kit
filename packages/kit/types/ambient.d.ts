@@ -1,5 +1,5 @@
 /**
- * It's possible to tell SvelteKit how to type objects inside your app by declaring the `App` namespace. By default, a new project will have a file called `src/app.d.ts` containing the following:
+ * `App` namespace を宣言することで、アプリ内のオブジェクトを型付けする方法を SvelteKit に伝えることが可能です。デフォルトでは、新しいプロジェクトには `src/app.d.ts` というファイルがあり、以下の内容を含んでいます:
  *
  * ```ts
  * /// <reference types="@sveltejs/kit" />
@@ -15,26 +15,26 @@
  * }
  * ```
  *
- * By populating these interfaces, you will gain type safety when using `event.locals`, `event.platform`, `session` and `stuff`:
+ * これらの interface を活用することで、`event.locals`、`event.platform`、`session`、`stuff` を使用する際に型の安全性を得ることができます:
  */
 declare namespace App {
 	/**
-	 * The interface that defines `event.locals`, which can be accessed in [hooks](/docs/hooks) (`handle`, `handleError` and `getSession`) and [endpoints](/docs/routing#endpoints).
+	 * `event.locals` を定義する interface です。`event.locals` は [hooks](/docs/hooks) (`handle`、`handleError`、`getSession`) と [エンドポイント(endpoints)](/docs/routing#endpoints) からアクセスできます。
 	 */
 	export interface Locals {}
 
 	/**
-	 * If your adapter provides [platform-specific context](/docs/adapters#supported-environments-platform-specific-context) via `event.platform`, you can specify it here.
+	 * adapter が `event.platform` で [プラットフォーム固有の情報](/docs/adapters#supported-environments-platform-specific-context) を提供する場合、ここでそれを指定することができます。
 	 */
 	export interface Platform {}
 
 	/**
-	 * The interface that defines `session`, both as an argument to [`load`](/docs/loading) functions and the value of the [session store](/docs/modules#$app-stores).
+	 * `session` を定義する interfaceです。`session` は、[`load`](/docs/loading) 関数の引数であり、[session store](/docs/modules#$app-stores) の値でもあります。
 	 */
 	export interface Session {}
 
 	/**
-	 * The interface that defines `stuff`, as input or output to [`load`](/docs/loading) or as the value of the `stuff` property of the [page store](/docs/modules#$app-stores).
+	 * `stuff` を定義する interface です。`stuff` は [`load`](/docs/loading) 関数の input/output であり、[page store](/docs/modules#$app-stores) の `stuff` プロパティの値でもあります。
 	 */
 	export interface Stuff {}
 }
@@ -46,25 +46,25 @@ declare namespace App {
  */
 declare module '$app/env' {
 	/**
-	 * Whether or not the app is running in [AMP mode](/docs/seo#manual-setup-amp).
+	 * アプリが [AMP モード](/docs/seo#manual-setup-amp) で動作しているかどうかを示します。
 	 */
 	export const amp: boolean;
 	/**
-	 * Whether the app is running in the browser or on the server.
+	 * アプリがブラウザで動作しているか、それともサーバーで動作しているかを示します。
 	 */
 	export const browser: boolean;
 	/**
-	 * `true` in development mode, `false` in production.
+	 * 開発モードの場合は `true`、本番環境の場合は `false` です。
 	 */
 	export const dev: boolean;
 	/**
-	 * `true` when prerendering, `false` otherwise.
+	 * プリレンダリング時は `true`、それ以外の場合は `false` です。
 	 */
 	export const prerendering: boolean;
 	/**
-	 * The Vite.js mode the app is running in. Configure in `config.kit.vite.mode`.
-	 * Vite.js loads the dotenv file associated with the provided mode, `.env.[mode]` or `.env.[mode].local`.
-	 * By default, `svelte-kit dev` runs with `mode=development` and `svelte-kit build` runs with `mode=production`.
+	 * アプリが動作している Vite.js のモードを示します。`config.kit.vite.mode` で設定可能です。
+	 * Vite.js は、`.env.[mode]` や `.env.[mode].local` のような、モードに関する dotenv ファイルを読み込みます。
+	 * デフォルトでは、`svelte-kit dev` の場合は `mode=development` で、`svelte-kit build` の場合は `mode=production` で実行されます。
 	 */
 	export const mode: string;
 }
@@ -84,12 +84,12 @@ declare module '$app/env' {
  */
 declare module '$app/navigation' {
 	/**
-	 * If called when the page is being updated following a navigation (in `onMount` or an action, for example), this disables SvelteKit's built-in scroll handling.
-	 * This is generally discouraged, since it breaks user expectations.
+	 * ナビゲーション後のページ更新の時にこれが(例えば `onMount` の中や action で)呼び出された場合、SvelteKit の組み込みのスクロール処理を無効にします。
+	 * ユーザーの期待する動きではなくなるため、一般的には推奨されません。
 	 */
 	export function disableScrollHandling(): void;
 	/**
-	 * Returns a Promise that resolves when SvelteKit navigates (or fails to navigate, in which case the promise rejects) to the specified `href`.
+	 * SvelteKit が指定された `href` にナビゲーションしたときに解決する Promise を返します(ナビゲーションに失敗した場合は、Promise はリジェクトされます)。
 	 *
 	 * @param href Where to navigate to
 	 * @param opts.replaceState If `true`, will replace the current `history` entry rather than creating a new one with `pushState`
@@ -102,44 +102,44 @@ declare module '$app/navigation' {
 		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
 	): Promise<void>;
 	/**
-	 * Causes any `load` functions belonging to the currently active page to re-run if they `fetch` the resource in question. Returns a `Promise` that resolves when the page is subsequently updated.
+	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` する場合、再実行させます。それに続いてページが更新されたときに解決される `Promise` を返します。
 	 * @param href The invalidated resource
 	 */
 	export function invalidate(href: string): Promise<void>;
 	/**
-	 * Programmatically prefetches the given page, which means
-	 *  1. ensuring that the code for the page is loaded, and
-	 *  2. calling the page's load function with the appropriate options.
+	 * 指定されたページをプログラム的にプリフェッチします、つまり
+	 *  1. そのページのコードが取得され読み込まれていることを確認し、
+	 *  2. そのページの load 関数を適切なオプションで呼び出します。
 	 *
-	 * This is the same behaviour that SvelteKit triggers when the user taps or mouses over an `<a>` element with `sveltekit:prefetch`.
-	 * If the next navigation is to `href`, the values returned from load will be used, making navigation instantaneous.
-	 * Returns a Promise that resolves when the prefetch is complete.
+	 * `sveltekit:prefetch` が使用された `<a>` 要素をユーザーがタップまたはマウスオーバーしたときに SvelteKit がトリガーする動作と同じです。
+	 * 次のナビゲーション先が `href` である場合、load から返される値が使われるので、ナビゲーションを瞬時に行うことができます。
+	 * プリフェッチが完了したときに解決される Promise を返します。
 	 *
 	 * @param href Page to prefetch
 	 */
 	export function prefetch(href: string): Promise<void>;
 	/**
-	 * Programmatically prefetches the code for routes that haven't yet been fetched.
-	 * Typically, you might call this to speed up subsequent navigation.
+	 * まだ取得されていないルート(routes)のコードをプログラム的にプリフェッチします。
+	 * 通常、後続のナビゲーションを高速にするためにこれを呼び出します。
 	 *
-	 * If no argument is given, all routes will be fetched, otherwise you can specify routes by any matching pathname
-	 * such as `/about` (to match `src/routes/about.svelte`) or `/blog/*` (to match `src/routes/blog/[slug].svelte`).
+	 * 引数を指定しない場合は全てのルート(routes)を取得します。指定する場合は、ルート(routes)にマッチするパス名、例えば
+	 * `/about` (`src/routes/about.svelte` にマッチ) や `/blog/*` (`src/routes/blog/[slug].svelte` にマッチ) のように指定することができます。
 	 *
 	 * Unlike prefetch, this won't call preload for individual pages.
-	 * Returns a Promise that resolves when the routes have been prefetched.
+	 * ルート(routes)のプリフェッチが完了したときに解決される Promise を返します。
 	 */
 	export function prefetchRoutes(routes?: string[]): Promise<void>;
 
 	/**
-	 * A navigation interceptor that triggers before we navigate to a new URL (internal or external) whether by clicking a link, calling `goto`, or using the browser back/forward controls.
-	 * This is helpful if we want to conditionally prevent a navigation from completing or lookup the upcoming url.
+	 * リンクをクリックしたり、`goto` を呼び出したり、ブラウザの 戻る/進む を使うなどして新しい URL (内部と外部どちらも含む) にナビゲーションするその直前にトリガーされるナビゲーションインターセプターです。
+	 * 条件付きでナビゲーションを完了させないようにしたり、次の URL を調べたい場合に便利です。
 	 */
 	export function beforeNavigate(
 		fn: (navigation: { from: URL; to: URL | null; cancel: () => void }) => void
 	): void;
 
 	/**
-	 * A lifecycle function that runs when the page mounts, and also whenever SvelteKit navigates to a new URL but stays on this component.
+	 * ページがマウントされたときや、ページコンポーネントがそのままでも Sveltekit がナビゲーションしたときに実行されるライフサイクル関数です。
 	 */
 	export function afterNavigate(fn: (navigation: { from: URL | null; to: URL }) => void): void;
 }
@@ -151,13 +151,13 @@ declare module '$app/navigation' {
  */
 declare module '$app/paths' {
 	/**
-	 * A string that matches [`config.kit.paths.base`](/docs/configuration#paths). It must begin, but not end, with a `/`.
+	 * [`config.kit.paths.base`](/docs/configuration#paths) にマッチする文字列です。`/` で始まる必要があります。末尾を `/` にしてはいけません。
 	 */
 	export const base: `/${string}`;
 	/**
-	 * An absolute path that matches [`config.kit.paths.assets`](/docs/configuration#paths).
+	 * [`config.kit.paths.assets`](/docs/configuration#paths) にマッチする絶対パスです。
 	 *
-	 * > If a value for `config.kit.paths.assets` is specified, it will be replaced with `'/_svelte_kit_assets'` during [`svelte-kit dev`](/docs/cli#svelte-kit-dev) or [`svelte-kit preview`](/docs/cli#svelte-kit-preview), since the assets don't yet live at their eventual URL.
+	 * > [`svelte-kit dev`](/docs/cli#svelte-kit-dev) や [`svelte-kit preview`](/docs/cli#svelte-kit-preview) を実行しているときはアセットがまだ最終的な URL に存在しないため、`config.kit.paths.assets` に値が指定されている場合はそれが `'/_svelte_kit_assets'` に置き換えられます。
 	 */
 	export const assets: `https://${string}` | `http://${string}`;
 }
@@ -167,17 +167,17 @@ declare module '$app/paths' {
  * import { getStores, navigating, page, session, updated } from '$app/stores';
  * ```
  *
- * Stores are _contextual_ — they are added to the [context](https://svelte.dev/tutorial/context-api) of your root component. This means that `session` and `page` are unique to each request on the server, rather than shared between multiple requests handled by the same server simultaneously, which is what makes it safe to include user-specific data in `session`.
+ * ストア(Store)は _コンテクスチュアル(contextual)_ で、ルート(root)コンポーネントの [context](https://svelte.jp/tutorial/context-api) に追加されます。つまり、`session` と `page` はサーバー上の各リクエストごとにユニークであり、同じサーバー上で同時に処理される複数のリクエスト間で共有されません。これにより、`session` にユーザー固有のデータを含めても安全になります。
  *
- * Because of that, you must subscribe to the stores during component initialization (which happens automatically if you reference the store value, e.g. as `$page`, in a component) before you can use them.
+ * そのため、ストアを使用するにはコンポーネントの初期化の際にそのストアをサブスクライブする必要があります (コンポーネント内で `$page` というような形でストアの値を参照する場合、自動的にそうなります)。
  */
 declare module '$app/stores' {
 	import { Readable, Writable } from 'svelte/store';
 	import { Navigation, Page } from '@sveltejs/kit';
 
 	/**
-	 * A convenience function around `getContext`. Must be called during component initialization.
-	 * Only use this if you need to defer store subscription until after the component has mounted, for some reason.
+	 * `getContext` をラップしている便利な関数です。コンポーネントの初期化時に呼び出す必要があります。
+	 * 何らかの理由で、コンポーネントのマウント後までストアのサブスクライブを遅延させたい場合にのみ、これを使用してください。
 	 */
 	export function getStores(): {
 		navigating: typeof navigating;
@@ -187,28 +187,28 @@ declare module '$app/stores' {
 	};
 
 	/**
-	 * A readable store whose value contains page data.
+	 * ページ(page) のデータを値として持つ読み取り可能なストアです。
 	 */
 	export const page: Readable<Page>;
 	/**
-	 * A readable store.
-	 * When navigating starts, its value is `{ from: URL, to: URL }`,
-	 * When navigating finishes, its value reverts to `null`.
+	 * 読み取り可能なストアです。
+	 * ナビゲーションを開始すると、その値は `{ from: URL, to: URL }` となります。
+	 * ナビゲーションが終了すると、その値は `null` に戻ります。
 	 */
 	export const navigating: Readable<Navigation | null>;
 	/**
-	 * A writable store whose initial value is whatever was returned from [`getSession`](/docs/hooks#getsession).
-	 * It can be written to, but this will not cause changes to persist on the server — this is something you must implement yourself.
+	 * 書き込み可能なストアで、初期値は [`getSession`](/docs/hooks#getsession) の戻り値です。
+	 * 書き込み可能ですがその変更内容をサーバー上で永続化しません。それはご自身で実装する必要があります。
 	 */
 	export const session: Writable<App.Session>;
 	/**
-	 *  A readable store whose initial value is `false`. If [`version.pollInterval`](/docs/configuration#version) is a non-zero value, SvelteKit will poll for new versions of the app and update the store value to `true` when it detects one. `updated.check()` will force an immediate check, regardless of polling.
+	 *  読み取り可能なストアで、初期値は `false` です。もし [`version.pollInterval`](/docs/configuration#version) が0以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` にします。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
 	 */
 	export const updated: Readable<boolean> & { check: () => boolean };
 }
 
 /**
- * This is a simple alias to `src/lib`, or whatever directory is specified as [`config.kit.files.lib`](/docs/configuration#files). It allows you to access common components and utility modules without `../../../../` nonsense.
+ * これは `src/lib` または [`config.kit.files.lib`](/docs/configuration#files) で指定されたディレクトリのシンプルなエイリアスです。これにより、`../../../../` のようなナンセンスなことをせずに、共通コンポーネントやユーティリティモジュールにアクセスすることができます。
  */
 declare module '$lib' {}
 
@@ -217,19 +217,19 @@ declare module '$lib' {}
  * import { build, files, timestamp } from '$service-worker';
  * ```
  *
- * This module is only available to [service workers](/docs/service-workers).
+ * このモジュールは [service workers](/docs/service-workers) でのみ使用できます。
  */
 declare module '$service-worker' {
 	/**
-	 * An array of URL strings representing the files generated by Vite, suitable for caching with `cache.addAll(build)`.
+	 * Viteが生成するファイルを表すURL文字列の配列で、`cache.addAll(build)` を使ってキャッシュするのに適しています。
 	 */
 	export const build: string[];
 	/**
-	 * An array of URL strings representing the files in your static directory, or whatever directory is specified by `config.kit.files.assets`. You can customize which files are included from `static` directory using [`config.kit.serviceWorker.files`](/docs/configuration)
+	 * `static` ディレクトリまたは [`config.kit.files.assets`](/docs/configuration#files) で指定されたディレクトリにあるファイルを表すURL文字列の配列です。どのファイルを `static` ディレクトリに含めるかについては、[`config.kit.serviceWorker.files`](/docs/configuration#serviceworker) でカスタマイズできます。
 	 */
 	export const files: string[];
 	/**
-	 * The result of calling `Date.now()` at build time. It's useful for generating unique cache names inside your service worker, so that a later deployment of your app can invalidate old caches.
+	 * ビルド時に `Date.now()` を呼び出した結果の値です。これは、Service Worker 内で一意なキャッシュ名を生成するのに便利で、後でアプリをデプロイしたときに古いキャッシュを無効にすることができます。
 	 */
 	export const timestamp: number;
 }
@@ -238,7 +238,7 @@ declare module '@sveltejs/kit/hooks' {
 	import { Handle } from '@sveltejs/kit';
 
 	/**
-	 * A helper function for sequencing multiple `handle` calls in a middleware-like manner.
+	 * 複数の `handle` の呼び出しを middleware ライクな方法でシーケンス化するヘルパー関数です。
 	 *
 	 * ```js
 	 * /// file: src/hooks.js
@@ -263,7 +263,7 @@ declare module '@sveltejs/kit/hooks' {
 	 * export const handle = sequence(first, second);
 	 * ```
 	 *
-	 * The example above would print:
+	 * 上記の例はこのようにプリントされます:
 	 *
 	 * ```
 	 * first pre-processing
@@ -278,17 +278,17 @@ declare module '@sveltejs/kit/hooks' {
 }
 
 /**
- * A polyfill for `fetch` and its related interfaces, used by adapters for environments that don't provide a native implementation.
+ * `fetch` やそれに関連する interface の polyfill で、ネイティブ実装が提供されない環境向けの adapter が使用します。
  */
 declare module '@sveltejs/kit/install-fetch' {
 	/**
-	 * Make `fetch`, `Headers`, `Request` and `Response` available as globals, via `node-fetch`
+	 * `node-fetch` を使用して、`fetch` `Headers` `Request` `Response` を global で利用できるようにします。
 	 */
 	export function installFetch(): void;
 }
 
 /**
- * Utilities used by adapters for Node-like environments.
+ * Node ライクな環境向けの adapter で使用されるユーティリティーです。
  */
 declare module '@sveltejs/kit/node' {
 	export function getRequest(

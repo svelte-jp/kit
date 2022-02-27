@@ -128,10 +128,10 @@ export interface Navigation {
 }
 
 /**
- * A function exported from an endpoint that corresponds to an
- * HTTP verb (`get`, `put`, `patch`, etc) and handles requests with
- * that method. Note that since 'delete' is a reserved word in
- * JavaScript, delete handles are called `del` instead.
+ * HTTP の動詞 (`get`、`put`、`patch`、etc) に対応する関数で、
+ * エンドポイントからエクスポートされます。それぞれの HTTP メソッドのリクエストを処理します。
+ * 'delete' は JavaScriptの予約語なので、delete メソッド を処理する関数は
+ * `del` です。
  */
 export interface RequestHandler<Params = Record<string, string>, Output extends Body = Body> {
 	(event: RequestEvent<Params>): RequestHandlerOutput<Output>;
