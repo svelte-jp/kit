@@ -125,7 +125,7 @@ declare module '$app/navigation' {
 	 * 引数を指定しない場合は全てのルート(routes)を取得します。指定する場合は、ルート(routes)にマッチするパス名、例えば
 	 * `/about` (`src/routes/about.svelte` にマッチ) や `/blog/*` (`src/routes/blog/[slug].svelte` にマッチ) のように指定することができます。
 	 *
-	 * Unlike prefetch, this won't call preload for individual pages.
+	 * prefetch 関数とは異なり、この関数はそれぞれのページの load を呼び出しません。
 	 * ルート(routes)のプリフェッチが完了したときに解決される Promise を返します。
 	 */
 	export function prefetchRoutes(routes?: string[]): Promise<void>;
