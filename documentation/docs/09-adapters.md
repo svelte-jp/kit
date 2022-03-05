@@ -99,7 +99,7 @@ export default function (options) {
 `adapt` メソッドの中では、adapter がすべきことがたくさんあります:
 
 - build ディレクトリの掃除
-- Write SvelteKit output with `builder.writeClient`, `builder.writePrerendered`, `builder.writeServer`, and `builder.writeStatic`
+- `builder.writeClient`、`builder.writePrerendered`、`builder.writeServer`、`builder.writeStatic` を用いて SvelteKit のアウトプットを書き出す
 - コードの出力:
   - `${builder.getServerDirectory()}/app.js` から `App` をインポートする
   - `builder.generateManifest({ relativePath })` で生成された manifest でアプリをインスタンス化する

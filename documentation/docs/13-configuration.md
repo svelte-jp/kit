@@ -138,7 +138,7 @@ export default config;
 
 ### endpointExtensions
 
-An array of file extensions that SvelteKit will treat as endpoints. Files with extensions that match neither `config.extensions` nor `config.kit.endpointExtensions` will be ignored by the router.
+SvelteKit がエンドポイントとして扱うファイル拡張子の配列です。`config.extensions` と `config.kit.endpointExtensions` のどちらにも一致しない拡張子を持つファイルは、ルーターから無視されます。
 
 ### files
 
@@ -178,7 +178,7 @@ CSS を HTML の先頭の `<style>` ブロック内にインライン化する�
 
 ### outDir
 
-The directory that SvelteKit writes files to during `dev` and `build`. You should exclude this directory from version control.
+SvelteKit が `dev` と `build` のときにファイルを書き込むディレクトリです。このディレクトリをバージョン管理から除外する必要があります。
 
 ### package
 
@@ -229,7 +229,7 @@ export default config;
 
 - `concurrency` — 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートのCMSからコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます
 - `crawl` — SvelteKitがシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
-- `default` — set to `true` to prerender every page without `export const prerender = false`
+- `default` — `true` に設定すると、`export const prerender = false` が無いページをすべてプリレンダリングします
 - `enabled` — `false` に設定すると、プリレンダリングを完全に無効化できます
 - `entries` — プリレンダリングするページ、またはクロールを開始するページ(`crawl: true` の場合)の配列。`*` 文字列には、全ての動的ではないルート(routes)(すなわち `[parameters]` を含まないページ) が含まれます
 - `onError`

@@ -19,7 +19,7 @@ npx svelte-kit dev
 - `--host` — サーバーをネットワークに公開するか
 - `--https` — 自己署名証明書を使用してHTTPSサーバーを起動するか。外部のデバイスでHTTPS-onlyな機能をテストするのに便利です
 
-> This command will fail if the specified (or default) port is unavailable. To use an alternative port instead of failing, set the [`config.kit.vite.server.strictPort`](/docs/configuration#vite) option to `false`.
+> 指定したポート (またはデフォルトのポート) が使用できない場合、このコマンドは失敗します。失敗させるのではなく、別のポートを使用するには [`config.kit.vite.server.strictPort`](/docs/configuration#vite) オプションを `false` にしてください。
 
 ### svelte-kit build
 
@@ -42,6 +42,6 @@ npx svelte-kit dev
 
 ### svelte-kit package
 
-> `svelte-kit package` is currently experimental and is not subject to Semantic Versioning rules. Non-backward compatible changes may occur in any future release.
+> `svelte-kit package` は現時点では experimental で、セマンティックバージョニングのルールの対象外です。将来のリリースで後方互換性のない変更が行われる可能性があります。
 
 パッケージ作者の方は、[packaging](/docs/packaging) をご覧ください。

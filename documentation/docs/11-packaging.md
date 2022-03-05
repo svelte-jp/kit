@@ -2,7 +2,7 @@
 title: Packaging
 ---
 
-> `svelte-kit package` is currently experimental and is not subject to Semantic Versioning rules. Non-backward compatible changes may occur in any future release.
+> `svelte-kit package` は現時点では experimental で、セマンティックバージョニングのルールの対象外です。将来のリリースで後方互換性のない変更が行われる可能性があります。
 
 SvelteKit は、アプリだけでなくコンポーネントライブラリを構築するのにもお使いいただけます。
 

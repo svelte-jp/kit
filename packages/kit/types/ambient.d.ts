@@ -229,7 +229,7 @@ declare module '$service-worker' {
 	 */
 	export const files: string[];
 	/**
-	 * An array of pathnames corresponding to prerendered pages and endpoints.
+	 * プリレンダリングされたページとエンドポイントに合致するパス名の配列です。
 	 */
 	export const prerendered: string[];
 	/**

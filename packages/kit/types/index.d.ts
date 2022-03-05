@@ -114,9 +114,9 @@ export interface HandleError {
 }
 
 /**
- * The type of a `load` function exported from `<script context="module">` in a page or layout.
+ * ページやレイアウト の `<script context="module">` からエクスポートされる `load` 関数の型です。
  *
- * Note that you can use [generated types](/docs/types#generated-types) instead of manually specifying the Params generic argument.
+ * Params のジェネリックな引数を手作業で指定する代わりに、[generated types](/docs/types#generated-types) を使用することができます。
  */
 export interface Load<
 	Params extends Record<string, string> = Record<string, string>,
@@ -147,8 +147,8 @@ export interface Page<Params extends Record<string, string> = Record<string, str
  * 'delete' は JavaScriptの予約語なので、delete メソッド を処理する関数は
  * `del` です。
  *
- * Note that you can use [generated types](/docs/types#generated-types)
- * instead of manually specifying the `Params` generic argument.
+ * Params のジェネリックな引数を手作業で指定する代わりに、
+ * [generated types](/docs/types#generated-types) を使用することができます。
  */
 export interface RequestHandler<Params = Record<string, string>, Output extends Body = Body> {
 	(event: RequestEvent<Params>): RequestHandlerOutput<Output>;

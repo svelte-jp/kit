@@ -38,7 +38,7 @@ SvelteKit には [クライアントサイドルーター(client-side router)](/
 
 アプリの中のいくつかのページは、ビルド時にシンプルなHTMLとして生成できるかもしれません。それらのページは [adapter](/docs/adapters) によって [_プリレンダリング_](/docs/appendix#prerendering) することができます。
 
-Prerendering happens automatically for any page with the `prerender` annotation:
+`prerender` アノテーションがあるページは自動的にプリレンダリングされます:
 
 ```html
 <script context="module">
@@ -46,7 +46,7 @@ Prerendering happens automatically for any page with the `prerender` annotation:
 </script>
 ```
 
-Alternatively, you can set [`confit.kit.prerender.default`](/docs/configuration#prerender) to `true` and prerender everything except pages that are explicitly marked as _not_ prerenderable:
+あるいは、[`confit.kit.prerender.default`](/docs/configuration#prerender) を `true` にした場合、明示的に _プリレンダリング可能ではない_ とマークしているページを除いて全てプリレンダリングされます:
 
 ```html
 <script context="module">
@@ -54,7 +54,7 @@ Alternatively, you can set [`confit.kit.prerender.default`](/docs/configuration#
 </script>
 ```
 
-> If your entire app is suitable for prerendering, you can use [`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static), which will output files suitable for use with any static webserver.
+> もしアプリ全体がプリレンダリングに適しているなら、[`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使用して、静的な web サーバーで扱うのに適した出力ファイルにすることができます。
 
 プリレンダラーはアプリのルート(root)から始め、プリレンダリング可能なページを見つけるとHTMLを生成します。それぞれのページは、プリレンダリングの候補となる他のページを指す `<a>` 要素を見つけるためにスキャンされます — このため、通常はどのページにアクセスするか指定する必要はありません。もしプリレンダラーによってアクセスされるべきページを指定する必要があれば、[prerender configuration](/docs/configuration#prerender) の `entries` オプションでそれを行えます。
 

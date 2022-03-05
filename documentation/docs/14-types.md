@@ -6,7 +6,7 @@ title: Types
 
 ### Generated types
 
-The [`RequestHandler`](#sveltejs-kit-requesthandler) and [`Load`](#sveltejs-kit-load) types both accept a `Params` argument allowing you to type the `params` object. For example this endpoint expects `foo`, `bar` and `baz` params:
+[`RequestHandler`](#sveltejs-kit-requesthandler) と [`Load`](#sveltejs-kit-load) の型はどちらも `Params` 引数を受け取りますが、その `params` オブジェクトに型を付けることができます。例えば、このエンドポイントは `foo`、`bar`、`baz` が渡されることを想定しています:
 
 ```js
 /// file: src/routes/[foo]/[bar]/[baz].js
@@ -21,9 +21,9 @@ export async function get({ params }) {
 }
 ```
 
-Needless to say, this is cumbersome to write out, and less portable (if you were to rename the `[foo]` directory to `[qux]`, the type would no longer reflect reality).
+言うまでもなく、これを書くのは面倒で、移植性も低いです (`[foo]` ディレクトリを `[qux]` にリネームした場合、この型は実態を反映していないものとなります)。
 
-To solve this problem, SvelteKit generates `.d.ts` files for each of your endpoints and pages:
+この問題を解決するため、SvelteKit は各エンドポイント、各ページごとに `.d.ts` ファイルを生成します:
 
 ```ts
 /// file: .svelte-kit/types/src/routes/[foo]/[bar]/[baz].d.ts
@@ -41,7 +41,7 @@ export type Load<Props = Record<string, any>> = GenericLoad<
 >;
 ```
 
-These files can be imported into your endpoints and pages as siblings, thanks to the [`rootDirs`](https://www.typescriptlang.org/tsconfig#rootDirs) option in your TypeScript configuration:
+TypeScript の設定にある [`rootDirs`](https://www.typescriptlang.org/tsconfig#rootDirs) オプションのおかげで、エンドポイントとページではこれらのファイルが同じディレクトリにあるかのようにインポートすることができます:
 
 ```js
 /// file: src/routes/[foo]/[bar]/[baz].js
@@ -71,6 +71,6 @@ export async function get({ params }) {
 </script>
 ```
 
-> For this to work, your own `tsconfig.json` or `jsconfig.json` should extend from the generated `.svelte-kit/tsconfig.json` (where `.svelte-kit` is your [`outDir`](/docs/configuration#outdir)):
+> これを動作させるためには、`tsconfig.json` または `jsconfig.json` が生成された `.svelte-kit/tsconfig.json` を継承する必要があります (`.svelte-kit` の場所は [`outDir`](/docs/configuration#outdir) です):
 >
 >     { "extends": "./.svelte-kit/tsconfig.json" }

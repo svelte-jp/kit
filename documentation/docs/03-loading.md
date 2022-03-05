@@ -26,7 +26,7 @@ title: Loading
 
 > `<script context="module">` であることにご注意ください。これは、コンポーネントがレンダリングされる前に `load` が実行されるのに必要なものです。コンポーネントインスタンスごとのコードは2つ目の `<script>` タグに記述する必要があります。
 
-As with [endpoints](/docs/routing#endpoints), pages can import [generated types](/docs/types#generated) — the `./[slug]` in the example above — to ensure that `params` are correctly typed.
+[エンドポイント(endpoints)](/docs/routing#endpoints) と同様、ページでは [generated types](/docs/types#generated) をインポートできます。上記の例の `./[slug]` ように、`params` を正確に型付けすることができます。
 
 `load` は Next.js の `getStaticProps` や `getServerSideProps` に似ていますが、違いとしては、`load` はサーバーとクライアントの両方で動作します。上記の例では、もしユーザーがこのページへのリンクをクリックした場合、自身のサーバーを経由せずに `cms.example.com` からデータを取得します。
 
@@ -58,7 +58,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### url
 
-`url` は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、 `searchParams` といったプロパティを持っています (which contains the parsed query string as a [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) object)。
+`url` は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、`searchParams` (これは [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) オブジェクトとしてパースされたクエリ文字列を含んでいます) といったプロパティを持っています。
 
 > 環境によっては、サーバーサイドレンダリングのときにこれがリクエストヘッダーから導き出される場合もあります。例えば、[adapter-node](/docs/adapters#supported-environments-node-js) を使用している場合、URL を正確にするために adapter-node に設定が必要かもしれません。
 
