@@ -41,6 +41,7 @@ export interface Config {
 			mode?: 'hash' | 'nonce' | 'auto';
 			directives?: CspDirectives;
 		};
+		endpointExtensions?: string[];
 		files?: {
 			assets?: string;
 			hooks?: string;
@@ -55,6 +56,7 @@ export interface Config {
 			parameter?: string;
 			allowed?: string[];
 		};
+		outDir?: string;
 		package?: {
 			dir?: string;
 			emitTypes?: boolean;
@@ -68,6 +70,7 @@ export interface Config {
 		prerender?: {
 			concurrency?: number;
 			crawl?: boolean;
+			default?: boolean;
 			enabled?: boolean;
 			entries?: string[];
 			onError?: PrerenderOnErrorValue;
@@ -110,8 +113,24 @@ export interface HandleError {
 	(input: { error: Error & { frame?: string }; event: RequestEvent }): void;
 }
 
-export interface Load<Params = Record<string, string>, Props = Record<string, any>> {
-	(input: LoadInput<Params>): MaybePromise<Either<Fallthrough, LoadOutput<Props>>>;
+/**
+ * ページやレイアウト の `<script context="module">` からエクスポートされる `load` 関数の型です。
+ *
+ * Params のジェネリックな引数を手作業で指定する代わりに、[generated types](/docs/types#generated-types) を使用することができます。
+ */
+export interface Load<
+	Params extends Record<string, string> = Record<string, string>,
+	InputProps extends Record<string, any> = Record<string, any>,
+	OutputProps extends Record<string, any> = InputProps
+> {
+	(input: LoadInput<Params, InputProps>): MaybePromise<
+		Either<Fallthrough, LoadOutput<OutputProps>>
+	>;
+}
+
+export interface Navigation {
+	from: URL;
+	to: URL;
 }
 
 export interface Page<Params extends Record<string, string> = Record<string, string>> {
@@ -122,16 +141,14 @@ export interface Page<Params extends Record<string, string> = Record<string, str
 	error: Error | null;
 }
 
-export interface Navigation {
-	from: URL;
-	to: URL;
-}
-
 /**
  * HTTP の動詞 (`get`、`put`、`patch`、etc) に対応する関数で、
  * エンドポイントからエクスポートされます。それぞれの HTTP メソッドのリクエストを処理します。
  * 'delete' は JavaScriptの予約語なので、delete メソッド を処理する関数は
  * `del` です。
+ *
+ * Params のジェネリックな引数を手作業で指定する代わりに、
+ * [generated types](/docs/types#generated-types) を使用することができます。
  */
 export interface RequestHandler<Params = Record<string, string>, Output extends Body = Body> {
 	(event: RequestEvent<Params>): RequestHandlerOutput<Output>;

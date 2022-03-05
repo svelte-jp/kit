@@ -229,6 +229,10 @@ declare module '$service-worker' {
 	 */
 	export const files: string[];
 	/**
+	 * プリレンダリングされたページとエンドポイントに合致するパス名の配列です。
+	 */
+	export const prerendered: string[];
+	/**
 	 * ビルド時に `Date.now()` を呼び出した結果の値です。これは、Service Worker 内で一意なキャッシュ名を生成するのに便利で、後でアプリをデプロイしたときに古いキャッシュを無効にすることができます。
 	 */
 	export const timestamp: number;

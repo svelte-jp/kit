@@ -1,5 +1,59 @@
 # @sveltejs/kit
 
+## 1.0.0-next.292
+
+### Patch Changes
+
+- Prevent Vite from copying static assets if directory is called "public" ([#4214](https://github.com/sveltejs/kit/pull/4214))
+
+* Add sync CLI command ([#4182](https://github.com/sveltejs/kit/pull/4182))
+
+- [breaking] expose entire config to adapters, rather than just appDir and trailingSlash ([#4192](https://github.com/sveltejs/kit/pull/4192))
+
+* [breaking] replace builder.prerender() with builder.writePrerendered() and builder.prerendered ([#4192](https://github.com/sveltejs/kit/pull/4192))
+
+- [breaking] prerender pages during build, regardless of adapter ([#4192](https://github.com/sveltejs/kit/pull/4192))
+
+* Add config.kit.prerender.default option ([#4192](https://github.com/sveltejs/kit/pull/4192))
+
+- Ensure props are loaded from matching endpoint during client-side navigation ([#4203](https://github.com/sveltejs/kit/pull/4203))
+
+* Use prerendered pages in svelte-kit preview ([#4192](https://github.com/sveltejs/kit/pull/4192))
+
+- Upgrade to TypeScript 4.6 ([#4190](https://github.com/sveltejs/kit/pull/4190))
+
+* Fix `svelte-kit preview` ([#4207](https://github.com/sveltejs/kit/pull/4207))
+
+- Make prerendered paths available to service workers ([#4192](https://github.com/sveltejs/kit/pull/4192))
+
+* Update history immediately before updating DOM ([#4191](https://github.com/sveltejs/kit/pull/4191))
+
+- Add config.kit.endpointExtensions option ([#4197](https://github.com/sveltejs/kit/pull/4197))
+
+## 1.0.0-next.291
+
+### Patch Changes
+
+- Focus on `body` instead of `html` on navigation due to issues on Firefox ([#4184](https://github.com/sveltejs/kit/pull/4184))
+
+## 1.0.0-next.290
+
+### Patch Changes
+
+- Add config.kit.outDir ([#4176](https://github.com/sveltejs/kit/pull/4176))
+
+* [breaking] allow `InputProps` and `OutputProps` to be typed separately in `Load` ([#4160](https://github.com/sveltejs/kit/pull/4160))
+
+## 1.0.0-next.289
+
+### Patch Changes
+
+- Only fall back to full page reload if pathname has changed ([#4116](https://github.com/sveltejs/kit/pull/4116))
+
+* Generate types for each page/endpoint ([#4120](https://github.com/sveltejs/kit/pull/4120))
+
+- Extend user tsconfig from generated .svelte-kit/tsconfig.json ([#4118](https://github.com/sveltejs/kit/pull/4118))
+
 ## 1.0.0-next.288
 
 ### Patch Changes

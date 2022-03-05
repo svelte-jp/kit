@@ -4,14 +4,14 @@ import { URL } from 'url';
 import colors from 'kleur';
 import sirv from 'sirv';
 import { installFetch } from '../../install-fetch.js';
-import { create_app } from '../create_app/index.js';
-import create_manifest_data from '../create_manifest_data/index.js';
+import * as sync from '../sync/sync.js';
 import { getRequest, setResponse } from '../../node.js';
-import { SVELTE_KIT, SVELTE_KIT_ASSETS } from '../constants.js';
-import { get_mime_lookup, resolve_entry, runtime } from '../utils.js';
+import { SVELTE_KIT_ASSETS } from '../constants.js';
+import { get_mime_lookup, get_runtime_path, resolve_entry } from '../utils.js';
 import { coalesce_to_error } from '../../utils/error.js';
 import { load_template } from '../config/index.js';
 import { sequence } from '../../hooks.js';
+import { posixify } from '../../utils/filesystem.js';
 
 /**
  * @param {import('types').ValidatedConfig} config
@@ -19,6 +19,8 @@ import { sequence } from '../../hooks.js';
  * @returns {Promise<import('vite').Plugin>}
  */
 export async function create_plugin(config, cwd) {
+	const runtime = get_runtime_path(config);
+
 	/** @type {import('types').Handle} */
 	let amp;
 
@@ -42,9 +44,7 @@ export async function create_plugin(config, cwd) {
 			let manifest;
 
 			function update_manifest() {
-				const manifest_data = create_manifest_data({ config, cwd });
-
-				create_app({ manifest_data, output: `${SVELTE_KIT}/generated`, cwd });
+				const { manifest_data } = sync.update(config);
 
 				manifest = {
 					appDir: config.kit.appDir,
@@ -107,6 +107,7 @@ export async function create_plugin(config, cwd) {
 							if (route.type === 'page') {
 								return {
 									type: 'page',
+									key: route.key,
 									pattern: route.pattern,
 									params: get_params(route.params),
 									shadow: route.shadow
@@ -200,7 +201,6 @@ export async function create_plugin(config, cwd) {
 
 						/** @type {import('types').Hooks} */
 						const hooks = {
-							// @ts-expect-error this picks up types that belong to the tests
 							getSession: user_hooks.getSession || (() => ({})),
 							handle: amp ? sequence(amp, handle) : handle,
 							handleError:
@@ -229,9 +229,18 @@ export async function create_plugin(config, cwd) {
 							throw new Error('The serverFetch hook has been renamed to externalFetch.');
 						}
 
-						const root = (await vite.ssrLoadModule(`/${SVELTE_KIT}/generated/root.svelte`)).default;
+						// TODO the / prefix will probably fail if outDir is outside the cwd (which
+						// could be the case in a monorepo setup), but without it these modules
+						// can get loaded twice via different URLs, which causes failures. Might
+						// require changes to Vite to fix
+						const { default: root } = await vite.ssrLoadModule(
+							`/${posixify(path.relative(cwd, `${config.kit.outDir}/generated/root.svelte`))}`
+						);
+
 						const paths = await vite.ssrLoadModule(
-							process.env.BUNDLED ? `/${SVELTE_KIT}/runtime/paths.js` : `/@fs${runtime}/paths.js`
+							process.env.BUNDLED
+								? `/${posixify(path.relative(cwd, `${config.kit.outDir}/runtime/paths.js`))}`
+								: `/@fs${runtime}/paths.js`
 						);
 
 						paths.set_paths({
