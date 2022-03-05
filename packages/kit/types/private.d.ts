@@ -2,7 +2,7 @@
 // but which cannot be imported from `@sveltejs/kit`. Care should
 // be taken to avoid breaking changes when editing this file
 
-import { SSRNodeLoader, SSRRoute } from './internal';
+import { SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal';
 
 export interface AdapterEntry {
 	/**
@@ -35,8 +35,8 @@ export interface Builder {
 	rimraf(dir: string): void;
 	mkdirp(dir: string): void;
 
-	appDir: string;
-	trailingSlash: TrailingSlash;
+	config: ValidatedConfig;
+	prerendered: Prerendered;
 
 	/**
 	 * Create entry points that map to individual functions
@@ -56,6 +56,16 @@ export interface Builder {
 	 * @returns an array of paths corresponding to the files that have been created by the copy
 	 */
 	writeClient(dest: string): string[];
+	/**
+	 *
+	 * @param dest
+	 */
+	writePrerendered(
+		dest: string,
+		opts?: {
+			fallback?: string;
+		}
+	): string[];
 	/**
 	 * @param dest the destination folder to which files should be copied
 	 * @returns an array of paths corresponding to the files that have been created by the copy
@@ -81,8 +91,6 @@ export interface Builder {
 			replace?: Record<string, string>;
 		}
 	): string[];
-
-	prerender(options: { all?: boolean; dest: string; fallback?: string }): Promise<Prerendered>;
 }
 
 // Based on https://github.com/josh-hemphill/csp-typed-directives/blob/latest/src/csp.types.ts
@@ -126,7 +134,7 @@ export namespace Csp {
 	type UriPath = `${HttpDelineator}${string}`;
 }
 
-export type CspDirectives = {
+export interface CspDirectives {
 	'child-src'?: Csp.Sources;
 	'default-src'?: Array<Csp.Source | Csp.ActionSource>;
 	'frame-src'?: Csp.Sources;
@@ -191,7 +199,7 @@ export type CspDirectives = {
 		| 'unsafe-url'
 		| 'none'
 	>;
-};
+}
 
 export type Either<T, U> = Only<T, U> | Only<U, T>;
 
@@ -206,7 +214,9 @@ export interface Fallthrough {
 
 export type HttpMethod = 'get' | 'head' | 'post' | 'put' | 'delete' | 'patch';
 
-export type JSONObject = { [key: string]: JSONValue };
+export interface JSONObject {
+	[key: string]: JSONValue;
+}
 
 export type JSONValue =
 	| string
@@ -218,10 +228,10 @@ export type JSONValue =
 	| JSONValue[]
 	| JSONObject;
 
-export interface LoadInput<Params = Record<string, string>> {
+export interface LoadInput<Params = Record<string, string>, Props = Record<string, any>> {
 	url: URL;
 	params: Params;
-	props: Record<string, any>;
+	props: Props;
 	fetch(info: RequestInfo, init?: RequestInit): Promise<Response>;
 	session: App.Session;
 	stuff: Partial<App.Stuff>;
@@ -248,12 +258,6 @@ export interface Logger {
 export type MaybePromise<T> = T | Promise<T>;
 
 export type Only<T, U> = { [P in keyof T]: T[P] } & { [P in Exclude<keyof U, keyof T>]?: never };
-
-export type PayloadScriptAttributes = PayloadScriptAttributesData | PayloadScriptAttributesProps;
-
-type PayloadScriptAttributesData = { type: 'data'; url: string; body?: string };
-
-type PayloadScriptAttributesProps = { type: 'props' };
 
 export interface Prerendered {
 	pages: Map<
@@ -304,10 +308,10 @@ export interface RequestOptions {
 	platform?: App.Platform;
 }
 
-export type ResolveOptions = {
+export interface ResolveOptions {
 	ssr?: boolean;
 	transformPage?: ({ html }: { html: string }) => MaybePromise<string>;
-};
+}
 
 /** `string[]` is only for set-cookie, everything else must be type of `string` */
 export type ResponseHeaders = Record<string, string | number | string[]>;
@@ -346,6 +350,8 @@ export interface SSRManifest {
 	};
 }
 
-export type ToJSON = { toJSON(...args: any[]): Exclude<JSONValue, ToJSON> };
+export interface ToJSON {
+	toJSON(...args: any[]): Exclude<JSONValue, ToJSON>;
+}
 
 export type TrailingSlash = 'never' | 'always' | 'ignore';

@@ -1,12 +1,12 @@
 import { OutputAsset, OutputChunk } from 'rollup';
 import {
-	RequestHandler,
-	Load,
+	Config,
 	ExternalFetch,
 	GetSession,
 	Handle,
 	HandleError,
-	Config
+	Load,
+	RequestHandler
 } from './index';
 import {
 	Either,
@@ -14,6 +14,7 @@ import {
 	HttpMethod,
 	JSONObject,
 	MaybePromise,
+	Prerendered,
 	RequestEvent,
 	RequestOptions,
 	ResolveOptions,
@@ -63,15 +64,13 @@ export interface BuildData {
 		methods: Record<string, HttpMethod[]>;
 		vite_manifest: import('vite').Manifest;
 	};
-	static: string[];
-	entries: string[];
 }
 
 export type CSRComponent = any; // TODO
 
 export type CSRComponentLoader = () => Promise<CSRComponent>;
 
-export type CSRRoute = [RegExp, CSRComponentLoader[], CSRComponentLoader[], GetParams?, HasShadow?];
+export type CSRRoute = [RegExp, CSRComponentLoader[], CSRComponentLoader[], GetParams?, ShadowKey?];
 
 export interface EndpointData {
 	type: 'endpoint';
@@ -83,8 +82,6 @@ export interface EndpointData {
 }
 
 export type GetParams = (match: RegExpExecArray) => Record<string, string>;
-
-type HasShadow = 1;
 
 export interface Hooks {
 	externalFetch: ExternalFetch;
@@ -139,14 +136,18 @@ export interface PageData {
 	b: string[];
 }
 
+export type PayloadScriptAttributes =
+	| { type: 'data'; url: string; body?: string }
+	| { type: 'props' };
+
 export interface PrerenderDependency {
 	response: Response;
 	body: null | string | Uint8Array;
 }
 
 export interface PrerenderOptions {
-	fallback?: string;
-	all: boolean;
+	fallback?: boolean;
+	default: boolean;
 	dependencies: Map<string, PrerenderDependency>;
 }
 
@@ -174,6 +175,13 @@ export interface ShadowEndpointOutput<Output extends JSONObject = JSONObject> {
 	headers?: Partial<ResponseHeaders>;
 	body?: Output;
 }
+
+/**
+ * The route key of a page with a matching endpoint — used to ensure the
+ * client loads data from the right endpoint during client-side navigation
+ * rather than a different route that happens to match the path
+ */
+type ShadowKey = string;
 
 export interface ShadowRequestHandler<Output extends JSONObject = JSONObject> {
 	(event: RequestEvent): MaybePromise<Either<ShadowEndpointOutput<Output>, Fallthrough>>;
@@ -268,6 +276,7 @@ export interface SSROptions {
 
 export interface SSRPage {
 	type: 'page';
+	key: string;
 	pattern: RegExp;
 	params: GetParams;
 	shadow:

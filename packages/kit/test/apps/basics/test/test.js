@@ -284,7 +284,7 @@ test.describe.parallel('Imports', () => {
 		await page.goto('/asset-import');
 
 		const sources = await page.evaluate(() =>
-			[...document.querySelectorAll('img')].map((img) => img.src)
+			Array.from(document.querySelectorAll('img'), (img) => img.src)
 		);
 
 		if (process.env.DEV) {
@@ -503,6 +503,18 @@ test.describe.parallel('Shadowed pages', () => {
 		expect(await page.textContent('h1')).toBe('slug: foo');
 		await clicknav('[href="/shadowed/dynamic/bar"]');
 		expect(await page.textContent('h1')).toBe('slug: bar');
+	});
+
+	test('Shadow fallthrough to shadowed page', async ({ page, clicknav }) => {
+		await page.goto('/shadowed/fallthrough');
+		await clicknav('[href="/shadowed/fallthrough/b"]');
+		expect(await page.textContent('h2')).toBe('b-b');
+	});
+
+	test('Shadow fallthrough to unshadowed page', async ({ page, clicknav }) => {
+		await page.goto('/shadowed/fallthrough');
+		await clicknav('[href="/shadowed/fallthrough/c"]');
+		expect(await page.textContent('h2')).toBe('c');
 	});
 });
 
@@ -2155,6 +2167,15 @@ test.describe.parallel('Routing', () => {
 
 		await page.evaluate('window.fulfil_navigation && window.fulfil_navigation()');
 		expect(await page.url()).toBe(`${baseURL}/routing/cancellation/b`);
+	});
+
+	test('Relative paths are relative to the current URL', async ({ page, clicknav }) => {
+		await page.goto('/iframes');
+		await clicknav('[href="/iframes/nested/parent"]');
+
+		expect(await page.frameLocator('iframe').locator('h1').textContent()).toBe(
+			'Hello from the child'
+		);
 	});
 });
 

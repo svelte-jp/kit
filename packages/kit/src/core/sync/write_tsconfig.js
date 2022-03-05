@@ -1,29 +1,40 @@
 import fs from 'fs';
 import path from 'path';
 import colors from 'kleur';
-import { mkdirp } from '../utils/filesystem.js';
-import { SVELTE_KIT } from './constants.js';
+import { posixify } from '../../utils/filesystem.js';
+import { write_if_changed } from './utils.js';
 
 /** @param {string} file */
 const exists = (file) => fs.existsSync(file) && file;
 
 /** @param {import('types').ValidatedConfig} config */
-export function generate_tsconfig(config) {
-	const out = path.resolve(SVELTE_KIT, 'tsconfig.json');
+export function write_tsconfig(config) {
+	const out = path.join(config.kit.outDir, 'tsconfig.json');
 	const user_file = exists('tsconfig.json') || exists('jsconfig.json');
 
 	if (user_file) validate(config, out, user_file);
 
-	mkdirp(SVELTE_KIT);
+	/** @param {string} file */
+	const project_relative = (file) => posixify(path.relative('.', file));
 
 	/** @param {string} file */
-	const project_relative = (file) => path.relative('.', file);
+	const config_relative = (file) => posixify(path.relative(config.kit.outDir, file));
 
-	/** @param {string} file */
-	const config_relative = (file) => path.relative(SVELTE_KIT, file);
+	const dirs = new Set([
+		project_relative(path.dirname(config.kit.files.routes)),
+		project_relative(path.dirname(config.kit.files.lib))
+	]);
 
-	fs.writeFileSync(
-		`${SVELTE_KIT}/tsconfig.json`,
+	/** @type {string[]} */
+	const include = [];
+	dirs.forEach((dir) => {
+		include.push(config_relative(`${dir}/**/*.js`));
+		include.push(config_relative(`${dir}/**/*.ts`));
+		include.push(config_relative(`${dir}/**/*.svelte`));
+	});
+
+	write_if_changed(
+		out,
 		JSON.stringify(
 			{
 				compilerOptions: {
@@ -51,10 +62,11 @@ export function generate_tsconfig(config) {
 					paths: {
 						$lib: [project_relative(config.kit.files.lib)],
 						'$lib/*': [project_relative(config.kit.files.lib + '/*')]
-					}
+					},
+					rootDirs: [config_relative('.'), './types']
 				},
-				include: ['**/*.d.ts', '**/*.js', '**/*.ts', '**/*.svelte'].map(config_relative),
-				exclude: ['node_modules/**'].map(config_relative)
+				include,
+				exclude: [config_relative('node_modules/**'), './**']
 			},
 			null,
 			'\t'
@@ -80,16 +92,15 @@ function validate(config, out, user_file) {
 		const { paths: user_paths } = user_tsconfig.compilerOptions || {};
 
 		if (user_paths) {
+			/** @type {string[]} */
 			const lib = user_paths['$lib'] || [];
+			/** @type {string[]} */
 			const lib_ = user_paths['$lib/*'] || [];
 
 			const missing_lib_paths =
-				!lib.some(
-					(/** @type {string} */ relative) => path.resolve('.', relative) === config.kit.files.lib
-				) ||
+				!lib.some((relative) => path.resolve('.', relative) === config.kit.files.lib) ||
 				!lib_.some(
-					(/** @type {string} */ relative) =>
-						path.resolve('.', relative) === config.kit.files.lib + '/*'
+					(relative) => path.resolve('.', relative) === path.join(config.kit.files.lib, '/*')
 				);
 
 			if (missing_lib_paths) {
@@ -98,13 +109,13 @@ function validate(config, out, user_file) {
 						.bold()
 						.yellow(`Your compilerOptions.paths in ${user_file} should include the following:`)
 				);
-				const relative = path.relative('.', config.kit.files.lib);
+				const relative = posixify(path.relative('.', config.kit.files.lib));
 				console.warn(`{\n  "$lib":["${relative}"],\n  "$lib/*":["${relative}/*"]\n}`);
 			}
 		}
 	} else {
-		let relative = path.relative('.', out);
-		if (relative.startsWith(SVELTE_KIT)) relative = './' + relative;
+		let relative = posixify(path.relative('.', out));
+		if (!relative.startsWith('./')) relative = './' + relative;
 
 		console.warn(
 			colors

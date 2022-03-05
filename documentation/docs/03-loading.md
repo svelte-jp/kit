@@ -9,7 +9,7 @@ title: Loading
 ```html
 /// file: src/routes/blog/[slug].svelte
 <script context="module">
-	/** @type {import('@sveltejs/kit').Load} */
+	/** @type {import('./[slug]').Load} */
 	export async function load({ params, fetch, session, stuff }) {
 		const url = `https://cms.example.com/article/${params.slug}.json`;
 		const response = await fetch(url);
@@ -25,6 +25,8 @@ title: Loading
 ```
 
 > `<script context="module">` であることにご注意ください。これは、コンポーネントがレンダリングされる前に `load` が実行されるのに必要なものです。コンポーネントインスタンスごとのコードは2つ目の `<script>` タグに記述する必要があります。
+
+As with [endpoints](/docs/routing#endpoints), pages can import [generated types](/docs/types#generated) — the `./[slug]` in the example above — to ensure that `params` are correctly typed.
 
 `load` は Next.js の `getStaticProps` や `getServerSideProps` に似ていますが、違いとしては、`load` はサーバーとクライアントの両方で動作します。上記の例では、もしユーザーがこのページへのリンクをクリックした場合、自身のサーバーを経由せずに `cms.example.com` からデータを取得します。
 
@@ -56,7 +58,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### url
 
-`url` は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、 `searchParams` といったプロパティを持っています。
+`url` は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、 `searchParams` といったプロパティを持っています (which contains the parsed query string as a [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) object)。
 
 > 環境によっては、サーバーサイドレンダリングのときにこれがリクエストヘッダーから導き出される場合もあります。例えば、[adapter-node](/docs/adapters#supported-environments-node-js) を使用している場合、URL を正確にするために adapter-node に設定が必要かもしれません。
 

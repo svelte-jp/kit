@@ -29,6 +29,7 @@ const config = {
 				// ...
 			}
 		},
+		endpointExtensions: ['.js', '.ts'],
 		files: {
 			assets: 'static',
 			hooks: 'src/hooks',
@@ -43,6 +44,7 @@ const config = {
 			parameter: '_method',
 			allowed: []
 		},
+		outDir: '.svelte-kit',
 		package: {
 			dir: 'package',
 			emitTypes: true,
@@ -134,6 +136,10 @@ export default config;
 
 > `mode` が `'auto'` の場合、SvelteKit は動的にレンダリングされたページには nonce を、プリレンダリングされたページには hash を使用します。プリレンダリングされたページで nonce を使用するのは安全でないため、禁止されています。
 
+### endpointExtensions
+
+An array of file extensions that SvelteKit will treat as endpoints. Files with extensions that match neither `config.extensions` nor `config.kit.endpointExtensions` will be ignored by the router.
+
 ### files
 
 以下の `string` 値のうち、0個以上を含むオブジェクトです:
@@ -169,6 +175,10 @@ CSS を HTML の先頭の `<style>` ブロック内にインライン化する�
 
 - `parameter` — 使いたいメソッドの値を渡すのに使用するクエリパラメータ名
 - `allowed` - オリジナルのリクエストメソッドを上書きするときに使用することができる HTTP メソッドの配列
+
+### outDir
+
+The directory that SvelteKit writes files to during `dev` and `build`. You should exclude this directory from version control.
 
 ### package
 
@@ -219,6 +229,7 @@ export default config;
 
 - `concurrency` — 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートのCMSからコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます
 - `crawl` — SvelteKitがシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
+- `default` — set to `true` to prerender every page without `export const prerender = false`
 - `enabled` — `false` に設定すると、プリレンダリングを完全に無効化できます
 - `entries` — プリレンダリングするページ、またはクロールを開始するページ(`crawl: true` の場合)の配列。`*` 文字列には、全ての動的ではないルート(routes)(すなわち `[parameters]` を含まないページ) が含まれます
 - `onError`

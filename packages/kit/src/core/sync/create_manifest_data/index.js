@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import mime from 'mime';
-import { runtime } from '../utils.js';
-import { posixify } from '../../utils/filesystem.js';
+import { get_runtime_path } from '../../utils.js';
+import { posixify } from '../../../utils/filesystem.js';
 
 /**
  * A portion of a file or directory name where the name has been split into
@@ -37,7 +37,7 @@ const specials = new Set(['__layout', '__layout.reset', '__error']);
  */
 export default function create_manifest_data({
 	config,
-	fallback = `${runtime}/components`,
+	fallback = `${get_runtime_path(config)}/components`,
 	cwd = process.cwd()
 }) {
 	/**
@@ -74,7 +74,12 @@ export default function create_manifest_data({
 			const file = posixify(path.relative(cwd, resolved));
 			const is_dir = fs.statSync(resolved).isDirectory();
 
-			const ext = config.extensions.find((ext) => basename.endsWith(ext)) || path.extname(basename);
+			const ext = is_dir
+				? ''
+				: config.extensions.find((ext) => basename.endsWith(ext)) ||
+				  config.kit.endpointExtensions.find((ext) => basename.endsWith(ext));
+
+			if (ext === undefined) return;
 
 			const name = ext ? basename.slice(0, -ext.length) : basename;
 
@@ -261,20 +266,19 @@ export default function create_manifest_data({
 
 	walk(config.kit.files.routes, [], [], [], [layout], [error]);
 
-	// merge matching page/endpoint pairs into shadowed pages
+	const lookup = new Map();
+	for (const route of routes) {
+		if (route.type === 'page') {
+			lookup.set(route.key, route);
+		}
+	}
+
 	let i = routes.length;
 	while (i--) {
 		const route = routes[i];
-		const prev = routes[i - 1];
-
-		if (prev && prev.key === route.key) {
-			if (prev.type !== 'endpoint' || route.type !== 'page') {
-				const relative = path.relative(cwd, path.resolve(config.kit.files.routes, prev.key));
-				throw new Error(`Duplicate route files: ${relative}`);
-			}
-
-			route.shadow = prev.file;
-			routes.splice(--i, 1);
+		if (route.type === 'endpoint' && lookup.has(route.key)) {
+			lookup.get(route.key).shadow = route.file;
+			routes.splice(i, 1);
 		}
 	}
 

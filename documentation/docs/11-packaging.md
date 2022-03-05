@@ -2,6 +2,8 @@
 title: Packaging
 ---
 
+> `svelte-kit package` is currently experimental and is not subject to Semantic Versioning rules. Non-backward compatible changes may occur in any future release.
+
 SvelteKit は、アプリだけでなくコンポーネントライブラリを構築するのにもお使いいただけます。
 
 アプリを作成するとき、`src/routes` のコンテンツが公開される部分となります。[`src/lib`](/docs/modules#$lib) にはアプリの内部ライブラリが含まれます。

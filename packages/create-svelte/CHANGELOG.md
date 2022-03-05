@@ -1,5 +1,19 @@
 # create-svelte
 
+## 2.0.0-next.124
+
+### Patch Changes
+
+- Add sync CLI command ([#4182](https://github.com/sveltejs/kit/pull/4182))
+
+* Upgrade to TypeScript 4.6 ([#4190](https://github.com/sveltejs/kit/pull/4190))
+
+## 2.0.0-next.123
+
+### Patch Changes
+
+- Extend user tsconfig from generated .svelte-kit/tsconfig.json ([#4118](https://github.com/sveltejs/kit/pull/4118))
+
 ## 2.0.0-next.122
 
 ### Patch Changes
