@@ -54,7 +54,7 @@ export default {
 
 [fallback page](https://github.com/sveltejs/kit/tree/master/packages/adapter-static#spa-mode) を指定すれば、`adapter-static` を使用してシングルページアプリ(SPA)を生成することができます。
 
-> You must ensure [`trailingSlash`](configuration#trailingslash) is set appropriately for your environment. If your host does not render `/a.html` upon receiving a request for `/a` then you will need to set `trailingSlash: 'always'` to create `/a/index.html` instead.
+> SvelteKit をデプロイする環境に対して [`trailingSlash`](configuration#trailingslash) が適切に設定されているかよく確かめてください。`/a` に対するリクエストを受け取っても `/a.html` をレンダリングしない環境の場合、`/a.html` の代わりに `/a/index.html` を生成するために `trailingSlash: 'always'` を設定する必要があります。
 
 #### プラットフォーム固有の情報
 
