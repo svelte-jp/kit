@@ -12,7 +12,6 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 
 `package.json` に `"type": "module"` を追加します。もし Sapper 0.29.3 以降を使用している場合は、インクリメンタルマイグレーションの一部として、このステップを他のステップとは別に行うことができます。
 
-
 #### dependencies
 
 `polka` や `express` を使用している場合はそれを削除し、`sirv` や `compression` などのミドルウェア(middleware)も削除します。
@@ -40,7 +39,7 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 
 [adapter](/docs/adapters) を追加する必要があります。`sapper build` は [adapter-node](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) とおおよそ同じで、`sapper export` は [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) とおおよそ同じですが、デプロイ先のプラットフォーム向けにデザインされた adapter を使用するのも良いでしょう。
 
-[Vite](https://vitejs.dev) では自動的に処理されないファイルタイプのプラグインを使用している場合は、Viteにおいて同等なことを行う方法を探し、[Vite config](/docs/configuration#vite) に追加する必要があります。
+[Vite](https://vitejs.dev) では自動的に処理されないファイルタイプのプラグインを使用している場合は、Vite において同等なことを行う方法を探し、[Vite config](/docs/configuration#vite) に追加する必要があります。
 
 #### src/client.js
 
@@ -54,10 +53,10 @@ SvelteKit アプリはサーバーレス環境で動作することを可能に�
 
 `@sapper/service-worker` からインポートするほとんどのものは、[`$service-worker`](/docs/modules#$service-worker) に同等なものがあります:
 
-- `timestamp` は変更されていません
 - `files` は変更されていません
-- `shell` は現在 `build` になりました
 - `routes` は削除されました
+- `shell` は現在 `build` になりました
+- `timestamp` は現在 `version` になりました
 
 #### src/template.html
 
@@ -73,7 +72,7 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 
 #### 名前が変わったファイル
 
-カスタムエラーページコンポーネントを `_error.svelte` から `__error.svelte` にリネームしてください。同様に、`_layout.svelte` ファイルも `__layout.svelte` にリネームしてください。SvelteKitでは二重のアンダースコアの接頭辞をリザーブしています。[プライベートモジュール](/docs/routing#private-modules)にはまだ接頭辞として `_` を1つ付けます([`ルート(routes)`](/docs/configuration#routes)コンフィグで変更可能です)。
+カスタムエラーページコンポーネントを `_error.svelte` から `__error.svelte` にリネームしてください。同様に、`_layout.svelte` ファイルも `__layout.svelte` にリネームしてください。SvelteKit では二重のアンダースコアの接頭辞をリザーブしています。[プライベートモジュール](/docs/routing#private-modules)にはまだ接頭辞として `_` を 1 つ付けます([`ルート(routes)`](/docs/configuration#routes)コンフィグで変更可能です)。
 
 #### Imports
 
@@ -87,7 +86,7 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 
 以前と同様に、ページやレイアウトではレンダリングが行われる前にデータをロードできる関数をエクスポートすることができます。
 
-この関数は `preload` から [`load`](/docs/loading) にリネームされ、その API が変更されました。2つの引数 — `page` と `session` — の代わりに、両方を1つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
+この関数は `preload` から [`load`](/docs/loading) にリネームされ、その API が変更されました。2 つの引数 — `page` と `session` — の代わりに、両方を 1 つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
 
 `this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。プロパティ(props)を直接返す代わりに、`load` は `props` やその他様々なものを _含む_ オブジェクトを返すようになりました。
 
@@ -117,7 +116,7 @@ SvelteKit では、それらにアクセスする方法が異なります。`sto
 
 #### URLs
 
-Sapperでは、相対 URL は、現在のページに対してではなく、base URL (`basepath` オプションが使用されていない限り、大抵の場合は `/`) に対して解決されていました。
+Sapper では、相対 URL は、現在のページに対してではなく、base URL (`basepath` オプションが使用されていない限り、大抵の場合は `/`) に対して解決されていました。
 
 これによって問題が発生していましたが、SvelteKit ではもうそのようなことはありません。URL は現在のページ(または `load` 関数の `fetch` URL の場合は移動先のページ) に対して解決されるようになりました。
 

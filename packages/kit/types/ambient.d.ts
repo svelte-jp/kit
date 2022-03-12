@@ -208,13 +208,8 @@ declare module '$app/stores' {
 }
 
 /**
- * これは `src/lib` または [`config.kit.files.lib`](/docs/configuration#files) で指定されたディレクトリのシンプルなエイリアスです。これにより、`../../../../` のようなナンセンスなことをせずに、共通コンポーネントやユーティリティモジュールにアクセスすることができます。
- */
-declare module '$lib' {}
-
-/**
  * ```ts
- * import { build, files, timestamp } from '$service-worker';
+ * import { build, files, prerendered, version } from '$service-worker';
  * ```
  *
  * このモジュールは [service workers](/docs/service-workers) でのみ使用できます。
@@ -233,9 +228,9 @@ declare module '$service-worker' {
 	 */
 	export const prerendered: string[];
 	/**
-	 * ビルド時に `Date.now()` を呼び出した結果の値です。これは、Service Worker 内で一意なキャッシュ名を生成するのに便利で、後でアプリをデプロイしたときに古いキャッシュを無効にすることができます。
+	 * [`config.kit.version`](/docs/configuration#version) をご参照ください。これは、Service Worker 内で一意なキャッシュ名を生成するのに便利で、後でアプリをデプロイしたときに古いキャッシュを無効にすることができます。
 	 */
-	export const timestamp: number;
+	export const version: string;
 }
 
 declare module '@sveltejs/kit/hooks' {
