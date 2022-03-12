@@ -2,7 +2,7 @@
 title: Adapters
 ---
 
-SvelteKitアプリをデプロイする前に、それをデプロイ先の環境に _合わせる(adapt)_ 必要があります。adapter は、ビルドされたアプリをインプットとして受け取り、デプロイ用のアウトプットを生成する小さなプラグインです。
+SvelteKit アプリをデプロイする前に、それをデプロイ先の環境に _合わせる(adapt)_ 必要があります。adapter は、ビルドされたアプリをインプットとして受け取り、デプロイ用のアウトプットを生成する小さなプラグインです。
 
 デフォルトでは、プロジェクトは `@sveltejs/adapter-auto` を使用するように設定されており、プロダクション環境を検出して可能な限り適切な adapter を選択します。もし(まだ)プラットフォームがサポートされていなければ、[custom adapter をインストール](/docs/adapters#community-adapters)するか、[custom adapter を作成](/docs/adapters#writing-custom-adapters)する必要があるかもしれません。
 
@@ -54,11 +54,13 @@ export default {
 
 [fallback page](https://github.com/sveltejs/kit/tree/master/packages/adapter-static#spa-mode) を指定すれば、`adapter-static` を使用してシングルページアプリ(SPA)を生成することができます。
 
+> SvelteKit をデプロイする環境に対して [`trailingSlash`](configuration#trailingslash) が適切に設定されているかよく確かめてください。`/a` に対するリクエストを受け取っても `/a.html` をレンダリングしない環境の場合、`/a.html` の代わりに `/a/index.html` を生成するために `trailingSlash: 'always'` を設定する必要があります。
+
 #### プラットフォーム固有の情報
 
 adapter によっては、リクエストに関する追加情報にアクセスすることができます。例えば、Cloudflare Workers の場合は KV namespaces などを含む `env` オブジェクトにアクセスできます。これは [hooks](/docs/hooks) や [エンドポイント(endpoints)](/docs/routing#endpoints) で使用される `RequestEvent` に、`platform` プロパティとして渡されます — 詳しくは、各 adapter のドキュメントをご参照ください。
 
-### コミュニティが提供するadapter
+### コミュニティが提供する adapter
 
 加えて、他のプラットフォーム向けに、[コミュニティによって提供されている adapter](https://sveltesociety.dev/components#adapters) もございます。パッケージマネージャーで該当の adapter をインストールした後、`svelte.config.js` を更新してください:
 
@@ -68,7 +70,7 @@ adapter によっては、リクエストに関する追加情報にアクセス
 +import adapter from 'svelte-adapter-[x]';
 ```
 
-### custom adapterを作成する
+### custom adapter を作成する
 
 似ているプラットフォーム向けの [adapter のソースを探し](https://github.com/sveltejs/kit/tree/master/packages)、それをコピーするところから始めることを推奨します。
 
@@ -104,7 +106,7 @@ export default function (options) {
   - `${builder.getServerDirectory()}/app.js` から `App` をインポートする
   - `builder.generateManifest({ relativePath })` で生成された manifest でアプリをインスタンス化する
   - プラットフォームからのリクエストをリスンし、必要に応じて標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) に変換し、`render` 関数を呼び出して [Response](https://developer.mozilla.org/ja/docs/Web/API/Response) を生成し、応答する
-  - `app.render` に渡される `platform` オプションを通して、SvelteKit にプラットフォーム固有の情報を公開する
+  - `server.respond` に渡される `platform` オプションを通して、SvelteKit にプラットフォーム固有の情報を公開する
   - 必要であれば、対象プラットフォームで動作するように `fetch` をグローバルに shim する。SvelteKit は `node-fetch` を使用できるプラットフォーム向けに `@sveltejs/kit/install-fetch` ヘルパーを提供しています
 - 必要であれば、ターゲットプラットフォームに依存ライブラリをインストールするのを避けるために出力ファイルをバンドルする
 - 対象プラットフォームの正しい場所にユーザーの静的ファイルや生成した JS/CSS ファイルを設置する

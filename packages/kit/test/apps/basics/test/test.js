@@ -516,6 +516,12 @@ test.describe.parallel('Shadowed pages', () => {
 		await clicknav('[href="/shadowed/fallthrough/c"]');
 		expect(await page.textContent('h2')).toBe('c');
 	});
+
+	test('Shadow redirect', async ({ page, clicknav }) => {
+		await page.goto('/shadowed/redirect');
+		await clicknav('[href="/shadowed/redirect/a"]');
+		expect(await page.textContent('h1')).toBe('done');
+	});
 });
 
 test.describe.parallel('Endpoints', () => {
@@ -887,7 +893,7 @@ test.describe.parallel('Errors', () => {
 		expect(await page.textContent('#message')).toBe('This is your custom error page saying: ""');
 
 		const contents = await page.textContent('#stack');
-		const location = 'endpoint.svelte:12:15';
+		const location = /endpoint\.svelte:12:9|endpoint\.svelte:12:15/; // TODO: Remove second location with Vite 2.9
 
 		if (process.env.DEV) {
 			expect(contents).toMatch(location);
@@ -905,7 +911,7 @@ test.describe.parallel('Errors', () => {
 		expect(await page.textContent('#message')).toBe('This is your custom error page saying: ""');
 
 		const contents = await page.textContent('#stack');
-		const location = 'endpoint-not-ok.svelte:12:15';
+		const location = /endpoint-not-ok\.svelte:12:9|endpoint-not-ok\.svelte:12:15/; // TODO: Remove second location with Vite 2.9
 
 		if (process.env.DEV) {
 			expect(contents).toMatch(location);

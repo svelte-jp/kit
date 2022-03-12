@@ -1,5 +1,31 @@
 # @sveltejs/kit
 
+## 1.0.0-next.295
+
+### Patch Changes
+
+- fix error message for invalid request object ([#4277](https://github.com/sveltejs/kit/pull/4277))
+
+* Handle explicit redirects from endpoints ([#4260](https://github.com/sveltejs/kit/pull/4260))
+
+- Allow routes with the same name as fallback components ([#4284](https://github.com/sveltejs/kit/pull/4284))
+
+## 1.0.0-next.294
+
+### Patch Changes
+
+- [breaking] Replace timestamp in \$service-worker with version ([#4213](https://github.com/sveltejs/kit/pull/4213))
+
+* Remove declared `$lib` module ([#4227](https://github.com/sveltejs/kit/pull/4227))
+
+## 1.0.0-next.293
+
+### Patch Changes
+
+- Expose Server and SSRManifest as public types ([#4220](https://github.com/sveltejs/kit/pull/4220))
+
+* fetch `version.json` relative to `paths.assets`, if set ([#4234](https://github.com/sveltejs/kit/pull/4234))
+
 ## 1.0.0-next.292
 
 ### Patch Changes

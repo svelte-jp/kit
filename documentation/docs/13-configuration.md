@@ -59,6 +59,7 @@ const config = {
 		prerender: {
 			concurrency: 1,
 			crawl: true,
+			default: false,
 			enabled: true,
 			entries: ['*'],
 			onError: 'fail'
@@ -96,18 +97,18 @@ export default config;
 
 ### appDir
 
-ビルドされたJSとCSS(およびインポートされたアセット)が提供される `paths.assets` からの相対ディレクトリ(ファイル名にはコンテンツベースのハッシュが含まれており、つまり、無期限にキャッシュすることができます)。先頭または末尾が `/` であってはいけません。
+ビルドされた JS と CSS(およびインポートされたアセット)が提供される `paths.assets` からの相対ディレクトリ(ファイル名にはコンテンツベースのハッシュが含まれており、つまり、無期限にキャッシュすることができます)。先頭または末尾が `/` であってはいけません。
 
 ### browser
 
-以下の `boolean` 値のうち、0個以上を含むオブジェクトです:
+以下の `boolean` 値のうち、0 個以上を含むオブジェクトです:
 
 - `hydrate` — サーバーでレンダリングされた HTML をクライアントサイドのアプリで [ハイドレート(hydrate)](/docs/page-options#hydrate) するかどうかを指定します。(アプリ全体でこれを `false` に設定することはめったにありません)
 - `router` — クライアントサイドの[ルーター(router)](/docs/page-options#router)をアプリ全体で有効または無効にします。
 
 ### csp
 
-以下の値のうち、0個以上を含むオブジェクトです:
+以下の値のうち、0 個以上を含むオブジェクトです:
 
 - `mode` — 'hash'、'nonce'、または 'auto'
 - `directives` — `[directive]: value[]` ペアのオブジェクト
@@ -142,18 +143,18 @@ SvelteKit がエンドポイントとして扱うファイル拡張子の配列�
 
 ### files
 
-以下の `string` 値のうち、0個以上を含むオブジェクトです:
+以下の `string` 値のうち、0 個以上を含むオブジェクトです:
 
-- `assets` — `favicon.ico` or `manifest.json` のような、何も処理する必要もなく、安定したURLを持つべき静的ファイルを配置する場所
+- `assets` — `favicon.ico` or `manifest.json` のような、何も処理する必要もなく、安定した URL を持つべき静的ファイルを配置する場所
 - `hooks` — hooks モジュールのロケーション([Hooks](/docs/hooks) をご参照ください)
 - `lib` — コードベース全体から `$lib` でアクセスできる、アプリの内部ライブラリ
 - `routes` — アプリの構造を定義するファイル([ルーティング](/docs/routing) をご参照ください)
 - `serviceWorker` — Service Worker のエントリーポイントのロケーション([Service workers](/docs/service-workers) をご参照ください)
-- `template` — HTMLレスポンス用テンプレートのロケーション
+- `template` — HTML レスポンス用テンプレートのロケーション
 
 ### floc
 
-Google の [FLoC](https://github.com/WICG/floc) は、[Electronic Frontier Foundation](https://www.eff.org/) がユーザーのプライバシーに[害を及ぼす](https://www.eff.org/deeplinks/2021/03/googles-floc-terrible-idea)と判断したターゲティング広告のテクノロジーです。[Chrome以外のブラウザ](https://www.theverge.com/2021/4/16/22387492/google-floc-ad-tech-privacy-browsers-brave-vivaldi-edge-mozilla-chrome-safari) は実装を断わりました。
+Google の [FLoC](https://github.com/WICG/floc) は、[Electronic Frontier Foundation](https://www.eff.org/) がユーザーのプライバシーに[害を及ぼす](https://www.eff.org/deeplinks/2021/03/googles-floc-terrible-idea)と判断したターゲティング広告のテクノロジーです。[Chrome 以外のブラウザ](https://www.theverge.com/2021/4/16/22387492/google-floc-ad-tech-privacy-browsers-brave-vivaldi-edge-mozilla-chrome-safari) は実装を断わりました。
 
 [GitHub Pages](https://github.blog/changelog/2021-04-27-github-pages-permissions-policy-interest-cohort-header-added-to-all-pages-sites/) などのサービスと同様に、SvelteKit は自動的に FLoC をオプトアウトすることでユーザーを保護します。`floc` を `true` にしない限り、レスポンスに以下のヘッダを追加します:
 
@@ -165,13 +166,13 @@ Permissions-Policy: interest-cohort=()
 
 ### inlineStyleThreshold
 
-CSS を HTML の先頭の `<style>` ブロック内にインライン化するかどうか。このオプションでは、インライン化するCSSファイルの最大長を数値で指定します。ページに必要な CSS ファイルで、このオプションの値より小さいものはマージされ、`<style>` ブロックにインライン化されます。
+CSS を HTML の先頭の `<style>` ブロック内にインライン化するかどうか。このオプションでは、インライン化する CSS ファイルの最大長を数値で指定します。ページに必要な CSS ファイルで、このオプションの値より小さいものはマージされ、`<style>` ブロックにインライン化されます。
 
 > この結果、最初のリクエストが少なくなり、[First Contentful Paint](https://web.dev/first-contentful-paint) スコアを改善することができます。しかし、HTML 出力が大きくなり、ブラウザキャッシュの効果が低下します。慎重に使用してください。
 
 ### methodOverride
 
-[HTTP Method Overrides](/docs/routing#endpoints-http-method-overrides) をご参照ください。以下のうち、0個以上を含むオブジェクトです:
+[HTTP Method Overrides](/docs/routing#endpoints-http-method-overrides) をご参照ください。以下のうち、0 個以上を含むオブジェクトです:
 
 - `parameter` — 使いたいメソッドの値を渡すのに使用するクエリパラメータ名
 - `allowed` - オリジナルのリクエストメソッドを上書きするときに使用することができる HTTP メソッドの配列
@@ -218,17 +219,17 @@ export default config;
 
 ### paths
 
-以下の `string` 値のうち、0個以上を含むオブジェクトです:
+以下の `string` 値のうち、0 個以上を含むオブジェクトです:
 
 - `assets` — アプリのファイルが提供される絶対パス。これは、何らかのストレージバケットからファイルを提供する場合に便利です
 - `base` — 先頭が `/` で、末尾は `/` であってはならないルート相対パス(例 `/base-path`)。これはアプリがどこから提供されるかを指定し、これによってアプリを非ルートパスで動作させることができます
 
 ### prerender
 
-[プリレンダリング(Prerendering)](/docs/page-options#prerender) をご参照ください。以下のうち、0個以上を含むオブジェクトです:
+[プリレンダリング(Prerendering)](/docs/page-options#prerender) をご参照ください。以下のうち、0 個以上を含むオブジェクトです:
 
-- `concurrency` — 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートのCMSからコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます
-- `crawl` — SvelteKitがシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
+- `concurrency` — 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートの CMS からコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます
+- `crawl` — SvelteKit がシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
 - `default` — `true` に設定すると、`export const prerender = false` が無いページをすべてプリレンダリングします
 - `enabled` — `false` に設定すると、プリレンダリングを完全に無効化できます
 - `entries` — プリレンダリングするページ、またはクロールを開始するページ(`crawl: true` の場合)の配列。`*` 文字列には、全ての動的ではないルート(routes)(すなわち `[parameters]` を含まないページ) が含まれます
@@ -265,7 +266,7 @@ export default config;
 
 ### serviceWorker
 
-以下の値のうち、0個以上を含むオブジェクトです:
+以下の値のうち、0 個以上を含むオブジェクトです:
 
 - `register` - `false` を設定した場合、service worker の自動登録を無効にします。
 - `files` - `(filepath: string) => boolean` という型を持つ関数。`true` の場合、与えられたファイルが `$service-worker.files` で利用可能になります。それ以外の場合は除外されます。
@@ -274,25 +275,25 @@ export default config;
 
 URL をルート(routes)に解決する際に、末尾のスラッシュ(trailing slashes)を削除するか、追加するか、無視するかどうかを指定します。
 
-- `"never"` — `/x/` を `/x` にリダイレクトします
-- `"always"` — `/x` を `/x/` にリダイレクトします
-- `"ignore"` — 末尾のスラッシュを自動で追加したり削除したりしません。`/x` と `/x/` は同等に扱われます
+- `'never` — `/x/` を `/x` にリダイレクトします
+- `'always'` — `/x` を `/x/` にリダイレクトします
+- `'ignore'` — 末尾のスラッシュを自動で追加したり削除したりしません。`/x` と `/x/` は同等に扱われます
 
 このオプションは [プリレンダリング](/docs/page-options#prerender) にも影響します。もし `trailingSlash` が `always` なら、`/about` のようなルートは `about/index.html` ファイルを生成し、それ以外の場合は `about.html` を生成し、静的な web サーバーの規約に従います。
 
-> 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別のURLとして扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](/docs/hooks#handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
+> 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別の URL として扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](/docs/hooks#handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
 
 ### version
 
-以下の値のうち、0個以上を含むオブジェクトです:
+以下の値のうち、0 個以上を含むオブジェクトです:
 
 - `name` - 現在のアプリのバージョン文字列
 - `pollInterval` - バージョンの変更をポーリングするインターバル(ミリ秒)
 
 アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、古いコンテンツがある可能性があります。そうでなくとも、アプリのルートマニフェストがもう存在しない JavaScript ファイルを指している可能性があります。SvelteKit は、ここで指定された `name` (デフォルトではビルドのタイムスタンプ) を使用して新しいバージョンがデプロイされたことを検知すると、従来のフルページナビゲーションにフォールバックすることにより、この問題を解決しています。
 
-`pollInterval` を0以外の値に設定した場合、SvelteKit はバックグラウンドで新しいバージョンをポーリングし、それを検知すると [`updated`](/docs/modules#$app-stores) ストアの値を `true` にします。
+`pollInterval` を 0 以外の値に設定した場合、SvelteKit はバックグラウンドで新しいバージョンをポーリングし、それを検知すると [`updated`](/docs/modules#$app-stores) ストアの値を `true` にします。
 
 ### vite
 
-[Vite のコンフィグオブジェクト](https://ja.vitejs.dev/config/) か、またはそれを返す関数を指定します。[Vite と Rollup のプラグイン](https://github.com/vitejs/awesome-vite#plugins)を [`plugins` オプション](https://ja.vitejs.dev/config/#plugins) 経由で渡すことができ、イメージ最適化、Tauri、WASM、Workboxなどのサポートなど、高度な方法でビルドをカスタマイズすることができます。SvelteKit が特定の設定値に依存しているため、特定のビルドに関連しているオプションを設定することはできません。
+[Vite のコンフィグオブジェクト](https://ja.vitejs.dev/config/) か、またはそれを返す関数を指定します。[Vite と Rollup のプラグイン](https://github.com/vitejs/awesome-vite#plugins)を [`plugins` オプション](https://ja.vitejs.dev/config/#plugins) 経由で渡すことができ、イメージ最適化、Tauri、WASM、Workbox などのサポートなど、高度な方法でビルドをカスタマイズすることができます。SvelteKit が特定の設定値に依存しているため、特定のビルドに関連しているオプションを設定することはできません。
