@@ -2,9 +2,9 @@
 title: アセットハンドリング
 ---
 
-### ハッシュ化
+### Importing
 
-アセットのファイル名にハッシュを含めてそれをキャッシュする場合は、以下のようにアセットをインポートすることで、Vite にアセットを処理させることができます:
+[Vite will automatically process imported assets](https://vitejs.dev/guide/assets.html) for improved performance. Hashes will be added to the filenames so that they can be cached and assets smaller than `assetsInlineLimit` will be inlined.
 
 ```html
 <script>

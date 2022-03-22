@@ -1,5 +1,17 @@
 # create-svelte
 
+## 2.0.0-next.127
+
+### Patch Changes
+
+- Fix iOS double-tap zoom on counter buttons ([#4390](https://github.com/sveltejs/kit/pull/4390))
+
+## 2.0.0-next.126
+
+### Patch Changes
+
+- [fix] use .ts extension for tests when using TypeScript ([#4368](https://github.com/sveltejs/kit/pull/4368))
+
 ## 2.0.0-next.125
 
 ### Patch Changes
