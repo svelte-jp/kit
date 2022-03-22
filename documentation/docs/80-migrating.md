@@ -112,7 +112,7 @@ SvelteKit では、それらにアクセスする方法が異なります。`sto
 
 #### ルーティング
 
-Regex routes are no longer supported. Instead, use [advanced route matching](/docs/routing#advanced-routing-matching).
+ルート(routes) の正規表現はもうサポートされていません。代わりに、[advanced route matching](/docs/routing#advanced-routing-matching) をお使いください。
 
 #### URLs
 

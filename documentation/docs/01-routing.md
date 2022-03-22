@@ -318,7 +318,7 @@ export default config;
 
 #### Matching
 
-A route like `src/routes/archive/[page]` would match `/archive/3`, but it would also match `/archive/potato`. We don't want that. You can ensure that route parameters are well-formed by adding a _matcher_ — which takes the parameter string (`"3"` or `"potato"`) and returns `true` if it is valid — to your [`params`](/docs/configuration#files) directory...
+`src/routes/archive/[page]` のようなルート(route)は `/archive/3` にマッチしますが、`/archive/potato` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"3"` や `"potato"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](/docs/configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
 
 ```js
 /// file: src/params/integer.js
@@ -328,14 +328,14 @@ export function match(param) {
 }
 ```
 
-...and augmenting your routes:
+…そしてルート(routes)を拡張します:
 
 ```diff
 -src/routes/archive/[page]
 +src/routes/archive/[page=integer]
 ```
 
-If the pathname doesn't match, SvelteKit will try to match other routes (using the sort order specified below), before eventually returning a 404.
+もしパス名がマッチしない場合、SvelteKit は (後述のソート順の指定に従って) 他のルートでマッチするか試行し、どれにもマッチしない場合は最終的に 404 を返します。
 
 #### ソート
 
@@ -352,7 +352,7 @@ SvelteKit は、どのルート(route)に対してリクエストされている
 
 - より詳細・明確(specific)なルート(routes)ほど、より優先度が高い
 - Standalone endpoints は、同じ詳細度(specificity)のページよりも優先度が高い
-- Parameters with [matchers](#advanced-routing-matching) (`[name=type]`) are higher priority than those without (`[name]`)
+- [matchers](#advanced-routing-matching) 付きのパラメータ (`[name=type]`) は matchers なしのパラメータ (`[name]`) よりも優先度が高い
 - Restパラメータは最も優先度が低い
 - 優先度が同じ場合はアルファベット順で解決される
 

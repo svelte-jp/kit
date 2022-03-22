@@ -149,7 +149,7 @@ SvelteKit がエンドポイントとして扱うファイル拡張子の配列�
 - `assets` — `favicon.ico` or `manifest.json` のような、何も処理する必要もなく、安定した URL を持つべき静的ファイルを配置する場所
 - `hooks` — hooks モジュールのロケーション([Hooks](/docs/hooks) をご参照ください)
 - `lib` — コードベース全体から `$lib` でアクセスできる、アプリの内部ライブラリ
-- `params` — a directory containing [parameter matchers](/docs/routing#advanced-routing-matching)
+- `params` — [parameter matchers](/docs/routing#advanced-routing-matching) を含むディレクトリ
 - `routes` — アプリの構造を定義するファイル([ルーティング](/docs/routing) をご参照ください)
 - `serviceWorker` — Service Worker のエントリーポイントのロケーション([Service workers](/docs/service-workers) をご参照ください)
 - `template` — HTML レスポンス用テンプレートのロケーション
