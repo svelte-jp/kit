@@ -46,7 +46,7 @@ SvelteKit には [クライアントサイドルーター(client-side router)](/
 </script>
 ```
 
-あるいは、[`confit.kit.prerender.default`](/docs/configuration#prerender) を `true` にした場合、明示的に _プリレンダリング可能ではない_ とマークしているページを除いて全てプリレンダリングされます:
+あるいは、[`config.kit.prerender.default`](/docs/configuration#prerender) を `true` にした場合、明示的に _プリレンダリング可能ではない_ とマークしているページを除いて全てプリレンダリングされます:
 
 ```html
 <script context="module">

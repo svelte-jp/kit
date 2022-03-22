@@ -3,6 +3,7 @@ import path from 'path';
 import mime from 'mime';
 import { get_runtime_path } from '../../utils.js';
 import { posixify } from '../../../utils/filesystem.js';
+import { parse_route_id } from '../../../utils/routing.js';
 
 /**
  * A portion of a file or directory name where the name has been split into
@@ -11,11 +12,10 @@ import { posixify } from '../../../utils/filesystem.js';
  *   content: string;
  *   dynamic: boolean;
  *   rest: boolean;
+ *   type: string | null;
  * }} Part
  * @typedef {{
- *   basename: string;
  *   name: string;
- *   ext: string;
  *   parts: Part[],
  *   file: string;
  *   is_dir: boolean;
@@ -60,15 +60,14 @@ export default function create_manifest_data({
 
 	/**
 	 * @param {string} dir
-	 * @param {string[]} parent_key
-	 * @param {Part[][]} parent_segments
-	 * @param {string[]} parent_params
+	 * @param {string[]} parent_id
 	 * @param {Array<string|undefined>} layout_stack // accumulated __layout.svelte components
 	 * @param {Array<string|undefined>} error_stack // accumulated __error.svelte components
 	 */
-	function walk(dir, parent_key, parent_segments, parent_params, layout_stack, error_stack) {
+	function walk(dir, parent_id, layout_stack, error_stack) {
 		/** @type {Item[]} */
-		let items = [];
+		const items = [];
+
 		fs.readdirSync(dir).forEach((basename) => {
 			const resolved = path.join(dir, basename);
 			const file = posixify(path.relative(cwd, resolved));
@@ -81,107 +80,37 @@ export default function create_manifest_data({
 
 			if (ext === undefined) return;
 
-			const name = ext ? basename.slice(0, -ext.length) : basename;
+			const name = basename.slice(0, basename.length - ext.length);
 
-			// TODO remove this after a while
-			['layout', 'layout.reset', 'error'].forEach((reserved) => {
-				if (name === `$${reserved}`) {
-					const prefix = posixify(path.relative(cwd, dir));
-					const bad = `${prefix}/$${reserved}${ext}`;
-					const good = `${prefix}/__${reserved}${ext}`;
-
-					throw new Error(`${bad} should be renamed ${good}`);
-				}
-			});
-
-			if (basename.startsWith('__') && !specials.has(name)) {
+			if (name.startsWith('__') && !specials.has(name)) {
 				throw new Error(`Files and directories prefixed with __ are reserved (saw ${file})`);
 			}
 
-			if (!is_dir && !/^(\.[a-z0-9]+)+$/i.test(ext)) return null; // filter out tmp files etc
-
-			if (!config.kit.routes(file)) {
-				return;
-			}
-
-			const segment = is_dir ? basename : name;
-
-			if (/\]\[/.test(segment)) {
-				throw new Error(`Invalid route ${file} — parameters must be separated`);
-			}
-
-			if (count_occurrences('[', segment) !== count_occurrences(']', segment)) {
-				throw new Error(`Invalid route ${file} — brackets are unbalanced`);
-			}
-
-			const parts = get_parts(segment, file);
-			const is_index = is_dir ? false : basename.startsWith('index.');
-			const is_page = config.extensions.indexOf(ext) !== -1;
-			const route_suffix = basename.slice(basename.indexOf('.'), -ext.length);
+			if (!config.kit.routes(file)) return;
 
 			items.push({
-				basename,
-				name,
-				ext,
-				parts,
 				file,
+				name,
+				parts: get_parts(name, file),
+				route_suffix: basename.slice(basename.indexOf('.'), -ext.length),
 				is_dir,
-				is_index,
-				is_page,
-				route_suffix
+				is_index: !is_dir && basename.startsWith('index.'),
+				is_page: config.extensions.includes(ext)
 			});
 		});
-		items = items.sort(comparator);
+
+		items.sort(comparator);
 
 		items.forEach((item) => {
-			const key = parent_key.slice();
-			const segments = parent_segments.slice();
+			const id_parts = parent_id.slice();
 
 			if (item.is_index) {
-				if (item.route_suffix) {
-					if (segments.length > 0) {
-						const last_segment = segments[segments.length - 1].slice();
-						const last_part = last_segment[last_segment.length - 1];
-
-						if (last_part.dynamic) {
-							last_segment.push({
-								dynamic: false,
-								rest: false,
-								content: item.route_suffix
-							});
-						} else {
-							last_segment[last_segment.length - 1] = {
-								dynamic: false,
-								rest: false,
-								content: `${last_part.content}${item.route_suffix}`
-							};
-						}
-
-						segments[segments.length - 1] = last_segment;
-						key[key.length - 1] += item.route_suffix;
-					} else {
-						segments.push(item.parts);
-					}
+				if (item.route_suffix && id_parts.length > 0) {
+					id_parts[id_parts.length - 1] += item.route_suffix;
 				}
 			} else {
-				key.push(item.name);
-				segments.push(item.parts);
+				id_parts.push(item.name);
 			}
-
-			const params = parent_params.slice();
-			params.push(...item.parts.filter((p) => p.dynamic).map((p) => p.content));
-
-			// TODO seems slightly backwards to derive the simple segment representation
-			// from the more complex form, rather than vice versa — maybe swap it round
-			const simple_segments = segments.map((segment) => {
-				return {
-					dynamic: segment.some((part) => part.dynamic),
-					rest: segment.some((part) => part.rest),
-					content: segment
-						.map((part) => (part.dynamic ? `[${part.content}]` : part.content))
-						.join('')
-				};
-			});
 
 			if (item.is_dir) {
 				const layout_reset = find_layout('__layout.reset', item.file);
@@ -197,87 +126,80 @@ export default function create_manifest_data({
 				if (error) components.push(error);
 
 				walk(
-					path.join(dir, item.basename),
-					key,
-					segments,
-					params,
+					path.join(dir, item.name),
+					id_parts,
 					layout_reset ? [layout_reset] : layout_stack.concat(layout),
 					layout_reset ? [error] : error_stack.concat(error)
 				);
-			} else if (item.is_page) {
-				components.push(item.file);
-
-				const concatenated = layout_stack.concat(item.file);
-				const errors = error_stack.slice();
-
-				const pattern = get_pattern(segments, true);
-
-				let i = concatenated.length;
-				while (i--) {
-					if (!errors[i] && !concatenated[i]) {
-						errors.splice(i, 1);
-						concatenated.splice(i, 1);
-					}
-				}
-
-				i = errors.length;
-				while (i--) {
-					if (errors[i]) break;
-				}
-
-				errors.splice(i + 1);
-
-				const path = segments.every((segment) => segment.length === 1 && !segment[0].dynamic)
-					? `/${segments.map((segment) => segment[0].content).join('/')}`
-					: '';
-
-				routes.push({
-					type: 'page',
-					key: key.join('/'),
-					segments: simple_segments,
-					pattern,
-					params,
-					path,
-					shadow: null,
-					a: /** @type {string[]} */ (concatenated),
-					b: /** @type {string[]} */ (errors)
-				});
 			} else {
-				const pattern = get_pattern(segments, !item.route_suffix);
+				const id = id_parts.join('/');
+				const { pattern } = parse_route_id(id);
 
-				routes.push({
-					type: 'endpoint',
-					key: key.join('/'),
-					segments: simple_segments,
-					pattern,
-					file: item.file,
-					params
-				});
+				if (item.is_page) {
+					components.push(item.file);
+
+					const concatenated = layout_stack.concat(item.file);
+					const errors = error_stack.slice();
+
+					let i = concatenated.length;
+					while (i--) {
+						if (!errors[i] && !concatenated[i]) {
+							errors.splice(i, 1);
+							concatenated.splice(i, 1);
+						}
+					}
+
+					i = errors.length;
+					while (i--) {
+						if (errors[i]) break;
+					}
+
+					errors.splice(i + 1);
+
+					const path = id.includes('[') ? '' : `/${id}`;
+
+					routes.push({
+						type: 'page',
+						id,
+						pattern,
+						path,
+						shadow: null,
+						a: /** @type {string[]} */ (concatenated),
+						b: /** @type {string[]} */ (errors)
+					});
+				} else {
+					routes.push({
+						type: 'endpoint',
+						id,
+						pattern,
+						file: item.file
+					});
+				}
 			}
 		});
 	}
 
-	const base = path.relative(cwd, config.kit.files.routes);
+	const routes_base = path.relative(cwd, config.kit.files.routes);
 
-	const layout = find_layout('__layout', base) || default_layout;
-	const error = find_layout('__error', base) || default_error;
+	const layout = find_layout('__layout', routes_base) || default_layout;
+	const error = find_layout('__error', routes_base) || default_error;
 
 	components.push(layout, error);
 
-	walk(config.kit.files.routes, [], [], [], [layout], [error]);
+	walk(config.kit.files.routes, [], [layout], [error]);
 
 	const lookup = new Map();
 	for (const route of routes) {
 		if (route.type === 'page') {
-			lookup.set(route.key, route);
+			lookup.set(route.id, route);
 		}
 	}
 
 	let i = routes.length;
 	while (i--) {
 		const route = routes[i];
-		if (route.type === 'endpoint' && lookup.has(route.key)) {
-			lookup.get(route.key).shadow = route.file;
+		if (route.type === 'endpoint' && lookup.has(route.id)) {
+			lookup.get(route.id).shadow = route.file;
 			routes.splice(i, 1);
 		}
 	}
@@ -286,12 +208,32 @@ export default function create_manifest_data({
 		? list_files({ config, dir: config.kit.files.assets, path: '' })
 		: [];
 
+	const params_base = path.relative(cwd, config.kit.files.params);
+
+	/** @type {Record<string, string>} */
+	const matchers = {};
+	if (fs.existsSync(config.kit.files.params)) {
+		for (const file of fs.readdirSync(config.kit.files.params)) {
+			const ext = path.extname(file);
+			const type = file.slice(0, -ext.length);
+
+			if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(type)) {
+				matchers[type] = path.join(params_base, file);
+			} else {
+				throw new Error(
+					`Matcher names must match /^[a-zA-Z_][a-zA-Z0-9_]*$/ — "${file}" is invalid`
+				);
+			}
+		}
+	}
+
 	return {
 		assets,
 		layout,
 		error,
 		components,
-		routes
+		routes,
+		matchers
 	};
 }
 
@@ -307,11 +249,7 @@ function count_occurrences(needle, haystack) {
 	return count;
 }
 
-/** @param {string} path */
-function is_spread(path) {
-	const spread_pattern = /\[\.{3}/g;
-	return spread_pattern.test(path);
-}
+const spread_pattern = /\[\.{3}/;
 
 /**
  * @param {Item} a
@@ -319,9 +257,8 @@ function is_spread(path) {
  */
 function comparator(a, b) {
 	if (a.is_index !== b.is_index) {
-		if (a.is_index) return is_spread(a.file) ? 1 : -1;
-
-		return is_spread(b.file) ? -1 : 1;
+		if (a.is_index) return spread_pattern.test(a.file) ? 1 : -1;
+		return spread_pattern.test(b.file) ? -1 : 1;
 	}
 
 	const max = Math.max(a.parts.length, b.parts.length);
@@ -348,6 +285,10 @@ function comparator(a, b) {
 			return a_sub_part.dynamic ? 1 : -1;
 		}
 
+		if (a_sub_part.dynamic && !!a_sub_part.type !== !!b_sub_part.type) {
+			return a_sub_part.type ? -1 : 1;
+		}
+
 		if (!a_sub_part.dynamic && a_sub_part.content !== b_sub_part.content) {
 			return (
 				b_sub_part.content.length - a_sub_part.content.length ||
@@ -369,72 +310,43 @@ function comparator(a, b) {
  * @param {string} file
  */
 function get_parts(part, file) {
+	if (/\]\[/.test(part)) {
+		throw new Error(`Invalid route ${file} — parameters must be separated`);
+	}
+
+	if (count_occurrences('[', part) !== count_occurrences(']', part)) {
+		throw new Error(`Invalid route ${file} — brackets are unbalanced`);
+	}
+
 	/** @type {Part[]} */
 	const result = [];
 	part.split(/\[(.+?\(.+?\)|.+?)\]/).map((str, i) => {
 		if (!str) return;
 		const dynamic = i % 2 === 1;
 
-		const [, content] = dynamic ? /([^(]+)$/.exec(str) || [null, null] : [null, str];
+		const [, content, type] = dynamic
+			? /^((?:\.\.\.)?[a-zA-Z_][a-zA-Z0-9_]*)(?:=([a-zA-Z_][a-zA-Z0-9_]*))?$/.exec(str) || [
+					null,
+					null,
+					null
+			  ]
+			: [null, str, null];
 
-		if (!content || (dynamic && !/^(\.\.\.)?[a-zA-Z0-9_$]+$/.test(content))) {
-			throw new Error(`Invalid route ${file} — parameter name must match /^[a-zA-Z0-9_$]+$/`);
+		if (!content) {
+			throw new Error(
+				`Invalid route ${file} — parameter name and type must match /^[a-zA-Z_][a-zA-Z0-9_]*$/`
+			);
 		}
 
 		result.push({
 			content,
 			dynamic,
-			rest: dynamic && /^\.{3}.+$/.test(content)
+			rest: dynamic && /^\.{3}.+$/.test(content),
+			type
 		});
 	});
 
 	return result;
-}
-
-/**
- * @param {Part[][]} segments
- * @param {boolean} add_trailing_slash
- */
-function get_pattern(segments, add_trailing_slash) {
-	const path = segments
-		.map((segment) => {
-			if (segment.length === 1 && segment[0].rest) {
-				// special case — `src/routes/foo/[...bar]/baz` matches `/foo/baz`
-				// so we need to make the leading slash optional
-				return '(?:\\/(.*))?';
-			}
-
-			const parts = segment.map((part) => {
-				if (part.rest) return '(.*?)';
-				if (part.dynamic) return '([^/]+?)';
-
-				return (
-					part.content
-						// allow users to specify characters on the file system in an encoded manner
-						.normalize()
-						// We use [ and ] to denote parameters, so users must encode these on the file
-						// system to match against them. We don't decode all characters since others
-						// can already be epressed and so that '%' can be easily used directly in filenames
-						.replace(/%5[Bb]/g, '[')
-						.replace(/%5[Dd]/g, ']')
-						// '#', '/', and '?' can only appear in URL path segments in an encoded manner.
-						// They will not be touched by decodeURI so need to be encoded here, so
-						// that we can match against them.
-						// We skip '/' since you can't create a file with it on any OS
-						.replace(/#/g, '%23')
-						.replace(/\?/g, '%3F')
-						// escape characters that have special meaning in regex
-						.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-				);
-			});
-
-			return '\\/' + parts.join('');
-		})
-		.join('');
-
-	const trailing = add_trailing_slash && segments.length ? '\\/?$' : '$';
-
-	return new RegExp(`^${path || '\\/'}${trailing}`);
 }
 
 /**

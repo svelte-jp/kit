@@ -6,11 +6,9 @@ import './ambient';
 import { CompileOptions } from 'svelte/types/compiler/interfaces';
 import {
 	AdapterEntry,
-	Body,
 	CspDirectives,
-	Either,
 	ErrorLoadInput,
-	Fallthrough,
+	JSONValue,
 	LoadInput,
 	LoadOutput,
 	Logger,
@@ -114,6 +112,7 @@ export interface Config {
 			assets?: string;
 			hooks?: string;
 			lib?: string;
+			params?: string;
 			routes?: string;
 			serviceWorker?: string;
 			template?: string;
@@ -158,7 +157,10 @@ export interface Config {
 	preprocess?: any;
 }
 
-export interface ErrorLoad<Params = Record<string, string>, Props = Record<string, any>> {
+export interface ErrorLoad<
+	Params extends Record<string, string> = Record<string, string>,
+	Props extends Record<string, any> = Record<string, any>
+> {
 	(input: ErrorLoadInput<Params>): MaybePromise<LoadOutput<Props>>;
 }
 
@@ -191,9 +193,7 @@ export interface Load<
 	InputProps extends Record<string, any> = Record<string, any>,
 	OutputProps extends Record<string, any> = InputProps
 > {
-	(input: LoadInput<Params, InputProps>): MaybePromise<
-		Either<Fallthrough, LoadOutput<OutputProps>>
-	>;
+	(input: LoadInput<Params, InputProps>): MaybePromise<LoadOutput<OutputProps>>;
 }
 
 export interface Navigation {
@@ -204,9 +204,14 @@ export interface Navigation {
 export interface Page<Params extends Record<string, string> = Record<string, string>> {
 	url: URL;
 	params: Params;
+	routeId: string | null;
 	stuff: App.Stuff;
 	status: number;
 	error: Error | null;
+}
+
+export interface ParamMatcher {
+	(param: string): boolean;
 }
 
 /**
@@ -218,32 +223,33 @@ export interface Page<Params extends Record<string, string> = Record<string, str
  * Params のジェネリックな引数を手作業で指定する代わりに、
  * [generated types](/docs/types#generated-types) を使用することができます。
  */
-export interface RequestHandler<Params = Record<string, string>, Output extends Body = Body> {
+export interface RequestHandler<
+	Params extends Record<string, string> = Record<string, string>,
+	Output extends ResponseBody = ResponseBody
+> {
 	(event: RequestEvent<Params>): RequestHandlerOutput<Output>;
 }
 
-export type RequestHandlerOutput<Output extends Body = Body> = MaybePromise<
-	Either<
-		{
-			status?: number;
-			headers?: Headers | Partial<ResponseHeaders>;
-			body?: Output;
-		},
-		Fallthrough
-	>
->;
+export type RequestHandlerOutput<Output extends ResponseBody = ResponseBody> = MaybePromise<{
+	status?: number;
+	headers?: Headers | Partial<ResponseHeaders>;
+	body?: Output;
+}>;
+
+export type ResponseBody = JSONValue | Uint8Array | ReadableStream | import('stream').Readable;
 
 export class Server {
 	constructor(manifest: SSRManifest);
-	respond(request: Request, options?: RequestOptions): Promise<Response>;
+	respond(request: Request, options: RequestOptions): Promise<Response>;
 }
 
 export interface SSRManifest {
 	appDir: string;
 	assets: Set<string>;
+	mimeTypes: Record<string, string>;
+
 	/** private fields */
 	_: {
-		mime: Record<string, string>;
 		entry: {
 			file: string;
 			js: string[];
@@ -251,5 +257,6 @@ export interface SSRManifest {
 		};
 		nodes: SSRNodeLoader[];
 		routes: SSRRoute[];
+		matchers: () => Promise<Record<string, ParamMatcher>>;
 	};
 }

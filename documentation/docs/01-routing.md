@@ -92,8 +92,6 @@ export async function get({ params }) {
 - `4xx` — クライアントエラー
 - `5xx` — サーバーエラー
 
-> `{fallthrough: true}` が返された場合、SvelteKit は何か応答する他のルートに [フォールスルー](/docs/routing#advanced-routing-fallthrough-routes) し続けるか、一般的な 404 で応答します。
-
 #### ページエンドポイント(Page endpoints)
 
 エンドポイントとページのファイル名が(拡張子以外)同一である場合、そのページはその同名のファイルを持つエンドポイントからプロパティ(props)を取得します (クライアントサイドナビゲーションの時は `fetch` が使用され、SSRの時には直接その関数を呼び出します)。
@@ -318,70 +316,51 @@ export default config;
 
 > `src/routes/a/[...rest]/z.svelte` は `/a/z` だけでなく、`/a/b/z` と `/a/b/c/z` にもマッチします。rest パラメータの値が有効であることを必ず確かめてください。
 
+#### Matching
+
+`src/routes/archive/[page]` のようなルート(route)は `/archive/3` にマッチしますが、`/archive/potato` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"3"` や `"potato"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](/docs/configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
+
+```js
+/// file: src/params/integer.js
+/** @type {import('@sveltejs/kit').ParamMatcher} */
+export function match(param) {
+	return /^\d+$/.test(param);
+}
+```
+
+…そしてルート(routes)を拡張します:
+
+```diff
+-src/routes/archive/[page]
++src/routes/archive/[page=integer]
+```
+
+もしパス名がマッチしない場合、SvelteKit は (後述のソート順の指定に従って) 他のルートでマッチするか試行し、どれにもマッチしない場合は最終的に 404 を返します。
+
 #### ソート
 
 あるパスに対し、マッチするルート(routes)は複数でも構いません。例えば、これらのルート(routes)はどれも `/foo-abc` にマッチします:
 
 ```bash
+src/routes/[...catchall].svelte
 src/routes/[a].js
 src/routes/[b].svelte
-src/routes/[c].svelte
-src/routes/[...catchall].svelte
-src/routes/foo-[bar].svelte
+src/routes/foo-[c].svelte
 ```
 
 SvelteKit は、どのルート(route)に対してリクエストされているのかを判断しなければなりません。そのため、以下のルールに従ってこれらをソートします…
 
 - より詳細・明確(specific)なルート(routes)ほど、より優先度が高い
 - Standalone endpoints は、同じ詳細度(specificity)のページよりも優先度が高い
+- [matchers](#advanced-routing-matching) 付きのパラメータ (`[name=type]`) は matchers なしのパラメータ (`[name]`) よりも優先度が高い
 - Restパラメータは最も優先度が低い
 - 優先度が同じ場合はアルファベット順で解決される
 
 …この順序で並べると、`/foo-abc` の場合は `src/routes/foo-[bar].svelte` を呼び出すことになります:
 
 ```bash
-src/routes/foo-[bar].svelte
+src/routes/foo-[c].svelte
 src/routes/[a].js
 src/routes/[b].svelte
-src/routes/[c].svelte
 src/routes/[...catchall].svelte
-```
-
-#### フォールスルールート
-
-まれに、上記の順序では、パスに対してお望みの動きにならないことがあるでしょう。例えば、`/foo-abc` は `src/routes/foo-[bar].svelte` で解決したいけれど `/foo-def` は `src/routes/[b].svelte` で解決したい、というような場合です。
-
-優先度が高いルート(routes)では、`{ fallthrough: true }` を返すことによって優先度が低いルート(routes)に _フォールスルー_ することができます。ページの場合は `load`から、エンドポイントの場合は request handler から `{ fallthrough: true }` を返します:
-
-```svelte
-/// file: src/routes/foo-[bar].svelte
-<script context="module">
-	export function load({ params }) {
-		if (params.bar === 'def') {
-			return { fallthrough: true };
-		}
-
-		// ...
-	}
-</script>
-```
-
-```js
-/// file: src/routes/[a].js
-
-// @filename: [a].d.ts
-import type { RequestHandler as GenericRequestHandler } from '@sveltejs/kit';
-export type RequestHandler<Body = any> = GenericRequestHandler<{ a: string }, Body>;
-
-// @filename: index.js
-// @errors: 2366
-// ---cut---
-/** @type {import('./[a]').RequestHandler} */
-export function get({ params }) {
-	if (params.a === 'foo-def') {
-		return { fallthrough: true };
-	}
-
-	// ...
-}
 ```

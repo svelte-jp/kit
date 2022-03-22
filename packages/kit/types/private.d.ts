@@ -28,8 +28,6 @@ export interface AdapterEntry {
 	}) => void;
 }
 
-export type Body = JSONValue | Uint8Array | ReadableStream | import('stream').Readable;
-
 // Based on https://github.com/josh-hemphill/csp-typed-directives/blob/latest/src/csp.types.ts
 //
 // MIT License
@@ -138,15 +136,10 @@ export interface CspDirectives {
 	>;
 }
 
-export type Either<T, U> = Only<T, U> | Only<U, T>;
-
-export interface ErrorLoadInput<Params = Record<string, string>> extends LoadInput<Params> {
+export interface ErrorLoadInput<Params extends Record<string, string> = Record<string, string>>
+	extends LoadInput<Params> {
 	status?: number;
 	error?: Error;
-}
-
-export interface Fallthrough {
-	fallthrough: true;
 }
 
 export type HttpMethod = 'get' | 'head' | 'post' | 'put' | 'delete' | 'patch';
@@ -165,16 +158,20 @@ export type JSONValue =
 	| JSONValue[]
 	| JSONObject;
 
-export interface LoadInput<Params = Record<string, string>, Props = Record<string, any>> {
-	url: URL;
+export interface LoadInput<
+	Params extends Record<string, string> = Record<string, string>,
+	Props extends Record<string, any> = Record<string, any>
+> {
+	fetch(info: RequestInfo, init?: RequestInit): Promise<Response>;
 	params: Params;
 	props: Props;
-	fetch(info: RequestInfo, init?: RequestInit): Promise<Response>;
+	routeId: string | null;
 	session: App.Session;
 	stuff: Partial<App.Stuff>;
+	url: URL;
 }
 
-export interface LoadOutput<Props = Record<string, any>> {
+export interface LoadOutput<Props extends Record<string, any> = Record<string, any>> {
 	status?: number;
 	error?: string | Error;
 	redirect?: string;
@@ -233,15 +230,18 @@ export interface PrerenderErrorHandler {
 
 export type PrerenderOnErrorValue = 'fail' | 'continue' | PrerenderErrorHandler;
 
-export interface RequestEvent<Params = Record<string, string>> {
-	request: Request;
-	url: URL;
-	params: Params;
+export interface RequestEvent<Params extends Record<string, string> = Record<string, string>> {
+	clientAddress: string;
 	locals: App.Locals;
+	params: Params;
 	platform: Readonly<App.Platform>;
+	request: Request;
+	routeId: string | null;
+	url: URL;
 }
 
 export interface RequestOptions {
+	getClientAddress: () => string;
 	platform?: App.Platform;
 }
 

@@ -30,8 +30,6 @@ title: Loading
 
 `load` は Next.js の `getStaticProps` や `getServerSideProps` に似ていますが、違いとしては、`load` はサーバーとクライアントの両方で動作します。上記の例では、もしユーザーがこのページへのリンクをクリックした場合、自身のサーバーを経由せずに `cms.example.com` からデータを取得します。
 
-`load` が `{fallthrough: true}` を返す場合、SvelteKitは応答が返るまで他のルート(routes)に[フォールスルー](/docs/routing#advanced-routing-fallthrough-routes)するか、もしくは一般的な404で応答します。
-
 SvelteKitの `load` は、以下のような特別なプロパティを持つ `fetch` の実装を受け取ります。
 
 - サーバー上の cookie にアクセスできます

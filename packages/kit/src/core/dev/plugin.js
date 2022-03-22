@@ -12,6 +12,7 @@ import { coalesce_to_error } from '../../utils/error.js';
 import { load_template } from '../config/index.js';
 import { sequence } from '../../hooks.js';
 import { posixify } from '../../utils/filesystem.js';
+import { parse_route_id } from '../../utils/routing.js';
 
 /**
  * @param {import('types').ValidatedConfig} config
@@ -49,8 +50,8 @@ export async function create_plugin(config, cwd) {
 				manifest = {
 					appDir: config.kit.appDir,
 					assets: new Set(manifest_data.assets.map((asset) => asset.file)),
+					mimeTypes: get_mime_lookup(manifest_data),
 					_: {
-						mime: get_mime_lookup(manifest_data),
 						entry: {
 							file: `/@fs${runtime}/client/start.js`,
 							css: [],
@@ -104,12 +105,15 @@ export async function create_plugin(config, cwd) {
 							};
 						}),
 						routes: manifest_data.routes.map((route) => {
+							const { pattern, names, types } = parse_route_id(route.id);
+
 							if (route.type === 'page') {
 								return {
 									type: 'page',
-									key: route.key,
-									pattern: route.pattern,
-									params: get_params(route.params),
+									id: route.id,
+									pattern,
+									names,
+									types,
 									shadow: route.shadow
 										? async () => {
 												const url = path.resolve(cwd, /** @type {string} */ (route.shadow));
@@ -123,14 +127,34 @@ export async function create_plugin(config, cwd) {
 
 							return {
 								type: 'endpoint',
-								pattern: route.pattern,
-								params: get_params(route.params),
+								id: route.id,
+								pattern,
+								names,
+								types,
 								load: async () => {
 									const url = path.resolve(cwd, route.file);
 									return await vite.ssrLoadModule(url);
 								}
 							};
-						})
+						}),
+						matchers: async () => {
+							/** @type {Record<string, import('types').ParamMatcher>} */
+							const matchers = {};
+
+							for (const key in manifest_data.matchers) {
+								const file = manifest_data.matchers[key];
+								const url = path.resolve(cwd, file);
+								const module = await vite.ssrLoadModule(url);
+
+								if (module.match) {
+									matchers[key] = module.match;
+								} else {
+									throw new Error(`${file} does not export a \`match\` function`);
+								}
+							}
+
+							return matchers;
+						}
 					}
 				};
 			}
@@ -156,7 +180,7 @@ export async function create_plugin(config, cwd) {
 			update_manifest();
 
 			vite.watcher.on('add', update_manifest);
-			vite.watcher.on('remove', update_manifest);
+			vite.watcher.on('unlink', update_manifest);
 
 			const assets = config.kit.paths.assets ? SVELTE_KIT_ASSETS : config.kit.paths.base;
 			const asset_server = sirv(config.kit.files.assets, {
@@ -173,7 +197,9 @@ export async function create_plugin(config, cwd) {
 					try {
 						if (!req.url || !req.method) throw new Error('Incomplete request');
 
-						const base = `${vite.config.server.https ? 'https' : 'http'}://${req.headers.host}`;
+						const base = `${vite.config.server.https ? 'https' : 'http'}://${
+							req.headers[':authority'] || req.headers.host
+						}`;
 
 						const decoded = decodeURI(new URL(base + req.url).pathname);
 
@@ -259,62 +285,72 @@ export async function create_plugin(config, cwd) {
 
 						const template = load_template(cwd, config);
 
-						const rendered = await respond(request, {
-							amp: config.kit.amp,
-							csp: config.kit.csp,
-							dev: true,
-							floc: config.kit.floc,
-							get_stack: (error) => {
-								return fix_stack_trace(error);
-							},
-							handle_error: (error, event) => {
-								hooks.handleError({
-									error: new Proxy(error, {
-										get: (target, property) => {
-											if (property === 'stack') {
-												return fix_stack_trace(error);
+						const rendered = await respond(
+							request,
+							{
+								amp: config.kit.amp,
+								csp: config.kit.csp,
+								dev: true,
+								floc: config.kit.floc,
+								get_stack: (error) => {
+									return fix_stack_trace(error);
+								},
+								handle_error: (error, event) => {
+									hooks.handleError({
+										error: new Proxy(error, {
+											get: (target, property) => {
+												if (property === 'stack') {
+													return fix_stack_trace(error);
+												}
+
+												return Reflect.get(target, property, target);
 											}
+										}),
+										event,
 
-											return Reflect.get(target, property, target);
+										// TODO remove for 1.0
+										// @ts-expect-error
+										get request() {
+											throw new Error(
+												'request in handleError has been replaced with event. See https://github.com/sveltejs/kit/pull/3384 for details'
+											);
 										}
-									}),
-									event,
-
-									// TODO remove for 1.0
-									// @ts-expect-error
-									get request() {
-										throw new Error(
-											'request in handleError has been replaced with event. See https://github.com/sveltejs/kit/pull/3384 for details'
-										);
-									}
-								});
+									});
+								},
+								hooks,
+								hydrate: config.kit.browser.hydrate,
+								manifest,
+								method_override: config.kit.methodOverride,
+								paths: {
+									base: config.kit.paths.base,
+									assets
+								},
+								prefix: '',
+								prerender: config.kit.prerender.enabled,
+								read: (file) => fs.readFileSync(path.join(config.kit.files.assets, file)),
+								root,
+								router: config.kit.browser.router,
+								template: ({ head, body, assets, nonce }) => {
+									return (
+										template
+											.replace(/%svelte\.assets%/g, assets)
+											.replace(/%svelte\.nonce%/g, nonce)
+											// head and body must be replaced last, in case someone tries to sneak in %svelte.assets% etc
+											.replace('%svelte.head%', () => head)
+											.replace('%svelte.body%', () => body)
+									);
+								},
+								template_contains_nonce: template.includes('%svelte.nonce%'),
+								trailing_slash: config.kit.trailingSlash
 							},
-							hooks,
-							hydrate: config.kit.browser.hydrate,
-							manifest,
-							method_override: config.kit.methodOverride,
-							paths: {
-								base: config.kit.paths.base,
-								assets
-							},
-							prefix: '',
-							prerender: config.kit.prerender.enabled,
-							read: (file) => fs.readFileSync(path.join(config.kit.files.assets, file)),
-							root,
-							router: config.kit.browser.router,
-							template: ({ head, body, assets, nonce }) => {
-								return (
-									template
-										.replace(/%svelte\.assets%/g, assets)
-										.replace(/%svelte\.nonce%/g, nonce)
-										// head and body must be replaced last, in case someone tries to sneak in %svelte.assets% etc
-										.replace('%svelte.head%', () => head)
-										.replace('%svelte.body%', () => body)
-								);
-							},
-							template_contains_nonce: template.includes('%svelte.nonce%'),
-							trailing_slash: config.kit.trailingSlash
-						});
+							{
+								getClientAddress: () => {
+									const { remoteAddress } = req.socket;
+									if (remoteAddress) return remoteAddress;
+									throw new Error('Could not determine clientAddress');
+								}
+							}
+						);
 
 						if (rendered) {
 							setResponse(res, rendered);
@@ -331,29 +367,6 @@ export async function create_plugin(config, cwd) {
 			};
 		}
 	};
-}
-
-/** @param {string[]} array */
-function get_params(array) {
-	// given an array of params like `['x', 'y', 'z']` for
-	// src/routes/[x]/[y]/[z]/svelte, create a function
-	// that turns a RegExpExecArray into ({ x, y, z })
-
-	/** @param {RegExpExecArray} match */
-	const fn = (match) => {
-		/** @type {Record<string, string>} */
-		const params = {};
-		array.forEach((key, i) => {
-			if (key.startsWith('...')) {
-				params[key.slice(3)] = match[i + 1] || '';
-			} else {
-				params[key] = match[i + 1];
-			}
-		});
-		return params;
-	};
-
-	return fn;
 }
 
 /** @param {import('http').ServerResponse} res */

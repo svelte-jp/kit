@@ -112,7 +112,7 @@ SvelteKit では、それらにアクセスする方法が異なります。`sto
 
 #### ルーティング
 
-ルート(routes) の正規表現はもうサポートされていません。代わりに、[フォールスルールート](/docs/routing#advanced-routing-fallthrough-routes) をお使いください。
+ルート(routes) の正規表現はもうサポートされていません。代わりに、[advanced route matching](/docs/routing#advanced-routing-matching) をお使いください。
 
 #### URLs
 
