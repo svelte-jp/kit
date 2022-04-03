@@ -1,5 +1,21 @@
 # @sveltejs/kit
 
+## 1.0.0-next.304
+
+### Patch Changes
+
+- Upgrade to Vite 2.9 ([#4468](https://github.com/sveltejs/kit/pull/4468))
+
+* allow files and directories named `__tests__` and `__test__` in the routes directory ([#4438](https://github.com/sveltejs/kit/pull/4438))
+
+- Create fallback page when prerendering is disabled ([#4443](https://github.com/sveltejs/kit/pull/4443))
+
+## 1.0.0-next.303
+
+### Patch Changes
+
+- [fix] don't use client-side navigation when clicking on a link to the same path on a different origin ([#4433](https://github.com/sveltejs/kit/pull/4433))
+
 ## 1.0.0-next.302
 
 ### Patch Changes
