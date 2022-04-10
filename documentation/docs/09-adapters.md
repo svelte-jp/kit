@@ -20,7 +20,7 @@ SvelteKit は、公式にサポートされている adapter を多数提供し�
 
 #### Node.js
 
-シンプルな Node サーバーを作成するには、[`@sveltejs/adapter-node@next`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) パッケージをインストールし、`svelte.config.js` を更新します:
+シンプルな Node サーバーを作成するには、[`@sveltejs/adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) パッケージをインストールし、`svelte.config.js` を更新します:
 
 ```diff
 /// file: svelte.config.js
@@ -44,7 +44,7 @@ export default {
 
 #### 静的サイト(Static sites)
 
-ほとんどの adapter は、サイト内の [プリレンダリング可能な](/docs/page-options#prerender) ページについて、静的な HTML を生成します。アプリ全体がプリレンダリング可能な場合は、[`@sveltejs/adapter-static@next`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使用して _全ての_ ページ について静的な HTML を生成することができます。完全に静的なサイトは、[GitHub Pages](https://pages.github.com/) のような静的ホストなど、さまざまなプラットフォームでホストすることができます。
+ほとんどの adapter は、サイト内の [プリレンダリング可能な](/docs/page-options#prerender) ページについて、静的な HTML を生成します。アプリ全体がプリレンダリング可能な場合は、[`@sveltejs/adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使用して _全ての_ ページ について静的な HTML を生成することができます。完全に静的なサイトは、[GitHub Pages](https://pages.github.com/) のような静的ホストなど、さまざまなプラットフォームでホストすることができます。
 
 ```diff
 /// file: svelte.config.js

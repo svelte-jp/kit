@@ -24,7 +24,7 @@ SvelteKitはとてもハイパフォーマンスなWebアプリを構築する�
 SvelteKitアプリを構築してみるのに最も簡単な方法は、`npm init` を実行することです:
 
 ```bash
-npm init svelte@next my-app
+npm init svelte my-app
 cd my-app
 npm install
 npm run dev

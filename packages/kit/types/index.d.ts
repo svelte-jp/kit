@@ -184,7 +184,7 @@ export interface HandleError {
 }
 
 /**
- * ページやレイアウト の `<script context="module">` からエクスポートされる `load` 関数の型です。
+ * ページやレイアウト の `<script context="module">` からエクスポートされる `(input: LoadInput) => LoadOutput` `load` 関数です。
  *
  * Params のジェネリックな引数を手作業で指定する代わりに、[generated types](/docs/types#generated-types) を使用することができます。
  */
@@ -223,14 +223,14 @@ export interface RequestHandler<
 	Params extends Record<string, string> = Record<string, string>,
 	Output extends ResponseBody = ResponseBody
 > {
-	(event: RequestEvent<Params>): RequestHandlerOutput<Output>;
+	(event: RequestEvent<Params>): MaybePromise<RequestHandlerOutput<Output>>;
 }
 
-export type RequestHandlerOutput<Output extends ResponseBody = ResponseBody> = MaybePromise<{
+export interface RequestHandlerOutput<Output extends ResponseBody = ResponseBody> {
 	status?: number;
 	headers?: Headers | Partial<ResponseHeaders>;
 	body?: Output;
-}>;
+}
 
 export type ResponseBody = JSONValue | Uint8Array | ReadableStream | import('stream').Readable;
 
