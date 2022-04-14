@@ -22,7 +22,7 @@ SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から
 
 ### Manual setup
 
-#### `title` と `meta`
+#### &lt;title&gt; と &lt;meta&gt; 
 
 全てのページで、よく練られたユニークな `<title>` と `<meta name="description">` を [`<svelte:head>`](https://svelte.dev/docs#template-syntax-svelte-head) の内側に置くべきです。説明的な title と description の書き方に関するガイダンスと、検索エンジンにとってわかりやすいコンテンツを作るためのその他の方法については、Google の [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) のドキュメントで見つけることができます。
 

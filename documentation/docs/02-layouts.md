@@ -44,7 +44,7 @@ title: レイアウト
 
 ...nav は常に表示され、3つのページリンクをそれぞれクリックすると、`<h1>` が置き換えられるだけです。
 
-### ネストレイアウト
+### ネストレイアウト(Nested layouts)
 
 単一の `/settings` ページを持つのではなく、`/settings/profile` や `/settings/notifications` といったページをネストして(※入れ子にして)サブメニューを共有するとします (実例としては、[github.com/settings](https://github.com/settings) をご覧ください)。
 
@@ -62,11 +62,76 @@ title: レイアウト
 <slot></slot>
 ```
 
-### リセット
+### 名前付きレイアウト(Named layouts)
 
-レイアウトスタックをリセットするには、`__layout.svelte` の代わりに、`__layout.reset.svelte` ファイルを作成します。例えば、`/admin/*` ページにルートレイアウト(root layout)を継承させたくない場合は、`src/routes/admin/__layout.reset.svelte` というファイルを作成します。
+アプリには、デフォルトのレイアウトとは違うレイアウトが必要になる部分もあるでしょう。そういったケースには、_名前付きレイアウト(named layouts)_ を作成することができます…
 
-レイアウトリセットは、それ以外は通常のレイアウトコンポーネントと同じです。
+```svelte
+/// file: src/routes/__layout-foo.svelte
+<div class="foo">
+	<slot></slot>
+</div>
+```
+
+…そしてレイアウトの名前(上記の例では `foo`)をファイル名で参照することによってこれを使用します:
+
+```svelte
+/// file: src/routes/my-special-page@foo.svelte
+<h1>I am inside __layout-foo</h1>
+```
+
+名前付きレイアウト(Named layouts)はとてもパワフルですが、理解するのに少し時間がかかるかもしれません。一度に理解できなくても心配しないでください。
+
+#### スコープ(Scoping)
+
+名前付きレイアウト(Named layouts)は任意の深さに作成することができ、同じサブツリーにあるどのコンポーネントにも適用されます。例えば、`__layout-foo` は `/x/one` と `/x/two` に適用されますが、`/x/three` や `/four` には適用されません:
+
+```
+src/routes/
+├ x/
+│ ├ __layout-foo.svelte
+│ ├ one@foo.svelte
+│ ├ two@foo.svelte
+│ └ three.svelte
+└ four@foo.svelte
+```
+
+#### 継承チェーン(Inheritance chains)
+
+レイアウトは、同じディレクトリまたは親ディレクトリにある名前付きレイアウト(named layouts)を継承するかどうか選択できます。例えば、`x/y/__layout@root.svelte` には名前が付いていないため、`/x/y` のデフォルトのレイアウトです (つまり、`/x/y/one`、`/x/y/two`、`/x/y/three` はどれもこのレイアウトを継承します)。`@root` を指定しているため、もっとも近くにある `__layout-root.svelte` を直接継承することになり、`__layout.svelte` と `x/__layout.svelte` をスキップします。
+
+```
+src/routes/
+├ x/
+│ ├ y/
+│ │ ├ __layout@root.svelte
+│ │ ├ one.svelte
+│ │ ├ two.svelte
+│ │ └ three.svelte
+│ └ __layout.svelte
+├ __layout.svelte
+└ __layout-root.svelte
+```
+
+> `__layout-root.svelte` が単独の `<slot />` のみを含んでいる場合、アプリ内のネストレイアウト(nested layout)に `@root` を付けることで、任意のページをブランクレイアウトに 'リセット' することができます。
+
+親が指定されていない場合、レイアウトはツリー上もっとも近くにあるデフォルトのレイアウト(つまり名前が付いていないレイアウト)を継承することになります。名前付きレイアウト(named layout)がツリー上一緒に並んでいるデフォルトのレイアウトを継承するので便利です。例えば、`__layout-root.svelte` は `__layout.svelte` を継承します。明示的に `@default` を指定することで、`/x/y/one` や同じ階層にあるページがアプリのデフォルトのレイアウトを使用するのに `x/__layout.svelte` を使う必要がなくなります:
+
+```diff
+src/routes/
+├ x/
+│ ├ y/
+│ │ ├ __layout@root.svelte
+│ │ ├ one.svelte
+│ │ ├ two.svelte
+│ │ └ three.svelte
+│ └ __layout.svelte
+├ __layout.svelte
+-└ __layout-root.svelte
++└ __layout-root@default.svelte
+```
+
+> `default` は予約済の名前です。言い換えると、`__layout-default.svelte` というファイルを使用することはできないということです。
 
 ### エラーページ
 
@@ -100,3 +165,43 @@ title: レイアウト
 > レイアウトでは、[page store](/docs/modules#$app-stores) を使って `error` と `status` にアクセスすることもできます。  
 >
 > ユーザーに特権的な情報が公開されないようにするため、本番環境では `error` からサーバーサイドのスタックトレースが取り除かれます。
+
+#### 404s
+
+特定のページをレンダリングしているときにエラーが発生した場合のみ、ネストしたエラーページがレンダリングされます。リクエストがどのルートにもマッチしない場合、SvelteKitは代わりに一般的な 404 をレンダリングします。例えば、このようなルートの場合…
+
+```
+src/routes/
+├ __error.svelte
+├ marx-brothers/
+│ ├ __error.svelte
+│ ├ chico.svelte
+│ ├ harpo.svelte
+│ └ groucho.svelte
+```
+
+… `/marx-brothers/karl` をリクエストしたとしても `marx-brothers/__error.svelte` ファイルはレンダリングされません。ネストしたエラーページをレンダリングさせるには、`/marx-brothers/*` に対するどんなリクエストにもマッチするようなルート(route)を作成し、そこから 404 を返すようにしてください:
+
+```diff
+src/routes/
+├ __error.svelte
+├ marx-brothers/
+│ ├ __error.svelte
++│ ├ [...path].svelte
+│ ├ chico.svelte
+│ ├ harpo.svelte
+│ └ groucho.svelte
+```
+
+```svelte
+/// file: src/routes/marx-brothers/[...path.svelte]
+<script context="module">
+	/** @type {import('./[...path]').Load} */
+	export function load({ params }) {
+		return {
+			status: 404,
+			error: new Error(`Not found: /marx-brothers/${params.path}`)
+		};
+	}
+</script>
+```
