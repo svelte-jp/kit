@@ -20,28 +20,28 @@ _動的_ なルートにとって、例えば `src/routes/blog/[slug].svelte` �
 
 `$app/navigation` から `prefetch` をインポートしてプログラムで `prefetch` を実行することもできます。
 
+### sveltekit:reload
+
+By default, the SvelteKit runtime intercepts clicks on `<a>` elements and bypasses the normal browser navigation for relative (same-origin) URLs that match one of your page routes. We sometimes need to tell SvelteKit that certain links need to be handled by normal browser navigation. Examples of this might be linking to another page on your domain that's not part of your SvelteKit app or linking to an endpoint.
+
+Adding a `sveltekit:reload` attribute to a link...
+
+```html
+<a sveltekit:reload href="path">Path</a>
+```
+
+...will cause browser to navigate via a full page reload when the link is clicked.
+
+Links with a `rel="external"` attribute will receive the same treatment. In addition, they will be ignored during [prerendering](https://kit.svelte.dev/docs/page-options#prerender).
+
 ### sveltekit:noscroll
 
-内部リンクにナビゲートする場合、SvelteKit はブラウザのデフォルトのナビゲーションと同じように動作します。つまり、ユーザーがページの一番左上に来るようにスクロールポジションを [0,0] にします(リンクに `#hash` が含まれている場合は、そのIDがマッチする要素にスクロールします)。
+When navigating to internal links, SvelteKit mirrors the browser's default navigation behaviour: it will change the scroll position to 0,0 so that the user is at the very top left of the page (unless the link includes a `#hash`, in which case it will scroll to the element with a matching ID).
 
-必要に応じて、この動作を無効にすることもできます。リンクに `sveltekit:noscroll` 属性を追加します…
+In certain cases, you may wish to disable this behaviour. Adding a `sveltekit:noscroll` attribute to a link...
 
 ```html
 <a href="path" sveltekit:noscroll>Path</a>
 ```
 
-…これにより、リンクをクリックしたあとにスクロールされるのを防ぐことができます。
-
-### rel=external
-
-デフォルトでは、SvelteKitランタイムは `<a>` 要素に対するクリックをインターセプトし、ページのルート(routes)にマッチする相対URL(same-origin)に対する通常のブラウザのナビゲーションをバイパスします。時々、SvelteKitに、特定のリンクは通常のブラウザナビゲーションに処理させる必要があると示したいことがあります。例えば、同じドメイン上のSvelteKitアプリではない別のページへのリンクや、エンドポイントへのリンクなどです。
-
-リンクに `rel=external` 属性を追加します…
-
-```html
-<a rel="external" href="path">Path</a>
-```
-
-…これにより、リンクがクリックされたときにブラウザのナビゲーションがトリガーされます。
-
-> SvelteKit はルート(root)相対の外部リンクをプリレンダリングでは除外しないため、これらの URL が別のアプリでサーブされることを想定している場合、404 を引き起こします。これを無視する必要がある場合、カスタムの [`prerender.onError`](/docs/configuration#prerender) ハンドラをお使いください。
+...will prevent scrolling after the link is clicked.
