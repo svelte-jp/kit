@@ -1,5 +1,6 @@
 ---
 title: Sapper からの移行
+rank: 1
 ---
 
 SvelteKit は Sapper の後継であり、その設計の多くの要素を共有しています。

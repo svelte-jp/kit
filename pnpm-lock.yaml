@@ -17,7 +17,7 @@ importers:
       eslint: ^8.3.0
       eslint-plugin-import: ^2.25.3
       eslint-plugin-svelte3: ^3.2.1
-      playwright-chromium: ^1.19.1
+      playwright-chromium: ^1.21.0
       prettier: ^2.5.0
       rollup: ^2.60.2
       shelljs: ^0.8.3
@@ -40,7 +40,7 @@ importers:
       eslint: 8.3.0
       eslint-plugin-import: 2.25.3_eslint@8.3.0
       eslint-plugin-svelte3: 3.2.1_eslint@8.3.0
-      playwright-chromium: 1.19.2
+      playwright-chromium: 1.21.0
       prettier: 2.5.0
       rollup: 2.60.2
       shelljs: 0.8.4
@@ -163,7 +163,7 @@ importers:
     specifiers:
       '@sveltejs/kit': workspace:*
       devalue: ^2.0.1
-      playwright-chromium: ^1.20.2
+      playwright-chromium: ^1.21.0
       port-authority: ^1.1.2
       sirv: ^2.0.0
       svelte: ^3.44.2
@@ -175,7 +175,7 @@ importers:
     devDependencies:
       '@sveltejs/kit': link:../kit
       devalue: 2.0.1
-      playwright-chromium: 1.20.2
+      playwright-chromium: 1.21.0
       port-authority: 1.1.2
       sirv: 2.0.0
       svelte: 3.44.2
@@ -195,7 +195,7 @@ importers:
 
   packages/create-svelte:
     specifiers:
-      '@playwright/test': ^1.20.2
+      '@playwright/test': ^1.21.0
       '@sveltejs/kit': workspace:*
       '@types/gitignore-parser': ^0.0.0
       '@types/prettier': ^2.4.2
@@ -213,7 +213,7 @@ importers:
       kleur: 4.1.4
       prompts: 2.4.2
     devDependencies:
-      '@playwright/test': 1.20.2
+      '@playwright/test': 1.21.0
       '@sveltejs/kit': link:../kit
       '@types/gitignore-parser': 0.0.0
       '@types/prettier': 2.4.2
@@ -232,14 +232,14 @@ importers:
       '@lukeed/uuid': ^2.0.0
       '@sveltejs/adapter-auto': workspace:*
       '@sveltejs/kit': workspace:*
-      cookie: ^0.4.1
+      cookie: ^0.5.0
       svelte: ^3.44.0
       svelte-preprocess: ^4.9.8
       typescript: ~4.6.2
     dependencies:
       '@fontsource/fira-mono': 4.5.0
       '@lukeed/uuid': 2.0.0
-      cookie: 0.4.1
+      cookie: 0.5.0
     devDependencies:
       '@sveltejs/adapter-auto': link:../../../adapter-auto
       '@sveltejs/kit': link:../../../kit
@@ -249,17 +249,17 @@ importers:
 
   packages/kit:
     specifiers:
-      '@playwright/test': ^1.20.2
+      '@playwright/test': ^1.21.0
       '@rollup/plugin-replace': ^4.0.0
       '@sveltejs/vite-plugin-svelte': ^1.0.0-next.32
       '@types/amphtml-validator': ^1.0.1
-      '@types/cookie': ^0.4.1
+      '@types/cookie': ^0.5.0
       '@types/marked': ^4.0.1
       '@types/mime': ^2.0.3
       '@types/node': ^16.11.11
       '@types/sade': ^1.7.3
       amphtml-validator: ^1.0.35
-      cookie: ^0.4.1
+      cookie: ^0.5.0
       cross-env: ^7.0.3
       devalue: ^2.0.1
       eslint: ^8.3.0
@@ -274,7 +274,7 @@ importers:
       selfsigned: ^2.0.0
       sirv: ^2.0.0
       svelte: ^3.44.2
-      svelte-check: ^2.2.10
+      svelte-check: ^2.5.0
       svelte-preprocess: ^4.9.8
       svelte2tsx: ~0.5.0
       tiny-glob: ^0.2.9
@@ -285,16 +285,16 @@ importers:
       sade: 1.7.4
       vite: 2.9.1
     devDependencies:
-      '@playwright/test': 1.20.2
+      '@playwright/test': 1.21.0
       '@rollup/plugin-replace': 4.0.0_rollup@2.60.2
       '@types/amphtml-validator': 1.0.1
-      '@types/cookie': 0.4.1
+      '@types/cookie': 0.5.0
       '@types/marked': 4.0.1
       '@types/mime': 2.0.3
       '@types/node': 16.11.11
       '@types/sade': 1.7.3
       amphtml-validator: 1.0.35
-      cookie: 0.4.1
+      cookie: 0.5.0
       cross-env: 7.0.3
       devalue: 2.0.1
       eslint: 8.3.0
@@ -308,7 +308,7 @@ importers:
       selfsigned: 2.0.0
       sirv: 2.0.0
       svelte: 3.44.2
-      svelte-check: 2.2.10_svelte@3.44.2
+      svelte-check: 2.5.0_svelte@3.44.2
       svelte-preprocess: 4.9.8_svelte@3.44.2+typescript@4.6.2
       svelte2tsx: 0.5.0_svelte@3.44.2+typescript@4.6.2
       tiny-glob: 0.2.9
@@ -319,13 +319,13 @@ importers:
       '@sveltejs/kit': workspace:*
       cross-env: ^7.0.3
       svelte: ^3.43.0
-      svelte-check: ^2.2.10
+      svelte-check: ^2.5.0
       typescript: ~4.6.2
     devDependencies:
       '@sveltejs/kit': link:../../..
       cross-env: 7.0.3
       svelte: 3.44.2
-      svelte-check: 2.2.10_svelte@3.44.2
+      svelte-check: 2.5.0_svelte@3.44.2
       typescript: 4.6.2
 
   packages/kit/test/apps/basics:
@@ -333,13 +333,13 @@ importers:
       '@sveltejs/kit': workspace:*
       cross-env: ^7.0.3
       svelte: ^3.43.0
-      svelte-check: ^2.2.10
+      svelte-check: ^2.5.0
       typescript: ~4.6.2
     devDependencies:
       '@sveltejs/kit': link:../../..
       cross-env: 7.0.3
       svelte: 3.44.2
-      svelte-check: 2.2.10_svelte@3.44.2
+      svelte-check: 2.5.0_svelte@3.44.2
       typescript: 4.6.2
 
   packages/kit/test/apps/options:
@@ -347,13 +347,13 @@ importers:
       '@sveltejs/kit': workspace:*
       cross-env: ^7.0.3
       svelte: ^3.43.0
-      svelte-check: ^2.2.10
+      svelte-check: ^2.5.0
       typescript: ~4.6.2
     devDependencies:
       '@sveltejs/kit': link:../../..
       cross-env: 7.0.3
       svelte: 3.44.2
-      svelte-check: 2.2.10_svelte@3.44.2
+      svelte-check: 2.5.0_svelte@3.44.2
       typescript: 4.6.2
 
   packages/kit/test/apps/options-2:
@@ -362,27 +362,41 @@ importers:
       '@sveltejs/kit': workspace:*
       cross-env: ^7.0.3
       svelte: ^3.43.0
-      svelte-check: ^2.2.10
+      svelte-check: ^2.5.0
       typescript: ~4.6.2
     devDependencies:
       '@sveltejs/adapter-node': link:../../../../adapter-node
       '@sveltejs/kit': link:../../..
       cross-env: 7.0.3
       svelte: 3.44.2
-      svelte-check: 2.2.10_svelte@3.44.2
+      svelte-check: 2.5.0_svelte@3.44.2
       typescript: 4.6.2
 
   packages/kit/test/prerendering/basics:
     specifiers:
       '@sveltejs/kit': workspace:*
       svelte: ^3.43.0
-      svelte-check: ^2.2.10
+      svelte-check: ^2.5.0
       typescript: ~4.6.2
       uvu: ^0.5.2
     devDependencies:
       '@sveltejs/kit': link:../../..
       svelte: 3.44.2
-      svelte-check: 2.2.10_svelte@3.44.2
+      svelte-check: 2.5.0_svelte@3.44.2
+      typescript: 4.6.2
+      uvu: 0.5.2
+
+  packages/kit/test/prerendering/disabled:
+    specifiers:
+      '@sveltejs/kit': workspace:*
+      svelte: ^3.43.0
+      svelte-check: ^2.5.0
+      typescript: ~4.6.2
+      uvu: ^0.5.2
+    devDependencies:
+      '@sveltejs/kit': link:../../..
+      svelte: 3.44.2
+      svelte-check: 2.5.0_svelte@3.44.2
       typescript: 4.6.2
       uvu: 0.5.2
 
@@ -390,13 +404,13 @@ importers:
     specifiers:
       '@sveltejs/kit': workspace:*
       svelte: ^3.43.0
-      svelte-check: ^2.2.10
+      svelte-check: ^2.5.0
       typescript: ~4.6.2
       uvu: ^0.5.2
     devDependencies:
       '@sveltejs/kit': link:../../..
       svelte: 3.44.2
-      svelte-check: 2.2.10_svelte@3.44.2
+      svelte-check: 2.5.0_svelte@3.44.2
       typescript: 4.6.2
       uvu: 0.5.2
 
@@ -405,7 +419,7 @@ importers:
       '@sveltejs/adapter-auto': workspace:*
       '@sveltejs/adapter-static': workspace:*
       '@sveltejs/kit': workspace:*
-      '@sveltejs/site-kit': ^2.0.3
+      '@sveltejs/site-kit': ^2.1.0
       '@types/node': ^16.11.11
       devalue: ^2.0.1
       flexsearch: ^0.7.21
@@ -421,7 +435,7 @@ importers:
       '@sveltejs/adapter-auto': link:../../packages/adapter-auto
       '@sveltejs/adapter-static': link:../../packages/adapter-static
       '@sveltejs/kit': link:../../packages/kit
-      '@sveltejs/site-kit': 2.0.3
+      '@sveltejs/site-kit': 2.1.0
       '@types/node': 16.11.11
       devalue: 2.0.1
       flexsearch: 0.7.21
@@ -1410,8 +1424,8 @@ packages:
       '@octokit/openapi-types': 11.2.0
     dev: true
 
-  /@playwright/test/1.20.2:
-    resolution: {integrity: sha512-unkLa+xe/lP7MVC0qpgadc9iSG1+LEyGBzlXhGS/vLGAJaSFs8DNfI89hNd5shHjWfNzb34JgPVnkRKCSNo5iw==}
+  /@playwright/test/1.21.0:
+    resolution: {integrity: sha512-jvgN3ZeAG6rw85z4u9Rc4uyj6qIaYlq2xrOtS7J2+CDYhzKOttab9ix9ELcvBOCHuQ6wgTfxfJYdh6DRZmQ9hg==}
     engines: {node: '>=12'}
     hasBin: true
     dependencies:
@@ -1444,7 +1458,7 @@ packages:
       ms: 2.1.3
       open: 8.4.0
       pirates: 4.0.4
-      playwright-core: 1.20.2
+      playwright-core: 1.21.0
       rimraf: 3.0.2
       source-map-support: 0.4.18
       stack-utils: 2.0.5
@@ -1542,8 +1556,8 @@ packages:
       picomatch: 2.3.0
     dev: true
 
-  /@sveltejs/site-kit/2.0.3:
-    resolution: {integrity: sha512-l5fst4LmQOpvnqkpOagTE6yHqj5cm3xHnlFKLCYLMuvDENHUKhhYTX71oeRZhyboMZ2DO3gGhzlj3R6iP+TdLA==}
+  /@sveltejs/site-kit/2.1.0:
+    resolution: {integrity: sha512-nJddyYdBHXmiyhIAq0DQZpEjJ0B2Up4NCg08gVZuUxuOsshjUK8wZ5kuszP3Tl/q176MxFbceJo2Me4fj9bu9w==}
     dependencies:
       golden-fleece: 1.0.9
     dev: true
@@ -1745,8 +1759,8 @@ packages:
       '@types/node': 16.11.11
     dev: true
 
-  /@types/cookie/0.4.1:
-    resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
+  /@types/cookie/0.5.0:
+    resolution: {integrity: sha512-CJWHVHHupxBYfIlMM+qzXx4dRKIV1VzOm0cP3Wpqten8MDx1tK+y92YDXUshN1ONAfwodvKxDNkw35/pNs+izg==}
     dev: true
 
   /@types/estree/0.0.39:
@@ -2727,8 +2741,8 @@ packages:
       safe-buffer: 5.1.2
     dev: true
 
-  /cookie/0.4.1:
-    resolution: {integrity: sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==}
+  /cookie/0.5.0:
+    resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
     engines: {node: '>= 0.6'}
 
   /core-util-is/1.0.3:
@@ -5554,61 +5568,21 @@ packages:
       find-up: 4.1.0
     dev: true
 
-  /playwright-chromium/1.19.2:
-    resolution: {integrity: sha512-4S6KiJgR6PCQmlm4IzArgt9aDkzijYXxVG1j3vRqdugXQ1mPA2QIFUmXmRJeDczVkbIR5N8opJSNMnNDFg4qVw==}
+  /playwright-chromium/1.21.0:
+    resolution: {integrity: sha512-btps5gqqc4GUESv+H3/rTPMv5S6zUSsgEcpvM3HX08bqaHnpyy+cPK6XLJq9L8kGjm3SdzlmG8tkhSPP4iuWhA==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      playwright-core: 1.19.2
+      playwright-core: 1.21.0
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
     dev: true
 
-  /playwright-chromium/1.20.2:
-    resolution: {integrity: sha512-KsiPLRC1v56qLWqjzeEoDZNVW/eFrP5ad0PFQAa74u5EwnnId89LgOHEZFy487tt3xJdv3Ayyfdn8zwsUpS3Qg==}
-    engines: {node: '>=12'}
-    hasBin: true
-    requiresBuild: true
-    dependencies:
-      playwright-core: 1.20.2
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-    dev: true
-
-  /playwright-core/1.19.2:
-    resolution: {integrity: sha512-OsL3sJZIo1UxKNWSP7zW7sk3FyUGG06YRHxHeBw51eIOxTCQRx5t+hXd0cvXashN2CHnd3hIZTs2aKa/im4hZQ==}
-    engines: {node: '>=12'}
-    hasBin: true
-    dependencies:
-      commander: 8.3.0
-      debug: 4.3.3
-      extract-zip: 2.0.1
-      https-proxy-agent: 5.0.0
-      jpeg-js: 0.4.3
-      mime: 3.0.0
-      pngjs: 6.0.0
-      progress: 2.0.3
-      proper-lockfile: 4.1.2
-      proxy-from-env: 1.1.0
-      rimraf: 3.0.2
-      socks-proxy-agent: 6.1.1
-      stack-utils: 2.0.5
-      ws: 8.4.2
-      yauzl: 2.10.0
-      yazl: 2.5.1
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-    dev: true
-
-  /playwright-core/1.20.2:
-    resolution: {integrity: sha512-iV6+HftSPalynkq0CYJala1vaTOq7+gU9BRfKCdM9bAxNq/lFLrwbluug2Wt5OoUwbMABcnTThIEm3/qUhCdJQ==}
+  /playwright-core/1.21.0:
+    resolution: {integrity: sha512-yDGVs9qaaW6WiefgR7wH1CGt9D6D/X4U3jNpIzH0FjjrrWLCOYQo78Tu3SkW8X+/kWlBpj49iWf3QNSxhYc12Q==}
     engines: {node: '>=12'}
     hasBin: true
     dependencies:
@@ -6580,22 +6554,21 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  /svelte-check/2.2.10_svelte@3.44.2:
-    resolution: {integrity: sha512-UVLd/N7hUIG2v6dytofsw8MxYn2iS2hpNSglsGz9Z9b8ZfbJ5jayl4Mm1SXhNwiFs5aklG90zSBJtd7NTK8dTg==}
+  /svelte-check/2.5.0_svelte@3.44.2:
+    resolution: {integrity: sha512-/laO032JQ1TpmYHgaaLndHNPeWW3VSL3liMB97sA9fYTEzlIy3jIo4Rgr7EzjNvieiNWG73C5voOAeNHlrwbpg==}
     hasBin: true
     peerDependencies:
       svelte: ^3.24.0
     dependencies:
-      chalk: 4.1.2
       chokidar: 3.5.2
       fast-glob: 3.2.7
       import-fresh: 3.3.0
-      minimist: 1.2.5
+      picocolors: 1.0.0
       sade: 1.7.4
       source-map: 0.7.3
       svelte: 3.44.2
-      svelte-preprocess: 4.9.8_svelte@3.44.2+typescript@4.5.2
-      typescript: 4.5.2
+      svelte-preprocess: 4.9.8_svelte@3.44.2+typescript@4.6.2
+      typescript: 4.6.2
     transitivePeerDependencies:
       - '@babel/core'
       - coffeescript
@@ -6616,57 +6589,6 @@ packages:
     dependencies:
       svelte: 3.44.2
     dev: false
-
-  /svelte-preprocess/4.9.8_svelte@3.44.2+typescript@4.5.2:
-    resolution: {integrity: sha512-EQS/oRZzMtYdAprppZxY3HcysKh11w54MgA63ybtL+TAZ4hVqYOnhw41JVJjWN9dhPnNjjLzvbZ2tMhTsla1Og==}
-    engines: {node: '>= 9.11.2'}
-    requiresBuild: true
-    peerDependencies:
-      '@babel/core': ^7.10.2
-      coffeescript: ^2.5.1
-      less: ^3.11.3
-      node-sass: '*'
-      postcss: ^7 || ^8
-      postcss-load-config: ^2.1.0 || ^3.0.0
-      pug: ^3.0.0
-      sass: ^1.26.8
-      stylus: ^0.54.7
-      sugarss: ^2.0.0
-      svelte: ^3.23.0
-      typescript: ^3.9.5 || ^4.0.0
-    peerDependenciesMeta:
-      '@babel/core':
-        optional: true
-      coffeescript:
-        optional: true
-      less:
-        optional: true
-      node-sass:
-        optional: true
-      postcss:
-        optional: true
-      postcss-load-config:
-        optional: true
-      pug:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      typescript:
-        optional: true
-    dependencies:
-      '@types/pug': 2.0.5
-      '@types/sass': 1.43.1
-      detect-indent: 6.1.0
-      magic-string: 0.25.7
-      sorcery: 0.10.0
-      strip-indent: 3.0.0
-      svelte: 3.44.2
-      typescript: 4.5.2
-    dev: true
 
   /svelte-preprocess/4.9.8_svelte@3.44.2+typescript@4.6.2:
     resolution: {integrity: sha512-EQS/oRZzMtYdAprppZxY3HcysKh11w54MgA63ybtL+TAZ4hVqYOnhw41JVJjWN9dhPnNjjLzvbZ2tMhTsla1Og==}
@@ -7051,12 +6973,6 @@ packages:
 
   /typedarray/0.0.6:
     resolution: {integrity: sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=}
-    dev: true
-
-  /typescript/4.5.2:
-    resolution: {integrity: sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
     dev: true
 
   /typescript/4.5.5:

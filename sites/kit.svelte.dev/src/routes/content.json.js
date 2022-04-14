@@ -3,7 +3,6 @@ import { extract_frontmatter, transform } from '$lib/docs/server/markdown';
 import { render_modules } from '$lib/docs/server/modules';
 import { slugify } from '../lib/docs/server';
 import { convert_link } from '$lib/docs/server/convertlink';
-import { modules } from '../../../../documentation/types.js';
 
 const categories = [
 	{
@@ -40,13 +39,14 @@ export function get() {
 			const { body, metadata } = extract_frontmatter(markdown);
 
 			const sections = body.trim().split(/^### /m);
-
 			const intro = sections.shift().trim();
+			const rank = +metadata.rank || undefined;
 
 			blocks.push({
 				breadcrumbs: [...breadcrumbs, metadata.title],
 				href: category.href([slug]),
-				content: plaintext(intro)
+				content: plaintext(intro),
+				rank
 			});
 
 			for (const section of sections) {
@@ -62,7 +62,8 @@ export function get() {
 				blocks.push({
 					breadcrumbs: [...breadcrumbs, metadata.title, h3],
 					href: category.href([slug, slugify(h3link)]),
-					content: plaintext(intro)
+					content: plaintext(intro),
+					rank
 				});
 
 				for (const subsection of subsections) {
@@ -73,7 +74,8 @@ export function get() {
 					blocks.push({
 						breadcrumbs: [...breadcrumbs, metadata.title, h3, h4],
 						href: category.href([slug, slugify(h3link), slugify(h4link)]),
-						content: plaintext(lines.join('\n').trim())
+						content: plaintext(lines.join('\n').trim()),
+						rank
 					});
 				}
 			}
