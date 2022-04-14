@@ -8,13 +8,10 @@ const docs_routing = new Map([
 	['プライベートモジュール', 'Private modules'],
 	['高度なルーティング', 'Advanced routing'],
 	['Restパラメータ', 'Rest parameters'],
-	['ソート', 'Sorting'],
-	['フォールスルールート', 'Fallthrough routes']
+	['ソート', 'Sorting']
 ]);
 
 const docs_layouts = new Map([
-	['ネストレイアウト', 'Nested layouts'],
-	['リセット', 'Resets'],
 	['エラーページ', 'Error pages']
 ]);
 
@@ -32,7 +29,7 @@ const docs_page_options = new Map([['プリレンダリングしない場合', '
 const docs_seo = new Map([
 	['パフォーマンス', 'Performance'],
 	['URLの正規化', 'Normalized URLs'],
-	['`title` と `meta`', '`title` and `meta`'],
+	['&lt;title&gt; と &lt;meta&gt;', '&lt;title&gt; and &lt;meta&gt;'],
 	['構造化データ', 'Structured data'],
 	['サイトマップ', 'Sitemaps']
 ]);

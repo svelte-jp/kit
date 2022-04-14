@@ -44,7 +44,7 @@ title: レイアウト
 
 ...nav は常に表示され、3つのページリンクをそれぞれクリックすると、`<h1>` が置き換えられるだけです。
 
-### ネストレイアウト
+### ネストレイアウト(Nested layouts)
 
 単一の `/settings` ページを持つのではなく、`/settings/profile` や `/settings/notifications` といったページをネストして(※入れ子にして)サブメニューを共有するとします (実例としては、[github.com/settings](https://github.com/settings) をご覧ください)。
 
@@ -62,9 +62,9 @@ title: レイアウト
 <slot></slot>
 ```
 
-### Named layouts
+### 名前付きレイアウト(Named layouts)
 
-Some parts of your app might need something other than the default layout. For these cases you can create _named layouts_...
+アプリには、デフォルトのレイアウトとは違うレイアウトが必要になる部分もあるでしょう。そういったケースには、_名前付きレイアウト(named layouts)_ を作成することができます…
 
 ```svelte
 /// file: src/routes/__layout-foo.svelte
@@ -73,18 +73,18 @@ Some parts of your app might need something other than the default layout. For t
 </div>
 ```
 
-...and then use them by referencing the layout name (`foo`, in the example above) in the filename:
+…そしてレイアウトの名前(上記の例では `foo`)をファイル名で参照することによってこれを使用します:
 
 ```svelte
 /// file: src/routes/my-special-page@foo.svelte
 <h1>I am inside __layout-foo</h1>
 ```
 
-Named layouts are very powerful, but it can take a minute to get your head round them. Don't worry if this doesn't make sense all at once.
+名前付きレイアウト(Named layouts)はとてもパワフルですが、理解するのに少し時間がかかるかもしれません。一度に理解できなくても心配しないでください。
 
-#### Scoping
+#### スコープ(Scoping)
 
-Named layouts can be created at any depth, and will apply to any components in the same subtree. For example, `__layout-foo` will apply to `/x/one` and `/x/two`, but not `/x/three` or `/four`:
+名前付きレイアウト(Named layouts)は任意の深さに作成することができ、同じサブツリーにあるどのコンポーネントにも適用されます。例えば、`__layout-foo` は `/x/one` と `/x/two` に適用されますが、`/x/three` や `/four` には適用されません:
 
 ```
 src/routes/
@@ -96,9 +96,9 @@ src/routes/
 └ four@foo.svelte
 ```
 
-#### Inheritance chains
+#### 継承チェーン(Inheritance chains)
 
-Layouts can themselves choose to inherit from named layouts, from the same directory or a parent directory. For example, `x/y/__layout@root.svelte` is the default layout for `/x/y` (meaning `/x/y/one`, `/x/y/two` and `/x/y/three` all inherit from it) because it has no name. Because it specifies `@root`, it will inherit directly from the nearest `__layout-root.svelte`, skipping `__layout.svelte` and `x/__layout.svelte`.
+レイアウトは、同じディレクトリまたは親ディレクトリにある名前付きレイアウト(named layouts)を継承するかどうか選択できます。例えば、`x/y/__layout@root.svelte` には名前が付いていないため、`/x/y` のデフォルトのレイアウトです (つまり、`/x/y/one`、`/x/y/two`、`/x/y/three` はどれもこのレイアウトを継承します)。`@root` を指定しているため、もっとも近くにある `__layout-root.svelte` を直接継承することになり、`__layout.svelte` と `x/__layout.svelte` をスキップします。
 
 ```
 src/routes/
@@ -113,9 +113,9 @@ src/routes/
 └ __layout-root.svelte
 ```
 
-> In the case where `__layout-root.svelte` contains a lone `<slot />`, this effectively means we're able to 'reset' to a blank layout for any page or nested layout in the app by adding `@root`.
+> `__layout-root.svelte` が単独の `<slot />` のみを含んでいる場合、アプリ内のネストレイアウト(nested layout)に `@root` を付けることで、任意のページをブランクレイアウトに 'リセット' することができます。
 
-If no parent is specified, a layout will inherit from the nearest default (i.e. unnamed) layout _above_ it in the tree. In some cases, it's helpful for a named layout to inherit from a default layout _alongside_ it in the tree, such as `__layout-root.svelte` inheriting from `__layout.svelte`. We can do this by explicitly specifying `@default`, allowing `/x/y/one` and siblings to use the app's default layout without using `x/__layout.svelte`:
+親が指定されていない場合、レイアウトはツリー上もっとも近くにあるデフォルトのレイアウト(つまり名前が付いていないレイアウト)を継承することになります。名前付きレイアウト(named layout)がツリー上一緒に並んでいるデフォルトのレイアウトを継承するので便利です。例えば、`__layout-root.svelte` は `__layout.svelte` を継承します。明示的に `@default` を指定することで、`/x/y/one` や同じ階層にあるページがアプリのデフォルトのレイアウトを使用するのに `x/__layout.svelte` を使う必要がなくなります:
 
 ```diff
 src/routes/
@@ -131,7 +131,7 @@ src/routes/
 +└ __layout-root@default.svelte
 ```
 
-> `default` is a reserved name — in other words, you can't have a `__layout-default.svelte` file.
+> `default` は予約済の名前です。言い換えると、`__layout-default.svelte` というファイルを使用することはできないということです。
 
 ### エラーページ
 
@@ -168,7 +168,7 @@ src/routes/
 
 #### 404s
 
-Nested error pages are only rendered when an error occurs while rendering a specific page. In the case of a request that doesn't match any existing route, SvelteKit will render a generic 404 instead. For example, given these routes...
+特定のページをレンダリングしているときにエラーが発生した場合のみ、ネストしたエラーページがレンダリングされます。リクエストがどのルートにもマッチしない場合、SvelteKitは代わりに一般的な 404 をレンダリングします。例えば、このようなルートの場合…
 
 ```
 src/routes/
@@ -180,7 +180,7 @@ src/routes/
 │ └ groucho.svelte
 ```
 
-...the `marx-brothers/__error.svelte` file will _not_ be rendered if you visit `/marx-brothers/karl`. If you want to render the nested error page, you should create a route that matches any `/marx-brothers/*` request, and return a 404 from it:
+… `/marx-brothers/karl` をリクエストしたとしても `marx-brothers/__error.svelte` ファイルはレンダリングされません。ネストしたエラーページをレンダリングさせるには、`/marx-brothers/*` に対するどんなリクエストにもマッチするようなルート(route)を作成し、そこから 404 を返すようにしてください:
 
 ```diff
 src/routes/
