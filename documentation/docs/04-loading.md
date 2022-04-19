@@ -50,7 +50,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 ### Input
 
-`load` 関数は、`url`、`params`、`props`、`fetch`、`session`、`stuff` の6つのフィールドを持つオブジェクトを受け取ります。`load` 関数はリアクティブなので、関数内でそれらのパラメータが使われている場合は、そのパラメータが変更されると再実行されます。具体的には、`url`、`session`、`stuff` が関数で使用されている場合、それらの値が変更されると再実行されます。`params`の個別のプロパティも同様です。
+`load` 関数は、`url`、`params`、`props`、`fetch`、`session`、`stuff`、`status`、`error` の8つのフィールドを持つオブジェクトを受け取ります。`load` 関数はリアクティブなので、関数内でそれらのパラメータが使われている場合は、そのパラメータが変更されると再実行されます。具体的には、`url`、`session`、`stuff` が関数で使用されている場合、それらの値が変更されると再実行されます。`params`の個別のプロパティも同様です。
 
 > 関数の宣言の中でパラメータを分割しているだけで、使用されていると見なされるのでご注意ください。
 
@@ -93,6 +93,14 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 `stuff` は、レイアウトからその子孫のレイアウトとページに渡されるもので、使いたいものを埋め込むことができます。ルート(root)の `__layout.svelte` コンポーネントでは `{}` と同じですが、そのコンポーネントの `load` 関数が `stuff` プロパティを持つオブジェクトを返す場合、それ以降の `load` 関数でそれが利用できるようになります。
 
+#### status
+
+`status` is the HTTP status code when rendering an error page, or `null` otherwise.
+
+#### error
+
+`error` is the error that was thrown (or returned from a previous `load`) when rendering an error page, or `null` otherwise.
+
 ### Output
 
 `load` から Promise を返した場合、SvelteKit は Promise が解決するまでレンダリングを遅らせます。戻り値にはいくつかプロパティがあり、全てオプションです。
@@ -126,3 +134,9 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 これは既存の `stuff` とマージされ、後続のレイアウトコンポーネントやページコンポーネントの `load` 関数に渡されます。
 
 マージされた `stuff` は、`$page.stuff` のように [page store](/docs/modules#$app-stores) を使用するコンポーネントから利用可能で、ページがレイアウトに対してデータを '上向きに' 渡すためのメカニズムを提供します。
+
+#### dependencies
+
+An array of strings representing URLs the page depends on, which can subsequently be used with [`invalidate`](/docs/modules#$app-navigation-invalidate) to cause `load` to rerun. You only need to add them to `dependencies` if you're using a custom API client; URLs loaded with the provided `fetch` function are added automatically.
+
+URLs can be absolute or relative to the page being loaded, and must be [encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).

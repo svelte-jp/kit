@@ -81,7 +81,7 @@ export async function get({ params }) {
 }
 ```
 
-> エンドポイントを含む全てのサーバーサイドのコードは、外部のAPIにデータをリクエストする場合に備えて、`fetch` にアクセスすることができます。`$lib` のインポートについては心配無用です、それについては[後ほど](/docs/modules#$lib)触れます。
+> `$lib` のインポートについては心配無用です、それについては[後ほど](/docs/modules#$lib)触れます。
 
 上記の `get` 関数の型は、SvelteKit が ([`outDir`](/docs/configuration#outdir) の中に、[`rootDirs`](https://www.typescriptlang.org/tsconfig#rootDirs) オプションを使用して) 生成する `./[id].d.ts` ファイルにあり、`params` にアクセスするときの型安全性を提供します。詳細は [generated types](/docs/types#generated-types) をご覧ください。
 
