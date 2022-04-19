@@ -2,7 +2,7 @@
 title: Command Line Interface
 ---
 
-SvelteKit にはアプリのビルドと実行のためのコマンドラインインタフェースがあります。
+SvelteKit にはアプリのビルドと実行のためのコマンドラインインターフェイスがあります。
 
 デフォルトのプロジェクトテンプレートでは、`svelte-kit dev`、`svelte-kit build`、`svelte-kit preview` はそれぞれ `npm run dev`、`npm run build`、`npm run preview` でエイリアスされています。また、[npx](https://www.npmjs.com/package/npx) でCLIを実行することもできます:
 

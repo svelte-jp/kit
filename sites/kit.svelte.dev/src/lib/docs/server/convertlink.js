@@ -1,7 +1,7 @@
 const docs_introduction = new Map([
 	['始める前に', 'Before we begin'],
 	['SvelteKitとは', 'What is SvelteKit?'],
-	['エディターのセットアップ', 'Editor setup']
+	['エディタのセットアップ', 'Editor setup']
 ]);
 
 const docs_routing = new Map([
@@ -81,19 +81,19 @@ export function convert_link(label, file, heading) {
 		switch (file) {
 			case '00-introduction.md':
 				return docs_introduction.get(heading) || heading;
-			case '01-routing.md':
+			case '02-routing.md':
 				return docs_routing.get(heading) || heading;
-			case '02-layouts.md':
+			case '03-layouts.md':
 				return docs_layouts.get(heading) || heading;
-			case '09-adapters.md':
+			case '10-adapters.md':
 				return docs_adapters.get(heading) || heading;
-			case '10-page-options.md':
+			case '11-page-options.md':
 				return docs_page_options.get(heading) || heading;
-			case '11-packaging.md':
+			case '12-packaging.md':
 				return docs_packaging.get(heading) || heading;
-			case '15-seo.md':
+			case '16-seo.md':
 				return docs_seo.get(heading) || heading;
-			case '16-assets.md':
+			case '17-assets.md':
 				return docs_assets.get(heading) || heading;
 			case '80-migrating.md':
 				return docs_migrating.get(heading) || heading;

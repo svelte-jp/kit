@@ -2,31 +2,31 @@
 title: Web standards
 ---
 
-Throughout this documentation, you'll see references to the standard [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API) that SvelteKit builds on top of. Rather than reinventing the wheel, we _use the platform_, which means your existing web development skills are applicable to SvelteKit. Conversely, time spent learning SvelteKit will help you be a better web developer elsewhere.
+このドキュメントを通じて、SvelteKit の土台となっている標準の [Web API](https://developer.mozilla.org/en-US/docs/Web/API) を参照することができます。私たちは車輪の再発明をするのではなく、_プラットフォームを使用します_ 。つまり、既存の Web 開発スキルが SvelteKit にも活用できるということです。逆に言えば、SvelteKit の学習に時間を割くことは、あなたが他の場所でも通用する良い Web 開発者になるのに役立つでしょう。
 
-These APIs are available in all modern browsers and in many non-browser environments like Cloudflare Workers, Deno and Vercel Edge Functions. During development, and in [adapters](/docs/adapters) for Node-based environments (including AWS Lambda), they're made available via polyfills where necessary (for now, that is — Node is rapidly adding support for more web standards).
+これらの API は、全てのモダンブラウザはもちろん、Cloudflare Workers、Deno、Vercel Edge Functions といったブラウザ以外の環境でも使用することができます。開発中や、(AWS Lambda を含む) Node ベースの環境向けの [adapters](/docs/adapters) では、必要に応じて polyfill で利用できるようにしています (現時点においては。Node は急速により多くの Web 標準のサポートを追加しています)。
 
-In particular, you'll get comfortable with the following:
+具体的には、以下のことが楽にできるでしょう:
 
 ### Fetch APIs
 
-SvelteKit uses [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/fetch) for getting data from the network. It's available in [hooks](/docs/hooks) and [endpoints](/docs/routing#endpoints) as well as in the browser.
+SvelteKit は、ネットワーク越しにデータを取得するために [`fetch`](https://developer.mozilla.org/ja/docs/Web/API/fetch) を使用します。ブラウザだけでなく、[hooks](/docs/hooks) や [エンドポイント(endpoint)](/docs/routing#endpoints) の中でも使用することができます。
 
-> A special version of `fetch` is available in [`load`](/docs/loading) functions for accessing data directly from endpoints while preserving credentials.
+> [`load`](/docs/loading) 関数では、クレデンシャルを保持したままエンドポイントから直接データにアクセスするための特別バージョンの `fetch` を使用することができます。
 
-Besides `fetch` itself, the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) includes the following interfaces:
+`fetch` 自体の他に、[Fetch API](https://developer.mozilla.org/ja/docs/Web/API/Fetch_API) には以下のインターフェイスが含まれています:
 
 #### Request
 
-An instance of [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) is accessible in [hooks](/docs/hooks) and [endpoints](/docs/routing#endpoints) as `event.request`. It contains useful methods like `request.json()` and `request.formData()` for e.g. getting data that was posted to an endpoint.
+[`Request`](https://developer.mozilla.org/ja/docs/Web/API/Request) のインスタンスは [hooks](/docs/hooks) や [エンドポイント(endpoint)](/docs/routing#endpoints) で `event.request` という形でアクセスすることができます。これには `request.json()` や `request.formData()` など、例えばエンドポイントに送られたデータを取得するための便利なメソッドが含まれています。
 
 #### Response
 
-An instance of [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response) is returned from `await fetch(...)`. Fundamentally, a SvelteKit app is a machine for turning a `Request` into a `Response`.
+[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) のインスタンスは `await fetch(...)` から返されます。本質的には、SvelteKit アプリは `Request` を `Response` に変換するマシンです。
 
 #### Headers
 
-The [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers) interface allows you to read incoming `request.headers` and set outgoing `response.headers`:
+[`Headers`](https://developer.mozilla.org/ja/docs/Web/API/Headers) インターフェイスでは、SvelteKit が受信した `request.headers` を読むことと、送信する `response.headers` をセットすることができます:
 
 ```js
 // @errors: 2461
@@ -47,11 +47,11 @@ export function get(event) {
 
 ### URL APIs
 
-URLs are represented by the [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL) interface, which includes useful properties like `origin` and `pathname` (and, in the browser, `hash`). This interface shows up in various places — `event.url` in [hooks](/docs/hooks) and [endpoints](/docs/routing#endpoints), [`$page.url`](/docs/modules#$app-stores) in [pages](/docs/routing#pages), `from` and `to` in [`beforeNavigate` and `afterNavigate`](/docs/modules#$app-navigation) and so on.
+URL は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) インターフェイスで表現され、`origin` や `pathname` のような便利なプロパティが含まれています (ブラウザでは `hash` なども)。このインターフェイスは、[hooks](/docs/hooks) と [エンドポイント(endpoints)](/docs/routing#endpoints) では `event.url`、[ページ(pages)](/docs/routing#pages) では [`$page.url`](/docs/modules#$app-stores)、[`beforeNavigate` と `afterNavigate`](/docs/modules#$app-navigation) では `from` と `to`、など、様々な場所で使われています。
 
 #### URLSearchParams
 
-Wherever you encounter a URL, you can access query parameters via `url.searchParams`, which is an instance of [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams):
+URL が存在する場所であれば、[`URLSearchParams`](https://developer.mozilla.org/ja/docs/Web/API/URLSearchParams) のインスタンスである `url.searchParams` を使用してクエリパラメータにアクセスできます:
 
 ```js
 // @filename: ambient.d.ts

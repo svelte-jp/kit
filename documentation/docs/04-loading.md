@@ -95,11 +95,11 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### status
 
-`status` is the HTTP status code when rendering an error page, or `null` otherwise.
+`status` は、エラーページのレンダリング中は HTTP のステータスコードとなり、それ以外の場合は `null` となります。
 
 #### error
 
-`error` is the error that was thrown (or returned from a previous `load`) when rendering an error page, or `null` otherwise.
+`error` は、エラーページのレンダリング中は、スローされた (または直前の `load` から返された) エラーとなり、それ以外の場合には `null` となります。 
 
 ### Output
 
@@ -137,6 +137,6 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### dependencies
 
-An array of strings representing URLs the page depends on, which can subsequently be used with [`invalidate`](/docs/modules#$app-navigation-invalidate) to cause `load` to rerun. You only need to add them to `dependencies` if you're using a custom API client; URLs loaded with the provided `fetch` function are added automatically.
+ページが依存している URL を表す文字列の配列で、後から `load` を再実行させる [`invalidate`](/docs/modules#$app-navigation-invalidate) で使用することができます。カスタムの API クライアントを使用している場合は、その URL を `dependencies` に追加する必要があります。提供される `fetch` 関数で読み込まれる URL は自動的に追加されます。
 
-URLs can be absolute or relative to the page being loaded, and must be [encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
+URL は、読み込まれるページに対して相対 (relative) でも絶対 (absolute) でも大丈夫ですが、[エンコード](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding) されている必要があります。

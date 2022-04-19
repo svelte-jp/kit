@@ -77,7 +77,7 @@ export async function get({ params }) {
 
 #### Default tsconfig.json
 
-The generated `.svelte-kit/tsconfig.json` file contains a mixture of options. Some are generated programmatically based on your project configuration, and should generally not be overridden without good reason:
+生成された `.svelte-kit/tsconfig.json` ファイルには様々なオプションが含まれています。いくつかのオプションはプロジェクトの設定に基づいてプログラム的に生成されており、通常は、適切な理由なしに上書きするべきではありません。
 
 ```json
 /// file: .svelte-kit/tsconfig.json
@@ -95,7 +95,7 @@ The generated `.svelte-kit/tsconfig.json` file contains a mixture of options. So
 }
 ```
 
-Others are required for SvelteKit to work properly, and should also be left untouched unless you know what you're doing:
+その他のオプションは SvelteKit が正常に動作するために必要なものであり、変更したときに何が起こるのか把握していないのであれば、そのままにしておく必要があります:
 
 ```json
 /// file: .svelte-kit/tsconfig.json
