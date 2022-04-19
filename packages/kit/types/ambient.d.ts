@@ -103,9 +103,9 @@ declare module '$app/navigation' {
 	): Promise<void>;
 	/**
 	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` する場合、再実行させます。それに続いてページが更新されたときに解決される `Promise` を返します。
-	 * @param href The invalidated resource
+	 * @param dependency The invalidated resource
 	 */
-	export function invalidate(href: string): Promise<void>;
+	export function invalidate(dependency: string | ((href: string) => boolean)): Promise<void>;
 	/**
 	 * 指定されたページをプログラム的にプリフェッチします、つまり
 	 *  1. そのページのコードが取得され読み込まれていることを確認し、
