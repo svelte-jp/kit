@@ -128,9 +128,9 @@ cache: {
 }
 ```
 
-To cause pages to be cached, return a `cache` object containing a `maxage` property set to a `number` describing the page's max age in seconds. Optionally, also include a `boolean` `private` property indicating whether the resulting `Cache-Control` header should be `private` or `public` (meaning it can be cached by CDNs in addition to individual browsers).
+ページをキャッシュさせるには `cache` オブジェクトを返します。`cache` オブジェクトには、ページの最大保持期間(秒単位) を表す `number` 型の `maxage` プロパティを含めます。オプションで、`Cache-Control` ヘッダーを `private` にするか `public` にするか決める `boolean` 型の `private` プロパティも含めることができます (これにより、ブラウザ個別だけではなく CDN にキャッシュさせることができるようになります) 。
 
-> If `cache.private` is `undefined`, SvelteKit will set it automatically using the following heuristic: if a `load` function makes a credentialled `fetch`, or the page uses `session`, the page is considered private.
+> `cache.private` が `undefined` の場合は、SvelteKit が次のヒューリスティックに従い自動でセットします: もし `load` 関数がクレデンシャルな `fetch` を行っている場合、またはページが `session` を使用している場合は、そのページは private であるとみなされます。
 
 これはページにのみ適用され、レイアウトには適用されません。
 

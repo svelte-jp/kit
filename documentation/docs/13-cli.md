@@ -44,6 +44,6 @@ npx svelte-kit dev
 
 > `svelte-kit package` は現時点では experimental で、セマンティックバージョニングのルールの対象外です。将来のリリースで後方互換性のない変更が行われる可能性があります。
 
-For package authors, see [packaging](/docs/packaging). `svelte-kit package` accepts the following options:
+パッケージ作者の方は、[packaging](/docs/packaging) をご覧ください。`svelte-kit package` は以下のオプションを受け取ります:
 
-- `-w`/`--watch` — watch files in `src/lib` for changes and rebuild the package
+- `-w`/`--watch` — `src/lib` にあるファイルの変更をウォッチし、パッケージを再ビルドします

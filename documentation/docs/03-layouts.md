@@ -90,10 +90,10 @@ title: レイアウト
 src/routes/
 ├ x/
 │ ├ __layout-foo.svelte
-│ ├ one@foo.svelte       # ✅ page has `@foo`
-│ ├ two@foo.svelte       # ✅ page has `@foo`
-│ └ three.svelte         # ❌ page does not have `@foo`
-└ four@foo.svelte        # ❌ page has `@foo`, but __layout-foo is not 'in scope'
+│ ├ one@foo.svelte       # ✅ `@foo` が付いているページ
+│ ├ two@foo.svelte       # ✅ `@foo` が付いているページ
+│ └ three.svelte         # ❌ `@foo` が付いていないページ
+└ four@foo.svelte        # ❌ `@foo` が付いているページだが、__layout-foo の 'スコープ内' ではない
 ```
 
 #### 継承チェーン(Inheritance chains)
