@@ -1,5 +1,39 @@
 # @sveltejs/kit
 
+## 1.0.0-next.320
+
+### Patch Changes
+
+- [breaking] Replace `maxage` with `cache` in `LoadOutput` ([#4690](https://github.com/sveltejs/kit/pull/4690))
+
+## 1.0.0-next.319
+
+### Patch Changes
+
+- Add --watch flag to svelte-kit package ([#4658](https://github.com/sveltejs/kit/pull/4658))
+
+## 1.0.0-next.318
+
+### Patch Changes
+
+- fix broken AdapterEntry type ([#4674](https://github.com/sveltejs/kit/pull/4674))
+
+## 1.0.0-next.317
+
+### Patch Changes
+
+- Navigation to current URL is no longer a no-op ([#4664](https://github.com/sveltejs/kit/pull/4664))
+
+* builder.createEntries returns a promise that awaits complete() callbacks ([#4663](https://github.com/sveltejs/kit/pull/4663))
+
+- navigation store resets to null after aborted nav ([#4664](https://github.com/sveltejs/kit/pull/4664))
+
+## 1.0.0-next.316
+
+### Patch Changes
+
+- `invalidate` with `predicate` function ([#4636](https://github.com/sveltejs/kit/pull/4636))
+
 ## 1.0.0-next.315
 
 ### Patch Changes

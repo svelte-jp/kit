@@ -86,14 +86,14 @@ title: レイアウト
 
 名前付きレイアウト(Named layouts)は任意の深さに作成することができ、同じサブツリーにあるどのコンポーネントにも適用されます。例えば、`__layout-foo` は `/x/one` と `/x/two` に適用されますが、`/x/three` や `/four` には適用されません:
 
-```
+```bash
 src/routes/
 ├ x/
 │ ├ __layout-foo.svelte
-│ ├ one@foo.svelte
-│ ├ two@foo.svelte
-│ └ three.svelte
-└ four@foo.svelte
+│ ├ one@foo.svelte       # ✅ page has `@foo`
+│ ├ two@foo.svelte       # ✅ page has `@foo`
+│ └ three.svelte         # ❌ page does not have `@foo`
+└ four@foo.svelte        # ❌ page has `@foo`, but __layout-foo is not 'in scope'
 ```
 
 #### 継承チェーン(Inheritance chains)

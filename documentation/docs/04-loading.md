@@ -44,7 +44,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 > - `window` や `document` などの、ブラウザ固有のオブジェクトを参照してはいけません
 > - クライアントに公開されるAPIキーやシークレットを直接参照するのではなく、必要なシークレットを使用するエンドポイントを呼び出す必要があります。
 
-リクエスト前の状態をグローバル変数に保存しないでください。キャッシュやデータベース接続の保持など、横断的な関心事にのみ使用することを推奨します。
+リクエスト毎の状態をグローバル変数に保存しないでください。キャッシュやデータベースコネクションの保持など、横断的な関心事にのみ使用することを推奨します。
 
 > サーバー上の共有状態を変更すると、現在のクライアントだけでなく全てのクライアントに影響します。
 
@@ -119,9 +119,18 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 `redirect` 文字列は [適切にエンコードされた](https://developer.mozilla.org/ja/docs/Glossary/percent-encoding) URI である必要があります。絶対 URI と 相対 URI の両方が許容されます。
 
-#### maxage
+#### cache
 
-ページをキャッシュさせるには、ページの max age を秒単位で表した `number` を返します。レンダリングページにユーザーデータが含まれる場合(`session`経由か、`load` 関数内のクレデンシャル付きの `fetch` など)、結果のキャッシュヘッダには `private` が含まれます。それ以外の場合は、CDN でキャッシュできるように `public` が含まれます。
+```json
+cache: {
+	"maxage": 300,
+	"private": false
+}
+```
+
+To cause pages to be cached, return a `cache` object containing a `maxage` property set to a `number` describing the page's max age in seconds. Optionally, also include a `boolean` `private` property indicating whether the resulting `Cache-Control` header should be `private` or `public` (meaning it can be cached by CDNs in addition to individual browsers).
+
+> If `cache.private` is `undefined`, SvelteKit will set it automatically using the following heuristic: if a `load` function makes a credentialled `fetch`, or the page uses `session`, the page is considered private.
 
 これはページにのみ適用され、レイアウトには適用されません。
 
