@@ -38,7 +38,7 @@ export interface Builder {
 	 * Create entry points that map to individual functions
 	 * @param fn A function that groups a set of routes into an entry point
 	 */
-	createEntries(fn: (route: RouteDefinition) => AdapterEntry): void;
+	createEntries(fn: (route: RouteDefinition) => AdapterEntry): Promise<void>;
 
 	generateManifest: (opts: { relativePath: string; format?: 'esm' | 'cjs' }) => string;
 
@@ -207,8 +207,13 @@ export interface LoadOutput<Props extends Record<string, any> = Record<string, a
 	redirect?: string;
 	props?: Props;
 	stuff?: Partial<App.Stuff>;
-	maxage?: number;
+	cache?: LoadOutputCache;
 	dependencies?: string[];
+}
+
+export interface LoadOutputCache {
+	maxage: number;
+	private?: boolean;
 }
 
 export interface Navigation {
