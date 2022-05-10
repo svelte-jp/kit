@@ -1,5 +1,51 @@
 # @sveltejs/kit
 
+## 1.0.0-next.326
+
+### Patch Changes
+
+- [breaking] add lib, module, and target to generated tsconfig ([#4791](https://github.com/sveltejs/kit/pull/4791))
+
+## 1.0.0-next.325
+
+### Patch Changes
+
+- Display network logs in node 18 ([#4778](https://github.com/sveltejs/kit/pull/4778))
+
+## 1.0.0-next.324
+
+### Patch Changes
+
+- Throw errors on encountering named layout in directory ([#4756](https://github.com/sveltejs/kit/pull/4756))
+
+## 1.0.0-next.323
+
+### Patch Changes
+
+- Default to target: node14.8, so that top-level await is supported in user code ([#4742](https://github.com/sveltejs/kit/pull/4742))
+
+* Only complain about missing \$lib paths in tsconfig if src/lib exists ([#4735](https://github.com/sveltejs/kit/pull/4735))
+
+- Include all assets in `$service-worker` build, not just CSS ([#4744](https://github.com/sveltejs/kit/pull/4744))
+
+## 1.0.0-next.322
+
+### Patch Changes
+
+- Copy dotfiles from .svelte-kit/output ([#4725](https://github.com/sveltejs/kit/pull/4725))
+
+* [breaking] Ignore `trailingSlash` for endpoint requests, apply `trailingSlash` to pages consistently ([#4699](https://github.com/sveltejs/kit/pull/4699))
+
+## 1.0.0-next.321
+
+### Patch Changes
+
+- Tweak error message for non-validating base paths ([#4713](https://github.com/sveltejs/kit/pull/4713))
+
+* [breaking] Supplying an empty `--host` option to `preview` exposes the server to both ipv4 and ipv6 networks ([#4729](https://github.com/sveltejs/kit/pull/4729))
+
+- throw error on encountering infinite layout loop ([#4730](https://github.com/sveltejs/kit/pull/4730))
+
 ## 1.0.0-next.320
 
 ### Patch Changes

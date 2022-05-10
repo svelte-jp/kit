@@ -305,12 +305,20 @@ function trace(file, path, tree, extensions) {
 
 	let layout_id = base.includes('@') ? base.split('@')[1] : DEFAULT;
 
+	if (parts.findIndex((part) => part.indexOf('@') > -1) > -1) {
+		throw new Error(`Invalid route ${file} - named layouts are not allowed in directories`);
+	}
+
 	// walk up the tree, find which __layout and __error components
 	// apply to this page
 	// eslint-disable-next-line
 	while (true) {
 		const node = tree.get(parts.join('/'));
 		const layout = node?.layouts[layout_id];
+
+		if (layout?.file && layouts.indexOf(layout.file) > -1) {
+			throw new Error(`Recursive layout detected: ${layout.file} -> ${layouts.join(' -> ')}`);
+		}
 
 		// any segment that has neither a __layout nor an __error can be discarded.
 		// in other words these...

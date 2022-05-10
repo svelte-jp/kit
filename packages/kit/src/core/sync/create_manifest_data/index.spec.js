@@ -551,6 +551,34 @@ test('errors on duplicate layout definition', () => {
 	);
 });
 
+test('errors on recursive name layout', () => {
+	assert.throws(
+		() => create('samples/named-layout-recursive-1'),
+		/Recursive layout detected: samples\/named-layout-recursive-1\/__layout-a@b\.svelte -> samples\/named-layout-recursive-1\/__layout-b@a\.svelte -> samples\/named-layout-recursive-1\/__layout-a@b\.svelte/
+	);
+	assert.throws(
+		() => create('samples/named-layout-recursive-2'),
+		/Recursive layout detected: samples\/named-layout-recursive-2\/__layout-a@a\.svelte -> samples\/named-layout-recursive-2\/__layout-a@a\.svelte/
+	);
+
+	assert.throws(
+		() => create('samples/named-layout-recursive-3'),
+		/Recursive layout detected: samples\/named-layout-recursive-3\/__layout@a\.svelte -> samples\/named-layout-recursive-3\/__layout-a@default\.svelte -> samples\/named-layout-recursive-3\/__layout@a\.svelte/
+	);
+});
+
+test('errors on layout in directory', () => {
+	assert.throws(
+		() => create('samples/named-layout-on-directory-1'),
+		/Invalid route samples\/named-layout-on-directory-1\/foo@a\/index.svelte - named layouts are not allowed in directories/
+	);
+
+	assert.throws(
+		() => create('samples/named-layout-on-directory-2'),
+		/Invalid route samples\/named-layout-on-directory-2\/foo@a\/bar.svelte - named layouts are not allowed in directories/
+	);
+});
+
 test('allows for __tests__ directories', () => {
 	const { routes } = create('samples/legal-dunder');
 

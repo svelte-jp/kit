@@ -108,7 +108,7 @@ export async function get({ params }) {
 <h1>{item.title}</h1>
 ```
 
-ページとエンドポイントが同じURLになるため、ページから HTML を取得するのではなくエンドポイントから JSON を取得するときは `accept: application/json` ヘッダーを付ける必要があります。また、URL に `/__data.json` を追加することで(例: `/items/__data.json`)、生データ(raw data)を取得できます。
+ページとエンドポイントが同じURLになるため、ページから HTML を取得するのではなくエンドポイントから JSON を取得するときは `accept: application/json` ヘッダーを付ける必要があります。また、URL に `/__data.json` を追加することで(例: `/items/[id]/__data.json`)、生データ(raw data)を取得できます。
 
 #### スタンドアロンエンドポイント(Standalone endpoints)
 
