@@ -115,7 +115,14 @@ export async function get({ params }) {
 		// TypeScript cannot 'see' when you
 		// use an imported value in your
 		// markup, so we need this
-		"preserveValueImports": true
+		"preserveValueImports": true,
+
+		// This ensures both `svelte-kit build`
+		// and `svelte-kit package` work correctly
+		"lib": ["esnext", "DOM"],
+		"moduleResolution": "node",
+		"module": "esnext",
+		"target": "esnext"
 	}
 }
 ```

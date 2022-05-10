@@ -115,11 +115,15 @@ SvelteKit では、それらにアクセスする方法が異なります。`sto
 
 ルート(routes) の正規表現はもうサポートされていません。代わりに、[advanced route matching](/docs/routing#advanced-routing-matching) をお使いください。
 
+#### Segments
+
+Previously, layout components received a `segment` prop indicating the child segment. This has been removed; you should use the more flexible `$page.url.pathname` value to derive the segment you're interested in.
+
 #### URLs
 
 Sapper では、相対 URL は、現在のページに対してではなく、base URL (`basepath` オプションが使用されていない限り、大抵の場合は `/`) に対して解決されていました。
 
-これによって問題が発生していましたが、SvelteKit ではもうそのようなことはありません。URL は現在のページ(または `load` 関数の `fetch` URL の場合は移動先のページ) に対して解決されるようになりました。
+これによって問題が発生していましたが、SvelteKit ではもうそのようなことはありません。相対 URL が現在のページ (または `load` 関数の `fetch` URL の場合は移動先のページ) に対して解決されるようになりました。In most cases, it's easier to use root-relative (i.e. starts with `/`) URLs, since their meaning is not context-dependent.
 
 #### &lt;a&gt; attributes
 
