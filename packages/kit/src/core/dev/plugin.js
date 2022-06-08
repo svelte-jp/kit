@@ -1,55 +1,104 @@
+import { svelte as svelte_plugin } from '@sveltejs/vite-plugin-svelte';
 import fs from 'fs';
-import path from 'path';
-import { URL } from 'url';
 import colors from 'kleur';
+import path from 'path';
 import sirv from 'sirv';
-import { installFetch } from '../../install-fetch.js';
+import { URL } from 'url';
+import { searchForWorkspaceRoot } from 'vite';
+import { installPolyfills } from '../../node/polyfills.js';
 import * as sync from '../sync/sync.js';
-import { getRequest, setResponse } from '../../node.js';
+import { getRequest, setResponse } from '../../node/index.js';
 import { SVELTE_KIT_ASSETS } from '../constants.js';
-import { get_mime_lookup, get_runtime_path, resolve_entry } from '../utils.js';
+import { get_aliases, get_mime_lookup, get_runtime_path, resolve_entry } from '../utils.js';
 import { coalesce_to_error } from '../../utils/error.js';
-import { load_template } from '../config/index.js';
-import { sequence } from '../../hooks.js';
+import { load_template, print_config_conflicts } from '../config/index.js';
 import { posixify } from '../../utils/filesystem.js';
 import { parse_route_id } from '../../utils/routing.js';
-import { normalize_path } from '../../utils/url.js';
+import { deep_merge } from '../../utils/object.js';
+
+// Vite doesn't expose this so we just copy the list for now
+// https://github.com/vitejs/vite/blob/3edd1af56e980aef56641a5a51cf2932bb580d41/packages/vite/src/node/plugins/css.ts#L96
+const style_pattern = /\.(css|less|sass|scss|styl|stylus|pcss|postcss)$/;
+
+const cwd = process.cwd();
 
 /**
- * @param {import('types').ValidatedConfig} config
- * @param {string} cwd
- * @returns {Promise<import('vite').Plugin>}
+ * @param {import('types').ValidatedConfig} svelte_config
+ * @return {import('vite').Plugin}
  */
-export async function create_plugin(config, cwd) {
-	const runtime = get_runtime_path(config);
-
-	/** @type {import('types').Handle} */
-	let amp;
-
-	if (config.kit.amp) {
-		process.env.VITE_SVELTEKIT_AMP = 'true';
-		amp = (await import('./amp_hook.js')).handle;
-	}
-
-	process.env.VITE_SVELTEKIT_APP_VERSION_POLL_INTERVAL = '0';
-
-	/** @type {import('types').Respond} */
-	const respond = (await import(`${runtime}/server/index.js`)).respond;
-
+export const sveltekit = function (svelte_config) {
+	const kit_config = svelte_config.kit;
 	return {
 		name: 'vite-plugin-svelte-kit',
 
-		configureServer(vite) {
-			installFetch();
+		async config() {
+			const [vite_config] = deep_merge(
+				{
+					server: {
+						fs: {
+							allow: [
+								...new Set([
+									kit_config.files.lib,
+									kit_config.files.routes,
+									kit_config.outDir,
+									path.resolve(cwd, 'src'),
+									path.resolve(cwd, 'node_modules'),
+									path.resolve(searchForWorkspaceRoot(cwd), 'node_modules')
+								])
+							]
+						},
+						port: 3000,
+						strictPort: true,
+						watch: {
+							ignored: [`${kit_config.outDir}/**`, `!${kit_config.outDir}/generated/**`]
+						}
+					}
+				},
+				await kit_config.vite()
+			);
+
+			/** @type {[any, string[]]} */
+			const [merged_config, conflicts] = deep_merge(vite_config, {
+				configFile: false,
+				root: cwd,
+				resolve: {
+					alias: get_aliases(kit_config)
+				},
+				build: {
+					rollupOptions: {
+						// Vite dependency crawler needs an explicit JS entry point
+						// eventhough server otherwise works without it
+						input: `${get_runtime_path(kit_config)}/client/start.js`
+					}
+				},
+				base: '/'
+			});
+
+			print_config_conflicts(conflicts, 'kit.vite.');
+
+			return merged_config;
+		},
+
+		async configureServer(vite) {
+			installPolyfills();
+
+			sync.init(svelte_config);
+
+			const runtime = get_runtime_path(kit_config);
+
+			process.env.VITE_SVELTEKIT_APP_VERSION_POLL_INTERVAL = '0';
+
+			/** @type {import('types').Respond} */
+			const respond = (await import(`${runtime}/server/index.js`)).respond;
 
 			/** @type {import('types').SSRManifest} */
 			let manifest;
 
 			function update_manifest() {
-				const { manifest_data } = sync.update(config);
+				const { manifest_data } = sync.update(svelte_config);
 
 				manifest = {
-					appDir: config.kit.appDir,
+					appDir: kit_config.appDir,
 					assets: new Set(manifest_data.assets.map((asset) => asset.file)),
 					mimeTypes: get_mime_lookup(manifest_data),
 					_: {
@@ -58,7 +107,7 @@ export async function create_plugin(config, cwd) {
 							css: [],
 							js: []
 						},
-						nodes: manifest_data.components.map((id) => {
+						nodes: manifest_data.components.map((id, index) => {
 							return async () => {
 								const url = id.startsWith('..') ? `/@fs${path.posix.resolve(id)}` : `/${id}`;
 
@@ -70,7 +119,7 @@ export async function create_plugin(config, cwd) {
 								if (!node) throw new Error(`Could not find node for ${url}`);
 
 								const deps = new Set();
-								find_deps(node, deps);
+								await find_deps(vite, node, deps);
 
 								/** @type {Record<string, string>} */
 								const styles = {};
@@ -79,9 +128,8 @@ export async function create_plugin(config, cwd) {
 									const parsed = new URL(dep.url, 'http://localhost/');
 									const query = parsed.searchParams;
 
-									// TODO what about .scss files, etc?
 									if (
-										dep.file.endsWith('.css') ||
+										style_pattern.test(dep.file) ||
 										(query.has('svelte') && query.get('type') === 'style')
 									) {
 										try {
@@ -97,6 +145,7 @@ export async function create_plugin(config, cwd) {
 
 								return {
 									module,
+									index,
 									entry: url.endsWith('.svelte') ? url : url + '?import',
 									css: [],
 									js: [],
@@ -167,11 +216,16 @@ export async function create_plugin(config, cwd) {
 
 			update_manifest();
 
-			vite.watcher.on('add', update_manifest);
-			vite.watcher.on('unlink', update_manifest);
+			for (const event of ['add', 'unlink']) {
+				vite.watcher.on(event, (file) => {
+					if (file.startsWith(kit_config.files.routes + path.sep)) {
+						update_manifest();
+					}
+				});
+			}
 
-			const assets = config.kit.paths.assets ? SVELTE_KIT_ASSETS : config.kit.paths.base;
-			const asset_server = sirv(config.kit.files.assets, {
+			const assets = kit_config.paths.assets ? SVELTE_KIT_ASSETS : kit_config.paths.base;
+			const asset_server = sirv(kit_config.files.assets, {
 				dev: true,
 				etag: true,
 				maxAge: 0,
@@ -179,6 +233,11 @@ export async function create_plugin(config, cwd) {
 			});
 
 			return () => {
+				const serve_static_middleware = vite.middlewares.stack.find(
+					(middleware) =>
+						/** @type {function} */ (middleware.handle).name === 'viteServeStaticMiddleware'
+				);
+
 				remove_html_middlewares(vite.middlewares);
 
 				vite.middlewares.use(async (req, res) => {
@@ -193,28 +252,29 @@ export async function create_plugin(config, cwd) {
 
 						if (decoded.startsWith(assets)) {
 							const pathname = decoded.slice(assets.length);
-							const file = config.kit.files.assets + pathname;
+							const file = svelte_config.kit.files.assets + pathname;
 
 							if (fs.existsSync(file) && !fs.statSync(file).isDirectory()) {
-								req.url = encodeURI(pathname); // don't need query/hash
-								asset_server(req, res);
-								return;
+								if (has_correct_case(file, svelte_config.kit.files.assets)) {
+									req.url = encodeURI(pathname); // don't need query/hash
+									asset_server(req, res);
+									return;
+								}
 							}
 						}
 
-						if (req.url === '/favicon.ico') return not_found(res);
-
-						if (!decoded.startsWith(config.kit.paths.base)) {
-							const suggestion = normalize_path(
-								config.kit.paths.base + req.url,
-								config.kit.trailingSlash
+						if (!decoded.startsWith(svelte_config.kit.paths.base)) {
+							return not_found(
+								res,
+								`Not found (did you mean ${svelte_config.kit.paths.base + req.url}?)`
 							);
-							return not_found(res, `Not found (did you mean ${suggestion}?)`);
 						}
 
 						/** @type {Partial<import('types').Hooks>} */
-						const user_hooks = resolve_entry(config.kit.files.hooks)
-							? await vite.ssrLoadModule(`/${config.kit.files.hooks}`, { fixStacktrace: false })
+						const user_hooks = resolve_entry(svelte_config.kit.files.hooks)
+							? await vite.ssrLoadModule(`/${svelte_config.kit.files.hooks}`, {
+									fixStacktrace: false
+							  })
 							: {};
 
 						const handle = user_hooks.handle || (({ event, resolve }) => resolve(event));
@@ -222,7 +282,7 @@ export async function create_plugin(config, cwd) {
 						/** @type {import('types').Hooks} */
 						const hooks = {
 							getSession: user_hooks.getSession || (() => ({})),
-							handle: amp ? sequence(amp, handle) : handle,
+							handle,
 							handleError:
 								user_hooks.handleError ||
 								(({ /** @type {Error & { frame?: string }} */ error }) => {
@@ -254,19 +314,21 @@ export async function create_plugin(config, cwd) {
 						// can get loaded twice via different URLs, which causes failures. Might
 						// require changes to Vite to fix
 						const { default: root } = await vite.ssrLoadModule(
-							`/${posixify(path.relative(cwd, `${config.kit.outDir}/generated/root.svelte`))}`,
+							`/${posixify(
+								path.relative(cwd, `${svelte_config.kit.outDir}/generated/root.svelte`)
+							)}`,
 							{ fixStacktrace: false }
 						);
 
 						const paths = await vite.ssrLoadModule(
 							process.env.BUNDLED
-								? `/${posixify(path.relative(cwd, `${config.kit.outDir}/runtime/paths.js`))}`
+								? `/${posixify(path.relative(cwd, `${svelte_config.kit.outDir}/runtime/paths.js`))}`
 								: `/@fs${runtime}/paths.js`,
 							{ fixStacktrace: false }
 						);
 
 						paths.set_paths({
-							base: config.kit.paths.base,
+							base: svelte_config.kit.paths.base,
 							assets
 						});
 
@@ -279,15 +341,14 @@ export async function create_plugin(config, cwd) {
 							return res.end(err.reason || 'Invalid request body');
 						}
 
-						const template = load_template(cwd, config);
+						const template = load_template(cwd, svelte_config);
 
 						const rendered = await respond(
 							request,
 							{
-								amp: config.kit.amp,
-								csp: config.kit.csp,
+								csp: svelte_config.kit.csp,
 								dev: true,
-								floc: config.kit.floc,
+								floc: svelte_config.kit.floc,
 								get_stack: (error) => {
 									return fix_stack_trace(error);
 								},
@@ -314,30 +375,33 @@ export async function create_plugin(config, cwd) {
 									});
 								},
 								hooks,
-								hydrate: config.kit.browser.hydrate,
+								hydrate: svelte_config.kit.browser.hydrate,
 								manifest,
-								method_override: config.kit.methodOverride,
+								method_override: svelte_config.kit.methodOverride,
 								paths: {
-									base: config.kit.paths.base,
+									base: svelte_config.kit.paths.base,
 									assets
 								},
 								prefix: '',
-								prerender: config.kit.prerender.enabled,
-								read: (file) => fs.readFileSync(path.join(config.kit.files.assets, file)),
+								prerender: {
+									default: svelte_config.kit.prerender.default,
+									enabled: svelte_config.kit.prerender.enabled
+								},
+								read: (file) => fs.readFileSync(path.join(svelte_config.kit.files.assets, file)),
 								root,
-								router: config.kit.browser.router,
+								router: svelte_config.kit.browser.router,
 								template: ({ head, body, assets, nonce }) => {
 									return (
 										template
-											.replace(/%svelte\.assets%/g, assets)
-											.replace(/%svelte\.nonce%/g, nonce)
-											// head and body must be replaced last, in case someone tries to sneak in %svelte.assets% etc
-											.replace('%svelte.head%', () => head)
-											.replace('%svelte.body%', () => body)
+											.replace(/%sveltekit\.assets%/g, assets)
+											.replace(/%sveltekit\.nonce%/g, nonce)
+											// head and body must be replaced last, in case someone tries to sneak in %sveltekit.assets% etc
+											.replace('%sveltekit.head%', () => head)
+											.replace('%sveltekit.body%', () => body)
 									);
 								},
-								template_contains_nonce: template.includes('%svelte.nonce%'),
-								trailing_slash: config.kit.trailingSlash
+								template_contains_nonce: template.includes('%sveltekit.nonce%'),
+								trailing_slash: svelte_config.kit.trailingSlash
 							},
 							{
 								getClientAddress: () => {
@@ -348,10 +412,13 @@ export async function create_plugin(config, cwd) {
 							}
 						);
 
-						if (rendered) {
-							setResponse(res, rendered);
+						if (rendered.status === 404) {
+							// @ts-expect-error
+							serve_static_middleware.handle(req, res, () => {
+								setResponse(res, rendered);
+							});
 						} else {
-							not_found(res);
+							setResponse(res, rendered);
 						}
 					} catch (e) {
 						const error = coalesce_to_error(e);
@@ -363,7 +430,7 @@ export async function create_plugin(config, cwd) {
 			};
 		}
 	};
-}
+};
 
 /** @param {import('http').ServerResponse} res */
 function not_found(res, message = 'Not found') {
@@ -378,7 +445,8 @@ function remove_html_middlewares(server) {
 	const html_middlewares = [
 		'viteIndexHtmlMiddleware',
 		'vite404Middleware',
-		'viteSpaFallbackMiddleware'
+		'viteSpaFallbackMiddleware',
+		'viteServeStaticMiddleware'
 	];
 	for (let i = server.stack.length - 1; i > 0; i--) {
 		// @ts-expect-error using internals until https://github.com/vitejs/vite/pull/4640 is merged
@@ -389,14 +457,84 @@ function remove_html_middlewares(server) {
 }
 
 /**
+ * @param {import('vite').ViteDevServer} vite
  * @param {import('vite').ModuleNode} node
  * @param {Set<import('vite').ModuleNode>} deps
  */
-function find_deps(node, deps) {
-	for (const dep of node.importedModules) {
-		if (!deps.has(dep)) {
-			deps.add(dep);
-			find_deps(dep, deps);
+async function find_deps(vite, node, deps) {
+	// since `ssrTransformResult.deps` contains URLs instead of `ModuleNode`s, this process is asynchronous.
+	// instead of using `await`, we resolve all branches in parallel.
+	/** @type {Promise<void>[]} */
+	const branches = [];
+
+	/** @param {import('vite').ModuleNode} node */
+	async function add(node) {
+		if (!deps.has(node)) {
+			deps.add(node);
+			await find_deps(vite, node, deps);
 		}
 	}
+
+	/** @param {string} url */
+	async function add_by_url(url) {
+		const node = await vite.moduleGraph.getModuleByUrl(url);
+
+		if (node) {
+			await add(node);
+		}
+	}
+
+	if (node.ssrTransformResult) {
+		if (node.ssrTransformResult.deps) {
+			node.ssrTransformResult.deps.forEach((url) => branches.push(add_by_url(url)));
+		}
+	} else {
+		node.importedModules.forEach((node) => branches.push(add(node)));
+	}
+
+	await Promise.all(branches);
 }
+
+/**
+ * Determine if a file is being requested with the correct case,
+ * to ensure consistent behaviour between dev and prod and across
+ * operating systems. Note that we can't use realpath here,
+ * because we don't want to follow symlinks
+ * @param {string} file
+ * @param {string} assets
+ * @returns {boolean}
+ */
+function has_correct_case(file, assets) {
+	if (file === assets) return true;
+
+	const parent = path.dirname(file);
+
+	if (fs.readdirSync(parent).includes(path.basename(file))) {
+		return has_correct_case(parent, assets);
+	}
+
+	return false;
+}
+
+/**
+ * @param {import('types').ValidatedConfig} svelte_config
+ * @return {import('vite').Plugin[]}
+ */
+export const svelte = function (svelte_config) {
+	return svelte_plugin({
+		...svelte_config,
+		compilerOptions: {
+			...svelte_config.compilerOptions,
+			hydratable: !!svelte_config.kit.browser.hydrate
+		},
+		configFile: false
+	});
+};
+
+/**
+ * @param {import('types').ValidatedConfig} svelte_config
+ * @return {import('vite').Plugin[]}
+ */
+export const plugins = function (svelte_config) {
+	return [...svelte(svelte_config), sveltekit(svelte_config)];
+};

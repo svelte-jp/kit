@@ -16,7 +16,7 @@ const config = {
 
 	kit: {
 		adapter: undefined,
-		amp: false,
+		alias: {},
 		appDir: '_app',
 		browser: {
 			hydrate: true,
@@ -92,9 +92,26 @@ export default config;
 
 `svelte-kit build` を実行するのに必要で、異なるプラットフォーム向けにアウトプットがどのように変換されるかを決定します。[Adapters](/docs/adapters) をご参照ください。
 
-### amp
+### alias
 
-[AMP](/docs/seo#amp) モードを有効にします。
+An object containing zero or more aliases used to replace values in `import` statements. These aliases are automatically passed to Vite and TypeScript.
+
+For example, you can add aliases to a `components` and `utils` folder:
+
+```js
+/// file: svelte.config.js
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+	kit: {
+		alias: {
+			$components: 'src/components',
+			$utils: 'src/utils'
+		}
+	}
+};
+```
+
+> The built-in `$lib` alias is controlled by `config.kit.files.lib` as it is used for packaging.
 
 ### appDir
 

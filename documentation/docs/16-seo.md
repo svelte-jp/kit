@@ -22,7 +22,7 @@ SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から
 
 ### Manual setup
 
-#### &lt;title&gt; と &lt;meta&gt; 
+#### &lt;title&gt; と &lt;meta&gt;
 
 全てのページで、よく練られたユニークな `<title>` と `<meta name="description">` を [`<svelte:head>`](https://svelte.dev/docs#template-syntax-svelte-head) の内側に置くべきです。説明的な title と description の書き方に関するガイダンスと、検索エンジンにとってわかりやすいコンテンツを作るためのその他の方法については、Google の [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) のドキュメントで見つけることができます。
 
@@ -82,8 +82,40 @@ export async function get() {
 
 #### AMP
 
-現代のWeb開発における残念な現実として、サイトの [Accelerated Mobile Pages (AMP)](https://amp.dev/ja/) バージョンを作成しなければならないときがある、というものがあります。SvelteKitでは [`amp`](/docs/configuration#amp) コンフィグオプションを設定することでこれを行うことができます。これには、以下の効果があります。
+An unfortunate reality of modern web development is that it is sometimes necessary to create an [Accelerated Mobile Pages (AMP)](https://amp.dev/) version of your site. In SvelteKit this can be done by enforcing the following [configuration](/docs/configuration) options...
 
-- ルーターを含むクライアントサイドJavaScriptが無効になります
-- スタイルは `<style amp-custom>` に連結され、[AMP boilerplate](https://amp.dev/boilerplate/) がインジェクトされます
-- 開発時には、リクエストは [AMP validator](https://validator.ampproject.org/) でチェックされるため、エラーがあれば早い段階で警告を受け取ることができます
+```js
+/// file: svelte.config.js
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+	kit: {
+		// the combination of these options
+		// disables JavaScript
+		browser: {
+			hydrate: false,
+			router: false
+		},
+
+		// since <link rel="stylesheet"> isn't
+		// allowed, inline all styles
+		inlineStyleThreshold: Infinity
+	}
+};
+
+export default config;
+```
+
+...and transforming the HTML using `transformPage` along with `transform` imported from `@sveltejs/amp`:
+
+```js
+import * as amp from '@sveltejs/amp';
+
+/** @type {import('@sveltejs/kit').Handle} */
+export async function handle({ event, resolve }) {
+	return resolve(event, {
+		transformPage: ({ html }) => amp.transform(html)
+	});
+}
+```
+
+> It's a good idea to use the `handle` hook to validate the transformed HTML using `amphtml-validator`, but only if you're prerendering pages since it's very slow.

@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { pathToFileURL, URL } from 'url';
 import { mkdirp } from '../../../utils/filesystem.js';
-import { installFetch } from '../../../install-fetch.js';
+import { installPolyfills } from '../../../node/polyfills.js';
 import { is_root_relative, normalize_path, resolve } from '../../../utils/url.js';
 import { queue } from './queue.js';
 import { crawl } from './crawl.js';
@@ -40,7 +40,7 @@ const REDIRECT = 3;
 
 /**
  * @param {{
- *   config: import('types').ValidatedConfig;
+ *   config: import('types').ValidatedKitConfig;
  *   entries: string[];
  *   files: Set<string>;
  *   log: Logger;
@@ -55,43 +55,43 @@ export async function prerender({ config, entries, files, log }) {
 		paths: []
 	};
 
-	if (!config.kit.prerender.enabled) {
+	if (!config.prerender.enabled) {
 		return prerendered;
 	}
 
-	installFetch();
+	installPolyfills();
 
-	const server_root = join(config.kit.outDir, 'output');
+	const server_root = join(config.outDir, 'output');
 
 	/** @type {import('types').ServerModule} */
 	const { Server, override } = await import(pathToFileURL(`${server_root}/server/index.js`).href);
 	const { manifest } = await import(pathToFileURL(`${server_root}/server/manifest.js`).href);
 
 	override({
-		paths: config.kit.paths,
+		paths: config.paths,
 		prerendering: true,
-		read: (file) => readFileSync(join(config.kit.files.assets, file))
+		read: (file) => readFileSync(join(config.files.assets, file))
 	});
 
 	const server = new Server(manifest);
 
-	const error = normalise_error_handler(log, config.kit.prerender.onError);
+	const error = normalise_error_handler(log, config.prerender.onError);
 
-	const q = queue(config.kit.prerender.concurrency);
+	const q = queue(config.prerender.concurrency);
 
 	/**
 	 * @param {string} path
 	 * @param {boolean} is_html
 	 */
 	function output_filename(path, is_html) {
-		const file = path.slice(config.kit.paths.base.length + 1);
+		const file = path.slice(config.paths.base.length + 1);
 
 		if (file === '') {
 			return 'index.html';
 		}
 
 		if (is_html && !file.endsWith('.html')) {
-			return file + (config.kit.trailingSlash === 'always' ? 'index.html' : '.html');
+			return file + (file.endsWith('/') ? 'index.html' : '.html');
 		}
 
 		return file;
@@ -109,7 +109,7 @@ export async function prerender({ config, entries, files, log }) {
 		if (seen.has(decoded)) return;
 		seen.add(decoded);
 
-		const file = decoded.slice(config.kit.paths.base.length + 1);
+		const file = decoded.slice(config.paths.base.length + 1);
 		if (files.has(file)) return;
 
 		return q.add(() => visit(decoded, encoded || encodeURI(decoded), referrer));
@@ -121,7 +121,7 @@ export async function prerender({ config, entries, files, log }) {
 	 * @param {string?} referrer
 	 */
 	async function visit(decoded, encoded, referrer) {
-		if (!decoded.startsWith(config.kit.paths.base)) {
+		if (!decoded.startsWith(config.paths.base)) {
 			error({ status: 404, path: decoded, referrer, referenceType: 'linked' });
 			return;
 		}
@@ -131,8 +131,7 @@ export async function prerender({ config, entries, files, log }) {
 
 		const response = await server.respond(new Request(`http://sveltekit-prerender${encoded}`), {
 			getClientAddress,
-			prerender: {
-				default: config.kit.prerender.default,
+			prerendering: {
 				dependencies
 			}
 		});
@@ -159,20 +158,19 @@ export async function prerender({ config, entries, files, log }) {
 			);
 		}
 
-		if (config.kit.prerender.crawl && response.headers.get('content-type') === 'text/html') {
+		if (config.prerender.crawl && response.headers.get('content-type') === 'text/html') {
 			for (const href of crawl(text)) {
 				if (href.startsWith('data:') || href.startsWith('#')) continue;
 
 				const resolved = resolve(encoded, href);
 				if (!is_root_relative(resolved)) continue;
 
-				const parsed = new URL(resolved, 'http://localhost');
+				const { pathname, search } = new URL(resolved, 'http://localhost');
 
-				if (parsed.search) {
+				if (search) {
 					// TODO warn that query strings have no effect on statically-exported pages
 				}
 
-				const pathname = normalize_path(parsed.pathname, config.kit.trailingSlash);
 				enqueue(decoded, decodeURI(pathname), pathname);
 			}
 		}
@@ -193,37 +191,39 @@ export async function prerender({ config, entries, files, log }) {
 		const is_html = response_type === REDIRECT || type === 'text/html';
 
 		const file = output_filename(decoded, is_html);
-		const dest = `${config.kit.outDir}/output/prerendered/${category}/${file}`;
+		const dest = `${config.outDir}/output/prerendered/${category}/${file}`;
 
 		if (written.has(file)) return;
-		written.add(file);
 
 		if (response_type === REDIRECT) {
 			const location = response.headers.get('location');
 
 			if (location) {
-				mkdirp(dirname(dest));
-
-				log.warn(`${response.status} ${decoded} -> ${location}`);
-
-				writeFileSync(
-					dest,
-					`<meta http-equiv="refresh" content=${escape_html_attr(`0;url=${location}`)}>`
-				);
-
-				let resolved = resolve(encoded, location);
+				const resolved = resolve(encoded, location);
 				if (is_root_relative(resolved)) {
-					resolved = normalize_path(resolved, config.kit.trailingSlash);
 					enqueue(decoded, decodeURI(resolved), resolved);
 				}
 
-				if (!prerendered.redirects.has(decoded)) {
-					prerendered.redirects.set(decoded, {
-						status: response.status,
-						location: resolved
-					});
+				if (!response.headers.get('x-sveltekit-normalize')) {
+					mkdirp(dirname(dest));
 
-					prerendered.paths.push(normalize_path(decoded, 'never'));
+					log.warn(`${response.status} ${decoded} -> ${location}`);
+
+					writeFileSync(
+						dest,
+						`<meta http-equiv="refresh" content=${escape_html_attr(`0;url=${location}`)}>`
+					);
+
+					written.add(file);
+
+					if (!prerendered.redirects.has(decoded)) {
+						prerendered.redirects.set(decoded, {
+							status: response.status,
+							location: resolved
+						});
+
+						prerendered.paths.push(normalize_path(decoded, 'never'));
+					}
 				}
 			} else {
 				log.warn(`location header missing on redirect received from ${decoded}`);
@@ -237,6 +237,7 @@ export async function prerender({ config, entries, files, log }) {
 
 			log.info(`${response.status} ${decoded}`);
 			writeFileSync(dest, body);
+			written.add(file);
 
 			if (is_html) {
 				prerendered.pages.set(decoded, {
@@ -254,14 +255,14 @@ export async function prerender({ config, entries, files, log }) {
 		}
 	}
 
-	if (config.kit.prerender.enabled) {
-		for (const entry of config.kit.prerender.entries) {
+	if (config.prerender.enabled) {
+		for (const entry of config.prerender.entries) {
 			if (entry === '*') {
 				for (const entry of entries) {
-					enqueue(null, normalize_path(config.kit.paths.base + entry, config.kit.trailingSlash)); // TODO can we pre-normalize these?
+					enqueue(null, config.paths.base + entry); // TODO can we pre-normalize these?
 				}
 			} else {
-				enqueue(null, normalize_path(config.kit.paths.base + entry, config.kit.trailingSlash));
+				enqueue(null, config.paths.base + entry);
 			}
 		}
 
@@ -270,14 +271,13 @@ export async function prerender({ config, entries, files, log }) {
 
 	const rendered = await server.respond(new Request('http://sveltekit-prerender/[fallback]'), {
 		getClientAddress,
-		prerender: {
+		prerendering: {
 			fallback: true,
-			default: false,
 			dependencies: new Map()
 		}
 	});
 
-	const file = `${config.kit.outDir}/output/prerendered/fallback.html`;
+	const file = `${config.outDir}/output/prerendered/fallback.html`;
 	mkdirp(dirname(file));
 	writeFileSync(file, await rendered.text());
 
