@@ -5,8 +5,11 @@ import {
 	GetSession,
 	Handle,
 	HandleError,
+	KitConfig,
 	Load,
+	RequestEvent,
 	RequestHandler,
+	ResolveOptions,
 	Server,
 	SSRManifest
 } from './index';
@@ -14,9 +17,7 @@ import {
 	HttpMethod,
 	JSONObject,
 	MaybePromise,
-	RequestEvent,
 	RequestOptions,
-	ResolveOptions,
 	ResponseHeaders,
 	TrailingSlash
 } from './private';
@@ -94,7 +95,7 @@ export class InternalServer extends Server {
 	respond(
 		request: Request,
 		options: RequestOptions & {
-			prerender?: PrerenderOptions;
+			prerendering?: PrerenderOptions;
 		}
 	): Promise<Response>;
 }
@@ -147,7 +148,6 @@ export interface PrerenderDependency {
 
 export interface PrerenderOptions {
 	fallback?: boolean;
-	default: boolean;
 	dependencies: Map<string, PrerenderDependency>;
 }
 
@@ -227,6 +227,8 @@ export interface SSREndpoint {
 
 export interface SSRNode {
 	module: SSRComponent;
+	/** index into the `components` array in client-manifest.js */
+	index: number;
 	/** client-side module URL for this component */
 	entry: string;
 	/** external CSS files */
@@ -240,7 +242,6 @@ export interface SSRNode {
 export type SSRNodeLoader = () => Promise<SSRNode>;
 
 export interface SSROptions {
-	amp: boolean;
 	csp: ValidatedConfig['kit']['csp'];
 	dev: boolean;
 	floc: boolean;
@@ -255,7 +256,10 @@ export interface SSROptions {
 		assets: string;
 	};
 	prefix: string;
-	prerender: boolean;
+	prerender: {
+		default: boolean;
+		enabled: boolean;
+	};
 	read(file: string): Buffer;
 	root: SSRComponent['default'];
 	router: boolean;
@@ -309,12 +313,14 @@ export interface SSRState {
 	getClientAddress: () => string;
 	initiator?: SSRPage | null;
 	platform?: any;
-	prerender?: PrerenderOptions;
+	prerendering?: PrerenderOptions;
 }
 
 export type StrictBody = string | Uint8Array;
 
 export type ValidatedConfig = RecursiveRequired<Config>;
+
+export type ValidatedKitConfig = RecursiveRequired<KitConfig>;
 
 export * from './index';
 export * from './private';

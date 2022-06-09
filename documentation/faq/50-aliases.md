@@ -2,40 +2,6 @@
 title: パスのエイリアスを設定するにはどうすればよいですか？
 ---
 
-まず最初に、Vite の設定を追加する必要があります。`svelte.config.js` に [`vite.resolve.alias`](https://ja.vitejs.dev/config/#resolve-alias) を追加しましょう:
+エイリアスは `svelte.config.js` で設定することができます。詳細は [`configuration`](/docs/configuration#alias) ドキュメントをご覧ください。
 
-```js
-/// file: svelte.config.js
-// @filename: ambient.d.ts
-declare module 'path';
-
-// @filename: index.js
-import path from 'path';
-
-/** @type {import('@sveltejs/kit').Config} */
-const config = {
-	kit: {
-		vite: {
-			resolve: {
-				alias: {
-					$utils: path.resolve('./src/utils')
-				}
-			}
-		}
-	}
-};
-
-export default config;
-```
-
-そして、TypeScript にエイリアスを認識させるために、(TypeScript ユーザーは) `tsconfig.json`、または `jsconfig.json` に、以下のように設定を追加します:
-
-```json
-{
-	"compilerOptions": {
-		"paths": {
-			"$utils/*": ["src/utils/*"]
-		}
-	}
-}
-```
+設定したら、`npm run sync` または `npm run dev` (`sync` を実行します) を実行してください。SvelteKit は必要なエイリアスの設定を `jsconfig.json` または `tsconfig.json` に自動で生成します。

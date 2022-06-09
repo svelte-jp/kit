@@ -9,20 +9,24 @@ import { start_server, test } from '../../../utils.js';
 /** @typedef {import('@playwright/test').Response} Response */
 
 test.describe.parallel('a11y', () => {
-	test('resets focus', async ({ page, clicknav }) => {
+	test('resets focus', async ({ page, clicknav, browserName }) => {
+		const tab = browserName === 'webkit' ? 'Alt+Tab' : 'Tab';
+
 		await page.goto('/accessibility/a');
 
 		await clicknav('[href="/accessibility/b"]');
 		expect(await page.innerHTML('h1')).toBe('b');
 		expect(await page.evaluate(() => (document.activeElement || {}).nodeName)).toBe('BODY');
-		await page.keyboard.press('Tab');
+		await page.keyboard.press(tab);
+
 		expect(await page.evaluate(() => (document.activeElement || {}).nodeName)).toBe('A');
 		expect(await page.evaluate(() => (document.activeElement || {}).textContent)).toBe('a');
 
 		await clicknav('[href="/accessibility/a"]');
 		expect(await page.innerHTML('h1')).toBe('a');
 		expect(await page.evaluate(() => (document.activeElement || {}).nodeName)).toBe('BODY');
-		await page.keyboard.press('Tab');
+
+		await page.keyboard.press(tab);
 		expect(await page.evaluate(() => (document.activeElement || {}).nodeName)).toBe('A');
 		expect(await page.evaluate(() => (document.activeElement || {}).textContent)).toBe('a');
 
@@ -127,11 +131,12 @@ test.describe.parallel('beforeNavigate', () => {
 
 	test('prevents navigation triggered by back button', async ({ page, app, baseURL }) => {
 		await page.goto('/before-navigate/a');
-
 		await app.goto('/before-navigate/prevent-navigation');
+		await page.click('h1'); // The browsers block attempts to prevent navigation on a frame that's never had a user gesture.
+
 		await page.goBack();
-		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
 		expect(await page.innerHTML('pre')).toBe('true');
+		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
 	});
 
 	test('prevents unload', async ({ page }) => {
@@ -254,7 +259,19 @@ test.describe('Scrolling', () => {
 		page,
 		in_view
 	}) => {
-		await page.goto('/anchor-with-manual-scroll/anchor#go-to-element');
+		await page.goto('/anchor-with-manual-scroll/anchor-onmount#go-to-element');
+		expect(await in_view('#abcde')).toBe(true);
+	});
+
+	test('url-supplied anchor is ignored with afterNavigate() scrolling on direct page load', async ({
+		page,
+		in_view,
+		clicknav
+	}) => {
+		await page.goto('/anchor-with-manual-scroll/anchor-afternavigate#go-to-element');
+		expect(await in_view('#abcde')).toBe(true);
+
+		await clicknav('[href="/anchor-with-manual-scroll/anchor-afternavigate?x=y#go-to-element"]');
 		expect(await in_view('#abcde')).toBe(true);
 	});
 
@@ -265,7 +282,7 @@ test.describe('Scrolling', () => {
 		in_view
 	}) => {
 		await page.goto('/anchor-with-manual-scroll');
-		await clicknav('[href="/anchor-with-manual-scroll/anchor#go-to-element"]');
+		await clicknav('[href="/anchor-with-manual-scroll/anchor-onmount#go-to-element"]');
 		if (javaScriptEnabled) expect(await in_view('#abcde')).toBe(true);
 		else expect(await in_view('#go-to-element')).toBe(true);
 	});
@@ -299,6 +316,13 @@ test.describe('Scrolling', () => {
 		await back();
 		expect(await page.evaluate(() => window.scrollY)).toBe(1000);
 	});
+
+	test('scroll position is top of page on ssr:false reload', async ({ page }) => {
+		await page.goto('/no-ssr/margin');
+		expect(await page.evaluate(() => window.scrollY)).toBe(0);
+		await page.reload();
+		expect(await page.evaluate(() => window.scrollY)).toBe(0);
+	});
 });
 
 test.describe.parallel('Imports', () => {
@@ -323,7 +347,7 @@ test.describe.parallel('Imports', () => {
 			]);
 		} else {
 			expect(sources[0].startsWith('data:image/png;base64,')).toBeTruthy();
-			expect(sources[1]).toBe(`${baseURL}/_app/assets/large-3183867c.jpg`);
+			expect(sources[1]).toBe(`${baseURL}/_app/immutable/assets/large-3183867c.jpg`);
 		}
 	});
 });
@@ -461,6 +485,13 @@ test.describe.parallel('CSS', () => {
 				})
 			).toBe('absolute');
 		}
+	});
+
+	test('applies imported styles in the correct order', async ({ page }) => {
+		await page.goto('/css');
+
+		const color = await page.$eval('.overridden', (el) => getComputedStyle(el).color);
+		expect(color).toBe('rgb(0, 128, 0)');
 	});
 });
 
@@ -729,6 +760,17 @@ test.describe.parallel('Endpoints', () => {
 			'name=SvelteKit; path=/; HttpOnly'
 		]);
 	});
+
+	test('Standalone endpoint is not accessible via /__data.json suffix', async ({ request }) => {
+		const r1 = await request.get('/endpoint-output/simple', {
+			headers: { accept: 'application/json' }
+		});
+
+		expect(await r1.json()).toEqual({ answer: 42 });
+
+		const r2 = await request.get('/endpoint-output/simple/__data.json');
+		expect(r2.status()).toBe(404);
+	});
 });
 
 test.describe.parallel('Encoded paths', () => {
@@ -938,7 +980,7 @@ test.describe.parallel('Errors', () => {
 			const body = await page.textContent('body');
 
 			expect(body).toMatch(
-				'Error: "error" property returned from load() must be a string or instance of Error, received type "object"'
+				'"error" property returned from load() must be a string or instance of Error, received type "object"'
 			);
 		}
 	});
@@ -1073,6 +1115,24 @@ test.describe.parallel('Errors', () => {
 
 		expect(response.status()).toBe(500);
 		expect(await response.text()).toMatch('thisvariableisnotdefined is not defined');
+	});
+
+	test('prerendering a page whose load accesses session results in a catchable error', async ({
+		page
+	}) => {
+		await page.goto('/prerendering');
+		expect(await page.textContent('h1')).toBe(
+			'500: Attempted to access session from a prerendered page. Session would never be populated.'
+		);
+	});
+
+	test('prerendering a page with a mutative page endpoint results in a catchable error', async ({
+		page
+	}) => {
+		await page.goto('/prerendering/mutative-endpoint');
+		expect(await page.textContent('h1')).toBe(
+			'500: Cannot prerender pages that have endpoints with mutative methods'
+		);
 	});
 });
 
@@ -1292,6 +1352,13 @@ test.describe.parallel('Load', () => {
 		expect(await page.textContent('h1')).toBe('the answer is 42');
 	});
 
+	test('fetch resolves urls relatively to the target page', async ({ page, clicknav }) => {
+		await page.goto('/load');
+		await clicknav('[href="/load/fetch-relative"]');
+		expect(await page.textContent('h1')).toBe('the answer is 42');
+		expect(await page.textContent('h2')).toBe('the question was ?');
+	});
+
 	test('handles large responses', async ({ page }) => {
 		await page.goto('/load');
 
@@ -1382,7 +1449,8 @@ test.describe.parallel('Load', () => {
 		baseURL,
 		page,
 		clicknav,
-		javaScriptEnabled
+		javaScriptEnabled,
+		browserName
 	}) => {
 		await page.goto('/load');
 		await clicknav('[href="/load/fetch-headers"]');
@@ -1396,8 +1464,11 @@ test.describe.parallel('Load', () => {
 			referer: `${baseURL}/load`,
 			// these headers aren't particularly useful, but they allow us to verify
 			// that page headers are being forwarded
-			'sec-fetch-dest': javaScriptEnabled ? 'empty' : 'document',
-			'sec-fetch-mode': javaScriptEnabled ? 'cors' : 'navigate'
+			'sec-fetch-dest':
+				browserName === 'webkit' ? undefined : javaScriptEnabled ? 'empty' : 'document',
+			'sec-fetch-mode':
+				browserName === 'webkit' ? undefined : javaScriptEnabled ? 'cors' : 'navigate',
+			connection: 'keep-alive'
 		});
 	});
 
@@ -1431,6 +1502,46 @@ test.describe.parallel('Load', () => {
 
 		expect(cookies.answer).toBe('42');
 		expect(cookies.doubled).toBe('84');
+	});
+
+	test('accessing url.hash from load errors and suggests using page store', async ({
+		page,
+		javaScriptEnabled
+	}) => {
+		if (javaScriptEnabled) {
+			await page.goto('/load/url-hash#please-dont-send-me-to-load');
+			expect(await page.textContent('#message')).toBe(
+				'This is your custom error page saying: "url.hash is inaccessible from load. Consider accessing hash from the page store within the script tag of your component."'
+			);
+		}
+	});
+
+	test('using window.fetch causes a warning', async ({ page, javaScriptEnabled }) => {
+		if (javaScriptEnabled && process.env.DEV) {
+			const warnings = [];
+
+			page.on('console', (msg) => {
+				if (msg.type() === 'warning') {
+					warnings.push(msg.text());
+				}
+			});
+
+			await page.goto('/load/window-fetch/incorrect');
+			expect(await page.textContent('h1')).toBe('42');
+
+			expect(warnings).toContain(
+				'Loading http://localhost:3000/load/window-fetch/data.json using `window.fetch`. For best results, use the `fetch` that is passed to your `load` function: https://kit.svelte.dev/docs/loading#input-fetch'
+			);
+
+			warnings.length = 0;
+
+			await page.goto('/load/window-fetch/correct');
+			expect(await page.textContent('h1')).toBe('42');
+
+			expect(warnings).not.toContain(
+				'Loading http://localhost:3000/load/window-fetch/data.json using `window.fetch`. For best results, use the `fetch` that is passed to your `load` function: https://kit.svelte.dev/docs/loading#input-fetch'
+			);
+		}
 	});
 });
 
@@ -1650,7 +1761,7 @@ test.describe.parallel('$app/paths', () => {
 		);
 	});
 
-	test('replaces %svelte.assets% in template with relative path', async ({ page }) => {
+	test('replaces %sveltekit.assets% in template with relative path', async ({ page }) => {
 		await page.goto('/');
 		expect(await page.getAttribute('link[rel=icon]', 'href')).toBe('./favicon.png');
 
@@ -1710,6 +1821,7 @@ test.describe.parallel('$app/stores', () => {
 		clicknav,
 		javaScriptEnabled
 	}) => {
+		await page.goto('/store/stuff/foo?reset=true');
 		const stuff1 = JSON.stringify({ name: 'SvelteKit', value: 789, error: 'uh oh' });
 		const stuff2 = JSON.stringify({ name: 'SvelteKit', value: 123, foo: true });
 		await page.goto('/store/stuff/www');
@@ -1822,7 +1934,7 @@ test.describe.parallel('Redirects', () => {
 		expect(page.url()).toBe(`${baseURL}/redirect`);
 	});
 
-	test('prevents redirect loops', async ({ baseURL, page, javaScriptEnabled }) => {
+	test('prevents redirect loops', async ({ baseURL, page, javaScriptEnabled, browserName }) => {
 		await page.goto('/redirect');
 
 		await page.click('[href="/redirect/loopy/a"]');
@@ -1836,11 +1948,21 @@ test.describe.parallel('Redirects', () => {
 			);
 		} else {
 			// there's not a lot we can do to handle server-side redirect loops
-			expect(page.url()).toBe('chrome-error://chromewebdata/');
+			if (browserName === 'webkit') {
+				expect(page.url()).toBe(`${baseURL}/redirect`);
+			} else {
+				expect(page.url()).toBe('chrome-error://chromewebdata/');
+			}
 		}
 	});
 
-	test('errors on missing status', async ({ baseURL, page, clicknav }) => {
+	test('errors on missing status', async ({
+		baseURL,
+		page,
+		clicknav,
+		javaScriptEnabled,
+		read_errors
+	}) => {
 		await page.goto('/redirect');
 
 		await clicknav('[href="/redirect/missing-status/a"]');
@@ -1850,6 +1972,14 @@ test.describe.parallel('Redirects', () => {
 		expect(await page.textContent('#message')).toBe(
 			'This is your custom error page saying: ""redirect" property returned from load() must be accompanied by a 3xx status code"'
 		);
+
+		if (!javaScriptEnabled) {
+			// handleError is not invoked for client-side navigation
+			const lines = read_errors('/redirect/missing-status/a').split('\n');
+			expect(lines[0]).toBe(
+				'Error: "redirect" property returned from load() must be accompanied by a 3xx status code'
+			);
+		}
 	});
 
 	test('errors on invalid status', async ({ baseURL, page, clicknav }) => {
@@ -1875,6 +2005,88 @@ test.describe.parallel('Redirects', () => {
 
 		if (javaScriptEnabled) {
 			expect(await page.textContent('h1')).toBe('Hazaa!');
+		}
+	});
+});
+
+test.describe.parallel('Prefetching', () => {
+	test('prefetches programmatically', async ({ baseURL, page, app, javaScriptEnabled }) => {
+		if (javaScriptEnabled) {
+			await page.goto('/routing/a');
+
+			/** @type {string[]} */
+			let requests = [];
+			page.on('request', (r) => requests.push(r.url()));
+
+			// also wait for network processing to complete, see
+			// https://playwright.dev/docs/network#network-events
+			await Promise.all([
+				page.waitForResponse(`${baseURL}/routing/prefetched.json`),
+				app.prefetch('/routing/prefetched')
+			]);
+
+			// svelte request made is environment dependent
+			if (process.env.DEV) {
+				expect(requests.filter((req) => req.endsWith('index.svelte')).length).toBe(1);
+			} else {
+				expect(requests.filter((req) => req.endsWith('.js')).length).toBe(1);
+			}
+
+			expect(requests.includes(`${baseURL}/routing/prefetched.json`)).toBe(true);
+
+			requests = [];
+			await app.goto('/routing/prefetched');
+			expect(requests).toEqual([]);
+
+			try {
+				await app.prefetch('https://example.com');
+				throw new Error('Error was not thrown');
+			} catch (/** @type {any} */ e) {
+				expect(e.message).toMatch('Attempted to prefetch a URL that does not belong to this app');
+			}
+		}
+	});
+
+	test('chooses correct route when hash route is prefetched but regular route is clicked', async ({
+		app,
+		page,
+		javaScriptEnabled
+	}) => {
+		if (javaScriptEnabled) {
+			await page.goto('/routing/a');
+			await app.prefetch('/routing/prefetched/hash-route#please-dont-show-me');
+			await app.goto('/routing/prefetched/hash-route');
+			await expect(page.locator('h1')).not.toHaveText('Oopsie');
+		}
+	});
+
+	test('does not rerun load on calls to duplicate preload hash route', async ({
+		app,
+		page,
+		javaScriptEnabled
+	}) => {
+		if (javaScriptEnabled) {
+			await page.goto('/routing/a');
+
+			await app.prefetch('/routing/prefetched/hash-route#please-dont-show-me');
+			await app.prefetch('/routing/prefetched/hash-route#please-dont-show-me');
+			await app.goto('/routing/prefetched/hash-route#please-dont-show-me');
+			await expect(page.locator('p')).toHaveText('Loaded 1 times.');
+		}
+	});
+
+	test('does not rerun load on calls to different preload hash route', async ({
+		app,
+		page,
+		javaScriptEnabled
+	}) => {
+		if (javaScriptEnabled) {
+			await page.goto('/routing/a');
+
+			await app.prefetch('/routing/prefetched/hash-route#please-dont-show-me');
+			await app.prefetch('/routing/prefetched/hash-route#please-dont-show-me-jr');
+			await app.goto('/routing/prefetched/hash-route#please-dont-show-me');
+			await expect(page.locator('p')).toHaveText('Loaded 1 times.');
 		}
 	});
 });
@@ -2003,43 +2215,6 @@ test.describe.parallel('Routing', () => {
 		}
 	});
 
-	test('prefetches programmatically', async ({ baseURL, page, app, javaScriptEnabled }) => {
-		if (javaScriptEnabled) {
-			await page.goto('/routing/a');
-
-			/** @type {string[]} */
-			let requests = [];
-			page.on('request', (r) => requests.push(r.url()));
-
-			// also wait for network processing to complete, see
-			// https://playwright.dev/docs/network#network-events
-			await Promise.all([
-				page.waitForResponse(`${baseURL}/routing/prefetched.json`),
-				app.prefetch('/routing/prefetched')
-			]);
-
-			// svelte request made is environment dependent
-			if (process.env.DEV) {
-				expect(requests.filter((req) => req.endsWith('index.svelte')).length).toBe(1);
-			} else {
-				expect(requests.filter((req) => req.endsWith('.js')).length).toBe(1);
-			}
-
-			expect(requests.includes(`${baseURL}/routing/prefetched.json`)).toBe(true);
-
-			requests = [];
-			await app.goto('/routing/prefetched');
-			expect(requests).toEqual([]);
-
-			try {
-				await app.prefetch('https://example.com');
-				throw new Error('Error was not thrown');
-			} catch (/** @type {any} */ e) {
-				expect(e.message).toMatch('Attempted to prefetch a URL that does not belong to this app');
-			}
-		}
-	});
-
 	test('does not attempt client-side navigation to server routes', async ({ page }) => {
 		await page.goto('/routing');
 		await page.click('[href="/routing/ambiguous/ok.json"]');
@@ -2117,20 +2292,20 @@ test.describe.parallel('Routing', () => {
 		expect(await page.textContent('h1')).toBe('a');
 	});
 
-	test('focus works if page load has hash', async ({ page }) => {
+	test('focus works if page load has hash', async ({ page, browserName }) => {
 		await page.goto('/routing/hashes/target#p2');
 
-		await page.keyboard.press('Tab');
+		await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
 		expect(await page.evaluate(() => (document.activeElement || {}).textContent)).toBe(
 			'next focus element'
 		);
 	});
 
-	test('focus works when navigating to a hash on the same page', async ({ page }) => {
+	test('focus works when navigating to a hash on the same page', async ({ page, browserName }) => {
 		await page.goto('/routing/hashes/target');
 
 		await page.click('[href="#p2"]');
-		await page.keyboard.press('Tab');
+		await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
 
 		expect(await page.evaluate(() => (document.activeElement || {}).textContent)).toBe(
 			'next focus element'
@@ -2333,6 +2508,19 @@ test.describe.parallel('Routing', () => {
 		expect(await page.textContent('h1')).toBe('routeId in load: routing/route-id/[x]');
 		expect(await page.textContent('h2')).toBe('routeId in store: routing/route-id/[x]');
 	});
+
+	test('serves a page that clashes with a root directory', async ({ page }) => {
+		await page.goto('/static');
+		expect(await page.textContent('h1')).toBe('hello');
+	});
+
+	test('/favicon.ico is a valid route', async ({ request }) => {
+		const response = await request.get('/favicon.ico');
+		expect(response.status()).toBe(200);
+
+		const data = await response.json();
+		expect(data).toEqual({ surprise: 'lol' });
+	});
 });
 
 test.describe.parallel('Session', () => {
@@ -2393,6 +2581,25 @@ test.describe.parallel('Static files', () => {
 		const response = await request.get('/static/static.json');
 		expect(response.status()).toBe(process.env.DEV ? 403 : 404);
 	});
+
+	test('Vite serves assets in src directory', async ({ page, request }) => {
+		await page.goto('/assets');
+		const path = await page.textContent('h1');
+
+		const response = await request.get(path);
+		expect(response.status()).toBe(200);
+	});
+
+	test('Filenames are case-sensitive', async ({ request }) => {
+		const response = await request.get('/static.JSON');
+		expect(response.status()).toBe(404);
+	});
+
+	test('Serves symlinked asset', async ({ request }) => {
+		const response = await request.get('/symlink-from/hello.txt');
+		expect(response.status()).toBe(200);
+		expect(await response.text()).toBe('hello');
+	});
 });
 
 test.describe.parallel('Matchers', () => {
@@ -2414,7 +2621,7 @@ test.describe.parallel('Matchers', () => {
 });
 
 test.describe.parallel('XSS', () => {
-	test('replaces %svelte.xxx% tags safely', async ({ page }) => {
+	test('replaces %sveltekit.xxx% tags safely', async ({ page }) => {
 		await page.goto('/unsafe-replacement');
 
 		const content = await page.textContent('body');
@@ -2457,5 +2664,31 @@ test.describe.parallel('XSS', () => {
 		expect(await page.textContent('h1')).toBe(
 			'user.name is </script><script>window.pwned = 1</script>'
 		);
+	});
+});
+
+test.describe.parallel('Miscellaneous', () => {
+	test('Components are not double-mounted', async ({ page, javaScriptEnabled }) => {
+		const file = fileURLToPath(new URL('../src/routes/double-mount/index.svelte', import.meta.url));
+		const contents = fs.readFileSync(file, 'utf-8');
+
+		const mounted = javaScriptEnabled ? 1 : 0;
+
+		// we write to the file, to trigger HMR invalidation
+		fs.writeFileSync(file, contents.replace(/PLACEHOLDER:\d+/, `PLACEHOLDER:${Date.now()}`));
+		await page.goto('/double-mount');
+		expect(await page.textContent('h1')).toBe(`mounted: ${mounted}`);
+		await page.click('button');
+		await page.waitForTimeout(100);
+		expect(await page.textContent('h1')).toBe(`mounted: ${mounted}`);
+		fs.writeFileSync(file, contents.replace(/PLACEHOLDER:\d+/, 'PLACEHOLDER:0'));
+	});
+
+	test('does not serve version.json with an immutable cache header', async ({ request }) => {
+		// this isn't actually a great test, because caching behaviour is down to adapters.
+		// but it's better than nothing
+		const response = await request.get('/_app/version.json');
+		const headers = response.headers();
+		expect(headers['cache-control'] || '').not.toContain('immutable');
 	});
 });

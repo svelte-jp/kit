@@ -25,6 +25,8 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 </svelte:head>
 
 <h1>Hello and welcome to my site!</h1>
+
+<a href="/about">About my site</a>
 ```
 
 `src/routes/about.svelte` と `src/routes/about/index.svelte` はどちらも `/about` ルート(route)になります。
@@ -37,11 +39,15 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 
 <h1>About this site</h1>
 <p>TODO...</p>
+
+<a href="/">Home</a>
 ```
 
-動的なパラメータは `[括弧]` を使用してエンコードされます。例えば、ブログ記事は `src/routes/blog/[slug].svelte` のように定義されます。このパラメータは [`load`](/docs/loading#input-params) 関数の中でアクセスできますし、[`page`](/docs/modules#$app-stores) store を使ってアクセスすることもできます。
+> SvelteKit ではルート(routes)間のナビゲートに、フレームワーク固有の `<Link>` コンポーネントではなく、`<a>` 要素を使用します。
 
-ファイルやディレクトリは、`[id]-[category].svelte` のように、動的なパーツを複数持つことができます。(パラメータは 'non-greedy' です。`x-y-z` のようにあいまいなケースでは、`id` は `x` 、 `category` は `y-z` となります)
+動的なパラメータは `[カッコ]` を使用してエンコードされます。例えば、ブログ記事の場合は `src/routes/blog/[slug].svelte` のように定義することがあるでしょう。これらのパラメータは、[`load`](/docs/loading#input-params) 関数の中からアクセスできますし、[`page`](/docs/modules#$app-stores) ストアを使用してアクセスすることもできます。
+
+ルート(route)は動的なパラメータを複数持つことができます。例えば、`src/routes/[category]/[item].svelte` や `src/routes/[category]-[item].svelte` といった具合です。(パラメータは 'non-greedy' です; `x-y-z` のような曖昧なケースの場合、`category` は `x`、`item` は `y-z` になります。)
 
 ### エンドポイント(Endpoints)
 
@@ -56,7 +62,7 @@ declare module '$lib/database' {
 	export const get: (id: string) => Promise<Item>;
 }
 
-// @filename: [id].d.ts
+// @filename: __types/[id].d.ts
 import type { RequestHandler as GenericRequestHandler } from '@sveltejs/kit';
 export type RequestHandler<Body = any> = GenericRequestHandler<{ id: string }, Body>;
 
@@ -64,7 +70,7 @@ export type RequestHandler<Body = any> = GenericRequestHandler<{ id: string }, B
 // ---cut---
 import db from '$lib/database';
 
-/** @type {import('./[id]').RequestHandler} */
+/** @type {import('./__types/[id]').RequestHandler} */
 export async function get({ params }) {
 	// `params.id` comes from [id].js
 	const item = await db.get(params.id);
@@ -152,7 +158,7 @@ declare module '$lib/database' {
 	export const create: (request: Request) => Promise<[Record<string, ValidationError>, Item]>;
 }
 
-// @filename: items.d.ts
+// @filename: __types/items.d.ts
 import type { RequestHandler as GenericRequestHandler } from '@sveltejs/kit';
 export type RequestHandler<Body = any> = GenericRequestHandler<{}, Body>;
 
@@ -160,7 +166,7 @@ export type RequestHandler<Body = any> = GenericRequestHandler<{}, Body>;
 // ---cut---
 import * as db from '$lib/database';
 
-/** @type {import('./items').RequestHandler} */
+/** @type {import('./__types/items').RequestHandler} */
 export async function get() {
 	const items = await db.list();
 
@@ -169,7 +175,7 @@ export async function get() {
 	};
 }
 
-/** @type {import('./items').RequestHandler} */
+/** @type {import('./__types/items').RequestHandler} */
 export async function post({ request }) {
 	const [errors, item] = await db.create(request);
 
@@ -296,7 +302,7 @@ export default config;
 
 #### Restパラメータ
 
-例えば `src/routes/[category]/[item].svelte` や `src/routes/[category]-[item].svelte` のように、ルート(route)は動的なパラメータを複数持つことができます。(パラメータは 'non-greedy' です。`/x-y-z` のようにあいまいなケースでは、`category` は `x` 、 `item` は `y-z` となります) ルートセグメント(route segments)の数が不明な場合は、rest 構文を使用することができます。例えば、GitHubのファイルビューアは次のように実装することができます…
+ルート(route) セグメントの数がわからない場合は、rest 構文を使用することができます。例えば GitHub のファイルビューアのようなものを実装する場合には…
 
 ```bash
 /[org]/[repo]/tree/[branch]/[...file]
@@ -314,7 +320,7 @@ export default config;
 }
 ```
 
-> `src/routes/a/[...rest]/z.svelte` は `/a/z` だけでなく、`/a/b/z` と `/a/b/c/z` にもマッチします。rest パラメータの値が有効であることを必ず確かめてください。
+> `src/routes/a/[...rest]/z.svelte` は `/a/z` (つまり、パラメータがない場合) にマッチしますし、`/a/b/z` や `/a/b/c/z` などにもマッチします。rest パラメータの値が有効であることを、例えば [matcher](#advanced-routing-matching) などを使用して、確実にチェックしてください。
 
 #### Matching
 
@@ -336,6 +342,8 @@ export function match(param) {
 ```
 
 もしパス名がマッチしない場合、SvelteKit は (後述のソート順の指定に従って) 他のルートでマッチするか試行し、どれにもマッチしない場合は最終的に 404 を返します。
+
+> Matcher は サーバーとブラウザの両方で動作します。
 
 #### ソート
 

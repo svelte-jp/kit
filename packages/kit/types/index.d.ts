@@ -6,15 +6,14 @@ import './ambient';
 import { CompileOptions } from 'svelte/types/compiler/interfaces';
 import {
 	AdapterEntry,
+	BodyValidator,
 	CspDirectives,
 	JSONValue,
 	Logger,
 	MaybePromise,
 	Prerendered,
 	PrerenderOnErrorValue,
-	RequestEvent,
 	RequestOptions,
-	ResolveOptions,
 	ResponseHeaders,
 	RouteDefinition,
 	TrailingSlash
@@ -92,66 +91,68 @@ export interface Builder {
 export interface Config {
 	compilerOptions?: CompileOptions;
 	extensions?: string[];
-	kit?: {
-		adapter?: Adapter;
-		amp?: boolean;
-		appDir?: string;
-		browser?: {
-			hydrate?: boolean;
-			router?: boolean;
-		};
-		csp?: {
-			mode?: 'hash' | 'nonce' | 'auto';
-			directives?: CspDirectives;
-		};
-		endpointExtensions?: string[];
-		files?: {
-			assets?: string;
-			hooks?: string;
-			lib?: string;
-			params?: string;
-			routes?: string;
-			serviceWorker?: string;
-			template?: string;
-		};
-		floc?: boolean;
-		inlineStyleThreshold?: number;
-		methodOverride?: {
-			parameter?: string;
-			allowed?: string[];
-		};
-		outDir?: string;
-		package?: {
-			dir?: string;
-			emitTypes?: boolean;
-			exports?(filepath: string): boolean;
-			files?(filepath: string): boolean;
-		};
-		paths?: {
-			assets?: string;
-			base?: string;
-		};
-		prerender?: {
-			concurrency?: number;
-			crawl?: boolean;
-			default?: boolean;
-			enabled?: boolean;
-			entries?: string[];
-			onError?: PrerenderOnErrorValue;
-		};
-		routes?: (filepath: string) => boolean;
-		serviceWorker?: {
-			register?: boolean;
-			files?: (filepath: string) => boolean;
-		};
-		trailingSlash?: TrailingSlash;
-		version?: {
-			name?: string;
-			pollInterval?: number;
-		};
-		vite?: import('vite').UserConfig | (() => MaybePromise<import('vite').UserConfig>);
-	};
+	kit?: KitConfig;
 	preprocess?: any;
+}
+
+export interface KitConfig {
+	adapter?: Adapter;
+	alias?: Record<string, string>;
+	appDir?: string;
+	browser?: {
+		hydrate?: boolean;
+		router?: boolean;
+	};
+	csp?: {
+		mode?: 'hash' | 'nonce' | 'auto';
+		directives?: CspDirectives;
+	};
+	endpointExtensions?: string[];
+	files?: {
+		assets?: string;
+		hooks?: string;
+		lib?: string;
+		params?: string;
+		routes?: string;
+		serviceWorker?: string;
+		template?: string;
+	};
+	floc?: boolean;
+	inlineStyleThreshold?: number;
+	methodOverride?: {
+		parameter?: string;
+		allowed?: string[];
+	};
+	outDir?: string;
+	package?: {
+		dir?: string;
+		emitTypes?: boolean;
+		exports?(filepath: string): boolean;
+		files?(filepath: string): boolean;
+	};
+	paths?: {
+		assets?: string;
+		base?: string;
+	};
+	prerender?: {
+		concurrency?: number;
+		crawl?: boolean;
+		default?: boolean;
+		enabled?: boolean;
+		entries?: Array<'*' | `/${string}`>;
+		onError?: PrerenderOnErrorValue;
+	};
+	routes?: (filepath: string) => boolean;
+	serviceWorker?: {
+		register?: boolean;
+		files?: (filepath: string) => boolean;
+	};
+	trailingSlash?: TrailingSlash;
+	version?: {
+		name?: string;
+		pollInterval?: number;
+	};
+	vite?: import('vite').UserConfig | (() => MaybePromise<import('vite').UserConfig>);
 }
 
 export interface ExternalFetch {
@@ -174,7 +175,7 @@ export interface HandleError {
 }
 
 /**
- * ページやレイアウト の `<script context="module">` からエクスポートされる `(input: LoadInput) => LoadOutput` `load` 関数です。
+ * ページやレイアウト の `<script context="module">` からエクスポートされる `(event: LoadEvent) => LoadOutput` `load` 関数です。
  *
  * Params のジェネリックな引数を手作業で指定する代わりに、[generated types](/docs/types#generated-types) を使用することができます。
  */
@@ -183,10 +184,10 @@ export interface Load<
 	InputProps extends Record<string, any> = Record<string, any>,
 	OutputProps extends Record<string, any> = InputProps
 > {
-	(input: LoadInput<Params, InputProps>): MaybePromise<LoadOutput<OutputProps>>;
+	(event: LoadEvent<Params, InputProps>): MaybePromise<LoadOutput<OutputProps>>;
 }
 
-export interface LoadInput<
+export interface LoadEvent<
 	Params extends Record<string, string> = Record<string, string>,
 	Props extends Record<string, any> = Record<string, any>
 > {
@@ -234,6 +235,16 @@ export interface ParamMatcher {
 	(param: string): boolean;
 }
 
+export interface RequestEvent<Params extends Record<string, string> = Record<string, string>> {
+	clientAddress: string;
+	locals: App.Locals;
+	params: Params;
+	platform: Readonly<App.Platform>;
+	request: Request;
+	routeId: string | null;
+	url: URL;
+}
+
 /**
  * `(event: RequestEvent) => RequestHandlerOutput` という関数で、エンドポイントからエクスポートされます。HTTP の動詞 (`get`、`put`、`patch`、etc) に対応しており、それぞれの HTTP メソッドのリクエストを処理します。'delete' は JavaScriptの予約語であるため、HTTP の delete メソッド を処理する関数は `del` という名前を使います。
  *
@@ -241,15 +252,20 @@ export interface ParamMatcher {
  */
 export interface RequestHandler<
 	Params extends Record<string, string> = Record<string, string>,
-	Output extends ResponseBody = ResponseBody
+	Output = ResponseBody
 > {
 	(event: RequestEvent<Params>): MaybePromise<RequestHandlerOutput<Output>>;
 }
 
-export interface RequestHandlerOutput<Output extends ResponseBody = ResponseBody> {
+export interface RequestHandlerOutput<Output = ResponseBody> {
 	status?: number;
 	headers?: Headers | Partial<ResponseHeaders>;
-	body?: Output;
+	body?: Output extends ResponseBody ? Output : BodyValidator<Output>;
+}
+
+export interface ResolveOptions {
+	ssr?: boolean;
+	transformPage?: ({ html }: { html: string }) => MaybePromise<string>;
 }
 
 export type ResponseBody = JSONValue | Uint8Array | ReadableStream | import('stream').Readable;

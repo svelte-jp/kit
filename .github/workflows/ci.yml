@@ -15,14 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2.2.1
-        with:
-          version: 6.23.2
+      - uses: pnpm/action-setup@v2.2.2
       - uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: '16.x'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: cd packages/kit && pnpm build
       - run: pnpm turbo run lint check
   Tests:
     runs-on: ${{ matrix.os }}
@@ -30,11 +29,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [14]
+        node-version: [16]
         os: [ubuntu-latest, macOS-latest, windows-2019]
         include:
-          - node-version: 16
-            os: ubuntu-latest
           - node-version: 18
             os: ubuntu-latest
     env:
@@ -42,15 +39,13 @@ jobs:
     steps:
       - run: git config --global core.autocrlf false
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2.2.1
-        with:
-          version: 6.23.2
+      - uses: pnpm/action-setup@v2.2.2
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm turbo run test
+      - run: pnpm test
       - name: archive test results
         if: failure()
         shell: bash

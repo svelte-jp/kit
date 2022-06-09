@@ -48,7 +48,7 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 #### src/server.js
 
-SvelteKit アプリはサーバーレス環境で動作することを可能にしているため、このファイルも直接相当するものはありません。ただし、[hooks module](/docs/hooks) を使用してセッションロジックを実装することはできます。
+`adapter-node` を使用する場合は、[custom server](https://github.com/sveltejs/kit/tree/master/packages/adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜならSvelteKit アプリはサーバーレス環境でも実行だからです。セッションロジックを実装する場合は、[hooks module](/docs/hooks) をお使いいただけます。
 
 #### src/service-worker.js
 
@@ -63,7 +63,7 @@ SvelteKit アプリはサーバーレス環境で動作することを可能に�
 
 `src/template.html` は `src/app.html` にリネームする必要があります。
 
-`%sapper.base%`、`%sapper.scripts%`、`%sapper.styles%` は削除してください。`%sapper.head%` は `%svelte.head%` に、`%sapper.html%` は `%svelte.body%` にそれぞれ置き換えてください。`<div id="sapper">` はもう必要ありません。
+Remove `%sapper.base%`, `%sapper.scripts%` and `%sapper.styles%`. Replace `%sapper.head%` with `%sveltekit.head%` and `%sapper.html%` with `%sveltekit.body%`. The `<div id="sapper">` is no longer necessary.
 
 #### src/node_modules
 

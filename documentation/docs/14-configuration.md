@@ -16,7 +16,7 @@ const config = {
 
 	kit: {
 		adapter: undefined,
-		amp: false,
+		alias: {},
 		appDir: '_app',
 		browser: {
 			hydrate: true,
@@ -92,9 +92,26 @@ export default config;
 
 `svelte-kit build` を実行するのに必要で、異なるプラットフォーム向けにアウトプットがどのように変換されるかを決定します。[Adapters](/docs/adapters) をご参照ください。
 
-### amp
+### alias
 
-[AMP](/docs/seo#amp) モードを有効にします。
+`import` 文の値を置き換えるのに使用される 0 個以上のエイリアスを含むオブジェクトです。これらのエイリアスは自動的に Vite と TypeScript に渡されます。
+
+例えば、`components` フォルダと `utils` フォルダのエイリアスを追加する場合は以下の通りです:
+
+```js
+/// file: svelte.config.js
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+	kit: {
+		alias: {
+			$components: 'src/components',
+			$utils: 'src/utils'
+		}
+	}
+};
+```
+
+> ビルトインの `$lib` エイリアスはパッケージングで使用されるため、`config.kit.files.lib` でコントロールされています。
 
 ### appDir
 

@@ -1,11 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { mkdirp, posixify } from '../../utils/filesystem.js';
 import { deep_merge } from '../../utils/object.js';
 import { load_template, print_config_conflicts } from '../config/index.js';
-import { get_aliases, get_runtime_path, resolve_entry } from '../utils.js';
-import { create_build, find_deps } from './utils.js';
+import { get_runtime_path, resolve_entry } from '../utils.js';
+import { create_build, find_deps, get_default_config } from './utils.js';
 import { s } from '../../utils/misc.js';
 
 /**
@@ -24,10 +23,10 @@ import { set_paths, assets, base } from '${runtime}/paths.js';
 import { set_prerendering } from '${runtime}/env.js';
 
 const template = ({ head, body, assets, nonce }) => ${s(template)
-	.replace('%svelte.head%', '" + head + "')
-	.replace('%svelte.body%', '" + body + "')
-	.replace(/%svelte\.assets%/g, '" + assets + "')
-	.replace(/%svelte\.nonce%/g, '" + nonce + "')};
+	.replace('%sveltekit.head%', '" + head + "')
+	.replace('%sveltekit.body%', '" + body + "')
+	.replace(/%sveltekit\.assets%/g, '" + assets + "')
+	.replace(/%sveltekit\.nonce%/g, '" + nonce + "')};
 
 let read = null;
 
@@ -47,7 +46,6 @@ export function override(settings) {
 export class Server {
 	constructor(manifest) {
 		this.options = {
-			amp: ${config.kit.amp},
 			csp: ${s(config.kit.csp)},
 			dev: false,
 			floc: ${config.kit.floc},
@@ -70,14 +68,17 @@ export class Server {
 			manifest,
 			method_override: ${s(config.kit.methodOverride)},
 			paths: { base, assets },
-			prefix: assets + '/${config.kit.appDir}/',
-			prerender: ${config.kit.prerender.enabled},
+			prefix: assets + '/${config.kit.appDir}/immutable/',
+			prerender: {
+				default: ${config.kit.prerender.default},
+				enabled: ${config.kit.prerender.enabled}
+			},
 			read,
 			root,
 			service_worker: ${has_service_worker ? "base + '/service-worker.js'" : 'null'},
 			router: ${s(config.kit.browser.router)},
 			template,
-			template_contains_nonce: ${template.includes('%svelte.nonce%')},
+			template_contains_nonce: ${template.includes('%sveltekit.nonce%')},
 			trailing_slash: ${s(config.kit.trailingSlash)}
 		};
 	}
@@ -105,29 +106,17 @@ export class Server {
 /**
  * @param {{
  *   cwd: string;
- *   assets_base: string;
  *   config: import('types').ValidatedConfig
  *   manifest_data: import('types').ManifestData
  *   build_dir: string;
  *   output_dir: string;
  *   service_worker_entry_file: string | null;
- *   service_worker_register: boolean;
  * }} options
  * @param {{ vite_manifest: import('vite').Manifest, assets: import('rollup').OutputAsset[] }} client
  */
-export async function build_server(
-	{
-		cwd,
-		assets_base,
-		config,
-		manifest_data,
-		build_dir,
-		output_dir,
-		service_worker_entry_file,
-		service_worker_register
-	},
-	client
-) {
+export async function build_server(options, client) {
+	const { cwd, config, manifest_data, build_dir, output_dir, service_worker_entry_file } = options;
+
 	let hooks_file = resolve_entry(config.kit.files.hooks);
 	if (!hooks_file || !fs.existsSync(hooks_file)) {
 		hooks_file = path.join(config.kit.outDir, 'build/hooks.js');
@@ -179,8 +168,8 @@ export async function build_server(
 		server_template({
 			config,
 			hooks: app_relative(hooks_file),
-			has_service_worker: service_worker_register && !!service_worker_entry_file,
-			runtime: get_runtime_path(config),
+			has_service_worker: config.kit.serviceWorker.register && !!service_worker_entry_file,
+			runtime: get_runtime_path(config.kit),
 			template: load_template(cwd, config)
 		})
 	);
@@ -209,38 +198,10 @@ export async function build_server(
 	const [modified_vite_config] = deep_merge(default_config, vite_config);
 
 	/** @type {[any, string[]]} */
-	const [merged_config, conflicts] = deep_merge(modified_vite_config, {
-		configFile: false,
-		root: cwd,
-		base: assets_base,
-		build: {
-			ssr: true,
-			outDir: `${output_dir}/server`,
-			manifest: true,
-			polyfillDynamicImport: false,
-			rollupOptions: {
-				input,
-				output: {
-					format: 'esm',
-					entryFileNames: '[name].js',
-					chunkFileNames: 'chunks/[name]-[hash].js',
-					assetFileNames: 'assets/[name]-[hash][extname]'
-				},
-				preserveEntrySignatures: 'strict'
-			}
-		},
-		plugins: [
-			svelte({
-				extensions: config.extensions,
-				compilerOptions: {
-					hydratable: !!config.kit.browser.hydrate
-				}
-			})
-		],
-		resolve: {
-			alias: get_aliases(config)
-		}
-	});
+	const [merged_config, conflicts] = deep_merge(
+		modified_vite_config,
+		get_default_config({ ...options, input, ssr: true })
+	);
 
 	print_config_conflicts(conflicts, 'kit.vite.', 'build_server');
 
@@ -258,7 +219,7 @@ export async function build_server(
 
 	client.assets.forEach((asset) => {
 		if (asset.fileName.endsWith('.css')) {
-			if (config.kit.amp || asset.source.length < config.kit.inlineStyleThreshold) {
+			if (asset.source.length < config.kit.inlineStyleThreshold) {
 				const index = stylesheet_lookup.size;
 				const file = `${output_dir}/server/stylesheets/${index}.js`;
 
@@ -279,6 +240,7 @@ export async function build_server(
 
 		const exports = [
 			'export { module };',
+			`export const index = ${i};`,
 			`export const entry = '${client.vite_manifest[component].file}';`,
 			`export const js = ${s(Array.from(js))};`,
 			`export const css = ${s(Array.from(css))};`

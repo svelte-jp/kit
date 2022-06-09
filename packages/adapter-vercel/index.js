@@ -1,6 +1,7 @@
-import { mkdirSync, writeFileSync } from 'fs';
-import { dirname, posix } from 'path';
+import fs from 'fs';
+import path from 'path';
 import { fileURLToPath } from 'url';
+import { nodeFileTrace } from '@vercel/nft';
 import esbuild from 'esbuild';
 
 // rules for clean URLs and trailing slash handling,
@@ -80,7 +81,9 @@ const redirects = {
 	]
 };
 
-/** @type {import('.')} **/
+const files = fileURLToPath(new URL('./files', import.meta.url).href);
+
+/** @type {import('.').default} **/
 export default function ({ external = [], edge, split } = {}) {
 	return {
 		name: '@sveltejs/adapter-vercel',
@@ -90,7 +93,7 @@ export default function ({ external = [], edge, split } = {}) {
 				await v3(builder, external, edge, split);
 			} else {
 				if (edge || split) {
-					throw new Error('edge and split options can only be used with ENABLE_VC_BUILD');
+					throw new Error('`edge` and `split` options can only be used with ENABLE_VC_BUILD');
 				}
 
 				await v1(builder, external);
@@ -104,14 +107,14 @@ export default function ({ external = [], edge, split } = {}) {
  * @param {string[]} external
  */
 async function v1(builder, external) {
+	const node_version = get_node_version();
+
 	const dir = '.vercel_build_output';
 
 	const tmp = builder.getBuildDirectory('vercel-tmp');
 
 	builder.rimraf(dir);
 	builder.rimraf(tmp);
-
-	const files = fileURLToPath(new URL('./files', import.meta.url).href);
 
 	const dirs = {
 		static: `${dir}/static`,
@@ -120,7 +123,7 @@ async function v1(builder, external) {
 
 	builder.log.minor('Generating serverless function...');
 
-	const relativePath = posix.relative(tmp, builder.getServerDirectory());
+	const relativePath = path.posix.relative(tmp, builder.getServerDirectory());
 
 	builder.copy(`${files}/serverless.js`, `${tmp}/serverless.js`, {
 		replace: {
@@ -129,7 +132,7 @@ async function v1(builder, external) {
 		}
 	});
 
-	writeFileSync(
+	fs.writeFileSync(
 		`${tmp}/manifest.js`,
 		`export const manifest = ${builder.generateManifest({
 			relativePath
@@ -139,13 +142,14 @@ async function v1(builder, external) {
 	await esbuild.build({
 		entryPoints: [`${tmp}/serverless.js`],
 		outfile: `${dirs.lambda}/index.js`,
-		target: 'node14',
+		target: `node${node_version.full}`,
 		bundle: true,
 		platform: 'node',
-		external
+		external,
+		format: 'cjs'
 	});
 
-	writeFileSync(`${dirs.lambda}/package.json`, JSON.stringify({ type: 'commonjs' }));
+	fs.writeFileSync(`${dirs.lambda}/package.json`, JSON.stringify({ type: 'commonjs' }));
 
 	builder.log.minor('Copying assets...');
 
@@ -170,14 +174,14 @@ async function v1(builder, external) {
 		status: redirect.status
 	}));
 
-	writeFileSync(
+	fs.writeFileSync(
 		`${dir}/config/routes.json`,
 		JSON.stringify([
 			...redirects[builder.config.kit.trailingSlash],
 			...prerendered_pages,
 			...prerendered_redirects,
 			{
-				src: `/${builder.config.kit.appDir}/.+`,
+				src: `/${builder.config.kit.appDir}/immutable/.+`,
 				headers: {
 					'cache-control': 'public, immutable, max-age=31536000'
 				}
@@ -200,6 +204,8 @@ async function v1(builder, external) {
  * @param {boolean} split
  */
 async function v3(builder, external, edge, split) {
+	const node_version = get_node_version();
+
 	const dir = '.vercel/output';
 
 	const tmp = builder.getBuildDirectory('vercel-tmp');
@@ -245,10 +251,9 @@ async function v3(builder, external, edge, split) {
 	 * @param {(options: { relativePath: string }) => string} generate_manifest
 	 */
 	async function generate_serverless_function(name, pattern, generate_manifest) {
-		const tmp = builder.getBuildDirectory(`vercel-tmp/${name}`);
-		const relativePath = posix.relative(tmp, builder.getServerDirectory());
+		const relativePath = path.posix.relative(tmp, builder.getServerDirectory());
 
-		builder.copy(`${files}/serverless.js`, `${tmp}/serverless.js`, {
+		builder.copy(`${files}/serverless.js`, `${tmp}/index.js`, {
 			replace: {
 				SERVER: `${relativePath}/index.js`,
 				MANIFEST: './manifest.js'
@@ -260,26 +265,11 @@ async function v3(builder, external, edge, split) {
 			`export const manifest = ${generate_manifest({ relativePath })};\n`
 		);
 
-		await esbuild.build({
-			entryPoints: [`${tmp}/serverless.js`],
-			outfile: `${dirs.functions}/${name}.func/index.js`,
-			target: 'node14',
-			bundle: true,
-			platform: 'node',
-			format: 'cjs',
-			external
-		});
-
-		write(
-			`${dirs.functions}/${name}.func/.vc-config.json`,
-			JSON.stringify({
-				runtime: 'nodejs14.x',
-				handler: 'index.js',
-				launcherType: 'Nodejs'
-			})
+		await create_function_bundle(
+			`${tmp}/index.js`,
+			`${dirs.functions}/${name}.func`,
+			`nodejs${node_version.major}.x`
 		);
-
-		write(`${dirs.functions}/${name}.func/package.json`, JSON.stringify({ type: 'commonjs' }));
 
 		routes.push({ src: pattern, dest: `/${name}` });
 	}
@@ -291,7 +281,7 @@ async function v3(builder, external, edge, split) {
 	 */
 	async function generate_edge_function(name, pattern, generate_manifest) {
 		const tmp = builder.getBuildDirectory(`vercel-tmp/${name}`);
-		const relativePath = posix.relative(tmp, builder.getServerDirectory());
+		const relativePath = path.posix.relative(tmp, builder.getServerDirectory());
 
 		builder.copy(`${files}/edge.js`, `${tmp}/edge.js`, {
 			replace: {
@@ -308,7 +298,7 @@ async function v3(builder, external, edge, split) {
 		await esbuild.build({
 			entryPoints: [`${tmp}/edge.js`],
 			outfile: `${dirs.functions}/${name}.func/index.js`,
-			target: 'node14',
+			target: 'es2020', // TODO verify what the edge runtime supports
 			bundle: true,
 			platform: 'node',
 			format: 'esm',
@@ -324,7 +314,7 @@ async function v3(builder, external, edge, split) {
 			})
 		);
 
-		routes.push({ src: pattern, middlewarePath: name });
+		routes.push({ src: pattern, dest: `/${name}` });
 	}
 
 	const generate_function = edge ? generate_edge_function : generate_serverless_function;
@@ -335,10 +325,19 @@ async function v3(builder, external, edge, split) {
 				id: route.pattern.toString(), // TODO is `id` necessary?
 				filter: (other) => route.pattern.toString() === other.pattern.toString(),
 				complete: async (entry) => {
-					const src = `${route.pattern
+					let sliced_pattern = route.pattern
 						.toString()
-						.slice(1, -2) // remove leading / and trailing $/
-						.replace(/\\\//g, '/')}(?:/__data.json)?$`; // TODO adding /__data.json is a temporary workaround — those endpoints should be treated as distinct routes
+						// remove leading / and trailing $/
+						.slice(1, -2)
+						// replace escaped \/ with /
+						.replace(/\\\//g, '/');
+
+					// replace the root route "^/" with "^/?"
+					if (sliced_pattern === '^/') {
+						sliced_pattern = '^/?';
+					}
+
+					const src = `${sliced_pattern}(?:/__data.json)?$`; // TODO adding /__data.json is a temporary workaround — those endpoints should be treated as distinct routes
 
 					await generate_function(route.id || 'index', src, entry.generateManifest);
 				}
@@ -378,10 +377,95 @@ async function v3(builder, external, edge, split) {
  */
 function write(file, data) {
 	try {
-		mkdirSync(dirname(file), { recursive: true });
+		fs.mkdirSync(path.dirname(file), { recursive: true });
 	} catch {
 		// do nothing
 	}
 
-	writeFileSync(file, data);
+	fs.writeFileSync(file, data);
+}
+
+function get_node_version() {
+	const full = process.version.slice(1); // 'v16.5.0' --> '16.5.0'
+	const major = parseInt(full.split('.')[0]); // '16.5.0' --> 16
+
+	if (major < 16) {
+		throw new Error(
+			`SvelteKit only supports Node.js version 16 or greater (currently using v${full}). Consult the documentation: https://vercel.com/docs/runtimes#official-runtimes/node-js/node-js-version`
+		);
+	}
+
+	return { major, full };
+}
+
+/**
+ * @param {string} entry
+ * @param {string} dir
+ * @param {string} runtime
+ */
+async function create_function_bundle(entry, dir, runtime) {
+	let base = entry;
+	while (base !== (base = path.dirname(base)));
+
+	const traced = await nodeFileTrace([entry], { base });
+
+	traced.warnings.forEach((error) => {
+		// pending https://github.com/vercel/nft/issues/284
+		if (error.message.startsWith('Failed to resolve dependency node:')) return;
+		console.error(error);
+	});
+
+	// find common ancestor directory
+	let common_parts;
+
+	for (const file of traced.fileList) {
+		if (common_parts) {
+			const parts = file.split(path.sep);
+
+			for (let i = 0; i < common_parts.length; i += 1) {
+				if (parts[i] !== common_parts[i]) {
+					common_parts = common_parts.slice(0, i);
+					break;
+				}
+			}
+		} else {
+			common_parts = path.dirname(file).split(path.sep);
+		}
+	}
+
+	const ancestor = base + common_parts.join(path.sep);
+
+	for (const file of traced.fileList) {
+		const source = base + file;
+		const dest = path.join(dir, path.relative(ancestor, source));
+
+		const stats = fs.statSync(source);
+		const is_dir = stats.isDirectory();
+
+		const realpath = fs.realpathSync(source);
+
+		try {
+			fs.mkdirSync(path.dirname(dest), { recursive: true });
+		} catch {
+			// do nothing
+		}
+
+		if (source !== realpath) {
+			const realdest = path.join(dir, path.relative(ancestor, realpath));
+			fs.symlinkSync(path.relative(path.dirname(dest), realdest), dest, is_dir ? 'dir' : 'file');
+		} else if (!is_dir) {
+			fs.copyFileSync(source, dest);
+		}
+	}
+
+	write(
+		`${dir}/.vc-config.json`,
+		JSON.stringify({
+			runtime,
+			handler: path.relative(base + ancestor, entry),
+			launcherType: 'Nodejs'
+		})
+	);
+
+	write(`${dir}/package.json`, JSON.stringify({ type: 'module' }));
 }

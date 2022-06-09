@@ -9,7 +9,7 @@ title: Loading
 ```html
 /// file: src/routes/blog/[slug].svelte
 <script context="module">
-	/** @type {import('./[slug]').Load} */
+	/** @type {import('./__types/[slug]').Load} */
 	export async function load({ params, fetch, session, stuff }) {
 		const url = `https://cms.example.com/article/${params.slug}.json`;
 		const response = await fetch(url);
@@ -56,7 +56,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### url
 
-`url` は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、`searchParams` (これは [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) オブジェクトとしてパースされたクエリ文字列を含んでいます) といったプロパティを持っています。
+`url` は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、`searchParams` (これは [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) オブジェクトとしてパースされたクエリ文字列を含んでいます) といったプロパティを持っています。`url.hash` cannot be accessed during `load`, since it is unavailable on the server.
 
 > 環境によっては、サーバーサイドレンダリングのときにこれがリクエストヘッダーから導き出される場合もあります。例えば、[adapter-node](/docs/adapters#supported-environments-node-js) を使用している場合、URL を正確にするために adapter-node に設定が必要かもしれません。
 
@@ -79,9 +79,13 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### fetch
 
-`fetch` はネイティブの `fetch` web API と同等であり、クレデンシャル付きのリクエストができます。クライアントとサーバーの両方のコンテキストで使用することができます。
+`fetch` は [ネイティブの `fetch` web API](https://developer.mozilla.org/ja/docs/Web/API/fetch) と同等ですが、いくつか追加の機能があります。
 
-> `fetch` がサーバーで実行される場合、その結果のレスポンスはシリアライズされ、レンダリング済のHTMLにインライン化されます。これにより、その後のクライアントサイドの `load` は、追加のネットワークリクエストなしで、同一のデータに即座にアクセスすることができます。
+- ページリクエストの `cookie` と `authorization` ヘッダーを継承するので、サーバー上でクレデンシャル付きのリクエストを行うことができます
+- サーバー上で、相対パスのリクエストを行うことができます (通常、`fetch` はサーバーのコンテキストで使用する場合にはオリジン付きの URL が必要です)
+- サーバーサイドレンダリング中のエンドポイント(endpoints)へのリクエストは直接ハンドラ関数を実行するので、HTTPを呼び出すオーバーヘッドがありません
+- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます
+- ハイドレーション中は、レスポンスは HTML から読み込まれ、一貫性が保証され、追加のネットワークリクエストを防ぎます
 
 > Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より特定のサブドメインである場合にのみ引き渡されます。
 
@@ -103,7 +107,9 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 ### Output
 
-`load` から Promise を返した場合、SvelteKit は Promise が解決するまでレンダリングを遅らせます。戻り値にはいくつかプロパティがあり、全てオプションです。
+`load` から Promise を返す場合、SvelteKit はその Promise が解決するまでレンダリングを遅らせます。戻り値には以下のいくつかのプロパティが含まれており、いずれもオプションです。
+
+> `status`、`error`、`redirect`、`cache` は、エラーページをレンダリングする際には無視されます。
 
 #### status
 
