@@ -19,7 +19,7 @@ export function init(blocks) {
 
 	indexes = Array.from(
 		{ length: max_rank + 1 },
-		() => new flexsearch.Index({ tokenize: 'forward' })
+		() => new flexsearch.Index({ tokenize: 'reverse' })
 	);
 
 	for (const block of blocks) {

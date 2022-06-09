@@ -43,11 +43,11 @@ Sveltekitの核心は、 _ファイルシステムベースのルーター_ で�
 <a href="/">Home</a>
 ```
 
-> Note that SvelteKit uses `<a>` elements to navigate between routes, rather than a framework-specific `<Link>` component.
+> SvelteKit ではルート(routes)間のナビゲートに、フレームワーク固有の `<Link>` コンポーネントではなく、`<a>` 要素を使用します。
 
-Dynamic parameters are encoded using `[brackets]`. For example, a blog post might be defined by `src/routes/blog/[slug].svelte`. These parameters can be accessed in a [`load`](/docs/loading#input-params) function or via the [`page`](/docs/modules#$app-stores) store.
+動的なパラメータは `[カッコ]` を使用してエンコードされます。例えば、ブログ記事の場合は `src/routes/blog/[slug].svelte` のように定義することがあるでしょう。これらのパラメータは、[`load`](/docs/loading#input-params) 関数の中からアクセスできますし、[`page`](/docs/modules#$app-stores) ストアを使用してアクセスすることもできます。
 
-A route can have multiple dynamic parameters, for example `src/routes/[category]/[item].svelte` or even `src/routes/[category]-[item].svelte`. (Parameters are 'non-greedy'; in an ambiguous case like `x-y-z`, `category` would be `x` and `item` would be `y-z`.)
+ルート(route)は動的なパラメータを複数持つことができます。例えば、`src/routes/[category]/[item].svelte` や `src/routes/[category]-[item].svelte` といった具合です。(パラメータは 'non-greedy' です; `x-y-z` のような曖昧なケースの場合、`category` は `x`、`item` は `y-z` になります。)
 
 ### エンドポイント(Endpoints)
 
@@ -302,7 +302,7 @@ export default config;
 
 #### Restパラメータ
 
-If the number of route segments is unknown, you can use rest syntax — for example you might implement GitHub's file viewer like so...
+ルート(route) セグメントの数がわからない場合は、rest 構文を使用することができます。例えば GitHub のファイルビューアのようなものを実装する場合には…
 
 ```bash
 /[org]/[repo]/tree/[branch]/[...file]
@@ -320,7 +320,7 @@ If the number of route segments is unknown, you can use rest syntax — for exam
 }
 ```
 
-> `src/routes/a/[...rest]/z.svelte` will match `/a/z` (i.e. there's no parameter at all) as well as `/a/b/z` and `/a/b/c/z` and so on. Make sure you check that the value of the rest parameter is valid, for example using a [matcher](#advanced-routing-matching).
+> `src/routes/a/[...rest]/z.svelte` は `/a/z` (つまり、パラメータがない場合) にマッチしますし、`/a/b/z` や `/a/b/c/z` などにもマッチします。rest パラメータの値が有効であることを、例えば [matcher](#advanced-routing-matching) などを使用して、確実にチェックしてください。
 
 #### Matching
 
@@ -343,7 +343,7 @@ export function match(param) {
 
 もしパス名がマッチしない場合、SvelteKit は (後述のソート順の指定に従って) 他のルートでマッチするか試行し、どれにもマッチしない場合は最終的に 404 を返します。
 
-> Matchers run both on the server and in the browser.
+> Matcher は サーバーとブラウザの両方で動作します。
 
 #### ソート
 

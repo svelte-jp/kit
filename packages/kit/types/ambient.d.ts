@@ -15,9 +15,9 @@
  * }
  * ```
  *
- * By populating these interfaces, you will gain type safety when using `event.locals`, `event.platform`, `session` and `stuff`.
+ * これらのインターフェースを作成することによって、`event.locals`、`event.platform`、`session`、`stuff` を使用する際に型の安全性を確保することができます。
  *
- * Note that since it's an ambient declaration file, you can't use `import` statements — instead, use the `import(...)` function:
+ * アンビエント宣言(ambient declaration)ファイルであるため、`import` 文を使用することができません。代わりに、`import(...)` 関数をお使いください:
  *
  * ```ts
  * interface Locals {
@@ -54,15 +54,7 @@ declare namespace App {
  */
 declare module '$app/env' {
 	/**
-<<<<<<< HEAD
-	 * アプリが [AMP モード](/docs/seo#manual-setup-amp) で動作しているかどうかを示します。
-	 */
-	export const amp: boolean;
-	/**
 	 * アプリがブラウザで動作しているか、それともサーバーで動作しているかを示します。
-=======
-	 * Whether the app is running in the browser or on the server.
->>>>>>> sveltejs/master
 	 */
 	export const browser: boolean;
 	/**
@@ -96,13 +88,8 @@ declare module '$app/env' {
  */
 declare module '$app/navigation' {
 	/**
-<<<<<<< HEAD
-	 * ナビゲーション後のページ更新の時にこれが(例えば `onMount` の中や action で)呼び出された場合、SvelteKit の組み込みのスクロール処理を無効にします。
+	 * ナビゲーション後のページ更新の時にこれが(例えば `onMount`、`afterNavigate` の中や action で)呼び出された場合、SvelteKit の組み込みのスクロール処理を無効にします。
 	 * ユーザーの期待する動きではなくなるため、一般的には推奨されません。
-=======
-	 * If called when the page is being updated following a navigation (in `onMount` or `afterNavigate` or an action, for example), this disables SvelteKit's built-in scroll handling.
-	 * This is generally discouraged, since it breaks user expectations.
->>>>>>> sveltejs/master
 	 */
 	export function disableScrollHandling(): void;
 	/**
@@ -119,11 +106,7 @@ declare module '$app/navigation' {
 		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
 	): Promise<void>;
 	/**
-<<<<<<< HEAD
-	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` する場合、再実行させます。それに続いてページが更新されたときに解決される `Promise` を返します。
-=======
-	 * Causes any `load` functions belonging to the currently active page to re-run if they `fetch` the resource in question, or re-fetches data from a page endpoint if the invalidated resource is the page itself. Returns a `Promise` that resolves when the page is subsequently updated.
->>>>>>> sveltejs/master
+	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` する場合や、invalidate されたリソースがページそのものだったときにページエンドポイントからデータを再フェッチする場合に再実行させます。それに続いてページが更新されたときに解決される `Promise` を返します。
 	 * @param dependency The invalidated resource
 	 */
 	export function invalidate(dependency: string | ((href: string) => boolean)): Promise<void>;
@@ -172,11 +155,7 @@ declare module '$app/navigation' {
  */
 declare module '$app/paths' {
 	/**
-<<<<<<< HEAD
-	 * [`config.kit.paths.base`](/docs/configuration#paths) にマッチする文字列です。`/` で始まる必要があります。末尾を `/` にしてはいけません。
-=======
-	 * A string that matches [`config.kit.paths.base`](/docs/configuration#paths). It must start, but not end with `/` (e.g. `/base-path`), unless it is the empty string.
->>>>>>> sveltejs/master
+	 * [`config.kit.paths.base`](/docs/configuration#paths) にマッチする文字列です。先頭は `/` で始まる必要があり、末尾は `/` にしてはいけません(例 `/base-path`)。空文字(empty string)の場合はこのルールに該当しません。
 	 */
 	export const base: `/${string}`;
 	/**
@@ -306,16 +285,12 @@ declare module '@sveltejs/kit/hooks' {
  */
 declare module '@sveltejs/kit/node/polyfills' {
 	/**
-<<<<<<< HEAD
-	 * `node-fetch` を使用して、`fetch` `Headers` `Request` `Response` を global で利用できるようにします。
-=======
-	 * Make various web APIs available as globals:
+	 * 様々な web API をグローバルで使用できるようにします:
 	 * - `crypto`
 	 * - `fetch`
 	 * - `Headers`
 	 * - `Request`
 	 * - `Response`
->>>>>>> sveltejs/master
 	 */
 	export function installPolyfills(): void;
 }

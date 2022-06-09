@@ -94,9 +94,9 @@ export default config;
 
 ### alias
 
-An object containing zero or more aliases used to replace values in `import` statements. These aliases are automatically passed to Vite and TypeScript.
+`import` 文の値を置き換えるのに使用される 0 個以上のエイリアスを含むオブジェクトです。これらのエイリアスは自動的に Vite と TypeScript に渡されます。
 
-For example, you can add aliases to a `components` and `utils` folder:
+例えば、`components` フォルダと `utils` フォルダのエイリアスを追加する場合は以下の通りです:
 
 ```js
 /// file: svelte.config.js
@@ -111,7 +111,7 @@ const config = {
 };
 ```
 
-> The built-in `$lib` alias is controlled by `config.kit.files.lib` as it is used for packaging.
+> ビルトインの `$lib` エイリアスはパッケージングで使用されるため、`config.kit.files.lib` でコントロールされています。
 
 ### appDir
 

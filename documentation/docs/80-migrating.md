@@ -48,7 +48,7 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 #### src/server.js
 
-When using `adapter-node` the equivalent is a [custom server](https://github.com/sveltejs/kit/tree/master/packages/adapter-node#custom-server). Otherwise, this file has no direct equivalent, since SvelteKit apps can run in serverless environments. You can, however, use the [hooks module](/docs/hooks) to implement session logic.
+`adapter-node` を使用する場合は、[custom server](https://github.com/sveltejs/kit/tree/master/packages/adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜならSvelteKit アプリはサーバーレス環境でも実行だからです。セッションロジックを実装する場合は、[hooks module](/docs/hooks) をお使いいただけます。
 
 #### src/service-worker.js
 

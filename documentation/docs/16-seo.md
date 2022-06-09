@@ -82,7 +82,7 @@ export async function get() {
 
 #### AMP
 
-An unfortunate reality of modern web development is that it is sometimes necessary to create an [Accelerated Mobile Pages (AMP)](https://amp.dev/) version of your site. In SvelteKit this can be done by enforcing the following [configuration](/docs/configuration) options...
+現代の web 開発における不幸な現実として、サイトの [Accelerated Mobile Pages (AMP)](https://amp.dev/) バージョンを作らなければならないときがある、というのがあります。SvelteKit では、以下の [コンフィグレーション](/docs/configuration) オプションを設定することでこれを実現することができます…
 
 ```js
 /// file: svelte.config.js
@@ -105,7 +105,7 @@ const config = {
 export default config;
 ```
 
-...and transforming the HTML using `transformPage` along with `transform` imported from `@sveltejs/amp`:
+…そして `@sveltejs/amp` から `transform` をインポートし、`transformPage` で使用することで、HTML を変換します:
 
 ```js
 import * as amp from '@sveltejs/amp';
@@ -118,4 +118,4 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-> It's a good idea to use the `handle` hook to validate the transformed HTML using `amphtml-validator`, but only if you're prerendering pages since it's very slow.
+> `amphtml-validator` を使用して変換された HTML を検証するのに、`handle` hook を利用するのは良いアイデアですが、非常に遅くなってしまうので、ページをプリレンダリングするときだけにしてください。

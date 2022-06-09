@@ -175,7 +175,7 @@ export interface HandleError {
 }
 
 /**
- * The `(event: LoadEvent) => LoadOutput` `load` function exported from `<script context="module">` in a page or layout.
+ * ページやレイアウト の `<script context="module">` からエクスポートされる `(event: LoadEvent) => LoadOutput` `load` 関数です。
  *
  * Params のジェネリックな引数を手作業で指定する代わりに、[generated types](/docs/types#generated-types) を使用することができます。
  */

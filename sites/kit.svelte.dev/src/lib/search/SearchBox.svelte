@@ -138,15 +138,8 @@
 			<input
 				autofocus
 				on:keydown={(e) => {
-<<<<<<< HEAD
 					if (!e.isComposing && e.key === 'Enter') {
-						if (results.length > 0) {
-							modal.querySelector('a').click();
-						}
-=======
-					if (e.key === 'Enter') {
 						modal.querySelector('a[data-has-node]')?.click();
->>>>>>> sveltejs/master
 					}
 				}}
 				on:input={(e) => {

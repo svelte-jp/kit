@@ -79,13 +79,13 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 #### fetch
 
-`fetch` is equivalent to the [native `fetch` web API](https://developer.mozilla.org/en-US/docs/Web/API/fetch), with a few additional features:
+`fetch` は [ネイティブの `fetch` web API](https://developer.mozilla.org/ja/docs/Web/API/fetch) と同等ですが、いくつか追加の機能があります。
 
-- it can be used to make credentialed requests on the server, as it inherits the `cookie` and `authorization` headers for the page request
-- it can make relative requests on the server (ordinarily, `fetch` requires a URL with an origin when used in a server context)
-- requests for endpoints go direct to the handler function during server-side rendering, without the overhead of an HTTP call
-- during server-side rendering, the response will be captured and inlined into the rendered HTML
-- during hydration, the response will be read from the HTML, guaranteeing consistency and preventing an additional network request
+- ページリクエストの `cookie` と `authorization` ヘッダーを継承するので、サーバー上でクレデンシャル付きのリクエストを行うことができます
+- サーバー上で、相対パスのリクエストを行うことができます (通常、`fetch` はサーバーのコンテキストで使用する場合にはオリジン付きの URL が必要です)
+- サーバーサイドレンダリング中のエンドポイント(endpoints)へのリクエストは直接ハンドラ関数を実行するので、HTTPを呼び出すオーバーヘッドがありません
+- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます
+- ハイドレーション中は、レスポンスは HTML から読み込まれ、一貫性が保証され、追加のネットワークリクエストを防ぎます
 
 > Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より特定のサブドメインである場合にのみ引き渡されます。
 
@@ -107,9 +107,9 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 ### Output
 
-If you return a Promise from `load`, SvelteKit will delay rendering until the promise resolves. The return value has several properties listed below, all of which are optional.
+`load` から Promise を返す場合、SvelteKit はその Promise が解決するまでレンダリングを遅らせます。戻り値には以下のいくつかのプロパティが含まれており、いずれもオプションです。
 
-> `status`, `error`, `redirect` and `cache` are ignored when rendering error pages.
+> `status`、`error`、`redirect`、`cache` は、エラーページをレンダリングする際には無視されます。
 
 #### status
 
