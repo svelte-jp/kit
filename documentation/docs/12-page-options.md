@@ -36,7 +36,7 @@ SvelteKit には [クライアントサイドルーター(client-side router)](/
 
 ### prerender
 
-It's likely that at least some pages of your app can be represented as a simple HTML file generated at build time. These pages can be [_prerendered_](/docs/appendix#prerendering).
+アプリの中のいくつかのページは、ビルド時にシンプルなHTMLとして生成できるかもしれません。それらのページは [_プリレンダリング_](/docs/appendix#prerendering) することができます。
 
 `prerender` アノテーションがあるページは自動的にプリレンダリングされます:
 

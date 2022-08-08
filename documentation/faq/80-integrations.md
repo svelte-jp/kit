@@ -106,26 +106,26 @@ onMount(() => {
 });
 ```
 
-### How do I use with Yarn?
+### Yarn を使用するにはどうすれば良いですか？
 
-#### Does it work with Yarn 2?
+#### Yarn 2 で動作しますか？
 
-Sort of. The Plug'n'Play feature, aka 'pnp', is broken (it deviates from the Node module resolution algorithm, and [doesn't yet work with native JavaScript modules](https://github.com/yarnpkg/berry/issues/638) which SvelteKit — along with an [increasing number of packages](https://blog.sindresorhus.com/get-ready-for-esm-aa53530b3f77) — uses). You can use `nodeLinker: 'node-modules'` in your [`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc#nodeLinker) file to disable pnp, but it's probably easier to just use npm or [pnpm](https://pnpm.io/), which is similarly fast and efficient but without the compatibility headaches.
+多少は。Plug'n'Play 機能、通称 'pnp' は動きません (Node のモジュール解決アルゴリズムから逸脱しており、SvelteKitが[数多くのライブラリ](https://blog.sindresorhus.com/get-ready-for-esm-aa53530b3f77)とともに使用している[ネイティブの JavaScript モジュールではまだ動作しません](https://github.com/yarnpkg/berry/issues/638))。[`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc#nodeLinker) で `nodeLinker: 'node-modules'` を使用して pnp を無効にできますが、おそらく npm や [pnpm](https://pnpm.io/) を使用するほうが簡単でしょう。同じように高速で効率的ですが、互換性に頭を悩ませることはありません。
 
-#### How do I use with Yarn 3?
+#### Yarn 3 を使用するにはどうすれば良いですか？
 
-Currently ESM Support within the latest Yarn (version 3) is considered [experimental](https://github.com/yarnpkg/berry/pull/2161).
+現時点の、最新の Yarn (version 3) の ESM サポート は [experimental](https://github.com/yarnpkg/berry/pull/2161) であるようです。
 
-The below seems to work although your results may vary.
+結果は異なるかもしれませんが、下記が有効なようです。
 
-First create a new application:
+最初に新しいアプリケーションを作成します:
 
 ```sh
 yarn create svelte myapp
 cd myapp
 ```
 
-And enable Yarn Berry:
+そして Yarn Berry を有効にします:
 
 ```sh
 yarn set version berry
@@ -134,10 +134,10 @@ yarn install
 
 **Yarn 3 global cache**
 
-One of the more interesting features of Yarn Berry is the ability to have a single global cache for packages, instead of having multiple copies for each project on the disk. However, setting `enableGlobalCache` to true causes building to fail, so it is recommended to add the following to the `.yarnrc.yml` file:
+Yarn Berry の興味深い機能の1つに、ディスク上のプロジェクトごとに複数のコピーを持つのではなく、パッケージ用に単一のグローバルキャッシュを持つことができる、というのがあります。しかし、`enableGlobalCache` の設定を true にするとビルドが失敗するため、`.yarnrc.yml` ファイルに以下を追加することを推奨します:
 
 ```
 nodeLinker: node-modules
 ```
 
-This will cause packages to be downloaded into a local node_modules directory but avoids the above problem and is your best bet for using version 3 of Yarn at this point in time.
+これによってパッケm時はローカルの node_modules ディレクトリにダウンロードされますが、上記の問題は回避され、現時点では Yarn の version 3 を使用するベストな方法となります。

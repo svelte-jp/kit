@@ -25,10 +25,10 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 
 `sapper` を参照しているスクリプトを全て更新します:
 
-- `sapper build` should become `vite build` using the Node [adapter](/docs/adapters)
-- `sapper export` should become `vite build` using the static [adapter](/docs/adapters)
-- `sapper dev` should become `vite dev`
-- `node __sapper__/build` should become `node build`
+- `sapper build` は、Node [adapter](/docs/adapters) を使用した `vite build` に更新します 
+- `sapper export` は、static [adapter](/docs/adapters) を使用した `vite build` に更新します 
+- `sapper dev` は `vite dev` に更新します
+- `node __sapper__/build` は `node build` に更新します
 
 ### プロジェクトファイル
 
@@ -63,7 +63,7 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 `src/template.html` は `src/app.html` にリネームする必要があります。
 
-Remove `%sapper.base%`, `%sapper.scripts%` and `%sapper.styles%`. Replace `%sapper.head%` with `%sveltekit.head%` and `%sapper.html%` with `%sveltekit.body%`. The `<div id="sapper">` is no longer necessary.
+`%sapper.base%`、`%sapper.scripts%`、`%sapper.styles%` を削除します。`%sapper.head%` を `%sveltekit.head%` に、`%sapper.html%` を `%sveltekit.body%` にそれぞれ置き換えます。`<div id="sapper">` はもう必要ありません。
 
 #### src/node_modules
 
@@ -190,4 +190,4 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-Note that `prerendering` is `false` when using `vite preview` to test the production build of the site, so to verify the results of minifying, you'll need to inspect the built HTML files directly.
+サイトのプロダクションビルドをテストするのに `vite preview` を使用しているときは、`prerendering` が `false` となることにご注意ください。そのため、minify の結果を検証するには、ビルド済の HTML を直接確認する必要があります。

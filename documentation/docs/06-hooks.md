@@ -63,8 +63,8 @@ export async function handle({ event, resolve }) {
 
 `resolve` はオプションの第2引数をサポートしており、レスポンスのレンダリング方法をより詳細にコントロールすることができます。そのパラメータは、以下のフィールドを持つオブジェクトです:
 
-- `ssr: boolean` (default `true`) — if `false`, renders an empty 'shell' page instead of server-side rendering
-- `transformPageChunk(opts: { html: string, done: boolean }): MaybePromise<string | undefined>` — applies custom transforms to HTML. If `done` is true, it's the final chunk. Chunks are not guaranteed to be well-formed HTML (they could include an element's opening tag but not its closing tag, for example) but they will always be split at sensible boundaries such as `%sveltekit.head%` or layout/page components.
+- `ssr: boolean` (default `true`) — `false` の場合、サーバーサイドレンダリングの代わりに空の 'shell' ページをレンダリングします
+- `transformPageChunk(opts: { html: string, done: boolean }): MaybePromise<string | undefined>` — カスタムの変換を HTML に適用します。`done` が true の場合、それが最後のチャンクです。チャンクは整形された HTML であることが保証されませんが (例えば、要素の開始タグは含むが終了タグは含まれない、など)、常に `%sveltekit.head%` や レイアウト(layout)/ページ(page) コンポーネントなどのような理にかなった境界 (sensible boundaries) で分割されます。
 
 ```js
 /// file: src/hooks.js

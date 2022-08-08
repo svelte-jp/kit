@@ -26,7 +26,7 @@ title: Loading
 
 > `<script context="module">` であることにご注意ください。これは、コンポーネントがレンダリングされる前に `load` が実行されるのに必要なものです。コンポーネントインスタンスごとのコードは2つ目の `<script>` タグに記述する必要があります。
 
-As with [endpoints](/docs/routing#endpoints), pages can import [generated types](/docs/types#generated-types) — the `./[slug]` in the example above — to ensure that `params` are correctly typed.
+[エンドポイント(endpoints)](/docs/routing#endpoints) と同様、ページでは [generated types](/docs/types#generated-types) をインポートできます。上記の例の `./[slug]` のように、`params` を正確に型付けすることができます。
 
 `load` は Next.js の `getStaticProps` や `getServerSideProps` に似ていますが、違いとしては、`load` はサーバーとクライアントの両方で動作します。上記の例では、もしユーザーがこのページへのリンクをクリックした場合、自身のサーバーを経由せずに `cms.example.com` からデータを取得します。
 
@@ -107,7 +107,7 @@ SvelteKitの `load` は、以下のような特別なプロパティを持つ `f
 
 ### Output
 
-If you return a Promise from `load`, SvelteKit will delay rendering until the promise resolves. The return value has several properties listed below, all of which are optional (as is the return value itself).
+`load` から Promise を返す場合、SvelteKit はその Promise が解決するまでレンダリングを遅らせます。戻り値には以下のいくつかのプロパティが含まれており、いずれもオプションです (戻り値自身と同様)。
 
 > `status`、`error`、`redirect`、`cache` は、エラーページをレンダリングする際には無視されます。
 

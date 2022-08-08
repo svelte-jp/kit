@@ -28,7 +28,7 @@ SvelteKit は、公式にサポートされている adapter を多数提供し�
 +import adapter from '@sveltejs/adapter-node';
 ```
 
-With this, `vite build` will generate a self-contained Node app inside the `build` directory. You can pass options to adapters, such as customising the output directory:
+これにより、`vite build` は自己完結型の Node アプリを `build` ディレクトリの中に生成します。adapter にはオプションを渡すことができ、例えば出力ディレクトリをカスタマイズできます:
 
 ```diff
 /// file: svelte.config.js
@@ -100,16 +100,16 @@ export default function (options) {
 
 `adapt` メソッドの中では、adapter がすべきことがたくさんあります:
 
-- Clear out the build directory
-- Write SvelteKit output with `builder.writeClient`, `builder.writeServer`, and `builder.writePrerendered`
-- Output code that:
-  - Imports `Server` from `${builder.getServerDirectory()}/index.js`
-  - Instantiates the app with a manifest generated with `builder.generateManifest({ relativePath })`
-  - Listens for requests from the platform, converts them to a standard [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) if necessary, calls the `server.respond(request, { getClientAddress })` function to generate a [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) and responds with it
-  - expose any platform-specific information to SvelteKit via the `platform` option passed to `server.respond`
-  - Globally shims `fetch` to work on the target platform, if necessary. SvelteKit provides a `@sveltejs/kit/install-fetch` helper for platforms that can use `node-fetch`
-- Bundle the output to avoid needing to install dependencies on the target platform, if necessary
-- Put the user's static files and the generated JS/CSS in the correct location for the target platform
+- build ディレクトリの掃除
+- `builder.writeClient`、`builder.writeServer`、`builder.writePrerendered` を用いて SvelteKit のアウトプットを書き出す
+- コードの出力:
+  - `${builder.getServerDirectory()}/index.js` から `Server` をインポートする
+  - `builder.generateManifest({ relativePath })` で生成された manifest でアプリをインスタンス化する
+  - プラットフォームからのリクエストをリスンし、必要に応じて標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) に変換し、`server.respond(request, { getClientAddress })` 関数を呼び出して [Response](https://developer.mozilla.org/ja/docs/Web/API/Response) を生成し、応答する
+  - `server.respond` に渡される `platform` オプションを通して、SvelteKit にプラットフォーム固有の情報を公開する 
+  - 必要に応じて、対象プラットフォームで動作するように `fetch` をグローバルに shim する。SvelteKit は `node-fetch` を使用できるプラットフォーム向けに `@sveltejs/kit/install-fetch` ヘルパーを提供しています 
+- 必要に応じて、ターゲットプラットフォームに依存ライブラリをインストールするのを避けるために出力ファイルをバンドルする
+- 対象プラットフォームの正しい場所にユーザーの静的ファイルや生成した JS/CSS ファイルを設置する
 
 可能であれば、adapter の出力は `build/` ディレクトリに、中間出力は `.svelte-kit/[adapter-name]` に置くことを推奨します。
 

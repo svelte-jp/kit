@@ -89,7 +89,7 @@ export default config;
 
 ### adapter
 
-Run when executing `vite build` and determines how the output is converted for different platforms. See [Adapters](/docs/adapters).
+`vite build` の実行中に実行され、異なるプラットフォーム向けにアウトプットがどのように変換されるかを決定します。[Adapters](/docs/adapters) をご参照ください。
 
 ### alias
 
@@ -133,9 +133,9 @@ const config = {
 
 以下の値のうち、0 個以上を含むオブジェクトです:
 
-- `mode` — 'hash', 'nonce' or 'auto'
-- `directives` — an object of `[directive]: value[]` pairs
-- `reportOnly` — an object of `[directive]: value[]` pairs for CSP report-only mode
+- `mode` — 'hash'、'nonce'、'auto' のいずれか
+- `directives` — `[directive]: value[]` ペアのオブジェクト 
+- `reportOnly` — CSP report-only モードのための `[directive]: value[]` ペアのオブジェクト 
 
 [Content Security Policy](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Content-Security-Policy) の設定です。CSP は、リソースの読み込み元を制限することにより、クロスサイトスクリプティング (XSS) 攻撃からユーザーを守るのに役立ちます。例えば、このような設定では…
 
@@ -164,13 +164,13 @@ export default config;
 
 > `mode` が `'auto'` の場合、SvelteKit は動的にレンダリングされたページには nonce を、プリレンダリングされたページには hash を使用します。プリレンダリングされたページで nonce を使用するのは安全でないため、禁止されています。
 
-> Note that most [Svelte transitions](https://svelte.dev/tutorial/transition) work by creating an inline `<style>` element. If you use these in your app, you must either leave the `style-src` directive unspecified or add `unsafe-inline`.
+> ほとんどの [Svelte transitions](https://svelte.jp/tutorial/transition) は、インラインの `<style>` 要素を作成することで動作することにご注意ください。これらをアプリで使用する場合、`style-src` ディレクティブを指定しないようにするか、`unsafe-inline` を追加する必要があります。
 
 ### env
 
-Environment variable configuration:
+環境変数の設定です:
 
-- `publicPrefix` — a prefix that signals that an environment variable is safe to expose to client-side code. See [`$env/static/public`](/docs/modules#$env-static-public) and [`$env/dynamic/public`](/docs/modules#$env-dynamic-public). Note that Vite's [`envPrefix`](https://vitejs.dev/config/shared-options.html#envprefix) must be set separately if you are using Vite's environment variable handling - though use of that feature should generally be unnecessary.
+- `publicPrefix` — クライアントサイドのコードに公開しても安全であることを示す接頭辞です。[`$env/static/public`](/docs/modules#$env-static-public) と [`$env/dynamic/public`](/docs/modules#$env-dynamic-public) をご参照ください。Vite の環境変数のハンドリングを使用する場合は、Vite の [`envPrefix`](https://ja.vitejs.dev/config/shared-options.html#envprefix) を別途設定する必要があることにご注意ください。もっとも、通常はこの機能を使用する必要はありません。
 
 ### files
 
@@ -199,7 +199,7 @@ CSS を HTML の先頭の `<style>` ブロック内にインライン化する�
 
 ### moduleExtensions
 
-An array of file extensions that SvelteKit will treat as modules. Files with extensions that match neither `config.extensions` nor `config.kit.moduleExtensions` will be ignored by the router.
+SvelteKit がモジュールとして取り扱うファイル拡張子の配列です。`config.extensions` と `config.kit.moduleExtensions` のいずれにもマッチしない拡張子のファイルはルーター (router) から無視されます。
 
 ### outDir
 
@@ -284,7 +284,7 @@ export default config;
     export default config;
     ```
 
-- `origin` — the value of `url.origin` during prerendering; useful if it is included in rendered content
+- `origin` — プリレンダリング時の `url.origin` の値です。レンダリングされたコンテンツに含まれている場合に有用です。
 
 ### routes
 
@@ -318,4 +318,4 @@ URL を解決する際に、末尾のスラッシュ (trailing slashes) を削�
 
 アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、古いコンテンツがある可能性があります。そうでなくとも、アプリのルートマニフェストがもう存在しない JavaScript ファイルを指している可能性があります。SvelteKit は、ここで指定された `name` (デフォルトではビルドのタイムスタンプ) を使用して新しいバージョンがデプロイされたことを検知すると、従来のフルページナビゲーションにフォールバックすることにより、この問題を解決しています。
 
-If you set `pollInterval` to a non-zero value, SvelteKit will poll for new versions in the background and set the value of the [`updated`](/docs/modules#$app-stores) store to `true` when it detects one.
+`pollInterval` を 0 以外の値に設定した場合、SvelteKit はバックグラウンドで新しいバージョンをポーリングし、それを検知すると [`updated`](/docs/modules#$app-stores) ストアの値を `true` にします。

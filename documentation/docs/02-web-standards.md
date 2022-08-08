@@ -47,7 +47,7 @@ export function GET(event) {
 
 ### Stream APIs
 
-Most of the time, your endpoints will return complete data, as in the `userAgent` example above. Sometimes, you may need to return a response that's too large to fit in memory in one go, or is delivered in chunks, and for this the platform provides [streams](https://developer.mozilla.org/en-US/docs/Web/API/Streams_API) — [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream), [WritableStream](https://developer.mozilla.org/en-US/docs/Web/API/WritableStream) and [TransformStream](https://developer.mozilla.org/en-US/docs/Web/API/TransformStream).
+ほとんどの場合、エンドポイント(endpoints) は 上記の `userAgent` の例のように、完全なデータを返します。たまに、1度ではメモリに収まらない大きすぎるレスポンスを返したり、チャンクで配信したりしなければならないことがあります。このような場合のために、プラットフォームは [streams](https://developer.mozilla.org/ja/docs/Web/API/Streams_API) — [ReadableStream](https://developer.mozilla.org/ja/docs/Web/API/ReadableStream)、[WritableStream](https://developer.mozilla.org/ja/docs/Web/API/WritableStream)、[TransformStream](https://developer.mozilla.org/ja/docs/Web/API/TransformStream) を提供しています。
 
 ### URL APIs
 

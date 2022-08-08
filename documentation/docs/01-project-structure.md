@@ -1,8 +1,8 @@
 ---
-title: Project Structure
+title: プロジェクト構成
 ---
 
-A typical SvelteKit project looks like this:
+一般的な SvelteKit プロジェクトはこのような構成です:
 
 ```bash
 my-project/
@@ -23,55 +23,55 @@ my-project/
 └ vite.config.js
 ```
 
-You'll also find common files like `.gitignore` and `.npmrc` (and `.prettierrc` and `.eslintrc.cjs` and so on, if you chose those options when running `npm create svelte@latest`).
+また、`.gitignore`、`.npmrc` などの共通ファイルもあります (もし `npm create svelte@latest` の実行時にプションを選択した場合は `.prettierrc` や `.eslintrc.cjs` などもあるでしょう)。
 
-### Project files
+### プロジェクトファイル
 
 #### src
 
-The `src` directory contains the meat of your project.
+`src` ディレクトリには、プロジェクトの中身が格納します。
 
-- `lib` contains your library code, which can be imported via the [`$lib`](/docs/modules#$lib) alias, or packaged up for distribution using [`svelte-kit package`](/docs/packaging)
-- `params` contains any [param matchers](/docs/routing#advanced-routing-matching) your app needs
-- `routes` contains the [pages](/docs/routing#pages) and [endpoints](/docs/routing#endpoints) of your application
-- `app.html` is your page template — an HTML document containing the following placeholders:
-  - `%sveltekit.head%` — `<link>` and `<script>` elements needed by the app, plus any `<svelte:head>` content
-  - `%sveltekit.body%` — the markup for a rendered page
-  - `%sveltekit.assets%` — a relative path from the page to [`paths.assets`](/docs/configuration#paths)
-  - `%sveltekit.nonce%` — a [CSP](/docs/configuration#csp) nonce for manually included links and scripts, if used
-- `hooks.js` (optional) contains your application's [hooks](/docs/hooks)
-- `service-worker.js` (optional) contains your [service worker](/docs/service-workers)
+- `lib` にはあなたのライブラリのコードを格納します。格納されたコードは [`$lib`](/docs/modules#$lib) エイリアスを使用してインポートしたり、[`svelte-kit package`](/docs/packaging) を使用して配布用にパッケージングすることができます。
+- `params` には [param matchers](/docs/routing#advanced-routing-matching) を格納します
+- `routes` にはアプリケーションの [ページ(pages)](/docs/routing#pages) と [エンドポイント(endpoints)](/docs/routing#endpoints) を格納します
+- `app.html` はページのテンプレートで、以下のプレースホルダーを含む HTML document です:
+  - `%sveltekit.head%` — アプリに必要な `<link>` 要素や `<script>` 要素、`<svelte:head>` コンテンツ 
+  - `%sveltekit.body%` — レンダリングされたページのためのマークアップ
+  - `%sveltekit.assets%` — ページから [`paths.assets`](/docs/configuration#paths) に対する相対パス
+  - `%sveltekit.nonce%` — マニュアルで含めるリンクやスクリプトの [CSP](/docs/configuration#csp) ノンス (使用する場合)
+- `hooks.js` (optional) アプリケーションの [hooks](/docs/hooks)
+- `service-worker.js` (optional) [service worker](/docs/service-workers)
 
-You can use `.ts` files instead of `.js` files, if using TypeScript.
+TypeScript を使用している場合、`.js` の代わりに `.ts` ファイルを使用することができます。
 
 #### static
 
-Any static assets that should be served as-is, like `robots.txt` or `favicon.png`, go in here.
+`robots.txt` や `favicon.png` など、そのままサーブされる静的なアセットをここに含めます。
 
 #### package.json
 
-Your `package.json` file must include `@sveltejs/kit`, `svelte` and `vite` as `devDependencies`.
+`package.json` ファイルには `@sveltejs/kit`、`svelte`、`vite` が `devDependencies` に含まれていなければなりません。
 
-When you create a project with `npm create svelte@latest`, you'll also notice that `package.json` includes `"type": "module"`. This means that `.js` files are interpreted as native JavaScript modules with `import` and `export` keywords. Legacy CommonJS files need a `.cjs` file extension.
+`npm create svelte@latest` でプロジェクトを作成すると、`package.json` には `"type": "module"` が含まれることに気が付くでしょう。これは、`.js` ファイルが `import` や `export` キーワードを持つネイティブの JavaScript モジュールとして解釈されることを意味します。レガシーな CommonJS ファイルには `.cjs` ファイル拡張子が必要です。
 
 #### svelte.config.js
 
-This file contains your Svelte and SvelteKit [configuration](/docs/configuration).
+このファイルには Svelte と SvelteKit の [コンフィグレーション](/docs/configuration) が含まれています。
 
 #### tsconfig.json
 
-This file (or `jsconfig.json`, if you prefer type-checked `.js` files over `.ts` files) configures TypeScript, if you added typechecking during `npm create svelte@latest`. Since SvelteKit relies on certain configuration being set a specific way, it generates its own `.svelte-kit/tsconfig.json` file which your own config `extends`.
+`npm create svelte@latest` の際に型チェックを追加した場合、このファイル (または `.ts` ファイルより型チェックされた `.js` ファイルのほうがお好みであれば `jsconfig.json`) で TypeScript の設定を行います。SvelteKit は特定の設定に依存しているため、独自の `.svelte-kit/tsconfig.json` ファイルを生成し、あなたの設定を `extends` (拡張)しています。
 
 #### vite.config.js
 
-A SvelteKit project is really just a [Vite](https://vitejs.dev) project that uses the [`@sveltejs/kit/vite`](/docs/modules#sveltejs-kit-vite) plugin, along with any other [Vite configuration](https://vitejs.dev/config/).
+SvelteKit プロジェクトは実は、[`@sveltejs/kit/vite`](/docs/modules#sveltejs-kit-vite) プラグインと、その他の [Vite の設定](https://ja.vitejs.dev/config/) をともに使用した [Vite](https://ja.vitejs.dev) プロジェクトです。
 
-### Other files
+### その他のファイル
 
 #### test
 
-If you choose to add tests during `npm create svelte@latest`, they will go in a `test` directory.
+`npm create svelte@latest` の際にテストの追加を選択した場合、`test` ディレクトリに格納されます。
 
 #### .svelte-kit
 
-As you develop and build your project, SvelteKit will generate files in a `.svelte-kit` directory (configurable as [`outDir`](/docs/configuration#outdir)). You can ignore its contents, and delete them at any time (they will be regenerated when you next `dev` or `build`).
+開発してプロジェクトをビルドすると、SvelteKit は `.svelte-kit` ディレクトリ ([`outDir`](/docs/configuration#outdir) で変更可能です) にファイルを生成します。その中身を気にすることなく、いつでも削除することができます (次に `dev` や `build` を実行したときに再生成されます)。

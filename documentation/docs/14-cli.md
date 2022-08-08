@@ -2,22 +2,22 @@
 title: Command Line Interface
 ---
 
-SvelteKit projects use [Vite](https://vitejs.dev), meaning you'll mostly use its CLI (albeit via `npm run dev/build/preview` scripts):
+SvelteKit プロジェクトは [Vite](https://ja.vitejs.dev) を使用しています。つまり、ほとんどは Vite の CLI を使用することになります (`npm run dev/build/preview` scripts を経由しますが):
 
-- `vite dev` — start a development server
-- `vite build` — build a production version of your app
-- `vite preview` — run the production version locally
+- `vite dev` — 開発サーバーを起動します
+- `vite build` — アプリの本番バージョンをビルドします
+- `vite preview` — ローカルで本番バージョンを実行します
 
-However SvelteKit includes its own CLI for creating distributable packages and initialising your project:
+しかしながら SvelteKit には、配布可能なパッケージの作成やプロジェクト初期化のための CLI も含まれています:
 
 ### svelte-kit package
 
-> `svelte-kit package` is currently experimental and is not subject to Semantic Versioning rules. Non-backward compatible changes may occur in any future release.
+> `svelte-kit package` は現時点では experimental で、セマンティックバージョニングのルールの対象外です。将来のリリースで後方互換性のない変更が行われる可能性があります。
 
-See [packaging](/docs/packaging). `svelte-kit package` accepts the following options:
+[packaging](/docs/packaging) をご覧ください。`svelte-kit package` は以下のオプションを受け取ります:
 
-- `-w`/`--watch` — watch files in `src/lib` for changes and rebuild the package
+- `-w`/`--watch` — `src/lib` にあるファイルの変更をウォッチし、パッケージを再ビルドします
 
 ### svelte-kit sync
 
-`svelte-kit sync` creates the generated files for your project such as types and a `tsconfig.json`. When you create a new project, it is listed as the `prepare` script and will be run automatically as part of the npm lifecycle, so you should not ordinarily have to run this command.
+`svelte-kit sync` は、型や `tsconfig.json` などのプロジェクト用に生成されるファイルを作成します。プロジェクトを作成すると、`prepare` script としてリストアップされ、npm ライフサイクルの一部として自動的に実行されるので、通常はこのコマンドを実行する必要はないはずです。

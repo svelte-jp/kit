@@ -10,4 +10,4 @@ SvelteKit では、`src/service-worker.js` ファイル（または `src/service
 
 Service Worker の内部では、[`$service-worker` モジュール](/docs/modules#$service-worker) にアクセスすることができます。
 
-Because it needs to be bundled (since browsers don't yet support `import` in this context), and depends on the client-side app's build manifest, **service workers only work in the production build, not in development**. To test it locally, use `vite preview`.
+Service Worker は（現状はブラウザがまだ import をサポートしていないので）バンドルする必要があり、クライアント側アプリのビルドマニフェストに依存するため、**Service Worker は本番ビルドでのみ機能します。開発モードでは機能しません。**。ローカル環境でテストするには、`vite preview` を使用してください。

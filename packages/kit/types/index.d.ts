@@ -248,7 +248,7 @@ export interface RequestEvent<Params extends Record<string, string> = Record<str
 }
 
 /**
- * A `(event: RequestEvent) => RequestHandlerOutput` function exported from an endpoint that corresponds to an HTTP verb (`GET`, `PUT`, `PATCH`, etc) and handles requests with that method.
+ * `(event: RequestEvent) => RequestHandlerOutput` という関数で、エンドポイントからエクスポートされます。HTTP の動詞 (`GET`, `PUT`, `PATCH`, etc) に対応しており、それぞれの HTTP メソッドのリクエストを処理します。
  *
  * It receives `Params` as the first generic argument, which you can skip by using [generated types](/docs/types#generated-types) instead.
  *

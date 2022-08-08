@@ -24,7 +24,7 @@ SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から
 
 #### &lt;title&gt; と &lt;meta&gt;
 
-全てのページで、よく練られたユニークな `<title>` と `<meta name="description">` を [`<svelte:head>`](https://svelte.dev/docs#template-syntax-svelte-head) の内側に置くべきです。説明的な title と description の書き方に関するガイダンスと、検索エンジンにとってわかりやすいコンテンツを作るためのその他の方法については、Google の [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) のドキュメントで見つけることができます。
+全てのページで、よく練られたユニークな `<title>` と `<meta name="description">` を [`<svelte:head>`](https://svelte.jp/docs#template-syntax-svelte-head) の内側に置くべきです。説明的な title と description の書き方に関するガイダンスと、検索エンジンにとってわかりやすいコンテンツを作るためのその他の方法については、Google の [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) のドキュメントで見つけることができます。
 
 > SEO に関する [`stuff`](/docs/loading#output-stuff) をページの `load` 関数から返し、それを ([`$page.stuff`](/docs/modules#$app-stores) という形で) ルート(root)[レイアウト](/docs/layouts) の `<svelte:head>` の中で使うのが一般的なパターンです。
 
@@ -105,7 +105,7 @@ const config = {
 export default config;
 ```
 
-...and transforming the HTML using `transformPageChunk` along with `transform` imported from `@sveltejs/amp`:
+…そして `@sveltejs/amp` から `transform` をインポートし、`transformPageChunk` とともに使用して、HTML を変換します:
 
 ```js
 import * as amp from '@sveltejs/amp';

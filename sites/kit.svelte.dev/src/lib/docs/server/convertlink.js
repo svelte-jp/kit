@@ -11,6 +11,11 @@ const docs_routing = new Map([
 	['ソート', 'Sorting']
 ]);
 
+const docs_project_structure = new Map([
+	['プロジェクトファイル', 'Project files'],
+	['その他のファイル', 'Other files'],
+]);
+
 const docs_layouts = new Map([
 	['エラーページ', 'Error pages']
 ]);
@@ -66,7 +71,9 @@ const faq = new Map([
 		'`document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？',
 		'How do I use a client-side only library that depends on `document` or `window`?'
 	],
-	['Yarn 2 で動作しますか？', 'Does it work with Yarn 2?']
+	['Yarn を使用するにはどうすれば良いですか？', 'How do I use with Yarn?'],
+	['Yarn 2 で動作しますか？', 'Does it work with Yarn 2?'],
+	['Yarn 3 を使用するにはどうすれば良いですか？', 'How do I use with Yarn 3?']
 ]);
 
 /**
@@ -81,19 +88,21 @@ export function convert_link(label, file, heading) {
 		switch (file) {
 			case '00-introduction.md':
 				return docs_introduction.get(heading) || heading;
-			case '02-routing.md':
+			case '01-project-structure.md':
+				return docs_project_structure.get(heading) || heading;
+			case '03-routing.md':
 				return docs_routing.get(heading) || heading;
-			case '03-layouts.md':
+			case '04-layouts.md':
 				return docs_layouts.get(heading) || heading;
-			case '10-adapters.md':
+			case '11-adapters.md':
 				return docs_adapters.get(heading) || heading;
-			case '11-page-options.md':
+			case '12-page-options.md':
 				return docs_page_options.get(heading) || heading;
-			case '12-packaging.md':
+			case '13-packaging.md':
 				return docs_packaging.get(heading) || heading;
-			case '16-seo.md':
+			case '17-seo.md':
 				return docs_seo.get(heading) || heading;
-			case '17-assets.md':
+			case '18-assets.md':
 				return docs_assets.get(heading) || heading;
 			case '80-migrating.md':
 				return docs_migrating.get(heading) || heading;
