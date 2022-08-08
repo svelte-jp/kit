@@ -25,10 +25,10 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 
 `sapper` を参照しているスクリプトを全て更新します:
 
-- `sapper build` は、Node [adapter](/docs/adapters) を使用した [`svelte-kit build`](/docs/cli#svelte-kit-build) にします
-- `sapper export` は、static [adapter](/docs/adapters) を使用した [`svelte-kit build`](/docs/cli#svelte-kit-build) にします
-- `sapper dev` は [`svelte-kit dev`](/docs/cli#svelte-kit-dev) にします
-- `node __sapper__/build` は `node build` にします
+- `sapper build` should become `vite build` using the Node [adapter](/docs/adapters)
+- `sapper export` should become `vite build` using the static [adapter](/docs/adapters)
+- `sapper dev` should become `vite dev`
+- `node __sapper__/build` should become `node build`
 
 ### プロジェクトファイル
 
@@ -190,4 +190,4 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-サイトのプロダクションビルドをテストするのに `svelte-kit preview` を使用しているとき、`prerendering` が `false` となることにご注意ください。そのため、minify の結果を検証するには、ビルド済の HTML を直接確認する必要があります。
+Note that `prerendering` is `false` when using `vite preview` to test the production build of the site, so to verify the results of minifying, you'll need to inspect the built HTML files directly.

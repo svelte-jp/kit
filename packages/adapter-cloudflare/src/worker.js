@@ -9,6 +9,7 @@ const prefix = `/${manifest.appDir}/`;
 /** @type {import('worktop/cfw').Module.Worker<{ ASSETS: import('worktop/cfw.durable').Durable.Object }>} */
 const worker = {
 	async fetch(req, env, context) {
+		server.init({ env });
 		// skip cache if "cache-control: no-cache" in request
 		let pragma = req.headers.get('cache-control') || '';
 		let res = !pragma.includes('no-cache') && (await Cache.lookup(req));
@@ -54,7 +55,7 @@ const worker = {
 			} else {
 				// dynamically-generated pages
 				res = await server.respond(req, {
-					platform: { env, context },
+					platform: { env, context, caches },
 					getClientAddress() {
 						return req.headers.get('cf-connecting-ip');
 					}

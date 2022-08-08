@@ -21,16 +21,16 @@ SvelteKitはとてもハイパフォーマンスなWebアプリを構築する�
 
 ### Getting started
 
-SvelteKitアプリを構築してみるのに最も簡単な方法は、`npm init` を実行することです:
+The easiest way to start building a SvelteKit app is to run `npm create`:
 
 ```bash
-npm init svelte my-app
+npm create svelte@latest my-app
 cd my-app
 npm install
 npm run dev
 ```
 
-最初のコマンドは、TypeScript などの基本的なツールをセットアップするかどうか確認して、`my-app` ディレクトリに新しいプロジェクトを生成します。[追加のツールの設定に関するポイント](https://kit.svelte.jp/faq#integrations)については、FAQをご覧ください。以降のコマンドは、依存関係をインストールし、 [localhost:3000](http://localhost:3000) でサーバーを起動します。
+The first command will scaffold a new project in the `my-app` directory asking you if you'd like to set up some basic tooling such as TypeScript. See the FAQ for [pointers on setting up additional tooling](https://kit.svelte.dev/faq#integrations). The subsequent commands will then install its dependencies and start a server on [localhost:5173](http://localhost:5173).
 
 ここには2つの基本的なコンセプトがあります。
 

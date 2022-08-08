@@ -1,3 +1,8 @@
+import glob from 'tiny-glob';
+import zlib from 'zlib';
+import { existsSync, statSync, createReadStream, createWriteStream } from 'fs';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
 import { copy, rimraf, mkdirp } from '../../utils/filesystem.js';
 import { generate_manifest } from '../generate_manifest/index.js';
 
@@ -19,10 +24,34 @@ export function create_builder({ config, build_data, prerendered, log }) {
 	// TODO routes should come pre-filtered
 	function not_prerendered(route) {
 		if (route.type === 'page' && route.path) {
-			return !prerendered_paths.has(route.path);
+			return !prerendered_paths.has(route.path) && !prerendered_paths.has(route.path + '/');
 		}
 
 		return true;
+	}
+
+	const pipe = promisify(pipeline);
+
+	/**
+	 * @param {string} file
+	 * @param {'gz' | 'br'} format
+	 */
+	async function compress_file(file, format = 'gz') {
+		const compress =
+			format == 'br'
+				? zlib.createBrotliCompress({
+						params: {
+							[zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+							[zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+							[zlib.constants.BROTLI_PARAM_SIZE_HINT]: statSync(file).size
+						}
+				  })
+				: zlib.createGzip({ level: zlib.constants.Z_BEST_COMPRESSION });
+
+		const source = createReadStream(file);
+		const destination = createWriteStream(`${file}.${format}`);
+
+		await pipe(source, compress, destination);
 	}
 
 	return {
@@ -47,7 +76,7 @@ export function create_builder({ config, build_data, prerendered, log }) {
 					content: segment
 				})),
 				pattern: route.pattern,
-				methods: route.type === 'page' ? ['get'] : build_data.server.methods[route.file]
+				methods: route.type === 'page' ? ['GET'] : build_data.server.methods[route.file]
 			}));
 
 			const seen = new Set();
@@ -122,7 +151,7 @@ export function create_builder({ config, build_data, prerendered, log }) {
 		},
 
 		writeClient(dest) {
-			return copy(`${config.kit.outDir}/output/client`, dest);
+			return [...copy(`${config.kit.outDir}/output/client`, dest)];
 		},
 
 		writePrerendered(dest, { fallback } = {}) {
@@ -141,11 +170,33 @@ export function create_builder({ config, build_data, prerendered, log }) {
 			return copy(`${config.kit.outDir}/output/server`, dest);
 		},
 
-		writeStatic(dest) {
-			return copy(config.kit.files.assets, dest);
+		// TODO remove these methods for 1.0
+		// @ts-expect-error
+		writeStatic() {
+			throw new Error(
+				`writeStatic has been removed. Please ensure you are using the latest version of ${
+					config.kit.adapter.name || 'your adapter'
+				}`
+			);
 		},
 
-		// @ts-expect-error
+		async compress(directory) {
+			if (!existsSync(directory)) {
+				return;
+			}
+
+			const files = await glob('**/*.{html,js,json,css,svg,xml,wasm}', {
+				cwd: directory,
+				dot: true,
+				absolute: true,
+				filesOnly: true
+			});
+
+			await Promise.all(
+				files.map((file) => Promise.all([compress_file(file, 'gz'), compress_file(file, 'br')]))
+			);
+		},
+
 		async prerender() {
 			throw new Error(
 				'builder.prerender() has been removed. Prerendering now takes place in the build phase — see builder.prerender and builder.writePrerendered'

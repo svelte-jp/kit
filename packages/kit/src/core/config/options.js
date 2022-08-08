@@ -2,6 +2,40 @@ import { join } from 'path';
 
 /** @typedef {import('./types').Validator} Validator */
 
+const directives = object({
+	'child-src': string_array(),
+	'default-src': string_array(),
+	'frame-src': string_array(),
+	'worker-src': string_array(),
+	'connect-src': string_array(),
+	'font-src': string_array(),
+	'img-src': string_array(),
+	'manifest-src': string_array(),
+	'media-src': string_array(),
+	'object-src': string_array(),
+	'prefetch-src': string_array(),
+	'script-src': string_array(),
+	'script-src-elem': string_array(),
+	'script-src-attr': string_array(),
+	'style-src': string_array(),
+	'style-src-elem': string_array(),
+	'style-src-attr': string_array(),
+	'base-uri': string_array(),
+	sandbox: string_array(),
+	'form-action': string_array(),
+	'frame-ancestors': string_array(),
+	'navigate-to': string_array(),
+	'report-uri': string_array(),
+	'report-to': string_array(),
+	'require-trusted-types-for': string_array(),
+	'trusted-types': string_array(),
+	'upgrade-insecure-requests': boolean(false),
+	'require-sri-for': string_array(),
+	'block-all-mixed-content': boolean(false),
+	'plugin-types': string_array(),
+	referrer: string_array()
+});
+
 /** @type {Validator} */
 const options = object(
 	{
@@ -80,42 +114,18 @@ const options = object(
 
 			csp: object({
 				mode: list(['auto', 'hash', 'nonce']),
-				directives: object({
-					'child-src': string_array(),
-					'default-src': string_array(),
-					'frame-src': string_array(),
-					'worker-src': string_array(),
-					'connect-src': string_array(),
-					'font-src': string_array(),
-					'img-src': string_array(),
-					'manifest-src': string_array(),
-					'media-src': string_array(),
-					'object-src': string_array(),
-					'prefetch-src': string_array(),
-					'script-src': string_array(),
-					'script-src-elem': string_array(),
-					'script-src-attr': string_array(),
-					'style-src': string_array(),
-					'style-src-elem': string_array(),
-					'style-src-attr': string_array(),
-					'base-uri': string_array(),
-					sandbox: string_array(),
-					'form-action': string_array(),
-					'frame-ancestors': string_array(),
-					'navigate-to': string_array(),
-					'report-uri': string_array(),
-					'report-to': string_array(),
-					'require-trusted-types-for': string_array(),
-					'trusted-types': string_array(),
-					'upgrade-insecure-requests': boolean(false),
-					'require-sri-for': string_array(),
-					'block-all-mixed-content': boolean(false),
-					'plugin-types': string_array(),
-					referrer: string_array()
-				})
+				directives,
+				reportOnly: directives
 			}),
 
-			endpointExtensions: string_array(['.js', '.ts']),
+			// TODO: remove this for the 1.0 release
+			endpointExtensions: error(
+				(keypath) => `${keypath} has been renamed to config.kit.moduleExtensions`
+			),
+
+			env: object({
+				publicPrefix: string('PUBLIC_')
+			}),
 
 			files: object({
 				assets: string('static'),
@@ -126,8 +136,6 @@ const options = object(
 				serviceWorker: string(join('src', 'service-worker')),
 				template: string(join('src', 'app.html'))
 			}),
-
-			floc: boolean(false),
 
 			// TODO: remove this for the 1.0 release
 			headers: error(
@@ -160,6 +168,8 @@ const options = object(
 					return input;
 				})
 			}),
+
+			moduleExtensions: string_array(['.js', '.ts']),
 
 			outDir: string('.svelte-kit'),
 
@@ -250,6 +260,24 @@ const options = object(
 					);
 				}),
 
+				origin: validate('http://sveltekit-prerender', (input, keypath) => {
+					assert_string(input, keypath);
+
+					let origin;
+
+					try {
+						origin = new URL(input).origin;
+					} catch (e) {
+						throw new Error(`${keypath} must be a valid origin`);
+					}
+
+					if (input !== origin) {
+						throw new Error(`${keypath} must be a valid origin (${origin} rather than ${input})`);
+					}
+
+					return origin;
+				}),
+
 				// TODO: remove this for the 1.0 release
 				pages: error((keypath) => `${keypath} has been renamed to \`entries\`.`)
 			}),
@@ -273,7 +301,7 @@ const options = object(
 			// TODO remove this for 1.0
 			ssr: error(
 				(keypath) =>
-					`${keypath} has been removed — use the handle hook instead: https://kit.svelte.dev/docs/hooks#handle'`
+					`${keypath} has been removed — use the handle hook instead: https://kit.svelte.dev/docs/hooks#handle`
 			),
 
 			// TODO remove this for 1.0
@@ -286,23 +314,8 @@ const options = object(
 				pollInterval: number(0)
 			}),
 
-			vite: validate(
-				() => ({}),
-				(input, keypath) => {
-					if (typeof input === 'object') {
-						const config = input;
-						input = () => config;
-					}
-
-					if (typeof input !== 'function') {
-						throw new Error(
-							`${keypath} must be a Vite config object (https://vitejs.dev/config) or a function that returns one`
-						);
-					}
-
-					return input;
-				}
-			)
+			// TODO remove this for 1.0
+			vite: error((keypath) => `${keypath} has been removed — use vite.config.js instead`)
 		})
 	},
 	true

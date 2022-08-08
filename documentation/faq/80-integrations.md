@@ -13,6 +13,13 @@ title: SvelteKit で X を使うにはどうすればよいですか？
 `adapter-node` は、プロダクションモードで使用するためのミドルウェアを自分のサーバで構築します。開発モードでは、Vite プラグインを使用して Vite にミドルウェア(middleware) を追加することができます。例えば:
 
 ```js
+// @filename: ambient.d.ts
+declare module '@sveltejs/kit/vite'; // TODO this feels unnecessary, why can't it 'see' the declarations?
+
+// @filename: index.js
+// ---cut---
+import { sveltekit } from '@sveltejs/kit/vite';
+
 /** @type {import('vite').Plugin} */
 const myPlugin = {
 	name: 'log-request-middleware',
@@ -24,13 +31,9 @@ const myPlugin = {
 	}
 };
 
-/** @type {import('@sveltejs/kit').Config} */
+/** @type {import('vite').UserConfig} */
 const config = {
-	kit: {
-		vite: {
-			plugins: [myPlugin]
-		}
-	}
+	plugins: [myPlugin, sveltekit()]
 };
 
 export default config;
@@ -103,6 +106,38 @@ onMount(() => {
 });
 ```
 
-### Yarn 2 で動作しますか？
+### How do I use with Yarn?
 
-多少は。Plug'n'Play 機能、通称 'pnp' は動きません (Node のモジュール解決アルゴリズムから逸脱しており、SvelteKitが [数多くのライブラリ](https://blog.sindresorhus.com/get-ready-for-esm-aa53530b3f77) とともに使用している [ネイティブの JavaScript モジュールではまだ動作しません](https://github.com/yarnpkg/berry/issues/638))。[`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc#nodeLinker) ファイルで `nodeLinker: 'node-modules'` を使用して pnp を無効にできますが、おそらく npm や [pnpm](https://pnpm.io/ja/) を使用するほうが簡単でしょう。同じように高速で効率的ですが、互換性に頭を悩ませることはありません。
+#### Does it work with Yarn 2?
+
+Sort of. The Plug'n'Play feature, aka 'pnp', is broken (it deviates from the Node module resolution algorithm, and [doesn't yet work with native JavaScript modules](https://github.com/yarnpkg/berry/issues/638) which SvelteKit — along with an [increasing number of packages](https://blog.sindresorhus.com/get-ready-for-esm-aa53530b3f77) — uses). You can use `nodeLinker: 'node-modules'` in your [`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc#nodeLinker) file to disable pnp, but it's probably easier to just use npm or [pnpm](https://pnpm.io/), which is similarly fast and efficient but without the compatibility headaches.
+
+#### How do I use with Yarn 3?
+
+Currently ESM Support within the latest Yarn (version 3) is considered [experimental](https://github.com/yarnpkg/berry/pull/2161).
+
+The below seems to work although your results may vary.
+
+First create a new application:
+
+```sh
+yarn create svelte myapp
+cd myapp
+```
+
+And enable Yarn Berry:
+
+```sh
+yarn set version berry
+yarn install
+```
+
+**Yarn 3 global cache**
+
+One of the more interesting features of Yarn Berry is the ability to have a single global cache for packages, instead of having multiple copies for each project on the disk. However, setting `enableGlobalCache` to true causes building to fail, so it is recommended to add the following to the `.yarnrc.yml` file:
+
+```
+nodeLinker: node-modules
+```
+
+This will cause packages to be downloaded into a local node_modules directory but avoids the above problem and is your best bet for using version 3 of Yarn at this point in time.

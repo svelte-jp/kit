@@ -1,7 +1,7 @@
 /// <reference types="svelte" />
 /// <reference types="vite/client" />
 
-import './ambient';
+import './ambient.js';
 
 import { CompileOptions } from 'svelte/types/compiler/interfaces';
 import {
@@ -17,8 +17,8 @@ import {
 	ResponseHeaders,
 	RouteDefinition,
 	TrailingSlash
-} from './private';
-import { SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal';
+} from './private.js';
+import { SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
 
 export interface Adapter {
 	name: string;
@@ -52,7 +52,6 @@ export interface Builder {
 	 */
 	writeClient(dest: string): string[];
 	/**
-	 *
 	 * @param dest
 	 */
 	writePrerendered(
@@ -66,11 +65,6 @@ export interface Builder {
 	 * @returns an array of paths corresponding to the files that have been created by the copy
 	 */
 	writeServer(dest: string): string[];
-	/**
-	 * @param dest the destination folder to which files should be copied
-	 * @returns an array of paths corresponding to the files that have been created by the copy
-	 */
-	writeStatic(dest: string): string[];
 	/**
 	 * @param from the source file or folder
 	 * @param to the destination file or folder
@@ -86,6 +80,11 @@ export interface Builder {
 			replace?: Record<string, string>;
 		}
 	): string[];
+
+	/**
+	 * @param {string} directory Path to the directory containing the files to be compressed
+	 */
+	compress(directory: string): void;
 }
 
 export interface Config {
@@ -106,8 +105,12 @@ export interface KitConfig {
 	csp?: {
 		mode?: 'hash' | 'nonce' | 'auto';
 		directives?: CspDirectives;
+		reportOnly?: CspDirectives;
 	};
-	endpointExtensions?: string[];
+	env?: {
+		publicPrefix: string;
+	};
+	moduleExtensions?: string[];
 	files?: {
 		assets?: string;
 		hooks?: string;
@@ -117,7 +120,6 @@ export interface KitConfig {
 		serviceWorker?: string;
 		template?: string;
 	};
-	floc?: boolean;
 	inlineStyleThreshold?: number;
 	methodOverride?: {
 		parameter?: string;
@@ -141,6 +143,7 @@ export interface KitConfig {
 		enabled?: boolean;
 		entries?: Array<'*' | `/${string}`>;
 		onError?: PrerenderOnErrorValue;
+		origin?: string;
 	};
 	routes?: (filepath: string) => boolean;
 	serviceWorker?: {
@@ -152,7 +155,6 @@ export interface KitConfig {
 		name?: string;
 		pollInterval?: number;
 	};
-	vite?: import('vite').UserConfig | (() => MaybePromise<import('vite').UserConfig>);
 }
 
 export interface ExternalFetch {
@@ -184,7 +186,7 @@ export interface Load<
 	InputProps extends Record<string, any> = Record<string, any>,
 	OutputProps extends Record<string, any> = InputProps
 > {
-	(event: LoadEvent<Params, InputProps>): MaybePromise<LoadOutput<OutputProps>>;
+	(event: LoadEvent<Params, InputProps>): MaybePromise<LoadOutput<OutputProps> | void>;
 }
 
 export interface LoadEvent<
@@ -246,9 +248,11 @@ export interface RequestEvent<Params extends Record<string, string> = Record<str
 }
 
 /**
- * `(event: RequestEvent) => RequestHandlerOutput` という関数で、エンドポイントからエクスポートされます。HTTP の動詞 (`get`、`put`、`patch`、etc) に対応しており、それぞれの HTTP メソッドのリクエストを処理します。'delete' は JavaScriptの予約語であるため、HTTP の delete メソッド を処理する関数は `del` という名前を使います。
+ * A `(event: RequestEvent) => RequestHandlerOutput` function exported from an endpoint that corresponds to an HTTP verb (`GET`, `PUT`, `PATCH`, etc) and handles requests with that method.
  *
- * `Params` のジェネリックな引数を手作業で指定する代わりに、[generated types](/docs/types#generated-types) を使用することができます。
+ * It receives `Params` as the first generic argument, which you can skip by using [generated types](/docs/types#generated-types) instead.
+ *
+ * The next generic argument `Output` is used to validate the returned `body` from your functions by passing it through `BodyValidator`, which will make sure the variable in the `body` matches what with you assign here. It defaults to `ResponseBody`, which will error when `body` receives a [custom object type](https://www.typescriptlang.org/docs/handbook/2/objects.html).
  */
 export interface RequestHandler<
 	Params extends Record<string, string> = Record<string, string>,
@@ -265,14 +269,19 @@ export interface RequestHandlerOutput<Output = ResponseBody> {
 
 export interface ResolveOptions {
 	ssr?: boolean;
-	transformPage?: ({ html }: { html: string }) => MaybePromise<string>;
+	transformPageChunk?: (input: { html: string; done: boolean }) => MaybePromise<string | undefined>;
 }
 
-export type ResponseBody = JSONValue | Uint8Array | ReadableStream | import('stream').Readable;
+export type ResponseBody = JSONValue | Uint8Array | ReadableStream | Error;
 
 export class Server {
 	constructor(manifest: SSRManifest);
+	init(options: ServerInitOptions): void;
 	respond(request: Request, options: RequestOptions): Promise<Response>;
+}
+
+export interface ServerInitOptions {
+	env: Record<string, string>;
 }
 
 export interface SSRManifest {
@@ -284,8 +293,8 @@ export interface SSRManifest {
 	_: {
 		entry: {
 			file: string;
-			js: string[];
-			css: string[];
+			imports: string[];
+			stylesheets: string[];
 		};
 		nodes: SSRNodeLoader[];
 		routes: SSRRoute[];

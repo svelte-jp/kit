@@ -92,21 +92,38 @@ export async function read_file(dir, file) {
 				.replace(/\*\\\//g, '*/');
 
 			if (language === 'js') {
-				const twoslash = runTwoSlash(source, language, {
-					defaultCompilerOptions: {
-						allowJs: true,
-						checkJs: true,
-						target: 'es2021'
-					}
-				});
+				try {
+					const twoslash = runTwoSlash(source, language, {
+						defaultCompilerOptions: {
+							allowJs: true,
+							checkJs: true,
+							target: 'es2021'
+						}
+					});
 
-				html = renderCodeToHTML(twoslash.code, 'ts', { twoslash: true }, {}, highlighter, twoslash);
+					html = renderCodeToHTML(
+						twoslash.code,
+						'ts',
+						{ twoslash: true },
+						{},
+						highlighter,
+						twoslash
+					);
+				} catch (e) {
+					console.error(`Error compiling snippet in ${dir}/${file}`);
+					console.error(e.code);
+					throw e;
+				}
 
 				// we need to be able to inject the LSP attributes as HTML, not text, so we
 				// turn &lt; into &amp;lt;
-				html = html.replace(/<data-lsp lsp='(.+?)' *>(\w+)<\/data-lsp>/g, (match, lsp, name) => {
-					return `<data-lsp lsp='${lsp.replace(/&/g, '&amp;')}'>${name}</data-lsp>`;
-				});
+				html = html.replace(
+					/<data-lsp lsp='([^']*)'([^>]*)>(\w+)<\/data-lsp>/g,
+					(match, lsp, attrs, name) => {
+						if (!lsp) return name;
+						return `<data-lsp lsp='${lsp.replace(/&/g, '&amp;')}'${attrs}>${name}</data-lsp>`;
+					}
+				);
 
 				// preserve blank lines in output (maybe there's a more correct way to do this?)
 				html = `<div class="code-block">${

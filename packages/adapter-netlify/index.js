@@ -55,7 +55,6 @@ export default function ({ split = false, edge = edge_set_in_env_var } = {}) {
 			builder.log.minor(`Publishing to "${publish}"`);
 
 			builder.log.minor('Copying assets...');
-			builder.writeStatic(publish);
 			builder.writeClient(publish);
 			builder.writePrerendered(publish);
 
@@ -137,8 +136,9 @@ async function generate_edge_functions({ builder }) {
 		outfile: '.netlify/edge-functions/render.js',
 		bundle: true,
 		format: 'esm',
-		target: 'es2020',
-		platform: 'browser'
+		platform: 'browser',
+		sourcemap: 'linked',
+		target: 'es2020'
 	});
 
 	writeFileSync('.netlify/edge-functions/manifest.json', JSON.stringify(edge_manifest));
@@ -150,7 +150,7 @@ async function generate_edge_functions({ builder }) {
  * @param { boolean } params.split
  * @param { boolean } params.esm
  */
-function generate_lambda_functions({ builder, publish, split, esm }) {
+async function generate_lambda_functions({ builder, publish, split, esm }) {
 	builder.mkdirp('.netlify/functions-internal');
 
 	/** @type {string[]} */
@@ -177,7 +177,7 @@ function generate_lambda_functions({ builder, publish, split, esm }) {
 	if (split) {
 		builder.log.minor('Generating serverless functions...');
 
-		builder.createEntries((route) => {
+		await builder.createEntries((route) => {
 			const parts = [];
 			// Netlify's syntax uses '*' and ':param' as "splats" and "placeholders"
 			// https://docs.netlify.com/routing/redirects/redirect-options/#splats
@@ -211,6 +211,7 @@ function generate_lambda_functions({ builder, publish, split, esm }) {
 					writeFileSync(`.netlify/functions-internal/${name}.js`, fn);
 
 					redirects.push(`${pattern} /.netlify/functions/${name} 200`);
+					redirects.push(`${pattern}/__data.json /.netlify/functions/${name} 200`);
 				}
 			};
 		});
@@ -230,7 +231,7 @@ function generate_lambda_functions({ builder, publish, split, esm }) {
 		redirects.push('* /.netlify/functions/render 200');
 	}
 
-	// this should happen at the end, after builder.writeStatic(...),
+	// this should happen at the end, after builder.writeClient(...),
 	// so that generated redirects are appended to custom redirects
 	// rather than replaced by them
 	builder.log.minor('Writing redirects...');

@@ -1,12 +1,30 @@
-import fs from 'fs';
 import path from 'path';
 import colors from 'kleur';
 import { fileURLToPath } from 'url';
 
-export const get_runtime_path = process.env.BUNDLED
-	? /** @param {import('types').ValidatedKitConfig} config */ (config) =>
-			posixify_path(path.join(config.outDir, 'runtime'))
-	: () => posixify_path(fileURLToPath(new URL('../runtime', import.meta.url)));
+/**
+ * Get the prefix for the `runtime` directory, for use with import declarations
+ * @param {import('types').ValidatedKitConfig} config
+ */
+export function get_runtime_prefix(config) {
+	if (process.env.BUNDLED) {
+		return posixify_path(path.join(config.outDir, 'runtime'));
+	}
+
+	return posixify_path(fileURLToPath(new URL('../runtime', import.meta.url)));
+}
+
+/**
+ * Get the resolved path of the `runtime` directory
+ * @param {import('types').ValidatedKitConfig} config
+ */
+export function get_runtime_directory(config) {
+	if (process.env.BUNDLED) {
+		return path.join(config.outDir, 'runtime');
+	}
+
+	return fileURLToPath(new URL('../runtime', import.meta.url));
+}
 
 /** @param {string} str */
 function posixify_path(str) {
@@ -34,35 +52,6 @@ export function logger({ verbose }) {
 	return log;
 }
 
-/**
- * Given an entry point like [cwd]/src/hooks, returns a filename like [cwd]/src/hooks.js or [cwd]/src/hooks/index.js
- * @param {string} entry
- * @returns {string|null}
- */
-export function resolve_entry(entry) {
-	if (fs.existsSync(entry)) {
-		const stats = fs.statSync(entry);
-		if (stats.isDirectory()) {
-			return resolve_entry(path.join(entry, 'index'));
-		}
-
-		return entry;
-	} else {
-		const dir = path.dirname(entry);
-
-		if (fs.existsSync(dir)) {
-			const base = path.basename(entry);
-			const files = fs.readdirSync(dir);
-
-			const found = files.find((file) => file.replace(/\.[^.]+$/, '') === base);
-
-			if (found) return path.join(dir, found);
-		}
-	}
-
-	return null;
-}
-
 /** @param {import('types').ManifestData} manifest_data */
 export function get_mime_lookup(manifest_data) {
 	/** @type {Record<string, string>} */
@@ -76,23 +65,4 @@ export function get_mime_lookup(manifest_data) {
 	});
 
 	return mime;
-}
-
-/** @param {import('types').ValidatedKitConfig} config */
-export function get_aliases(config) {
-	/** @type {Record<string, string>} */
-	const alias = {
-		__GENERATED__: path.posix.join(config.outDir, 'generated'),
-		$app: `${get_runtime_path(config)}/app`,
-
-		// For now, we handle `$lib` specially here rather than make it a default value for
-		// `config.kit.alias` since it has special meaning for packaging, etc.
-		$lib: config.files.lib
-	};
-
-	for (const [key, value] of Object.entries(config.alias)) {
-		alias[key] = path.resolve(value);
-	}
-
-	return alias;
 }

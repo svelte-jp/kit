@@ -9,68 +9,127 @@
  *
  * 	interface Platform {}
  *
+ * 	interface PrivateEnv {}
+ *
+ * 	interface PublicEnv {}
+ *
  * 	interface Session {}
  *
  * 	interface Stuff {}
  * }
  * ```
  *
- * これらのインターフェースを作成することによって、`event.locals`、`event.platform`、`session`、`stuff` を使用する際に型の安全性を確保することができます。
+ * By populating these interfaces, you will gain type safety when using `env`, `event.locals`, `event.platform`, `session` and `stuff`.
  *
- * アンビエント宣言(ambient declaration)ファイルであるため、`import` 文を使用することができません。代わりに、`import(...)` 関数をお使いください:
+ * Note that since it's an ambient declaration file, you have to be careful when using `import` statements. Once you add an `import`
+ * at the top level, the declaration file is no longer considered ambient and you lose access to these typings in other files.
+ * To avoid this, either use the `import(...)` function:
  *
  * ```ts
  * interface Locals {
  * 	user: import('$lib/types').User;
  * }
  * ```
+ * Or wrap the namespace with `declare global`:
+ * ```ts
+ * import { User } from '$lib/types';
+ *
+ * declare global {
+ * 	namespace App {
+ * 		interface Locals {
+ * 			user: User;
+ * 		}
+ * 		// ...
+ * 	}
+ * }
+ * ```
+ *
  */
 declare namespace App {
 	/**
-	 * `event.locals` を定義する interface です。`event.locals` は [hooks](/docs/hooks) (`handle`、`handleError`、`getSession`) と [エンドポイント(endpoints)](/docs/routing#endpoints) からアクセスできます。
+	 * The interface that defines `event.locals`, which can be accessed in [hooks](https://kit.svelte.dev/docs/hooks) (`handle`, `handleError` and `getSession`) and [endpoints](https://kit.svelte.dev/docs/routing#endpoints).
 	 */
 	export interface Locals {}
 
 	/**
-	 * adapter が `event.platform` で [プラットフォーム固有の情報](/docs/adapters#supported-environments-platform-specific-context) を提供する場合、ここでそれを指定することができます。
+	 * If your adapter provides [platform-specific context](https://kit.svelte.dev/docs/adapters#supported-environments-platform-specific-context) via `event.platform`, you can specify it here.
 	 */
 	export interface Platform {}
 
 	/**
-	 * `session` を定義する interfaceです。`session` は、[`load`](/docs/loading) 関数の引数であり、[session store](/docs/modules#$app-stores) の値でもあります。
+	 * The interface that defines the dynamic environment variables exported from '$env/dynamic/private'.
+	 */
+	export interface PrivateEnv extends Record<string, string> {}
+
+	/**
+	 * The interface that defines the dynamic environment variables exported from '$env/dynamic/public'.
+	 */
+	export interface PublicEnv extends Record<string, string> {}
+
+	/**
+	 * The interface that defines `session`, both as an argument to [`load`](https://kit.svelte.dev/docs/loading) functions and the value of the [session store](https://kit.svelte.dev/docs/modules#$app-stores).
 	 */
 	export interface Session {}
 
 	/**
-	 * `stuff` を定義する interface です。`stuff` は [`load`](/docs/loading) 関数の input/output であり、[page store](/docs/modules#$app-stores) の `stuff` プロパティの値でもあります。
+	 * The interface that defines `stuff`, as input or output to [`load`](https://kit.svelte.dev/docs/loading) or as the value of the `stuff` property of the [page store](https://kit.svelte.dev/docs/modules#$app-stores).
 	 */
 	export interface Stuff {}
 }
 
 /**
  * ```ts
- * import { browser, dev, mode, prerendering } from '$app/env';
+ * import { browser, dev, prerendering } from '$app/env';
  * ```
  */
 declare module '$app/env' {
 	/**
-	 * アプリがブラウザで動作しているか、それともサーバーで動作しているかを示します。
+	 * `true` if the app is running in the browser.
 	 */
 	export const browser: boolean;
+
 	/**
-	 * 開発モードの場合は `true`、本番環境の場合は `false` です。
+	 * Whether the dev server is running. This is not guaranteed to correspond to `NODE_ENV` or `MODE`.
 	 */
 	export const dev: boolean;
+
 	/**
 	 * プリレンダリング時は `true`、それ以外の場合は `false` です。
 	 */
 	export const prerendering: boolean;
-	/**
-	 * アプリが動作している Vite.js のモードを示します。`config.kit.vite.mode` で設定可能です。
-	 * Vite.js は、`.env.[mode]` や `.env.[mode].local` のような、モードに関する dotenv ファイルを読み込みます。
-	 * デフォルトでは、`svelte-kit dev` の場合は `mode=development` で、`svelte-kit build` の場合は `mode=production` で実行されます。
-	 */
-	export const mode: string;
+}
+
+/**
+ * This module provides access to runtime environment variables, as defined by the platform you're running on. For example
+ * if you're using [`adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) (or running
+ * [`vite preview`](https://kit.svelte.dev/docs/cli)), this is equivalent to `process.env`. This module only includes
+ * variables that _do not_ begin with [`config.kit.env.publicPrefix`](https://kit.svelte.dev/docs/configuration#kit-env-publicprefix).
+ *
+ * This module cannot be imported into client-side code.
+ *
+ * ```ts
+ * import { env } from '$env/dynamic/private';
+ * console.log(env.DEPLOYMENT_SPECIFIC_VARIABLE);
+ * ```
+ */
+declare module '$env/dynamic/private' {
+	export let env: App.PrivateEnv;
+}
+
+/**
+ * Similar to [`$env/dynamic/private`](https://kit.svelte.dev/docs/modules#$env-dynamic-private), but only includes
+ * variables that begin with [`config.kit.env.publicPrefix`](https://kit.svelte.dev/docs/configuration#kit-env-publicprefix)
+ * (which defaults to `PUBLIC_`), and can therefore safely be exposed to client-side code
+ *
+ * Note that public dynamic environment variables must all be sent from the server to the client, causing larger network requests — when possible, use `$env/static/public` instead.
+ *
+ * ```ts
+ * import { env } from '$env/dynamic/public';
+ * console.log(env.PUBLIC_DEPLOYMENT_SPECIFIC_VARIABLE);
+ * ```
+ */
+declare module '$env/dynamic/public' {
+	export let env: App.PublicEnv;
 }
 
 /**
@@ -93,16 +152,16 @@ declare module '$app/navigation' {
 	 */
 	export function disableScrollHandling(): void;
 	/**
-	 * SvelteKit が指定された `href` にナビゲーションしたときに解決する Promise を返します(ナビゲーションに失敗した場合は、Promise はリジェクトされます)。
+	 * Returns a Promise that resolves when SvelteKit navigates (or fails to navigate, in which case the promise rejects) to the specified `url`.
 	 *
-	 * @param href Where to navigate to
+	 * @param url Where to navigate to
 	 * @param opts.replaceState If `true`, will replace the current `history` entry rather than creating a new one with `pushState`
 	 * @param opts.noscroll If `true`, the browser will maintain its scroll position rather than scrolling to the top of the page after navigation
 	 * @param opts.keepfocus If `true`, the currently focused element will retain focus after navigation. Otherwise, focus will be reset to the body
 	 * @param opts.state The state of the new/updated history entry
 	 */
 	export function goto(
-		href: string,
+		url: string | URL,
 		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
 	): Promise<void>;
 	/**
@@ -155,13 +214,13 @@ declare module '$app/navigation' {
  */
 declare module '$app/paths' {
 	/**
-	 * [`config.kit.paths.base`](/docs/configuration#paths) にマッチする文字列です。先頭は `/` で始まる必要があり、末尾は `/` にしてはいけません(例 `/base-path`)。空文字(empty string)の場合はこのルールに該当しません。
+	 * A string that matches [`config.kit.paths.base`](https://kit.svelte.dev/docs/configuration#paths). It must start, but not end with `/` (e.g. `/base-path`), unless it is the empty string.
 	 */
 	export const base: `/${string}`;
 	/**
-	 * [`config.kit.paths.assets`](/docs/configuration#paths) にマッチする絶対パスです。
+	 * An absolute path that matches [`config.kit.paths.assets`](https://kit.svelte.dev/docs/configuration#paths).
 	 *
-	 * > [`svelte-kit dev`](/docs/cli#svelte-kit-dev) や [`svelte-kit preview`](/docs/cli#svelte-kit-preview) を実行しているときはアセットがまだ最終的な URL に存在しないため、`config.kit.paths.assets` に値が指定されている場合はそれが `'/_svelte_kit_assets'` に置き換えられます。
+	 * > If a value for `config.kit.paths.assets` is specified, it will be replaced with `'/_svelte_kit_assets'` during `vite dev` or `vite preview`, since the assets don't yet live at their eventual URL.
 	 */
 	export const assets: `https://${string}` | `http://${string}`;
 }
@@ -201,12 +260,12 @@ declare module '$app/stores' {
 	 */
 	export const navigating: Readable<Navigation | null>;
 	/**
-	 * 書き込み可能なストアで、初期値は [`getSession`](/docs/hooks#getsession) の戻り値です。
-	 * 書き込み可能ですがその変更内容をサーバー上で永続化しません。それはご自身で実装する必要があります。
+	 * A writable store whose initial value is whatever was returned from [`getSession`](https://kit.svelte.dev/docs/hooks#getsession).
+	 * It can be written to, but this will not cause changes to persist on the server — this is something you must implement yourself.
 	 */
 	export const session: Writable<App.Session>;
 	/**
-	 *  読み取り可能なストアで、初期値は `false` です。もし [`version.pollInterval`](/docs/configuration#version) が0以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` にします。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
+	 *  A readable store whose initial value is `false`. If [`version.pollInterval`](https://kit.svelte.dev/docs/configuration#version) is a non-zero value, SvelteKit will poll for new versions of the app and update the store value to `true` when it detects one. `updated.check()` will force an immediate check, regardless of polling.
 	 */
 	export const updated: Readable<boolean> & { check: () => boolean };
 }
@@ -216,7 +275,7 @@ declare module '$app/stores' {
  * import { build, files, prerendered, version } from '$service-worker';
  * ```
  *
- * このモジュールは [service workers](/docs/service-workers) でのみ使用できます。
+ * This module is only available to [service workers](https://kit.svelte.dev/docs/service-workers).
  */
 declare module '$service-worker' {
 	/**
@@ -224,7 +283,7 @@ declare module '$service-worker' {
 	 */
 	export const build: string[];
 	/**
-	 * `static` ディレクトリまたは [`config.kit.files.assets`](/docs/configuration#files) で指定されたディレクトリにあるファイルを表すURL文字列の配列です。どのファイルを `static` ディレクトリに含めるかについては、[`config.kit.serviceWorker.files`](/docs/configuration#serviceworker) でカスタマイズできます。
+	 * An array of URL strings representing the files in your static directory, or whatever directory is specified by `config.kit.files.assets`. You can customize which files are included from `static` directory using [`config.kit.serviceWorker.files`](https://kit.svelte.dev/docs/configuration)
 	 */
 	export const files: string[];
 	/**
@@ -232,7 +291,7 @@ declare module '$service-worker' {
 	 */
 	export const prerendered: string[];
 	/**
-	 * [`config.kit.version`](/docs/configuration#version) をご参照ください。これは、Service Worker 内で一意なキャッシュ名を生成するのに便利で、後でアプリをデプロイしたときに古いキャッシュを無効にすることができます。
+	 * See [`config.kit.version`](https://kit.svelte.dev/docs/configuration#version). It's useful for generating unique cache names inside your service worker, so that a later deployment of your app can invalidate old caches.
 	 */
 	export const version: string;
 }
@@ -304,4 +363,13 @@ declare module '@sveltejs/kit/node' {
 		request: import('http').IncomingMessage
 	): Promise<Request>;
 	export function setResponse(res: import('http').ServerResponse, response: Response): void;
+}
+
+declare module '@sveltejs/kit/vite' {
+	import { Plugin } from 'vite';
+
+	/**
+	 * Returns the SvelteKit Vite plugins.
+	 */
+	export function sveltekit(): Plugin[];
 }

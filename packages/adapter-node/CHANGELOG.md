@@ -1,5 +1,53 @@
 # @sveltejs/adapter-node
 
+## 1.0.0-next.86
+
+### Patch Changes
+
+- Move `compress` logic to `Builder` API ([#5822](https://github.com/sveltejs/kit/pull/5822))
+
+## 1.0.0-next.85
+
+### Patch Changes
+
+- Initialise `env` ([#5663](https://github.com/sveltejs/kit/pull/5663))
+
+## 1.0.0-next.84
+
+### Patch Changes
+
+- Set Vite's publicDir and correctly serve public assets earlier in pipeline ([#5686](https://github.com/sveltejs/kit/pull/5686))
+
+## 1.0.0-next.83
+
+### Patch Changes
+
+- set Vite's `publicDir` option ([#5648](https://github.com/sveltejs/kit/pull/5648))
+
+## 1.0.0-next.82
+
+### Patch Changes
+
+- [breaking] remove writeStatic to align with Vite ([#5618](https://github.com/sveltejs/kit/pull/5618))
+
+## 1.0.0-next.81
+
+### Patch Changes
+
+- [breaking] remove compression middleware from adapter-node output server ([#5506](https://github.com/sveltejs/kit/pull/5506))
+
+## 1.0.0-next.80
+
+### Patch Changes
+
+- Update dependencies ([#5005](https://github.com/sveltejs/kit/pull/5005))
+
+## 1.0.0-next.79
+
+### Patch Changes
+
+- [chore] upgrade TypeScript to 4.7.4 ([#5414](https://github.com/sveltejs/kit/pull/5414))
+
 ## 1.0.0-next.78
 
 ### Patch Changes
