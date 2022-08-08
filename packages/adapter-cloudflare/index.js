@@ -4,7 +4,14 @@ import { fileURLToPath } from 'url';
 import * as esbuild from 'esbuild';
 
 /** @type {import('.').default} */
-export default function (options = {}) {
+export default function () {
+	// TODO remove for 1.0
+	if (arguments.length > 0) {
+		throw new Error(
+			'esbuild options can no longer be passed to adapter-cloudflare — see https://github.com/sveltejs/kit/pull/4639'
+		);
+	}
+
 	return {
 		name: '@sveltejs/adapter-cloudflare',
 		async adapt(builder) {
@@ -16,7 +23,6 @@ export default function (options = {}) {
 			builder.rimraf(tmp);
 			builder.mkdirp(tmp);
 
-			builder.writeStatic(dest);
 			builder.writeClient(dest);
 			builder.writePrerendered(dest);
 
@@ -37,9 +43,9 @@ export default function (options = {}) {
 			});
 
 			await esbuild.build({
-				target: 'es2020',
 				platform: 'browser',
-				...options,
+				sourcemap: 'linked',
+				target: 'es2020',
 				entryPoints: [`${tmp}/_worker.js`],
 				outfile: `${dest}/_worker.js`,
 				allowOverwrite: true,

@@ -3,9 +3,12 @@ import { render_page } from './page/index.js';
 import { render_response } from './page/render.js';
 import { respond_with_error } from './page/respond_with_error.js';
 import { coalesce_to_error } from '../../utils/error.js';
-import { decode_params } from './utils.js';
-import { normalize_path } from '../../utils/url.js';
+import { serialize_error, GENERIC_ERROR } from './utils.js';
+import { decode_params, normalize_path } from '../../utils/url.js';
 import { exec } from '../../utils/routing.js';
+import { negotiate } from '../../utils/http.js';
+
+/* global __SVELTEKIT_ADAPTER_NAME__ */
 
 const DATA_SUFFIX = '/__data.json';
 
@@ -41,7 +44,12 @@ export async function respond(request, options, state) {
 		}
 	}
 
-	let decoded = decodeURI(url.pathname);
+	let decoded;
+	try {
+		decoded = decodeURI(url.pathname);
+	} catch {
+		return new Response('Malformed URI', { status: 400 });
+	}
 
 	/** @type {import('types').SSRRoute | null} */
 	let route = null;
@@ -51,7 +59,7 @@ export async function respond(request, options, state) {
 
 	if (options.paths.base && !state.prerendering?.fallback) {
 		if (!decoded.startsWith(options.paths.base)) {
-			return new Response(undefined, { status: 404 });
+			return new Response('Not found', { status: 404 });
 		}
 		decoded = decoded.slice(options.paths.base.length) || '/';
 	}
@@ -109,9 +117,7 @@ export async function respond(request, options, state) {
 		get clientAddress() {
 			if (!state.getClientAddress) {
 				throw new Error(
-					`${
-						import.meta.env.VITE_SVELTEKIT_ADAPTER_NAME
-					} does not specify getClientAddress. Please raise an issue`
+					`${__SVELTEKIT_ADAPTER_NAME__} does not specify getClientAddress. Please raise an issue`
 				);
 			}
 
@@ -165,7 +171,7 @@ export async function respond(request, options, state) {
 	/** @type {import('types').RequiredResolveOptions} */
 	let resolve_opts = {
 		ssr: true,
-		transformPage: default_transform
+		transformPageChunk: default_transform
 	};
 
 	// TODO match route before calling handle?
@@ -175,9 +181,17 @@ export async function respond(request, options, state) {
 			event,
 			resolve: async (event, opts) => {
 				if (opts) {
+					// TODO remove for 1.0
+					// @ts-expect-error
+					if (opts.transformPage) {
+						throw new Error(
+							'transformPage has been replaced by transformPageChunk — see https://github.com/sveltejs/kit/pull/5657 for more information'
+						);
+					}
+
 					resolve_opts = {
 						ssr: opts.ssr !== false,
-						transformPage: opts.transformPage || default_transform
+						transformPageChunk: opts.transformPageChunk || default_transform
 					};
 				}
 
@@ -204,7 +218,7 @@ export async function respond(request, options, state) {
 					let response;
 
 					if (is_data_request && route.type === 'page' && route.shadow) {
-						response = await render_endpoint(event, await route.shadow());
+						response = await render_endpoint(event, await route.shadow(), options);
 
 						// loading data for a client-side transition is a special case
 						if (request.headers.has('x-sveltekit-load')) {
@@ -226,7 +240,7 @@ export async function respond(request, options, state) {
 					} else {
 						response =
 							route.type === 'endpoint'
-								? await render_endpoint(event, await route.load())
+								? await render_endpoint(event, await route.load(), options)
 								: await render_page(event, route, options, state, resolve_opts);
 					}
 
@@ -266,6 +280,12 @@ export async function respond(request, options, state) {
 
 						return response;
 					}
+				}
+
+				if (state.initiator === GENERIC_ERROR) {
+					return new Response('Internal Server Error', {
+						status: 500
+					});
 				}
 
 				// if this request came direct from the user, rather than
@@ -310,6 +330,19 @@ export async function respond(request, options, state) {
 
 		options.handle_error(error, event);
 
+		const type = negotiate(event.request.headers.get('accept') || 'text/html', [
+			'text/html',
+			'application/json'
+		]);
+
+		if (is_data_request || type === 'application/json') {
+			return new Response(serialize_error(error, options.get_stack), {
+				status: 500,
+				headers: { 'content-type': 'application/json; charset=utf-8' }
+			});
+		}
+
+		// TODO is this necessary? should we just return a plain 500 at this point?
 		try {
 			const $session = await options.hooks.getSession(event);
 			return await respond_with_error({

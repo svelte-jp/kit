@@ -1,5 +1,436 @@
 # @sveltejs/kit
 
+## 1.0.0-next.405
+
+### Patch Changes
+
+- Move `compress` logic to `Builder` API ([#5822](https://github.com/sveltejs/kit/pull/5822))
+
+* [feat] implement Link header ([#5735](https://github.com/sveltejs/kit/pull/5735))
+
+## 1.0.0-next.404
+
+### Patch Changes
+
+- Build server without removing `sveltekit` Vite plugin ([#5839](https://github.com/sveltejs/kit/pull/5839))
+
+## 1.0.0-next.403
+
+### Patch Changes
+
+- [chore] upgrade to Undici 5.8.1 ([#5804](https://github.com/sveltejs/kit/pull/5804))
+
+## 1.0.0-next.402
+
+### Patch Changes
+
+- [fix] Import analysis doesn't get stuck in an infinite loop when encountering cyclical imports ([#5794](https://github.com/sveltejs/kit/pull/5794))
+
+## 1.0.0-next.401
+
+### Patch Changes
+
+- [fix] chdir to user's application directory before running postinstall sync ([#5771](https://github.com/sveltejs/kit/pull/5771))
+
+## 1.0.0-next.400
+
+### Patch Changes
+
+- More robust path aliasing ([#5582](https://github.com/sveltejs/kit/pull/5582))
+
+## 1.0.0-next.399
+
+### Patch Changes
+
+- Use @sveltejs/kit postinstall lifecycle hook to invoke 'svelte-kit sync' instead of prepare in projects created by create-svelte ([#5760](https://github.com/sveltejs/kit/pull/5760))
+
+## 1.0.0-next.398
+
+### Patch Changes
+
+- Check url protocol to avoid mailto links navigated by kit in mobile devices ([#5726](https://github.com/sveltejs/kit/pull/5726))
+
+* [fix] Windows correctly errors on `$env/*/private` imports ([#5739](https://github.com/sveltejs/kit/pull/5739))
+  [fix] Illegal module analysis in dev ignores non-js|ts|svelte files
+
+- [feat] include reference to `@sveltejs/kit` types in ambient file ([#5745](https://github.com/sveltejs/kit/pull/5745))
+
+## 1.0.0-next.397
+
+### Patch Changes
+
+- load env before importing hooks during dev ([#5728](https://github.com/sveltejs/kit/pull/5728))
+
+* Add DOM.Iterable to default tsconfig ([#5734](https://github.com/sveltejs/kit/pull/5734))
+
+## 1.0.0-next.396
+
+### Patch Changes
+
+- [fix] Environment variable generated types ([#5719](https://github.com/sveltejs/kit/pull/5719))
+
+## 1.0.0-next.395
+
+### Patch Changes
+
+- Add `$env/static/private`, `$env/static/public`, `$env/dynamic/private` and `$env/dynamic/public` modules ([#5663](https://github.com/sveltejs/kit/pull/5663))
+
+## 1.0.0-next.394
+
+### Patch Changes
+
+- Set Vite's publicDir and correctly serve public assets earlier in pipeline ([#5686](https://github.com/sveltejs/kit/pull/5686))
+
+* prerender in a subprocess ([#5678](https://github.com/sveltejs/kit/pull/5678))
+
+## 1.0.0-next.393
+
+### Patch Changes
+
+- Prevent needless prop updates causing rerenders ([#5671](https://github.com/sveltejs/kit/pull/5671))
+
+* Support custom Vite config locations ([#5705](https://github.com/sveltejs/kit/pull/5705))
+
+- Prevent rerender when route state did not change ([#5654](https://github.com/sveltejs/kit/pull/5654))
+
+## 1.0.0-next.392
+
+### Patch Changes
+
+- Revert publicDir change from 1.0.0-next.387 ([#5683](https://github.com/sveltejs/kit/pull/5683))
+
+## 1.0.0-next.391
+
+### Patch Changes
+
+- [breaking] replace transformPage with transformPageChunk ([#5657](https://github.com/sveltejs/kit/pull/5657))
+
+## 1.0.0-next.390
+
+### Patch Changes
+
+- [fix] vite dev no longer covers errors ([#5563](https://github.com/sveltejs/kit/pull/5563))
+
+## 1.0.0-next.389
+
+### Patch Changes
+
+- Only normalise internal URLs ([#5645](https://github.com/sveltejs/kit/pull/5645))
+
+## 1.0.0-next.388
+
+### Patch Changes
+
+- Reset stack traces to avoid double-fix ([#5644](https://github.com/sveltejs/kit/pull/5644))
+
+## 1.0.0-next.387
+
+### Patch Changes
+
+- set Vite's `publicDir` option ([#5648](https://github.com/sveltejs/kit/pull/5648))
+
+* Normalize paths inside prerenderer, so they are correct inside \$service-worker ([#5641](https://github.com/sveltejs/kit/pull/5641))
+
+## 1.0.0-next.386
+
+### Patch Changes
+
+- Ensure private cache when something is returned from getSession hook ([#5640](https://github.com/sveltejs/kit/pull/5640))
+
+* [fix] transform link[rel=icon] to be absolute to avoid console error when navigating ([#5583](https://github.com/sveltejs/kit/pull/5583))
+
+## 1.0.0-next.385
+
+### Patch Changes
+
+- Make 404 error more helpful if paths.base is missing ([#5622](https://github.com/sveltejs/kit/pull/5622))
+
+* [fix] decode parameters on client ([`d02f1f25`](https://github.com/sveltejs/kit/commit/d02f1f25ac8acb29e21a06b94418c333928fb9bb))
+
+- Add config.kit.prerender.origin ([#5627](https://github.com/sveltejs/kit/pull/5627))
+
+## 1.0.0-next.384
+
+### Patch Changes
+
+- Respect custom Vite mode in SSR build ([#5602](https://github.com/sveltejs/kit/pull/5602))
+
+* [breaking] remove mode, prod and server from \$app/env ([#5602](https://github.com/sveltejs/kit/pull/5602))
+
+## 1.0.0-next.383
+
+### Patch Changes
+
+- Add formData method in superclass rather than monkey-patch ([#5629](https://github.com/sveltejs/kit/pull/5629))
+
+## 1.0.0-next.382
+
+### Patch Changes
+
+- [fix] change Vite's output directory from `_app` to client ([#5620](https://github.com/sveltejs/kit/pull/5620))
+
+## 1.0.0-next.381
+
+### Patch Changes
+
+- Handle errors in Node streams ([#5616](https://github.com/sveltejs/kit/pull/5616))
+
+## 1.0.0-next.380
+
+### Patch Changes
+
+- Handle circular dependencies in dynamic imports ([#5619](https://github.com/sveltejs/kit/pull/5619))
+
+* [fix] handle binary data when prerendering ([#5497](https://github.com/sveltejs/kit/pull/5497))
+
+- [breaking] remove writeStatic to align with Vite ([#5618](https://github.com/sveltejs/kit/pull/5618))
+
+* Reset navigating store upon return to site with a bfcache hit ([#5613](https://github.com/sveltejs/kit/pull/5613))
+
+## 1.0.0-next.379
+
+### Patch Changes
+
+- Use define instead of import.meta.env.VITE_SVELTEKIT_FOO for internal values ([#5594](https://github.com/sveltejs/kit/pull/5594))
+
+## 1.0.0-next.378
+
+### Patch Changes
+
+- Pause Node streams as necessary when converting to ReadableStream ([#5587](https://github.com/sveltejs/kit/pull/5587))
+
+* improve vite version check to work with custom resolutions, eg. pnpm overrides ([#5586](https://github.com/sveltejs/kit/pull/5586))
+
+## 1.0.0-next.377
+
+### Patch Changes
+
+- [breaking] Endpoint method names uppercased to match HTTP specifications ([#5513](https://github.com/sveltejs/kit/pull/5513))
+
+## 1.0.0-next.376
+
+### Patch Changes
+
+- [fix] ensure completed_build is reset ([#5541](https://github.com/sveltejs/kit/pull/5541))
+
+## 1.0.0-next.375
+
+### Patch Changes
+
+- fix: don't try adapting if build failed ([#5536](https://github.com/sveltejs/kit/pull/5536))
+
+* Render generic error page if `__layout` returns error while rendering full error page ([#4665](https://github.com/sveltejs/kit/pull/4665))
+
+## 1.0.0-next.374
+
+### Patch Changes
+
+- removed `vite` key from config definition ([#5530](https://github.com/sveltejs/kit/pull/5530))
+
+* Render page with correct status code when non-get endpoint returns validation error ([#4328](https://github.com/sveltejs/kit/pull/4328))
+
+## 1.0.0-next.373
+
+### Patch Changes
+
+- [breaking] require vite 3 ([#5005](https://github.com/sveltejs/kit/pull/5005))
+
+## 1.0.0-next.372
+
+### Patch Changes
+
+- ignore invalid accept header values instead of throwing an error ([#5502](https://github.com/sveltejs/kit/pull/5502))
+
+* support CSP report-only mode ([#5496](https://github.com/sveltejs/kit/pull/5496))
+
+## 1.0.0-next.371
+
+### Patch Changes
+
+- Pin vite-plugin-svelte to 1.0.0-next.49 ([#5498](https://github.com/sveltejs/kit/pull/5498))
+
+## 1.0.0-next.370
+
+### Patch Changes
+
+- Don't automatically buffer request bodies ([#5442](https://github.com/sveltejs/kit/pull/5442))
+
+## 1.0.0-next.369
+
+### Patch Changes
+
+- skip closeBundle hook during dev to prevent errors on restart ([#5466](https://github.com/sveltejs/kit/pull/5466))
+
+* Normalize paths on prefetch (fixes [#5457](https://github.com/sveltejs/kit/issues/5457)) ([#5458](https://github.com/sveltejs/kit/pull/5458))
+
+- clearer error on bad matcher names ([#5460](https://github.com/sveltejs/kit/pull/5460))
+
+## 1.0.0-next.368
+
+### Patch Changes
+
+- [fix] adapt in closeBundle ([#5439](https://github.com/sveltejs/kit/pull/5439))
+
+## 1.0.0-next.367
+
+### Patch Changes
+
+- [fix] allow Vite plugins to output mutable assets ([#5416](https://github.com/sveltejs/kit/pull/5416))
+
+## 1.0.0-next.366
+
+### Patch Changes
+
+- reset selection in setTimeout after navigating, to ensure correct behaviour in Firefox ([#5058](https://github.com/sveltejs/kit/pull/5058))
+
+## 1.0.0-next.365
+
+### Patch Changes
+
+- Serve static assets before routes in dev, but only if in an allowed directory ([#5070](https://github.com/sveltejs/kit/pull/5070))
+
+* [breaking] Allow %-encoded filenames ([#5056](https://github.com/sveltejs/kit/pull/5056))
+
+## 1.0.0-next.364
+
+### Patch Changes
+
+- [breaking] Use Vite defaults for port and strictPort ([#5392](https://github.com/sveltejs/kit/pull/5392))
+
+* Use anonymous function in service worker init script to support legacy browsers ([#5417](https://github.com/sveltejs/kit/pull/5417))
+
+## 1.0.0-next.363
+
+### Patch Changes
+
+- [chore] upgrade TypeScript to 4.7.4 ([#5414](https://github.com/sveltejs/kit/pull/5414))
+
+## 1.0.0-next.362
+
+### Patch Changes
+
+- Updated undici to fix #5383 ([#5420](https://github.com/sveltejs/kit/pull/5420))
+
+## 1.0.0-next.361
+
+### Patch Changes
+
+- [breaking] require Node 16.9 ([#5395](https://github.com/sveltejs/kit/pull/5395))
+
+* remove FLoC protection, now that we vanquished Google ([#5018](https://github.com/sveltejs/kit/pull/5018))
+
+- Prevent `Connection` header from being incorrectly inherited by requests made from `load`'s `fetch` during SSR ([#5393](https://github.com/sveltejs/kit/pull/5393))
+
+* Returns errors from page endpoints as JSON where appropriate ([#5314](https://github.com/sveltejs/kit/pull/5314))
+
+- Allow body to be a binary ReadableStream ([#5407](https://github.com/sveltejs/kit/pull/5407))
+
+## 1.0.0-next.360
+
+### Patch Changes
+
+- [fix] support conditional Vite configs ([#5376](https://github.com/sveltejs/kit/pull/5376))
+
+* Allow server restart when config changed ([#5379](https://github.com/sveltejs/kit/pull/5379))
+
+- Include dynamically imported styles during SSR ([#5138](https://github.com/sveltejs/kit/pull/5138))
+
+## 1.0.0-next.359
+
+### Patch Changes
+
+- Adjust type imports to satisfy TS NodeNext moduleResolution ([#5360](https://github.com/sveltejs/kit/pull/5360))
+
+* [breaking] require vite.config.js ([#5332](https://github.com/sveltejs/kit/pull/5332))
+
+- [breaking] graduate @sveltejs/kit/vite from experimental ([#5332](https://github.com/sveltejs/kit/pull/5332))
+
+* [breaking] switch to vite CLI for dev, build, and preview commands ([#5332](https://github.com/sveltejs/kit/pull/5332))
+
+## 1.0.0-next.358
+
+### Patch Changes
+
+- Only exit process in closeBundle hook if prerender is enabled ([#5356](https://github.com/sveltejs/kit/pull/5356))
+
+* [fix] don't log warning if root is configured ([#5330](https://github.com/sveltejs/kit/pull/5330))
+
+## 1.0.0-next.357
+
+### Patch Changes
+
+- [breaking] change endpointExtensions to moduleExtensions, and use to filter param matchers ([#5085](https://github.com/sveltejs/kit/pull/5085))
+
+* fix server crash when accessing a malformed URI ([#5246](https://github.com/sveltejs/kit/pull/5246))
+
+## 1.0.0-next.356
+
+### Patch Changes
+
+- Stream request bodies ([#5291](https://github.com/sveltejs/kit/pull/5291))
+
+* Enable multipart formdata parsing with node-fetch ([#5292](https://github.com/sveltejs/kit/pull/5292))
+
+- [fix] allow user to set dev port ([#5303](https://github.com/sveltejs/kit/pull/5303))
+
+* [breaking] use undici instead of node-fetch ([#5117](https://github.com/sveltejs/kit/pull/5117))
+
+## 1.0.0-next.355
+
+### Patch Changes
+
+- [chore] Prerendering URL is now a subclass instead of a proxy ([#5278](https://github.com/sveltejs/kit/pull/5278))
+
+* [fix] support vite.config.js on Windows ([#5265](https://github.com/sveltejs/kit/pull/5265))
+
+- Allow both string and URL as the first argument of `$app/navigation#goto` ([#5282](https://github.com/sveltejs/kit/pull/5282))
+
+* rename `goto(href)` to `goto(url)` ([#5286](https://github.com/sveltejs/kit/pull/5286))
+
+- Add types for @sveltejs/kit/experimental/vite ([#5266](https://github.com/sveltejs/kit/pull/5266))
+
+* fix: port flag doesn't work in preview ([#5284](https://github.com/sveltejs/kit/pull/5284))
+
+## 1.0.0-next.354
+
+### Patch Changes
+
+- Added `server` and `prod` env variables ([#5251](https://github.com/sveltejs/kit/pull/5251))
+
+## 1.0.0-next.353
+
+### Patch Changes
+
+- Expose Vite plugin as @sveltejs/kit/experimental/vite ([#5094](https://github.com/sveltejs/kit/pull/5094))
+
+## 1.0.0-next.352
+
+### Patch Changes
+
+- fix manifest not updating when adding routes ([#5157](https://github.com/sveltejs/kit/pull/5157))
+
+## 1.0.0-next.351
+
+### Patch Changes
+
+- [fix] URL instance methods now work in `load` ([#5183](https://github.com/sveltejs/kit/pull/5183))
+
+* Upgrade vite-plugin-svelte ([`4e4625ea`](https://github.com/sveltejs/kit/commit/4e4625ea6d9a084bc767ae216704aacd95fe8730))
+
+## 1.0.0-next.350
+
+### Patch Changes
+
+- [breaking] revert removal of `kit.browser.hydrate` ([#5178](https://github.com/sveltejs/kit/pull/5178))
+
+## 1.0.0-next.349
+
+### Patch Changes
+
+- [breaking] remove kit.browser.hydrate config in favor of compilerOptions.hydratable ([#5155](https://github.com/sveltejs/kit/pull/5155))
+
+* [chore] upgrade to Vite 2.9.10 ([#5170](https://github.com/sveltejs/kit/pull/5170))
+
 ## 1.0.0-next.348
 
 ### Patch Changes

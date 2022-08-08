@@ -2,9 +2,8 @@ import * as cookie from 'cookie';
 import * as set_cookie_parser from 'set-cookie-parser';
 import { normalize } from '../../load.js';
 import { respond } from '../index.js';
-import { is_root_relative, resolve } from '../../../utils/url.js';
-import { create_prerendering_url_proxy } from './utils.js';
-import { is_pojo, lowercase_keys, normalize_request_method } from '../utils.js';
+import { LoadURL, PrerenderingURL, is_root_relative, resolve } from '../../../utils/url.js';
+import { check_method_names, is_pojo, lowercase_keys } from '../utils.js';
 import { coalesce_to_error } from '../../../utils/error.js';
 import { domain_matches, path_matches } from './cookie.js';
 
@@ -14,7 +13,7 @@ import { domain_matches, path_matches } from './cookie.js';
  *   event: import('types').RequestEvent;
  *   options: import('types').SSROptions;
  *   state: import('types').SSRState;
- *   route: import('types').SSRPage | null;
+ *   route: import('types').SSRPage | import('types').SSRErrorPage;
  *   node: import('types').SSRNode;
  *   $session: any;
  *   stuff: Record<string, any>;
@@ -50,7 +49,7 @@ export async function load_node({
 	/** @type {import('set-cookie-parser').Cookie[]} */
 	const new_cookies = [];
 
-	/** @type {import('types').LoadOutput} */
+	/** @type {import('types').NormalizedLoadOutput} */
 	let loaded;
 
 	const should_prerender = node.module.prerender ?? options.prerender.default;
@@ -73,18 +72,16 @@ export async function load_node({
 
 	if (shadow.error) {
 		loaded = {
-			status: shadow.status,
 			error: shadow.error
 		};
 	} else if (shadow.redirect) {
 		loaded = {
-			status: shadow.status,
 			redirect: shadow.redirect
 		};
 	} else if (module.load) {
 		/** @type {import('types').LoadEvent} */
 		const load_input = {
-			url: state.prerendering ? create_prerendering_url_proxy(event.url) : event.url,
+			url: state.prerendering ? new PrerenderingURL(event.url) : new LoadURL(event.url),
 			params: event.params,
 			props: shadow.body || {},
 			routeId: event.routeId,
@@ -130,6 +127,7 @@ export async function load_node({
 				for (const [key, value] of event.request.headers) {
 					if (
 						key !== 'authorization' &&
+						key !== 'connection' &&
 						key !== 'cookie' &&
 						key !== 'host' &&
 						key !== 'if-none-match' &&
@@ -251,6 +249,11 @@ export async function load_node({
 						if (cookie) opts.headers.set('cookie', cookie);
 					}
 
+					// we need to delete the connection header, as explained here:
+					// https://github.com/nodejs/undici/issues/1470#issuecomment-1140798467
+					// TODO this may be a case for being selective about which headers we let through
+					opts.headers.delete('connection');
+
 					const external_request = new Request(requested, /** @type {RequestInit} */ (opts));
 					response = await options.hooks.externalFetch.call(null, external_request);
 				}
@@ -341,7 +344,7 @@ export async function load_node({
 				return proxy;
 			},
 			stuff: { ...stuff },
-			status: is_error ? status ?? null : null,
+			status: (is_error ? status : shadow.status) ?? null,
 			error: is_error ? error ?? null : null
 		};
 
@@ -354,12 +357,7 @@ export async function load_node({
 			});
 		}
 
-		loaded = await module.load.call(null, load_input);
-
-		if (!loaded) {
-			// TODO do we still want to enforce this now that there's no fallthrough?
-			throw new Error(`load function must return a value${options.dev ? ` (${node.entry})` : ''}`);
-		}
+		loaded = normalize(await module.load.call(null, load_input));
 	} else if (shadow.body) {
 		loaded = {
 			props: shadow.body
@@ -367,6 +365,8 @@ export async function load_node({
 	} else {
 		loaded = {};
 	}
+
+	loaded.status = loaded.status ?? shadow.status;
 
 	// generate __data.json files when prerendering
 	if (shadow.body && state.prerendering) {
@@ -383,7 +383,7 @@ export async function load_node({
 	return {
 		node,
 		props: shadow.body,
-		loaded: normalize(loaded),
+		loaded,
 		stuff: loaded.stuff || stuff,
 		fetched,
 		set_cookie_headers: new_cookies.map((new_cookie) => {
@@ -409,13 +409,15 @@ async function load_shadow_data(route, event, options, prerender) {
 	try {
 		const mod = await route.shadow();
 
-		if (prerender && (mod.post || mod.put || mod.del || mod.patch)) {
+		check_method_names(mod);
+
+		if (prerender && (mod.POST || mod.PUT || mod.DELETE || mod.PATCH)) {
 			throw new Error('Cannot prerender pages that have endpoints with mutative methods');
 		}
 
-		const method = normalize_request_method(event);
-		const is_get = method === 'head' || method === 'get';
-		const handler = method === 'head' ? mod.head || mod.get : mod[method];
+		const { method } = event.request;
+		const is_get = method === 'HEAD' || method === 'GET';
+		const handler = method === 'HEAD' ? mod.HEAD || mod.GET : mod[method];
 
 		if (!handler && !is_get) {
 			return {
@@ -426,28 +428,29 @@ async function load_shadow_data(route, event, options, prerender) {
 
 		/** @type {import('types').ShadowData} */
 		const data = {
-			status: 200,
+			status: undefined,
 			cookies: [],
 			body: {}
 		};
 
 		if (!is_get) {
-			const result = await handler(event);
-
-			// TODO remove for 1.0
-			// @ts-expect-error
-			if (result.fallthrough) {
-				throw new Error(
-					'fallthrough is no longer supported. Use matchers instead: https://kit.svelte.dev/docs/routing#advanced-routing-matching'
-				);
-			}
-
-			const { status, headers, body } = validate_shadow_output(result);
+			const { status, headers, body } = validate_shadow_output(await handler(event));
+			add_cookies(/** @type {string[]} */ (data.cookies), headers);
 			data.status = status;
 
-			add_cookies(/** @type {string[]} */ (data.cookies), headers);
+			// explicit errors cause an error page...
+			if (body instanceof Error) {
+				if (status < 400) {
+					data.status = 500;
+					data.error = new Error('A non-error status code was returned with an error body');
+				} else {
+					data.error = body;
+				}
 
-			// Redirects are respected...
+				return data;
+			}
+
+			// ...redirects are respected...
 			if (status >= 300 && status < 400) {
 				data.redirect = /** @type {string} */ (
 					headers instanceof Headers ? headers.get('location') : headers.location
@@ -461,28 +464,31 @@ async function load_shadow_data(route, event, options, prerender) {
 			data.body = body;
 		}
 
-		const get = (method === 'head' && mod.head) || mod.get;
+		const get = (method === 'HEAD' && mod.HEAD) || mod.GET;
 		if (get) {
-			const result = await get(event);
+			const { status, headers, body } = validate_shadow_output(await get(event));
+			add_cookies(/** @type {string[]} */ (data.cookies), headers);
 
-			// TODO remove for 1.0
-			// @ts-expect-error
-			if (result.fallthrough) {
-				throw new Error(
-					'fallthrough is no longer supported. Use matchers instead: https://kit.svelte.dev/docs/routing#advanced-routing-matching'
-				);
+			if (body instanceof Error) {
+				if (status < 400) {
+					data.status = 500;
+					data.error = new Error('A non-error status code was returned with an error body');
+				} else {
+					data.status = status;
+					data.error = body;
+				}
+
+				return data;
 			}
 
-			const { status, headers, body } = validate_shadow_output(result);
-			add_cookies(/** @type {string[]} */ (data.cookies), headers);
-			data.status = status;
-
 			if (status >= 400) {
+				data.status = status;
 				data.error = new Error('Failed to load data');
 				return data;
 			}
 
 			if (status >= 300) {
+				data.status = status;
 				data.redirect = /** @type {string} */ (
 					headers instanceof Headers ? headers.get('location') : headers.location
 				);
@@ -523,6 +529,14 @@ function add_cookies(target, headers) {
  * @param {import('types').ShadowEndpointOutput} result
  */
 function validate_shadow_output(result) {
+	// TODO remove for 1.0
+	// @ts-expect-error
+	if (result.fallthrough) {
+		throw new Error(
+			'fallthrough is no longer supported. Use matchers instead: https://kit.svelte.dev/docs/routing#advanced-routing-matching'
+		);
+	}
+
 	const { status = 200, body = {} } = result;
 	let headers = result.headers || {};
 
@@ -537,7 +551,9 @@ function validate_shadow_output(result) {
 	}
 
 	if (!is_pojo(body)) {
-		throw new Error('Body returned from endpoint request handler must be a plain object');
+		throw new Error(
+			'Body returned from endpoint request handler must be a plain object or an Error'
+		);
 	}
 
 	return { status, headers, body };

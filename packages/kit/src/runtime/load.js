@@ -1,8 +1,12 @@
 /**
- * @param {import('types').LoadOutput} loaded
+ * @param {import('types').LoadOutput | void} loaded
  * @returns {import('types').NormalizedLoadOutput}
  */
 export function normalize(loaded) {
+	if (!loaded) {
+		return {};
+	}
+
 	// TODO remove for 1.0
 	// @ts-expect-error
 	if (loaded.fallthrough) {
@@ -22,7 +26,10 @@ export function normalize(loaded) {
 		const status = loaded.status;
 
 		if (!loaded.error && has_error_status) {
-			return { status: status || 500, error: new Error() };
+			return {
+				status: status || 500,
+				error: new Error(`${status}`)
+			};
 		}
 
 		const error = typeof loaded.error === 'string' ? new Error(loaded.error) : loaded.error;

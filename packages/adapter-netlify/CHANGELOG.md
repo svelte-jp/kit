@@ -1,5 +1,47 @@
 # @sveltejs/adapter-netlify
 
+## 1.0.0-next.71
+
+### Patch Changes
+
+- Initialise `env` ([#5663](https://github.com/sveltejs/kit/pull/5663))
+
+## 1.0.0-next.70
+
+### Patch Changes
+
+- [breaking] remove writeStatic to align with Vite ([#5618](https://github.com/sveltejs/kit/pull/5618))
+
+## 1.0.0-next.69
+
+### Patch Changes
+
+- Update dependencies ([#5005](https://github.com/sveltejs/kit/pull/5005))
+
+## 1.0.0-next.68
+
+### Minor Changes
+
+- feat: get client IP from Context object rather than the request header ([#5473](https://github.com/sveltejs/kit/pull/5473))
+
+## 1.0.0-next.67
+
+### Patch Changes
+
+- [chore] upgrade TypeScript to 4.7.4 ([#5414](https://github.com/sveltejs/kit/pull/5414))
+
+## 1.0.0-next.66
+
+### Patch Changes
+
+- Generate sourcemaps for server-side functions when bundling with esbuild ([#5258](https://github.com/sveltejs/kit/pull/5258))
+
+## 1.0.0-next.65
+
+### Patch Changes
+
+- fix: add redirects for routes containing `__data.json` suffix ([#5180](https://github.com/sveltejs/kit/pull/5180))
+
 ## 1.0.0-next.64
 
 ### Patch Changes

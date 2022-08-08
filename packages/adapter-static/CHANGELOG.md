@@ -1,5 +1,35 @@
 # @sveltejs/adapter-static
 
+## 1.0.0-next.39
+
+### Patch Changes
+
+- Move `compress` logic to `Builder` API ([#5822](https://github.com/sveltejs/kit/pull/5822))
+
+## 1.0.0-next.38
+
+### Patch Changes
+
+- [breaking] remove writeStatic to align with Vite ([#5618](https://github.com/sveltejs/kit/pull/5618))
+
+## 1.0.0-next.37
+
+### Patch Changes
+
+- [breaking] Throws when correctly configured to run as a static site of a SPA ([#5562](https://github.com/sveltejs/kit/pull/5562))
+
+## 1.0.0-next.36
+
+### Patch Changes
+
+- Remove ENABLE_VC_BUILD check, use v3 build output API for all apps deployed to Vercel ([#5514](https://github.com/sveltejs/kit/pull/5514))
+
+## 1.0.0-next.35
+
+### Patch Changes
+
+- [chore] upgrade TypeScript to 4.7.4 ([#5414](https://github.com/sveltejs/kit/pull/5414))
+
 ## 1.0.0-next.34
 
 ### Patch Changes

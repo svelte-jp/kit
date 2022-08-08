@@ -1,5 +1,53 @@
 # @sveltejs/adapter-vercel
 
+## 1.0.0-next.66
+
+### Patch Changes
+
+- Initialise `env` ([#5663](https://github.com/sveltejs/kit/pull/5663))
+
+## 1.0.0-next.65
+
+### Patch Changes
+
+- [breaking] remove writeStatic to align with Vite ([#5618](https://github.com/sveltejs/kit/pull/5618))
+
+## 1.0.0-next.64
+
+### Patch Changes
+
+- Don't remove .vercel/output directory ([#5555](https://github.com/sveltejs/kit/pull/5555))
+
+## 1.0.0-next.63
+
+### Patch Changes
+
+- Print friendlier message if adapter-vercel fails to resolve dependencies ([#5551](https://github.com/sveltejs/kit/pull/5551))
+
+## 1.0.0-next.62
+
+### Patch Changes
+
+- Update dependencies ([#5005](https://github.com/sveltejs/kit/pull/5005))
+
+## 1.0.0-next.61
+
+### Patch Changes
+
+- Remove ENABLE_VC_BUILD check, use v3 build output API for all apps deployed to Vercel ([#5514](https://github.com/sveltejs/kit/pull/5514))
+
+## 1.0.0-next.60
+
+### Patch Changes
+
+- [chore] upgrade TypeScript to 4.7.4 ([#5414](https://github.com/sveltejs/kit/pull/5414))
+
+## 1.0.0-next.59
+
+### Patch Changes
+
+- Add sourcemap generation for the generated functions ([#5197](https://github.com/sveltejs/kit/pull/5197))
+
 ## 1.0.0-next.58
 
 ### Patch Changes

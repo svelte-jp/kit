@@ -11,8 +11,9 @@ import {
 	RequestHandler,
 	ResolveOptions,
 	Server,
+	ServerInitOptions,
 	SSRManifest
-} from './index';
+} from './index.js';
 import {
 	HttpMethod,
 	JSONObject,
@@ -20,7 +21,7 @@ import {
 	RequestOptions,
 	ResponseHeaders,
 	TrailingSlash
-} from './private';
+} from './private.js';
 
 export interface ServerModule {
 	Server: typeof InternalServer;
@@ -51,8 +52,8 @@ export interface BuildData {
 		chunks: OutputChunk[];
 		entry: {
 			file: string;
-			js: string[];
-			css: string[];
+			imports: string[];
+			stylesheets: string[];
 		};
 		vite_manifest: import('vite').Manifest;
 	};
@@ -91,7 +92,13 @@ export interface Hooks {
 	handleError: HandleError;
 }
 
+export interface ImportNode {
+	name: string;
+	dynamic: boolean;
+}
+
 export class InternalServer extends Server {
+	init(options: ServerInitOptions): void;
 	respond(
 		request: Request,
 		options: RequestOptions & {
@@ -113,7 +120,7 @@ export interface MethodOverride {
 }
 
 export type NormalizedLoadOutput = {
-	status: number;
+	status?: number;
 	error?: Error;
 	redirect?: string;
 	props?: Record<string, any> | Promise<Record<string, any>>;
@@ -153,12 +160,9 @@ export interface PrerenderOptions {
 
 export type RecursiveRequired<T> = {
 	// Recursive implementation of TypeScript's Required utility type.
-	// Will recursively continue until it reaches primitive or union
-	// with a Function in it, except those commented below
+	// Will recursively continue until it reaches a primitive or Function
 	[K in keyof T]-?: Extract<T[K], Function> extends never // If it does not have a Function type
 		? RecursiveRequired<T[K]> // recursively continue through.
-		: K extends 'vite' // If it reaches the 'vite' key
-		? Extract<T[K], Function> // only take the Function type.
 		: T[K]; // Use the exact type for everything else
 };
 
@@ -175,13 +179,6 @@ export interface ShadowEndpointOutput<Output extends JSONObject = JSONObject> {
 	headers?: Partial<ResponseHeaders>;
 	body?: Output;
 }
-
-/**
- * The route key of a page with a matching endpoint — used to ensure the
- * client loads data from the right endpoint during client-side navigation
- * rather than a different route that happens to match the path
- */
-type ShadowKey = string;
 
 export interface ShadowRequestHandler<Output extends JSONObject = JSONObject> {
 	(event: RequestEvent): MaybePromise<ShadowEndpointOutput<Output>>;
@@ -230,13 +227,13 @@ export interface SSRNode {
 	/** index into the `components` array in client-manifest.js */
 	index: number;
 	/** client-side module URL for this component */
-	entry: string;
-	/** external CSS files */
-	css: string[];
+	file: string;
 	/** external JS files */
-	js: string[];
+	imports: string[];
+	/** external CSS files */
+	stylesheets: string[];
 	/** inlined styles */
-	styles?: Record<string, string>;
+	inline_styles?: () => MaybePromise<Record<string, string>>;
 }
 
 export type SSRNodeLoader = () => Promise<SSRNode>;
@@ -244,7 +241,6 @@ export type SSRNodeLoader = () => Promise<SSRNode>;
 export interface SSROptions {
 	csp: ValidatedConfig['kit']['csp'];
 	dev: boolean;
-	floc: boolean;
 	get_stack: (error: Error) => string | undefined;
 	handle_error(error: Error & { frame?: string }, event: RequestEvent): void;
 	hooks: Hooks;
@@ -260,6 +256,7 @@ export interface SSROptions {
 		default: boolean;
 		enabled: boolean;
 	};
+	public_env: Record<string, string>;
 	read(file: string): Buffer;
 	root: SSRComponent['default'];
 	router: boolean;
@@ -301,6 +298,10 @@ export interface SSRPage {
 	b: Array<number | undefined>;
 }
 
+export interface SSRErrorPage {
+	id: '__error';
+}
+
 export interface SSRPagePart {
 	id: string;
 	load: SSRComponentLoader;
@@ -311,7 +312,7 @@ export type SSRRoute = SSREndpoint | SSRPage;
 export interface SSRState {
 	fallback?: string;
 	getClientAddress: () => string;
-	initiator?: SSRPage | null;
+	initiator?: SSRPage | SSRErrorPage;
 	platform?: any;
 	prerendering?: PrerenderOptions;
 }
@@ -324,3 +325,11 @@ export type ValidatedKitConfig = RecursiveRequired<KitConfig>;
 
 export * from './index';
 export * from './private';
+
+declare global {
+	const __SVELTEKIT_ADAPTER_NAME__: string;
+	const __SVELTEKIT_APP_VERSION__: string;
+	const __SVELTEKIT_APP_VERSION_FILE__: string;
+	const __SVELTEKIT_APP_VERSION_POLL_INTERVAL__: number;
+	const __SVELTEKIT_DEV__: boolean;
+}

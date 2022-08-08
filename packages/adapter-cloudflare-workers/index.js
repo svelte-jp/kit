@@ -15,7 +15,14 @@ import { fileURLToPath } from 'url';
  */
 
 /** @type {import('.').default} */
-export default function (options = {}) {
+export default function () {
+	// TODO remove for 1.0
+	if (arguments.length > 0) {
+		throw new Error(
+			'esbuild options can no longer be passed to adapter-cloudflare-workers — see https://github.com/sveltejs/kit/pull/4639'
+		);
+	}
+
 	return {
 		name: '@sveltejs/adapter-cloudflare-workers',
 
@@ -55,19 +62,18 @@ export default function (options = {}) {
 			);
 
 			await esbuild.build({
-				target: 'es2020',
 				platform: 'browser',
-				...options,
+				sourcemap: 'linked',
+				target: 'es2020',
 				entryPoints: [`${tmp}/entry.js`],
 				outfile: main,
 				bundle: true,
-				external: ['__STATIC_CONTENT_MANIFEST', ...(options?.external || [])],
+				external: ['__STATIC_CONTENT_MANIFEST'],
 				format: 'esm'
 			});
 
 			builder.log.minor('Copying assets...');
 			builder.writeClient(site.bucket);
-			builder.writeStatic(site.bucket);
 			builder.writePrerendered(site.bucket);
 		}
 	};
@@ -116,7 +122,6 @@ function validate_config(builder) {
 
 		name = "<your-site-name>"
 		account_id = "<your-account-id>"
-		route = "<your-route>"
 
 		main = "./.cloudflare/worker.js"
 		site.bucket = "./.cloudflare/public"

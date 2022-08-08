@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import { test } from 'uvu';
 import * as assert from 'uvu/assert';
@@ -6,7 +6,7 @@ import * as assert from 'uvu/assert';
 const build = fileURLToPath(new URL('../build', import.meta.url));
 
 /** @param {string} file */
-const read = (file) => fs.readFileSync(`${build}/${file}`, 'utf-8');
+const read = (file, encoding = 'utf-8') => fs.readFileSync(`${build}/${file}`, encoding);
 
 test('prerenders /', () => {
 	const content = read('index.html');
@@ -131,6 +131,9 @@ test('targets the data-sveltekit-hydrate parent node', () => {
 		/<body>([^]+?)<script type="module" data-sveltekit-hydrate="(\w+)">([^]+?)<\/script>[^]+?<\/body>/;
 
 	const match = pattern.exec(content);
+	if (!match) {
+		throw new Error('Could not find data-sveltekit-hydrate');
+	}
 
 	assert.equal(match[1].trim(), '<h1>hello</h1>');
 
@@ -139,6 +142,21 @@ test('targets the data-sveltekit-hydrate parent node', () => {
 			`target: document.querySelector('[data-sveltekit-hydrate="${match[2]}"]').parentNode`
 		)
 	);
+});
+
+test('prerenders binary data', async () => {
+	assert.equal(Buffer.compare(read('fetch-image/image.jpg', null), read('image.jpg', null)), 0);
+	assert.equal(Buffer.compare(read('fetch-image/image.png', null), read('image.png', null)), 0);
+});
+
+test('fetches data from local endpoint', () => {
+	assert.equal(read('origin/__data.json'), JSON.stringify({ message: 'hello' }));
+	assert.equal(read('origin/message.json'), JSON.stringify({ message: 'hello' }));
+});
+
+test('respects config.prerender.origin', () => {
+	const content = read('origin.html');
+	assert.ok(content.includes('<h2>http://example.com</h2>'));
 });
 
 test.run();

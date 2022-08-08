@@ -1,5 +1,53 @@
 # @sveltejs/adapter-cloudflare
 
+## 1.0.0-next.31
+
+### Patch Changes
+
+- Initialise `env` ([#5663](https://github.com/sveltejs/kit/pull/5663))
+
+## 1.0.0-next.30
+
+### Patch Changes
+
+- [breaking] remove writeStatic to align with Vite ([#5618](https://github.com/sveltejs/kit/pull/5618))
+
+## 1.0.0-next.29
+
+### Patch Changes
+
+- Update dependencies ([#5005](https://github.com/sveltejs/kit/pull/5005))
+
+## 1.0.0-next.28
+
+### Patch Changes
+
+- [breaking] Don't pass arbitrary options to esbuild ([#4639](https://github.com/sveltejs/kit/pull/4639))
+
+## 1.0.0-next.27
+
+### Patch Changes
+
+- Expose App interfaces ([#5386](https://github.com/sveltejs/kit/pull/5386))
+
+## 1.0.0-next.26
+
+### Patch Changes
+
+- [chore] upgrade TypeScript to 4.7.4 ([#5414](https://github.com/sveltejs/kit/pull/5414))
+
+## 1.0.0-next.25
+
+### Minor Changes
+
+- Expose Cloudflare Worker Cache API through `caches` in Platform ([#5081](https://github.com/sveltejs/kit/pull/5081))
+
+## 1.0.0-next.24
+
+### Patch Changes
+
+- Generate sourcemaps for server-side functions when bundling with esbuild ([#5258](https://github.com/sveltejs/kit/pull/5258))
+
 ## 1.0.0-next.23
 
 ### Patch Changes

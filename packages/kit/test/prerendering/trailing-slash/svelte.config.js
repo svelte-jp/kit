@@ -1,4 +1,3 @@
-import path from 'path';
 import adapter from '../../../../adapter-static/index.js';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -9,22 +8,11 @@ const config = {
 		}),
 
 		prerender: {
-			default: true
+			default: true,
+			entries: ['*', '/standalone-endpoint.json']
 		},
 
-		trailingSlash: 'always',
-
-		vite: {
-			build: {
-				minify: false
-			},
-			clearScreen: false,
-			server: {
-				fs: {
-					allow: [path.resolve('../../../src')]
-				}
-			}
-		}
+		trailingSlash: 'always'
 	}
 };
 
