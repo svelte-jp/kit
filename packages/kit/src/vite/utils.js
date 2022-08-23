@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { loadConfigFromFile, loadEnv, normalizePath } from 'vite';
-import { get_runtime_directory } from '../core/utils.js';
+import { runtime_directory } from '../core/utils.js';
+import { posixify } from '../utils/filesystem.js';
 
 /**
  * @param {import('vite').ResolvedConfig} config
@@ -104,49 +105,44 @@ export function get_aliases(config) {
 	/** @type {import('vite').Alias[]} */
 	const alias = [
 		{ find: '__GENERATED__', replacement: path.posix.join(config.outDir, 'generated') },
-		{ find: '$app', replacement: `${get_runtime_directory(config)}/app` },
+		{ find: '$app', replacement: `${runtime_directory}/app` },
+		{ find: '$env/dynamic/public', replacement: `${runtime_directory}/env/dynamic/public.js` },
+		{ find: '$env/dynamic/private', replacement: `${runtime_directory}/env/dynamic/private.js` },
 		// For now, we handle `$lib` specially here rather than make it a default value for
 		// `config.kit.alias` since it has special meaning for packaging, etc.
 		{ find: '$lib', replacement: config.files.lib }
 	];
 
 	for (let [key, value] of Object.entries(config.alias)) {
+		value = posixify(value);
 		if (value.endsWith('/*')) {
 			value = value.slice(0, -2);
 		}
 		if (key.endsWith('/*')) {
 			// Doing just `{ find: key.slice(0, -2) ,..}` would mean `import .. from "key"` would also be matched, which we don't want
 			alias.push({
-				find: new RegExp(`^${key.slice(0, -2)}\\/(.+)$`),
+				find: new RegExp(`^${escape_for_regexp(key.slice(0, -2))}\\/(.+)$`),
 				replacement: `${path.resolve(value)}/$1`
 			});
 		} else if (key + '/*' in config.alias) {
 			// key and key/* both exist -> the replacement for key needs to happen _only_ on import .. from "key"
-			alias.push({ find: new RegExp(`^${key}$`), replacement: path.resolve(value) });
+			alias.push({
+				find: new RegExp(`^${escape_for_regexp(key)}$`),
+				replacement: path.resolve(value)
+			});
 		} else {
 			alias.push({ find: key, replacement: path.resolve(value) });
 		}
 	}
 
-	if (!process.env.BUNDLED) {
-		alias.push(
-			{
-				find: '$env/static/public',
-				replacement: path.posix.join(config.outDir, 'runtime/env/static/public.js')
-			},
-			{
-				find: '$env/static/private',
-				replacement: path.posix.join(config.outDir, 'runtime/env/static/private.js')
-			}
-		);
-	}
-
-	alias.push({
-		find: '$env',
-		replacement: `${get_runtime_directory(config)}/env`
-	});
-
 	return alias;
+}
+
+/**
+ * @param {string} str
+ */
+function escape_for_regexp(str) {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, (match) => '\\' + match);
 }
 
 /**

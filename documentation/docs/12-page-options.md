@@ -4,9 +4,7 @@ title: Page options
 
 デフォルトでは、SvelteKitはまずサーバーでコンポーネントをレンダリングし、それをHTMLとしてクライアントに送信します。それからブラウザ上でコンポーネントをサイドレンダリングし、**ハイドレーション(hydration)** と呼ばれるプロセスでそれをインタラクティブにします。そのため、コンポーネントをサーバーとブラウザのどちらでも実行できるようにしておく必要があります。その後で、SvelteKit は後続のナビゲーションを引き継ぐ [**ルーター**](/docs/routing) を初期化します。
 
-基本的に、これらはそれぞれアプリ単位またはページ単位で制御できます。ページ単位の設定はそれぞれ [`context="module"`](https://svelte.jp/docs#component-format-script-context-module) を使用すること、[レイアウト](/docs/layouts)には _適用されず_ ページにのみ適用されることに注意してください。
-
-もし両方とも設定されていて、その設定がコンフリクトしていた場合、アプリ単位の設定よりページ単位の設定が優先されます。
+You can control each of these on a per-app (via `svelte.config.js`) or per-page (via `+page.js` or `+page.server.js`) basis. If both are specified, per-page settings override per-app settings in case of conflicts.
 
 ### router
 
@@ -14,10 +12,9 @@ SvelteKit には [クライアントサイドルーター(client-side router)](/
 
 特定の状況においては、アプリ全体では [`browser.router` コンフィグオプション](/docs/configuration#browser)、もしくはページレベルでは `router` の export によって、[クライアントサイドルーティング(client-side routing)](/docs/appendix#routing) を無効にする必要があるかもしれません。
 
-```html
-<script context="module">
-	export const router = false;
-</script>
+```js
+/// file: +page.js/+page.server.js
+export const router = false;
 ```
 
 これによって、ルーターがすでにアクティブかどうかに関わらず、このページからのナビゲーションについてクライアントサイドルーティングが無効になることに注意してください。
@@ -26,10 +23,9 @@ SvelteKit には [クライアントサイドルーター(client-side router)](/
 
 通常、SvelteKit はサーバーでレンダリングされたHTMLをインタラクティブなページに [ハイドレート(hydrates)](/docs/appendix#hydration) します。JavaScriptを全く必要としないページ — 多くのブログ記事や 'about' ページがこのカテゴリに入りますが、これらの場合、アプリ全体では [`browser.hydrate` コンフィグオプション](/docs/configuration#browser)、ページレベルでは `hydrate` を export することにより、アプリ起動時のハイドレーションをスキップすることができます:
 
-```html
-<script context="module">
-	export const hydrate = false;
-</script>
+```js
+/// file: +page.js/+page.server.js
+export const hydrate = false;
 ```
 
 > もし `hydrate` と `router` の両方を `false` にした場合、SvelteKit はそのページにJavaScriptを一切追加しません。もし [サーバーサイドレンダリング](/docs/hooks#handle) が `handle` で無効になっている場合、`hydrate` が `true` でないとコンテンツがレンダリングされません。
@@ -40,18 +36,16 @@ SvelteKit には [クライアントサイドルーター(client-side router)](/
 
 `prerender` アノテーションがあるページは自動的にプリレンダリングされます:
 
-```html
-<script context="module">
-	export const prerender = true;
-</script>
+```js
+/// file: +page.js/+page.server.js
+export const prerender = true;
 ```
 
 あるいは、[`config.kit.prerender.default`](/docs/configuration#prerender) を `true` にした場合、明示的に _プリレンダリング可能ではない_ とマークしているページを除いて全てプリレンダリングされます:
 
-```html
-<script context="module">
-	export const prerender = false;
-</script>
+```js
+/// file: +page.js/+page.server.js
+export const prerender = false;
 ```
 
 > もしアプリ全体がプリレンダリングに適しているなら、[`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使用して、静的な web サーバーで扱うのに適した出力ファイルにすることができます。
@@ -64,14 +58,14 @@ SvelteKit には [クライアントサイドルーター(client-side router)](/
 
 > 全てのページがプリレンダリングに適しているわけではありません。プリレンダリングされたコンテンツは全てのユーザーに表示されます。もちろん、プリレンダリングされたページの `onMount` でパーソナライズされたデータをフェッチできますが、ブランクの初期コンテンツやローディングインジケーターにより、ユーザエクスペリエンスが低下してしまう可能性があります。
 
-上記の `src/routes/blog/[slug].svelte` の例のような、パラメータを元にデータをロードするページもプリレンダリングができることにご注意ください。プリレンダラーは `load` 内で行われるリクエストをインターセプトするので、`src/routes/blog/[slug].json.js` から送られるデータも取り込むことができます。
+Note that you can still prerender pages that load data based on the page's parameters, such as a `src/routes/blog/[slug]/+page.svelte` route.
 
-プリレンダリング中に [`url.searchParams`](/docs/loading#input-url) にアクセスすることは禁止されています。もし使う必要があるなら、ブラウザの中だけで行うようにしてください(例えば、`onMount` の中で)。
+Accessing [`url.searchParams`](/docs/load#input-url) during prerendering is forbidden. If you need to use it, ensure you are only doing so in the browser (for example in `onMount`).
 
 #### ルートの衝突(Route conflicts)
 
-プリレンダリングはファイルシステムに書き込むため、ディレクトリとファイルが同じ名前になるエンドポイントを2つ持つことはできません。例えば、`src/routes/foo/index.js` と `src/routes/foo/bar.js` は `foo` と  `foo/bar` を作成しようとしますが、これは不可能です。
+Because prerendering writes to the filesystem, it isn't possible to have two endpoints that would cause a directory and a file to have the same name. For example, `src/routes/foo/+server.js` and `src/routes/foo/bar/+server.js` would try to create `foo` and `foo/bar`, which is impossible.
 
-このため(他にも理由はありますが)、常に拡張子を付けておくことを推奨します — `src/routes/foo/index.json.js` と `src/routes/foo/bar.json.js` は `foo.json` と `foo/bar.json` ファイルが並んで調和して共存できます。
+For that reason among others, it's recommended that you always include a file extension — `src/routes/foo.json/+server.js` and `src/routes/foo/bar.json/+server.js` would result in `foo.json` and `foo/bar.json` files living harmoniously side-by-side.
 
 _ページ_ では、`foo` の代わりに `foo/index.html` と書き込むことでこの問題を回避しています。

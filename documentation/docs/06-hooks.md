@@ -2,13 +2,13 @@
 title: Hooks
 ---
 
-オプションの `src/hooks.js` (または `src/hooks.ts`、または `src/hooks/index.js`) ファイルはサーバー上で実行される4つの関数 — `handle`、`handleError`、`getSession`、`externalFetch` — をエクスポートできます。全てオプションです。
+オプションの `src/hooks.js` (または `src/hooks.ts`、または `src/hooks/index.js`) ファイルはサーバー上で実行される3つの関数 — `handle`、`handleError`、`externalFetch` — をエクスポートできます。全てオプションです。
 
 > このファイルの配置場所は [コンフィグ](/docs/configuration) の `config.kit.files.hooks` で変更することができます。
 
 ### handle
 
-この関数は SvelteKit のサーバーが [リクエスト](/docs/web-standards#fetch-apis-request) を受けるたびに (アプリの実行中であろうと、[プリレンダリング](/docs/page-options#prerender)であろうと) 実行され、[レスポンス](/docs/web-standards#fetch-apis-response) を決定します。リクエストを表す `event` オブジェクトと、SvelteKitのルーターを呼び出しそれに応じて(ページをレンダリングしたり、エンドポイントを呼び出したりして)レスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでエンドポイントを実装する場合など)。
+この関数は SvelteKit のサーバーが [リクエスト](/docs/web-standards#fetch-apis-request) を受けるたびに (アプリの実行中であろうと、[プリレンダリング](/docs/page-options#prerender)であろうと) 実行され、[レスポンス](/docs/web-standards#fetch-apis-response) を決定します。リクエストを表す `event` オブジェクトと、ルート(route)をレンダリングしレスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでルート(routes)を実装する場合など)。
 
 ```js
 /// file: src/hooks.js
@@ -25,7 +25,7 @@ export async function handle({ event, resolve }) {
 
 > 静的アセット(プリレンダリング済みのページを含む)に対するリクエストは SvelteKit では処理されません。
 
-未実装の場合、デフォルトでは `({ event, resolve }) => resolve(event)` となります。カスタムデータをリクエストに追加してエンドポイントに渡すには、以下のように `event.locals` オブジェクトにデータを追加します。
+If unimplemented, defaults to `({ event, resolve }) => resolve(event)`. To add custom data to the request, which is passed to handlers in `+server.js` and server-only `load` functions, populate the `event.locals` object, as shown below.
 
 ```js
 /// file: src/hooks.js
@@ -83,7 +83,7 @@ export async function handle({ event, resolve }) {
 
 ### handleError
 
-もしレンダリング中にエラーがスローされたら、`error` とそれを引き起こした `event` を引数にこの関数が呼び出されます。これによってデータをエラートラッキングサービスに送ったり、エラーをコンソールに出力する前にフォーマットをカスタマイズしたりすることができます。
+If an error is thrown during loading or rendering, this function will be called with the `error` and the `event` that caused it. This allows you to send data to an error tracking service, or to customise the formatting before printing the error to the console.
 
 開発中、もし Svelte コードで構文エラーが発生した場合、エラー場所をハイライトする `frame` プロパティが追加されます。
 
@@ -103,57 +103,7 @@ export function handleError({ error, event }) {
 }
 ```
 
-> `handleError` は例外がキャッチされていない場合にのみ呼び出されます。ページやエンドポイントが明示的に 4xx や 5xx ステータスコードで応答した場合は呼び出されません。
-
-### getSession
-
-この関数は、`event` オブジェクトを引数に取り、[クライアントからアクセス可能](/docs/modules#$app-stores)な `session` オブジェクトを返します。つまり `session` オブジェクトはユーザーに公開しても安全なものでなければなりません。この関数はSvelteKitがページをサーバーレンダリングする際に実行されます。
-
-未実装の場合、session は `{}` です。
-
-```js
-/// file: src/hooks.js
-// @filename: ambient.d.ts
-declare namespace App {
-	interface Locals {
-		user: {
-			name: string;
-			email: string;
-			avatar: string;
-			token: string;
-		}
-	}
-	interface Session {
-		user?: {
-			name: string;
-			email: string;
-			avatar: string;
-		}
-	}
-}
-
-type MaybePromise<T> = T | Promise<T>;
-
-// @filename: index.js
-// ---cut---
-/** @type {import('@sveltejs/kit').GetSession} */
-export function getSession(event) {
-	return event.locals.user
-		? {
-				user: {
-					// only include properties needed client-side —
-					// exclude anything else attached to the user
-					// like access tokens etc
-					name: event.locals.user.name,
-					email: event.locals.user.email,
-					avatar: event.locals.user.avatar
-				}
-		  }
-		: {};
-}
-```
-
-> `session` はシリアライズ可能でなければなりません。つまり、関数やカスタムクラスなどを含んではならず、JavaScriptの組み込みデータ型だけでなければいけません
+> `handleError` is only called for _unexpected_ errors. It is not called for errors created with the [`error`](/docs/modules#sveltejs-kit-error) function imported from `@sveltejs/kit`, as these are _expected_ errors.
 
 ### externalFetch
 

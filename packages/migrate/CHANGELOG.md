@@ -1,5 +1,51 @@
 # svelte-migrate
 
+## 1.0.0-next.11
+
+### Patch Changes
+
+- [fix] git mv files correctly when they contain \$ characters ([#6129](https://github.com/sveltejs/kit/pull/6129))
+
+## 1.0.0-next.10
+
+### Patch Changes
+
+- Revert change to suggest props destructuring ([#6099](https://github.com/sveltejs/kit/pull/6099))
+
+## 1.0.0-next.9
+
+### Patch Changes
+
+- Handle Error without message, handle status 200, handle missing body ([#6096](https://github.com/sveltejs/kit/pull/6096))
+
+## 1.0.0-next.8
+
+### Patch Changes
+
+- Suggest props destructuring if possible ([#6069](https://github.com/sveltejs/kit/pull/6069))
+
+* Fix typo in migration task ([#6070](https://github.com/sveltejs/kit/pull/6070))
+
+## 1.0.0-next.7
+
+### Patch Changes
+
+- Migrate type comments on arrow functions ([#5933](https://github.com/sveltejs/kit/pull/5933))
+
+* Use LayoutLoad inside +layout.js files ([#5931](https://github.com/sveltejs/kit/pull/5931))
+
+## 1.0.0-next.6
+
+### Patch Changes
+
+- Create `.ts` files from `<script context="module" lang="ts">` ([#5905](https://github.com/sveltejs/kit/pull/5905))
+
+## 1.0.0-next.5
+
+### Patch Changes
+
+- Rewrite type names ([#5778](https://github.com/sveltejs/kit/pull/5778))
+
 ## 1.0.0-next.4
 
 ### Patch Changes

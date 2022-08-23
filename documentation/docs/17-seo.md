@@ -26,7 +26,7 @@ SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から
 
 全てのページで、よく練られたユニークな `<title>` と `<meta name="description">` を [`<svelte:head>`](https://svelte.jp/docs#template-syntax-svelte-head) の内側に置くべきです。説明的な title と description の書き方に関するガイダンスと、検索エンジンにとってわかりやすいコンテンツを作るためのその他の方法については、Google の [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) のドキュメントで見つけることができます。
 
-> SEO に関する [`stuff`](/docs/loading#output-stuff) をページの `load` 関数から返し、それを ([`$page.stuff`](/docs/modules#$app-stores) という形で) ルート(root)[レイアウト](/docs/layouts) の `<svelte:head>` の中で使うのが一般的なパターンです。
+> A common pattern is to return SEO-related `data` from page [`load`](/docs/load) functions, then use it (as [`$page.data`](/docs/modules#$app-stores)) in a `<svelte:head>` in your root [layout](/docs/routing#layout).
 
 #### 構造化データ
 
@@ -57,26 +57,27 @@ export default config;
 [サイトマップ](https://developers.google.com/search/docs/advanced/sitemaps/build-sitemap) は、検索エンジンがサイト内のページの優先順位付けをするのに役立ちます、特にコンテンツの量が多い場合は。エンドポイントを使用してサイトマップを動的に作成できます:
 
 ```js
-/// file: src/routes/sitemap.xml.js
+/// file: src/routes/sitemap.xml/+server.js
 export async function GET() {
-	return {
-		headers: {
-			'Content-Type': 'application/xml'
-		},
-		body: `
-			<?xml version="1.0" encoding="UTF-8" ?>
-			<urlset
-				xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
-				xmlns:xhtml="https://www.w3.org/1999/xhtml"
-				xmlns:mobile="https://www.google.com/schemas/sitemap-mobile/1.0"
-				xmlns:news="https://www.google.com/schemas/sitemap-news/0.9"
-				xmlns:image="https://www.google.com/schemas/sitemap-image/1.1"
-				xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"
-			>
-				<!-- <url> elements go here -->
-			</urlset>
-		`.trim()
-	};
+	return new Response(
+		`
+		<?xml version="1.0" encoding="UTF-8" ?>
+		<urlset
+			xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
+			xmlns:xhtml="https://www.w3.org/1999/xhtml"
+			xmlns:mobile="https://www.google.com/schemas/sitemap-mobile/1.0"
+			xmlns:news="https://www.google.com/schemas/sitemap-news/0.9"
+			xmlns:image="https://www.google.com/schemas/sitemap-image/1.1"
+			xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"
+		>
+			<!-- <url> elements go here -->
+		</urlset>`.trim(),
+		{
+			headers: {
+				'Content-Type': 'application/xml'
+			}
+		}
+	);
 }
 ```
 

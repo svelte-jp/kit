@@ -29,7 +29,7 @@
 		"@rollup/plugin-json": "^4.1.0",
 		"@rollup/plugin-node-resolve": "^13.3.0",
 		"@svitejs/changesets-changelog-github-compact": "^0.1.1",
-		"playwright": "^1.23.4",
+		"playwright": "^1.25.0",
 		"prettier": "^2.6.2",
 		"rollup": "^2.75.7",
 		"svelte": "^3.48.0",
@@ -43,7 +43,7 @@
 		"textlint-rule-no-mix-dearu-desumasu": "^4.0.1",
 		"textlint-rule-preset-jtf-style": "^2.3.8"
 	},
-	"packageManager": "pnpm@7.9.0",
+	"packageManager": "pnpm@7.9.3",
 	"engines": {
 		"pnpm": "^7.0.0"
 	},

@@ -48,13 +48,6 @@ const config = {
 		},
 		moduleExtensions: ['.js', '.ts'],
 		outDir: '.svelte-kit',
-		package: {
-			dir: 'package',
-			emitTypes: true,
-			// excludes all .d.ts and files starting with _ as the name
-			exports: (filepath) => !/^_|\/_|\.d\.ts$/.test(filepath),
-			files: () => true
-		},
 		paths: {
 			assets: '',
 			base: ''
@@ -68,7 +61,6 @@ const config = {
 			onError: 'fail',
 			origin: 'http://sveltekit-prerender'
 		},
-		routes: (filepath) => !/(?:(?:^_|\/_)|(?:^\.|\/\.)(?!well-known))/.test(filepath),
 		serviceWorker: {
 			register: true,
 			files: (filepath) => !/\.DS_Store/.test(filepath)
@@ -78,6 +70,16 @@ const config = {
 			name: Date.now().toString(),
 			pollInterval: 0
 		}
+	},
+
+	// options passed to @sveltejs/package
+	package: {
+		source: 'value of kit.files.lib, if available, else src/lib',
+		dir: 'package',
+		emitTypes: true,
+		// excludes all .d.ts and files starting with _ as the name
+		exports: (filepath) => !/^_|\/_|\.d\.ts$/.test(filepath),
+		files: () => true
 	},
 
 	// options passed to svelte.preprocess (https://svelte.dev/docs#compile-time-svelte-preprocess)
@@ -117,6 +119,8 @@ const config = {
 ```
 
 > ビルトインの `$lib` エイリアスはパッケージングで使用されるため、`config.kit.files.lib` でコントロールされています。
+
+> You will need to run `npm run dev` to have SvelteKit automatically generate the required alias configuration in `jsconfig.json` or `tsconfig.json`.
 
 ### appDir
 
@@ -209,8 +213,9 @@ SvelteKit が `dev` と `build` のときにファイルを書き込むディレ
 
 [パッケージ作成](/docs/packaging) に関連するオプションです。
 
+- `source` - library directory
 - `dir` - 出力ディレクトリ
-- `emitTypes` - デフォルトでは、`svelte-kit package` は自動的にパッケージの型を `.d.ts` ファイル形式で生成します。型の生成は設定で変更できますが、常に型を生成することがエコシステムの品質にとってベストであると私たちは信じています。`false` に設定するときは、十分な理由があることを確認してください(例えば、代わりに手書きの型定義を提供したい場合など)
+- `emitTypes` - デフォルトでは、`svelte-package` は自動的にパッケージの型を `.d.ts` ファイル形式で生成します。型の生成は設定で変更できますが、常に型を生成することがエコシステムの品質にとってベストであると私たちは信じています。`false` に設定するときは、十分な理由があることを確認してください(例えば、代わりに手書きの型定義を提供したい場合など)
 - `exports` - `(filepath: string) => boolean` という型を持つ関数。`true` の場合、ファイルパスが `package.json` の `exports` フィールドに含まれるようになります。`package.json` のソースにある既存の値は、オリジナルの `exports` フィールドの値が優先されてマージされます
 - `files` - `(filepath: string) => boolean` という型を持つ関数。`true` の場合、ファイルは処理され、`dir` で指定された最終的な出力フォルダにコピーされます
 
@@ -227,14 +232,12 @@ import mm from 'micromatch';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	kit: {
-		package: {
-			exports: (filepath) => {
-				if (filepath.endsWith('.d.ts')) return false;
-				return mm.isMatch(filepath, ['!**/_*', '!**/internal/**']);
-			},
-			files: mm.matcher('!**/build.*')
-		}
+	package: {
+		exports: (filepath) => {
+			if (filepath.endsWith('.d.ts')) return false;
+			return mm.isMatch(filepath, ['!**/_*', '!**/internal/**']);
+		},
+		files: mm.matcher('!**/build.*')
 	}
 };
 
@@ -285,10 +288,6 @@ export default config;
     ```
 
 - `origin` — プリレンダリング時の `url.origin` の値です。レンダリングされたコンテンツに含まれている場合に有用です。
-
-### routes
-
-`(filepath: string) => boolean` という関数で、どのファイルがルート(routes)を作成し、どれが [プライベートモジュール](/docs/routing#private-modules) として扱われるか決定します。
 
 ### serviceWorker
 

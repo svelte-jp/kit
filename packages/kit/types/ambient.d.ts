@@ -12,14 +12,10 @@
  * 	interface PrivateEnv {}
  *
  * 	interface PublicEnv {}
- *
- * 	interface Session {}
- *
- * 	interface Stuff {}
  * }
  * ```
  *
- * これらのインターフェースを作成することによって、`env`、`event.locals`、`event.platform`、`session`、`stuff` を使用する際に型の安全性を確保することができます。
+ * これらのインターフェースを作成することによって、`env`、`event.locals`、`event.platform` を使用する際に型の安全性を確保することができます。
  *
  * アンビエント宣言(ambient declaration)ファイルであるため、`import` 文を使用するときには注意が必要です。`import` を
  * トップレベルに追加すると、宣言ファイル (declaration file) はアンビエント (ambient) とはみなされなくなるため、他のファイルでこれらの型付けにアクセスできなくなります。
@@ -47,7 +43,7 @@
  */
 declare namespace App {
 	/**
-	 * `event.locals` を定義する interface です。`event.locals` は [hooks](https://kit.svelte.jp/docs/hooks) (`handle`、`handleError`、`getSession`) と [エンドポイント(endpoints)](https://kit.svelte.jp/docs/routing#endpoints) からアクセスできます。
+	 * `event.locals` を定義する interface です。`event.locals` は [hooks](https://kit.svelte.jp/docs/hooks) (`handle`、`handleError`)、`load` 関数(サーバーのみ)、`+server.js` ファイルからアクセスできます。
 	 */
 	export interface Locals {}
 
@@ -57,24 +53,14 @@ declare namespace App {
 	export interface Platform {}
 
 	/**
-	 * '$env/dynamic/private' からエクスポートされる動的な環境変数を定義する interface です。
+	 * `$env/dynamic/private` からエクスポートされる動的な環境変数を定義する interface です。
 	 */
 	export interface PrivateEnv extends Record<string, string> {}
 
 	/**
-	 * '$env/dynamic/public' からエクスポートされる動的な環境変数を定義する interface です。
+	 * `$env/dynamic/public` からエクスポートされる動的な環境変数を定義する interface です。
 	 */
 	export interface PublicEnv extends Record<string, string> {}
-
-	/**
-	 * `session` を定義する interface です。`session` は、[`load`](https://kit.svelte.jp/docs/loading) 関数の引数であり、[session store](https://kit.svelte.jp/docs/modules#$app-stores) の値でもあります。
-	 */
-	export interface Session {}
-
-	/**
-	 * `stuff` を定義する interface です。`stuff` は、[`load`](https://kit.svelte.jp/docs/loading) 関数の input/output であり、[page store](https://kit.svelte.jp/docs/modules#$app-stores) の `stuff` プロパティの値でもあります。
-	 */
-	export interface Stuff {}
 }
 
 /**
@@ -165,10 +151,10 @@ declare module '$app/navigation' {
 		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
 	): Promise<void>;
 	/**
-	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` する場合や、invalidate されたリソースがページそのものだったときにページエンドポイントからデータを再フェッチする場合に再実行させます。それに続いてページが更新されたときに解決される `Promise` を返します。
+	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` する場合や、invalidate されたリソースがページそのものだったときにページエンドポイントからデータを再フェッチする場合に再実行させます。If no argument is given, all resources will be invalidated. それに続いてページが更新されたときに解決される `Promise` を返します。
 	 * @param dependency The invalidated resource
 	 */
-	export function invalidate(dependency: string | ((href: string) => boolean)): Promise<void>;
+	export function invalidate(dependency?: string | ((href: string) => boolean)): Promise<void>;
 	/**
 	 * 指定されたページをプログラム的にプリフェッチします、つまり
 	 *  1. そのページのコードが取得され読み込まれていることを確認し、
@@ -228,30 +214,21 @@ declare module '$app/paths' {
 
 /**
  * ```ts
- * import { getStores, navigating, page, session, updated } from '$app/stores';
+ * import { getStores, navigating, page, updated } from '$app/stores';
  * ```
  *
- * ストア(Store)は _コンテクスチュアル(contextual)_ で、ルート(root)コンポーネントの [context](https://svelte.jp/tutorial/context-api) に追加されます。つまり、`session` と `page` はサーバー上の各リクエストごとにユニークであり、同じサーバー上で同時に処理される複数のリクエスト間で共有されません。これにより、`session` にユーザー固有のデータを含めても安全になります。
+ * Stores on the server are _contextual_ — they are added to the [context](https://svelte.dev/tutorial/context-api) of your root component. This means that `page` is unique to each request, rather than shared between multiple requests handled by the same server simultaneously.
  *
- * そのため、ストアを使用するにはコンポーネントの初期化の際にそのストアをサブスクライブする必要があります (コンポーネント内で `$page` というような形でストアの値を参照する場合、自動的にそうなります)。
+ * Because of that, you must subscribe to the stores during component initialization (which happens automatically if you reference the store value, e.g. as `$page`, in a component) before you can use them.
+ *
+ * In the browser, we don't need to worry about this, and stores can be accessed from anywhere. Code that will only ever run on the browser can refer to (or subscribe to) any of these stores at any time.
  */
 declare module '$app/stores' {
-	import { Readable, Writable } from 'svelte/store';
+	import { Readable } from 'svelte/store';
 	import { Navigation, Page } from '@sveltejs/kit';
 
 	/**
-	 * `getContext` をラップしている便利な関数です。コンポーネントの初期化時に呼び出す必要があります。
-	 * 何らかの理由で、コンポーネントのマウント後までストアのサブスクライブを遅延させたい場合にのみ、これを使用してください。
-	 */
-	export function getStores(): {
-		navigating: typeof navigating;
-		page: typeof page;
-		session: typeof session;
-		updated: typeof updated;
-	};
-
-	/**
-	 * ページ(page) のデータを値として持つ読み取り可能なストアです。
+	 * A readable store whose value contains page data.
 	 */
 	export const page: Readable<Page>;
 	/**
@@ -261,14 +238,19 @@ declare module '$app/stores' {
 	 */
 	export const navigating: Readable<Navigation | null>;
 	/**
-	 * 書き込み可能なストアで、初期値は [`getSession`](https://kit.svelte.jp/docs/hooks#getsession) の戻り値です。
-	 * 書き込み可能ですがその変更内容をサーバー上で永続化しません。それはご自身で実装する必要があります。
-	 */
-	export const session: Writable<App.Session>;
-	/**
-	 *  読み取り可能なストアで、初期値は `false` です。もし [`version.pollInterval`](https://kit.svelte.jp/docs/configuration#version) が0以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` にします。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
+	 *  A readable store whose initial value is `false`. If [`version.pollInterval`](https://kit.svelte.dev/docs/configuration#version) is a non-zero value, SvelteKit will poll for new versions of the app and update the store value to `true` when it detects one. `updated.check()` will force an immediate check, regardless of polling.
 	 */
 	export const updated: Readable<boolean> & { check: () => boolean };
+
+	/**
+	 * A function that returns all of the contextual stores. On the server, this must be called during component initialization.
+	 * Only use this if you need to defer store subscription until after the component has mounted, for some reason.
+	 */
+	export function getStores(): {
+		navigating: typeof navigating;
+		page: typeof page;
+		updated: typeof updated;
+	};
 }
 
 /**
