@@ -74,6 +74,7 @@ const get_defaults = (prefix = '') => ({
 		},
 		endpointExtensions: undefined,
 		env: {
+			dir: process.cwd(),
 			publicPrefix: 'PUBLIC_'
 		},
 		files: {
@@ -95,10 +96,6 @@ const get_defaults = (prefix = '') => ({
 		},
 		moduleExtensions: ['.js', '.ts'],
 		outDir: join(prefix, '.svelte-kit'),
-		package: {
-			dir: 'package',
-			emitTypes: true
-		},
 		serviceWorker: {
 			register: true
 		},
@@ -120,6 +117,7 @@ const get_defaults = (prefix = '') => ({
 		},
 		protocol: undefined,
 		router: undefined,
+		routes: undefined,
 		ssr: undefined,
 		target: undefined,
 		trailingSlash: 'never',
@@ -128,15 +126,14 @@ const get_defaults = (prefix = '') => ({
 			pollInterval: 0
 		},
 		// TODO cleanup for 1.0
-		vite: undefined
+		vite: undefined,
+		package: undefined
 	}
 });
 
 test('fills in defaults', () => {
 	const validated = validate_config({});
 
-	assert.equal(validated.kit.package.exports(''), true);
-	assert.equal(validated.kit.package.files(''), true);
 	assert.equal(validated.kit.serviceWorker.files(''), true);
 
 	remove_keys(validated, ([, v]) => typeof v === 'function');
@@ -174,7 +171,6 @@ test('errors on invalid nested values', () => {
 test('does not error on invalid top-level values', () => {
 	assert.not.throws(() => {
 		validate_config({
-			// @ts-expect-error - valid option for others but not in our definition
 			onwarn: () => {}
 		});
 	});
@@ -200,8 +196,6 @@ test('fills in partial blanks', () => {
 		}
 	});
 
-	assert.equal(validated.kit.package.exports(''), true);
-	assert.equal(validated.kit.package.files(''), true);
 	assert.equal(validated.kit.serviceWorker.files(''), true);
 
 	remove_keys(validated, ([, v]) => typeof v === 'function');
@@ -251,6 +245,19 @@ test('fails if kit.appDir ends with slash', () => {
 			}
 		});
 	}, /^config\.kit\.appDir cannot start or end with '\/'. See https:\/\/kit\.svelte\.dev\/docs\/configuration$/);
+});
+
+test('fails if browser.hydrate is false and browser.router is true', () => {
+	assert.throws(() => {
+		validate_config({
+			kit: {
+				browser: {
+					hydrate: false,
+					router: true
+				}
+			}
+		});
+	}, /^config\.kit\.browser\.router cannot be true if config\.kit\.browser\.hydrate is false$/);
 });
 
 test('fails if paths.base is not root-relative', () => {

@@ -12,7 +12,7 @@ title: Web standards
 
 SvelteKit は、ネットワーク越しにデータを取得するために [`fetch`](https://developer.mozilla.org/ja/docs/Web/API/fetch) を使用します。ブラウザだけでなく、[hooks](/docs/hooks) や [エンドポイント(endpoint)](/docs/routing#endpoints) の中でも使用することができます。
 
-> [`load`](/docs/loading) 関数の中では特別なバージョンの `fetch` を使用することができ、サーバーサイドレンダリング中に、HTTP をコールすることなく、クレデンシャルを保持したまま、直接エンドポイント(endpoints)を呼び出すことができます。(`load` の外側のサーバーサイドコードでクレデンシャル付きの fetch を行う場合は、明示的に `cookie` や `authorization` ヘッダーなどを渡さなければなりません。) また、通常のサーバーサイドの `fetch` では絶対パスの URL が必要となりますが、特別なバージョンの `fetch` では相対パスのリクエストが可能です。
+> [`load`](/docs/load) 関数の中では特別なバージョンの `fetch` を使用することができ、サーバーサイドレンダリング中に、HTTP をコールすることなく、クレデンシャルを保持したまま、直接エンドポイント(endpoints)を呼び出すことができます。(`load` の外側のサーバーサイドコードでクレデンシャル付きの fetch を行う場合は、明示的に `cookie` や `authorization` ヘッダーなどを渡さなければなりません。) また、通常のサーバーサイドの `fetch` では絶対パスの URL が必要となりますが、特別なバージョンの `fetch` では相対パスのリクエストが可能です。
 
 `fetch` 自体の他に、[Fetch API](https://developer.mozilla.org/ja/docs/Web/API/Fetch_API) には以下のインターフェイスが含まれています:
 
@@ -22,7 +22,7 @@ SvelteKit は、ネットワーク越しにデータを取得するために [`f
 
 #### Response
 
-[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) のインスタンスは `await fetch(...)` から返されます。本質的には、SvelteKit アプリは `Request` を `Response` に変換するマシンです。
+[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) のインスタンスは `await fetch(...)` と `+server.js` ファイル内のハンドラーから返されます。本質的には、SvelteKit アプリは `Request` を `Response` に変換するマシンです。
 
 #### Headers
 
@@ -30,18 +30,18 @@ SvelteKit は、ネットワーク越しにデータを取得するために [`f
 
 ```js
 // @errors: 2461
-/// file: src/routes/what-is-my-user-agent.js
-/** @type {import('@sveltejs/kit').RequestHandler} */
+/// file: src/routes/what-is-my-user-agent/+server.js
+import { json } from '@sveltejs/kit';
+
+/** @type {import('./$types').RequestHandler} */
 export function GET(event) {
 	// log all headers
 	console.log(...event.request.headers);
 
-	return {
-		body: {
-			// retrieve a specific header
-			userAgent: event.request.headers.get('user-agent')
-		}
-	};
+	return json({
+		// retrieve a specific header
+		userAgent: event.request.headers.get('user-agent')
+	});
 }
 ```
 

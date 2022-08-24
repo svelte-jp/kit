@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { loadConfigFromFile, loadEnv, normalizePath } from 'vite';
-import { get_runtime_directory } from '../core/utils.js';
+import { runtime_directory } from '../core/utils.js';
+import { posixify } from '../utils/filesystem.js';
 
 /**
  * @param {import('vite').ResolvedConfig} config
@@ -104,49 +105,42 @@ export function get_aliases(config) {
 	/** @type {import('vite').Alias[]} */
 	const alias = [
 		{ find: '__GENERATED__', replacement: path.posix.join(config.outDir, 'generated') },
-		{ find: '$app', replacement: `${get_runtime_directory(config)}/app` },
+		{ find: '$app', replacement: `${runtime_directory}/app` },
 		// For now, we handle `$lib` specially here rather than make it a default value for
 		// `config.kit.alias` since it has special meaning for packaging, etc.
 		{ find: '$lib', replacement: config.files.lib }
 	];
 
 	for (let [key, value] of Object.entries(config.alias)) {
+		value = posixify(value);
 		if (value.endsWith('/*')) {
 			value = value.slice(0, -2);
 		}
 		if (key.endsWith('/*')) {
 			// Doing just `{ find: key.slice(0, -2) ,..}` would mean `import .. from "key"` would also be matched, which we don't want
 			alias.push({
-				find: new RegExp(`^${key.slice(0, -2)}\\/(.+)$`),
+				find: new RegExp(`^${escape_for_regexp(key.slice(0, -2))}\\/(.+)$`),
 				replacement: `${path.resolve(value)}/$1`
 			});
 		} else if (key + '/*' in config.alias) {
 			// key and key/* both exist -> the replacement for key needs to happen _only_ on import .. from "key"
-			alias.push({ find: new RegExp(`^${key}$`), replacement: path.resolve(value) });
+			alias.push({
+				find: new RegExp(`^${escape_for_regexp(key)}$`),
+				replacement: path.resolve(value)
+			});
 		} else {
 			alias.push({ find: key, replacement: path.resolve(value) });
 		}
 	}
 
-	if (!process.env.BUNDLED) {
-		alias.push(
-			{
-				find: '$env/static/public',
-				replacement: path.posix.join(config.outDir, 'runtime/env/static/public.js')
-			},
-			{
-				find: '$env/static/private',
-				replacement: path.posix.join(config.outDir, 'runtime/env/static/private.js')
-			}
-		);
-	}
-
-	alias.push({
-		find: '$env',
-		replacement: `${get_runtime_directory(config)}/env`
-	});
-
 	return alias;
+}
+
+/**
+ * @param {string} str
+ */
+function escape_for_regexp(str) {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, (match) => '\\' + match);
 }
 
 /**
@@ -189,13 +183,19 @@ function repeat(str, times) {
 /**
  * Create a formatted error for an illegal import.
  * @param {Array<{name: string, dynamic: boolean}>} stack
- * @param {string} out_dir The directory specified by config.kit.outDir
  */
-function format_illegal_import_chain(stack, out_dir) {
-	const app = path.join(out_dir, 'runtime/env');
+function format_illegal_import_chain(stack) {
+	const dev_virtual_prefix = '/@id/__x00__';
+	const prod_virtual_prefix = '\0';
 
 	stack = stack.map((file) => {
-		if (file.name.startsWith(app)) return { ...file, name: file.name.replace(app, '$env') };
+		if (file.name.startsWith(dev_virtual_prefix)) {
+			return { ...file, name: file.name.replace(dev_virtual_prefix, '') };
+		}
+		if (file.name.startsWith(prod_virtual_prefix)) {
+			return { ...file, name: file.name.replace(prod_virtual_prefix, '') };
+		}
+
 		return { ...file, name: path.relative(process.cwd(), file.name) };
 	});
 
@@ -213,15 +213,15 @@ function format_illegal_import_chain(stack, out_dir) {
 
 /**
  * Load environment variables from process.env and .env files
+ * @param {import('types').ValidatedKitConfig['env']} env_config
  * @param {string} mode
- * @param {string} prefix
  */
-export function get_env(mode, prefix) {
-	const entries = Object.entries(loadEnv(mode, process.cwd(), ''));
+export function get_env(env_config, mode) {
+	const entries = Object.entries(loadEnv(mode, env_config.dir, ''));
 
 	return {
-		public: Object.fromEntries(entries.filter(([k]) => k.startsWith(prefix))),
-		private: Object.fromEntries(entries.filter(([k]) => !k.startsWith(prefix)))
+		public: Object.fromEntries(entries.filter(([k]) => k.startsWith(env_config.publicPrefix))),
+		private: Object.fromEntries(entries.filter(([k]) => !k.startsWith(env_config.publicPrefix)))
 	};
 }
 
@@ -229,11 +229,17 @@ export function get_env(mode, prefix) {
  * @param {(id: string) => import('rollup').ModuleInfo | null} node_getter
  * @param {import('rollup').ModuleInfo} node
  * @param {Set<string>} illegal_imports Illegal module IDs -- be sure to call vite.normalizePath!
- * @param {string} out_dir The directory specified by config.kit.outDir
  */
-export function prevent_illegal_rollup_imports(node_getter, node, illegal_imports, out_dir) {
+export function prevent_illegal_rollup_imports(node_getter, node, illegal_imports) {
 	const chain = find_illegal_rollup_imports(node_getter, node, false, illegal_imports);
-	if (chain) throw new Error(format_illegal_import_chain(chain, out_dir));
+	if (chain) throw new Error(format_illegal_import_chain(chain));
+}
+
+const query_pattern = /\?.*$/s;
+
+/** @param {string} path */
+function remove_query_from_path(path) {
+	return path.replace(query_pattern, '');
 }
 
 /**
@@ -251,7 +257,7 @@ const find_illegal_rollup_imports = (
 	illegal_imports,
 	seen = new Set()
 ) => {
-	const name = normalizePath(node.id);
+	const name = remove_query_from_path(normalizePath(node.id));
 	if (seen.has(name)) return null;
 	seen.add(name);
 
@@ -304,11 +310,10 @@ const get_module_types = (config_module_types) => {
  * @param {import('vite').ModuleNode} node
  * @param {Set<string>} illegal_imports Illegal module IDs -- be sure to call vite.normalizePath!
  * @param {Iterable<string>} module_types File extensions to analyze in addition to the defaults: `.ts`, `.js`, etc.
- * @param {string} out_dir The directory specified by config.kit.outDir
  */
-export function prevent_illegal_vite_imports(node, illegal_imports, module_types, out_dir) {
+export function prevent_illegal_vite_imports(node, illegal_imports, module_types) {
 	const chain = find_illegal_vite_imports(node, illegal_imports, get_module_types(module_types));
-	if (chain) throw new Error(format_illegal_import_chain(chain, out_dir));
+	if (chain) throw new Error(format_illegal_import_chain(chain));
 }
 
 /**
@@ -320,9 +325,11 @@ export function prevent_illegal_vite_imports(node, illegal_imports, module_types
  */
 function find_illegal_vite_imports(node, illegal_imports, module_types, seen = new Set()) {
 	if (!node.id) return null; // TODO when does this happen?
-	const name = normalizePath(node.id);
+	const name = remove_query_from_path(normalizePath(node.id));
 
-	if (seen.has(name) || !module_types.has(path.extname(name))) return null;
+	if (path.extname(name) !== '' && (seen.has(name) || !module_types.has(path.extname(name)))) {
+		return null;
+	}
 	seen.add(name);
 
 	if (name && illegal_imports.has(name)) {

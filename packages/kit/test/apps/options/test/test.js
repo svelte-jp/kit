@@ -134,6 +134,13 @@ test.describe('Custom extensions', () => {
 	});
 });
 
+test.describe('env', () => {
+	test('resolves downwards', async ({ page }) => {
+		await page.goto('/path-base/env');
+		expect(await page.textContent('p')).toBe('and thank you');
+	});
+});
+
 test.describe('trailingSlash', () => {
 	test('adds trailing slash', async ({ baseURL, page, clicknav }) => {
 		await page.goto('/path-base/slash');
@@ -159,7 +166,10 @@ test.describe('trailingSlash', () => {
 	test('can fetch data from page-endpoint', async ({ request, baseURL }) => {
 		const r = await request.get('/path-base/page-endpoint/__data.json');
 		expect(r.url()).toBe(`${baseURL}/path-base/page-endpoint/__data.json`);
-		expect(await r.json()).toEqual({ data: 'hi' });
+		expect(await r.json()).toEqual({
+			type: 'data',
+			nodes: [null, { type: 'data', data: { message: 'hi' }, uses: {} }]
+		});
 	});
 
 	test('accounts for trailingSlash when prefetching', async ({

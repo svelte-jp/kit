@@ -48,7 +48,7 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 #### src/server.js
 
-`adapter-node` を使用する場合は、[custom server](https://github.com/sveltejs/kit/tree/master/packages/adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜならSvelteKit アプリはサーバーレス環境でも実行だからです。セッションロジックを実装する場合は、[hooks module](/docs/hooks) をお使いいただけます。
+`adapter-node` を使用する場合は、[custom server](https://github.com/sveltejs/kit/tree/master/packages/adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜならSvelteKit アプリはサーバーレス環境でも実行だからです。
 
 #### src/service-worker.js
 
@@ -87,7 +87,7 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 
 以前と同様に、ページやレイアウトではレンダリングが行われる前にデータをロードできる関数をエクスポートすることができます。
 
-この関数は `preload` から [`load`](/docs/loading) にリネームされ、その API が変更されました。2 つの引数 — `page` と `session` — の代わりに、両方を 1 つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
+この関数は `preload` から [`load`](/docs/load) にリネームされ、その API が変更されました。2 つの引数 — `page` と `session` — の代わりに、両方を 1 つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
 
 `this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。プロパティ(props)を直接返す代わりに、`load` は `props` やその他様々なものを _含む_ オブジェクトを返すようになりました。
 

@@ -17,6 +17,8 @@ my-project/
 │ └ hooks.js
 ├ static/
 │ └ [your static assets]
+├ tests/
+│ └ [your tests]
 ├ package.json
 ├ svelte.config.js
 ├ tsconfig.json
@@ -31,13 +33,13 @@ my-project/
 
 `src` ディレクトリには、プロジェクトの中身が格納します。
 
-- `lib` にはあなたのライブラリのコードを格納します。格納されたコードは [`$lib`](/docs/modules#$lib) エイリアスを使用してインポートしたり、[`svelte-kit package`](/docs/packaging) を使用して配布用にパッケージングすることができます。
-- `params` には [param matchers](/docs/routing#advanced-routing-matching) を格納します
-- `routes` にはアプリケーションの [ページ(pages)](/docs/routing#pages) と [エンドポイント(endpoints)](/docs/routing#endpoints) を格納します
+- `lib` にはあなたのライブラリのコードを格納します。格納されたコードは [`$lib`](/docs/modules#$lib) エイリアスを使用してインポートしたり、[`svelte-package`](/docs/packaging) を使用して配布用にパッケージングすることができます。
+- `params` にはアプリに必要な [param matchers](/docs/advanced-routing#matching) を格納します
+- `routes` にはアプリケーションの [ルート(routes)](/docs/routing) を格納します
 - `app.html` はページのテンプレートで、以下のプレースホルダーを含む HTML document です:
   - `%sveltekit.head%` — アプリに必要な `<link>` 要素や `<script>` 要素、`<svelte:head>` コンテンツ 
   - `%sveltekit.body%` — レンダリングされたページのためのマークアップ
-  - `%sveltekit.assets%` — ページから [`paths.assets`](/docs/configuration#paths) に対する相対パス
+  - `%sveltekit.assets%` — [`paths.assets`](/docs/configuration#paths) が指定されている場合は [`paths.assets`](/docs/configuration#paths)、指定されていない場合は [`paths.base`](/docs/configuration#base) への相対パス
   - `%sveltekit.nonce%` — マニュアルで含めるリンクやスクリプトの [CSP](/docs/configuration#csp) ノンス (使用する場合)
 - `hooks.js` (optional) アプリケーションの [hooks](/docs/hooks)
 - `service-worker.js` (optional) [service worker](/docs/service-workers)
@@ -47,6 +49,10 @@ TypeScript を使用している場合、`.js` の代わりに `.ts` ファイ�
 #### static
 
 `robots.txt` や `favicon.png` など、そのままサーブされる静的なアセットをここに含めます。
+
+#### tests
+
+`npm create svelte@latest` の実行時、プロジェクトにテストを追加することを選択した場合、このディレクトリに格納されます。
 
 #### package.json
 

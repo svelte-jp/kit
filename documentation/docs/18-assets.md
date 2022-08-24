@@ -21,8 +21,10 @@ CSS 関数の `url()` でインクルードされたアセットの場合は、[
 ```js
 // svelte.config.js
 export default {
-	experimental: {
-		useVitePreprocess: true
+	vitePlugin: {
+		experimental: {
+			useVitePreprocess: true
+		}
 	}
 };
 ```

@@ -9,7 +9,7 @@ title: Types
 `RequestHandler` と `Load` の型はどちらも `Params` 引数を受け取りますが、その `params` オブジェクトに型を付けることができます。例えば、このエンドポイントは `foo`、`bar`、`baz` が渡されることを想定しています:
 
 ```js
-/// file: src/routes/[foo]/[bar]/[baz].js
+/// file: src/routes/[foo]/[bar]/[baz]/+page.server.js
 // @errors: 2355
 /** @type {import('@sveltejs/kit').RequestHandler<{
  *   foo: string;
@@ -26,49 +26,64 @@ export async function GET({ params }) {
 この問題を解決するため、SvelteKit は各エンドポイント、各ページごとに `.d.ts` ファイルを生成します:
 
 ```ts
-/// file: .svelte-kit/types/src/routes/[foo]/[bar]/__types/[baz].d.ts
+/// file: .svelte-kit/types/src/routes/[foo]/[bar]/[baz]/$types.d.ts
 /// link: false
-import type { RequestHandler as GenericRequestHandler, Load as GenericLoad } from '@sveltejs/kit';
+import type * as Kit from '@sveltejs/kit';
 
-export type RequestHandler<Body = any> = GenericRequestHandler<
-	{ foo: string; bar: string; baz: string },
-	Body
->;
+interface RouteParams {
+	foo: string;
+	bar: string;
+	baz: string;
+}
 
-export type Load<
-	InputProps extends Record<string, any> = Record<string, any>,
-	OutputProps extends Record<string, any> = InputProps
-> = GenericLoad<{ foo: string; bar: string; baz: string }, InputProps, OutputProps>;
+export type PageServerLoad = Kit.ServerLoad<RouteParams>;
+export type PageLoad = Kit.Load<RouteParams>;
 ```
 
 TypeScript の設定にある [`rootDirs`](https://www.typescriptlang.org/tsconfig#rootDirs) オプションのおかげで、エンドポイントとページではこれらのファイルが同じディレクトリにあるかのようにインポートすることができます:
 
 ```js
-/// file: src/routes/[foo]/[bar]/[baz].js
-// @filename: __types/[baz].d.ts
-import type { RequestHandler as GenericRequestHandler, Load as GenericLoad } from '@sveltejs/kit';
+/// file: src/routes/[foo]/[bar]/[baz]/+page.server.js
+// @filename: $types.d.ts
+import type * as Kit from '@sveltejs/kit';
 
-export type RequestHandler<Body = any> = GenericRequestHandler<
-	{ foo: string, bar: string, baz: string },
-	Body
->;
+interface RouteParams {
+	foo: string;
+	bar: string;
+	baz: string;
+}
+
+export type PageServerLoad = Kit.ServerLoad<RouteParams>;
 
 // @filename: index.js
 // @errors: 2355
 // ---cut---
-/** @type {import('./__types/[baz]').RequestHandler} */
+/** @type {import('./$types').PageServerLoad} */
 export async function GET({ params }) {
 	// ...
 }
 ```
 
-```svelte
-<script context="module">
-	/** @type {import('./__types/[baz]').Load} */
-	export async function load({ params, fetch, session, stuff }) {
-		// ...
-	}
-</script>
+```js
+/// file: src/routes/[foo]/[bar]/[baz]/+page.js
+// @filename: $types.d.ts
+import type * as Kit from '@sveltejs/kit';
+
+interface RouteParams {
+	foo: string;
+	bar: string;
+	baz: string;
+}
+
+export type PageLoad = Kit.Load<RouteParams>;
+
+// @filename: index.js
+// @errors: 2355
+// ---cut---
+/** @type {import('./$types').PageLoad} */
+export async function load({ params, fetch }) {
+	// ...
+}
 ```
 
 > これを動作させるためには、`tsconfig.json` または `jsconfig.json` が生成された `.svelte-kit/tsconfig.json` を継承する必要があります (`.svelte-kit` の場所は [`outDir`](/docs/configuration#outdir) です):
@@ -118,8 +133,8 @@ export async function GET({ params }) {
 		"preserveValueImports": true,
 
 		// This ensures both `vite build`
-		// and `svelte-kit package` work correctly
-		"lib": ["esnext", "DOM"],
+		// and `svelte-package` work correctly
+		"lib": ["esnext", "DOM", "DOM.Iterable"],
 		"moduleResolution": "node",
 		"module": "esnext",
 		"target": "esnext"

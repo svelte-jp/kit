@@ -12,14 +12,10 @@
  * 	interface PrivateEnv {}
  *
  * 	interface PublicEnv {}
- *
- * 	interface Session {}
- *
- * 	interface Stuff {}
  * }
  * ```
  *
- * これらのインターフェースを作成することによって、`env`、`event.locals`、`event.platform`、`session`、`stuff` を使用する際に型の安全性を確保することができます。
+ * これらのインターフェースを作成することによって、`env`、`event.locals`、`event.platform` を使用する際に型の安全性を確保することができます。
  *
  * アンビエント宣言(ambient declaration)ファイルであるため、`import` 文を使用するときには注意が必要です。`import` を
  * トップレベルに追加すると、宣言ファイル (declaration file) はアンビエント (ambient) とはみなされなくなるため、他のファイルでこれらの型付けにアクセスできなくなります。
@@ -47,7 +43,7 @@
  */
 declare namespace App {
 	/**
-	 * `event.locals` を定義する interface です。`event.locals` は [hooks](https://kit.svelte.jp/docs/hooks) (`handle`、`handleError`、`getSession`) と [エンドポイント(endpoints)](https://kit.svelte.jp/docs/routing#endpoints) からアクセスできます。
+	 * `event.locals` を定義する interface です。`event.locals` は [hooks](https://kit.svelte.jp/docs/hooks) (`handle`、`handleError`)、`load` 関数(サーバーのみ)、`+server.js` ファイルからアクセスできます。
 	 */
 	export interface Locals {}
 
@@ -57,24 +53,14 @@ declare namespace App {
 	export interface Platform {}
 
 	/**
-	 * '$env/dynamic/private' からエクスポートされる動的な環境変数を定義する interface です。
+	 * `$env/dynamic/private` からエクスポートされる動的な環境変数を定義する interface です。
 	 */
 	export interface PrivateEnv extends Record<string, string> {}
 
 	/**
-	 * '$env/dynamic/public' からエクスポートされる動的な環境変数を定義する interface です。
+	 * `$env/dynamic/public` からエクスポートされる動的な環境変数を定義する interface です。
 	 */
 	export interface PublicEnv extends Record<string, string> {}
-
-	/**
-	 * `session` を定義する interface です。`session` は、[`load`](https://kit.svelte.jp/docs/loading) 関数の引数であり、[session store](https://kit.svelte.jp/docs/modules#$app-stores) の値でもあります。
-	 */
-	export interface Session {}
-
-	/**
-	 * `stuff` を定義する interface です。`stuff` は、[`load`](https://kit.svelte.jp/docs/loading) 関数の input/output であり、[page store](https://kit.svelte.jp/docs/modules#$app-stores) の `stuff` プロパティの値でもあります。
-	 */
-	export interface Stuff {}
 }
 
 /**
@@ -165,10 +151,10 @@ declare module '$app/navigation' {
 		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
 	): Promise<void>;
 	/**
-	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` する場合や、invalidate されたリソースがページそのものだったときにページエンドポイントからデータを再フェッチする場合に再実行させます。それに続いてページが更新されたときに解決される `Promise` を返します。
+	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` している場合は `load` 関数を再実行し、無効化(invalidate) されたリソースがページそのものの場合はページエンドポイントからデータを再取得させます。引数なしの場合、全てのリソースが 無効化・再実行(invalidate) されます。ページが更新されたときに解決される `Promise` を返します。
 	 * @param dependency The invalidated resource
 	 */
-	export function invalidate(dependency: string | ((href: string) => boolean)): Promise<void>;
+	export function invalidate(dependency?: string | ((href: string) => boolean)): Promise<void>;
 	/**
 	 * 指定されたページをプログラム的にプリフェッチします、つまり
 	 *  1. そのページのコードが取得され読み込まれていることを確認し、
@@ -220,7 +206,6 @@ declare module '$app/paths' {
 	/**
 	 * [`config.kit.paths.assets`](https://kit.svelte.jp/docs/configuration#paths) にマッチする絶対パス(absolute path)です。
 	 *
-	 * > If a value for `config.kit.paths.assets` is specified, it will be replaced with `'/_svelte_kit_assets'` during `vite dev` or `vite preview`, since the assets don't yet live at their eventual URL.
 	 * > `config.kit.paths.assets` に値が設定された場合でも、`vite dev` や `vite preview` のときは `'/_svelte_kit_assets'` で置き換えられます。なぜなら、アセットはまだその最終的な URL に存在しないからです。
 	 */
 	export const assets: `https://${string}` | `http://${string}`;
@@ -228,47 +213,43 @@ declare module '$app/paths' {
 
 /**
  * ```ts
- * import { getStores, navigating, page, session, updated } from '$app/stores';
+ * import { getStores, navigating, page, updated } from '$app/stores';
  * ```
  *
- * ストア(Store)は _コンテクスチュアル(contextual)_ で、ルート(root)コンポーネントの [context](https://svelte.jp/tutorial/context-api) に追加されます。つまり、`session` と `page` はサーバー上の各リクエストごとにユニークであり、同じサーバー上で同時に処理される複数のリクエスト間で共有されません。これにより、`session` にユーザー固有のデータを含めても安全になります。
+ * サーバー上のストア(Store)は _コンテクスチュアル(contextual)_ で、ルート(root)コンポーネントの [context](https://svelte.jp/tutorial/context-api) に追加されます。つまり、`page` はリクエストごとにユニークであり、同じサーバーで同時に処理される複数のリクエスト感で共有されません。
  *
- * そのため、ストアを使用するにはコンポーネントの初期化の際にそのストアをサブスクライブする必要があります (コンポーネント内で `$page` というような形でストアの値を参照する場合、自動的にそうなります)。
+ * そのため、ストアを使用するためには、コンポーネントの初期化の際にそのストアをサブスクライブする必要があります (コンポーネント内で `$page` という形でストアの値を参照する場合、自動的にそうなります)。
+ *
+ * ブラウザでは、これを心配する必要はありません。ストアはどこからでもアクセスできます。ブラウザ上でのみ実行されるコードは、いつでもこれらのストアを参照 (またはサブスクライブ) することができます。
  */
 declare module '$app/stores' {
-	import { Readable, Writable } from 'svelte/store';
+	import { Readable } from 'svelte/store';
 	import { Navigation, Page } from '@sveltejs/kit';
 
 	/**
-	 * `getContext` をラップしている便利な関数です。コンポーネントの初期化時に呼び出す必要があります。
-	 * 何らかの理由で、コンポーネントのマウント後までストアのサブスクライブを遅延させたい場合にのみ、これを使用してください。
-	 */
-	export function getStores(): {
-		navigating: typeof navigating;
-		page: typeof page;
-		session: typeof session;
-		updated: typeof updated;
-	};
-
-	/**
-	 * ページ(page) のデータを値として持つ読み取り可能なストアです。
+	 * ページのデータの値を含む読み取り可能なストア(readable store)です。
 	 */
 	export const page: Readable<Page>;
 	/**
-	 * 読み取り可能なストアです。
+	 * 読み取り可能なストア(readable store)です。
 	 * ナビゲーションを開始すると、その値は `{ from: URL, to: URL }` となります。
 	 * ナビゲーションが終了すると、その値は `null` に戻ります。
 	 */
 	export const navigating: Readable<Navigation | null>;
 	/**
-	 * 書き込み可能なストアで、初期値は [`getSession`](https://kit.svelte.jp/docs/hooks#getsession) の戻り値です。
-	 * 書き込み可能ですがその変更内容をサーバー上で永続化しません。それはご自身で実装する必要があります。
-	 */
-	export const session: Writable<App.Session>;
-	/**
-	 *  読み取り可能なストアで、初期値は `false` です。もし [`version.pollInterval`](https://kit.svelte.jp/docs/configuration#version) が0以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` にします。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
+	 * 読み取り可能なストア(readable store)で、初期値は `false` です。[`version.pollInterval`](https://kit.svelte.jp/docs/configuration#version) が 0 以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` に更新します。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
 	 */
 	export const updated: Readable<boolean> & { check: () => boolean };
+
+	/**
+	 * 全てのコンテクスチュアルなストア(contextual stores)を返す関数です。サーバー上では、コンポーネントの初期化時に呼び出す必要があります。
+	 * 何らかの理由で、コンポーネントのマウント後までストアのサブスクライブを遅延させたい場合にのみ、これを使用してください。
+	 */
+	export function getStores(): {
+		navigating: typeof navigating;
+		page: typeof page;
+		updated: typeof updated;
+	};
 }
 
 /**

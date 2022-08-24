@@ -92,7 +92,7 @@ function strip_origin(str) {
 
 	modules.push({
 		name: '@sveltejs/kit',
-		comment: '下記の型を `@sveltejs/kit` からインポートすることができます:',
+		comment: '以下を `@sveltejs/kit` からインポートすることができます:',
 		...get_types(code, node.statements)
 	});
 }

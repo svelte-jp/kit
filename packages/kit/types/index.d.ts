@@ -6,9 +6,7 @@ import './ambient.js';
 import { CompileOptions } from 'svelte/types/compiler/interfaces';
 import {
 	AdapterEntry,
-	BodyValidator,
 	CspDirectives,
-	JSONValue,
 	Logger,
 	MaybePromise,
 	Prerendered,
@@ -19,11 +17,28 @@ import {
 	TrailingSlash
 } from './private.js';
 import { SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
+import { HttpError, Redirect } from '../src/index/private.js';
 
 export interface Adapter {
 	name: string;
 	adapt(builder: Builder): MaybePromise<void>;
 }
+
+export type AwaitedProperties<input extends Record<string, any> | void> = input extends void
+	? undefined // needs to be undefined, because void will break intellisense
+	: input extends Record<string, any>
+	? {
+			[key in keyof input]: Awaited<input[key]>;
+	  }
+	: {} extends input // handles the any case
+	? input
+	: unknown;
+
+export type AwaitedErrors<T extends (...args: any) => any> = Awaited<ReturnType<T>> extends {
+	errors?: any;
+}
+	? Awaited<ReturnType<T>>['errors']
+	: undefined;
 
 export interface Builder {
 	log: Logger;
@@ -91,7 +106,15 @@ export interface Config {
 	compilerOptions?: CompileOptions;
 	extensions?: string[];
 	kit?: KitConfig;
+	package?: {
+		source?: string;
+		dir?: string;
+		emitTypes?: boolean;
+		exports?: (filepath: string) => boolean;
+		files?: (filepath: string) => boolean;
+	};
 	preprocess?: any;
+	[key: string]: any;
 }
 
 export interface KitConfig {
@@ -108,7 +131,8 @@ export interface KitConfig {
 		reportOnly?: CspDirectives;
 	};
 	env?: {
-		publicPrefix: string;
+		dir?: string;
+		publicPrefix?: string;
 	};
 	moduleExtensions?: string[];
 	files?: {
@@ -126,12 +150,6 @@ export interface KitConfig {
 		allowed?: string[];
 	};
 	outDir?: string;
-	package?: {
-		dir?: string;
-		emitTypes?: boolean;
-		exports?(filepath: string): boolean;
-		files?(filepath: string): boolean;
-	};
 	paths?: {
 		assets?: string;
 		base?: string;
@@ -145,7 +163,6 @@ export interface KitConfig {
 		onError?: PrerenderOnErrorValue;
 		origin?: string;
 	};
-	routes?: (filepath: string) => boolean;
 	serviceWorker?: {
 		register?: boolean;
 		files?: (filepath: string) => boolean;
@@ -161,10 +178,6 @@ export interface ExternalFetch {
 	(req: Request): Promise<Response>;
 }
 
-export interface GetSession {
-	(event: RequestEvent): MaybePromise<App.Session>;
-}
-
 export interface Handle {
 	(input: {
 		event: RequestEvent;
@@ -177,46 +190,31 @@ export interface HandleError {
 }
 
 /**
- * ページやレイアウト の `<script context="module">` からエクスポートされる `(event: LoadEvent) => LoadOutput` `load` 関数です。
- *
- * Params のジェネリックな引数を手作業で指定する代わりに、[generated types](/docs/types#generated-types) を使用することができます。
+ * `PageLoad` と `LayoutLoad` のジェネリックなフォームです。`Load` を直接使用するのではなく、`./$types` ([generated types](https://kit.svelte.jp/docs/types#generated-types) 参照) から
+ * インポートしてください。
  */
 export interface Load<
-	Params extends Record<string, string> = Record<string, string>,
-	InputProps extends Record<string, any> = Record<string, any>,
-	OutputProps extends Record<string, any> = InputProps
+	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
+	InputData extends Record<string, any> | null = Record<string, any> | null,
+	ParentData extends Record<string, any> = Record<string, any>,
+	OutputData extends Record<string, any> | void = Record<string, any> | void
 > {
-	(event: LoadEvent<Params, InputProps>): MaybePromise<LoadOutput<OutputProps> | void>;
+	(event: LoadEvent<Params, InputData, ParentData>): MaybePromise<OutputData>;
 }
 
 export interface LoadEvent<
-	Params extends Record<string, string> = Record<string, string>,
-	Props extends Record<string, any> = Record<string, any>
+	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
+	Data extends Record<string, any> | null = Record<string, any> | null,
+	ParentData extends Record<string, any> = Record<string, any>
 > {
 	fetch(info: RequestInfo, init?: RequestInit): Promise<Response>;
 	params: Params;
-	props: Props;
+	data: Data;
 	routeId: string | null;
-	session: App.Session;
-	stuff: Partial<App.Stuff>;
+	setHeaders: (headers: ResponseHeaders) => void;
 	url: URL;
-	status: number | null;
-	error: Error | null;
-}
-
-export interface LoadOutput<Props extends Record<string, any> = Record<string, any>> {
-	status?: number;
-	error?: string | Error;
-	redirect?: string;
-	props?: Props;
-	stuff?: Partial<App.Stuff>;
-	cache?: LoadOutputCache;
-	dependencies?: string[];
-}
-
-export interface LoadOutputCache {
-	maxage: number;
-	private?: boolean;
+	parent: () => Promise<ParentData>;
+	depends: (...deps: string[]) => void;
 }
 
 export interface Navigation {
@@ -228,51 +226,41 @@ export interface Page<Params extends Record<string, string> = Record<string, str
 	url: URL;
 	params: Params;
 	routeId: string | null;
-	stuff: App.Stuff;
 	status: number;
-	error: Error | null;
+	error: HttpError | Error | null;
+	data: Record<string, any>;
 }
 
 export interface ParamMatcher {
 	(param: string): boolean;
 }
 
-export interface RequestEvent<Params extends Record<string, string> = Record<string, string>> {
+export interface RequestEvent<
+	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>
+> {
 	clientAddress: string;
 	locals: App.Locals;
 	params: Params;
 	platform: Readonly<App.Platform>;
 	request: Request;
 	routeId: string | null;
+	setHeaders: (headers: ResponseHeaders) => void;
 	url: URL;
 }
 
 /**
- * `(event: RequestEvent) => RequestHandlerOutput` という関数で、エンドポイントからエクスポートされます。HTTP の動詞 (`GET`, `PUT`, `PATCH`, etc) に対応しており、それぞれの HTTP メソッドのリクエストを処理します。
+ * `(event: RequestEvent) => Response` という関数で、`+server.js` ファイルからエクスポートされます。HTTP verb (`GET`, `PUT`, `PATCH`, etc) に対応しており、それぞれの HTTP メソッドのリクエストを処理します。
  *
- * It receives `Params` as the first generic argument, which you can skip by using [generated types](/docs/types#generated-types) instead.
- *
- * The next generic argument `Output` is used to validate the returned `body` from your functions by passing it through `BodyValidator`, which will make sure the variable in the `body` matches what with you assign here. It defaults to `ResponseBody`, which will error when `body` receives a [custom object type](https://www.typescriptlang.org/docs/handbook/2/objects.html).
+ * 1つめのジェネリックな引数(first generic argument)として `Params` を受け取りますが、代わりに [generated types](/docs/types#generated-types) を使うことでこれをスキップすることができます。
  */
-export interface RequestHandler<
-	Params extends Record<string, string> = Record<string, string>,
-	Output = ResponseBody
-> {
-	(event: RequestEvent<Params>): MaybePromise<RequestHandlerOutput<Output>>;
-}
-
-export interface RequestHandlerOutput<Output = ResponseBody> {
-	status?: number;
-	headers?: Headers | Partial<ResponseHeaders>;
-	body?: Output extends ResponseBody ? Output : BodyValidator<Output>;
+export interface RequestHandler<Params extends Record<string, string> = Record<string, string>> {
+	(event: RequestEvent<Params>): MaybePromise<Response>;
 }
 
 export interface ResolveOptions {
 	ssr?: boolean;
 	transformPageChunk?: (input: { html: string; done: boolean }) => MaybePromise<string | undefined>;
 }
-
-export type ResponseBody = JSONValue | Uint8Array | ReadableStream | Error;
 
 export class Server {
 	constructor(manifest: SSRManifest);
@@ -301,3 +289,55 @@ export interface SSRManifest {
 		matchers: () => Promise<Record<string, ParamMatcher>>;
 	};
 }
+
+/**
+ * `PageServerLoad` と `LayoutServerLoad` のジェネリックなフォームです。`ServerLoad` を直接使用するのではなく、`./$types` ([generated types](https://kit.svelte.jp/docs/types#generated-types) を参照) から
+ * インポートしてください。
+ */
+export interface ServerLoad<
+	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
+	ParentData extends Record<string, any> = Record<string, any>,
+	OutputData extends Record<string, any> | void = Record<string, any> | void
+> {
+	(event: ServerLoadEvent<Params, ParentData>): MaybePromise<OutputData>;
+}
+
+export interface ServerLoadEvent<
+	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
+	ParentData extends Record<string, any> = Record<string, any>
+> extends RequestEvent<Params> {
+	parent: () => Promise<ParentData>;
+}
+
+export interface Action<
+	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>
+> {
+	(event: RequestEvent<Params>): MaybePromise<
+		| { status?: number; errors: Record<string, any>; location?: never }
+		| { status?: never; errors?: never; location: string }
+		| void
+	>;
+}
+
+// TODO figure out how to just re-export from '../src/index/index.js' without
+// breaking the site
+
+/**
+ * HTTP ステータスコードとオプションのメッセージで `HttpError` オブジェクトを作成します。
+ * リクエストの処理中にこのオブジェクトがスローされると、SvelteKit は
+ * `handleError` を呼ばずにエラーレスポンス(error response)を返します。
+ * @param {number} status
+ * @param {string | undefined} [message]
+ */
+export function error(status: number, message?: string | undefined): HttpError;
+
+/**
+ * `Redirect` オブジェクトを作成します。リクエストの処理中にスローされると、SvelteKit は
+ * リダイレクトレスポンス(redirect response)を返します。
+ */
+export function redirect(status: number, location: string): Redirect;
+
+/**
+ * 与えられた data から JSON `Response` オブジェクトを生成します。
+ */
+export function json(data: any, init?: ResponseInit): Response;

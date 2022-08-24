@@ -1,6 +1,7 @@
-## A load function that only exports props
+## A load function that only returns props
 
 ```js before
+/** @type {import('./$types').Load} */
 export function load() {
 	return {
 		props: {
@@ -11,7 +12,32 @@ export function load() {
 ```
 
 ```js after
+/** @type {import('./$types').PageLoad} */
 export function load() {
+	return {
+		a: 1
+	};
+}
+```
+
+## A TypeScript load function that only returns props
+
+```ts before
+import type { Load } from './$types';
+
+export const load: Load = () => {
+	return {
+		props: {
+			a: 1
+		}
+	};
+}
+```
+
+```ts after
+import type { PageLoad } from './$types';
+
+export const load: PageLoad = () => {
 	return {
 		a: 1
 	};
@@ -131,6 +157,29 @@ export function load({ session }) {
 }
 ```
 
+## Error constructor with no arguments
+
+```js before
+export function load({ session }) {
+	if (!session.user?.admin) {
+		return {
+			status: 403,
+			error: new Error()
+		};
+	}
+}
+```
+
+```js after
+import { error } from '@sveltejs/kit';
+
+export function load({ session }) {
+	if (!session.user?.admin) {
+		throw error(403);
+	}
+}
+```
+
 ## Error status with no error
 
 ```js before
@@ -165,6 +214,7 @@ export function load() {
 ## Arrow function load
 
 ```js before
+/** @type {import('./$types').Load} */
 export const load = () => ({
 	props: {
 		a: 1
@@ -173,6 +223,7 @@ export const load = () => ({
 ```
 
 ```js after
+/** @type {import('./$types').PageLoad} */
 export const load = () => ({
 	a: 1
 });
@@ -292,5 +343,38 @@ export function load() {
 ```js after
 export function load() {
 	return;
+}
+```
+
+## A load function that returns props and status 200
+
+```js before
+export function load() {
+	return {
+		status: 200,
+		props: {}
+	};
+}
+```
+
+```js after
+export function load() {
+	return {};
+}
+```
+
+## A load function that returns status 200
+
+```js before
+export function load() {
+	return {
+		status: 200 
+	};
+}
+```
+
+```js after
+export function load() {
+	return ;
 }
 ```

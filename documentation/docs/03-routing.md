@@ -2,421 +2,351 @@
 title: ルーティング
 ---
 
-Sveltekitの核心は、 _ファイルシステムベースのルーター_ です。これは、アプリケーション構造がコードベースの構造(具体的には `src/routes` のコンテンツ)によって定義されることを意味します。
+SvelteKit の中心は、 _ファイルシステムベースのルーター_ です。アプリのルート(routes) — 例えばユーザーがアクセスできる URL パス — は、コードベースのディレクトリによって定義されます:
 
-> [プロジェクトのコンフィグ](/docs/configuration) を編集することで、これを異なるディレクトリに変更できます。
+- `src/routes` は最上位のルート(the root route)です 
+- `src/routes/about` は `/about` ルート(route)を作成します
+- `src/routes/blog/[slug]` は _パラメータ_ `slug` を使ったルート(route)を作成します。パラメータは、ユーザーからのリクエストが `/blog/hello-world` のようなページに行われた場合に、動的にデータを読み込むために使用することができます
 
-ルートには、**ページ(pages)** と **エンドポイント(endpoints)** の2つのタイプがあります。
+> [プロジェクトの設定](/docs/configuration) を編集することで、`src/routes` から別のディレクトリに変更することができます。
 
-ページは通常、ユーザーに表示するHTML(及びページに必要なCSSやJavaScript)を生成します。デフォルトでは、ページはクライアントとサーバーの両方でレンダリングされますが、この動作は設定によって変更可能です。
+ルート(route)のディレクトリはそれぞれ1つ以上の _ルートファイル(route files)_ を格納します。ルートファイル(route files)には `+` という接頭辞が付いているので、それで見分けることができます。
 
-エンドポイントは、サーバー上でのみ実行されます(もしくはサイトをビルドするときに[プリレンダリング](/docs/page-options#prerender)している場合)。これは、プライベートな認証情報を必要とするデータベースやAPIにアクセスする場合や、本番環境ネットワーク上のマシンにあるデータを返す場合などに使用されます。ページはエンドポイントにデータをリクエストすることができます。エンドポイントはデフォルトではJSONを返しますが、他のフォーマットでもデータを返すことができます。
+### +page
 
-### ページ(Pages)
+#### +page.svelte
 
-ページ(Pages)は `.svelte` ファイル (または[`config.extensions`](/docs/configuration) に記載されている拡張子のファイル) に書かれているSvelteコンポーネントです。デフォルトでは、ユーザーが初めてアプリにアクセスすると、サーバーレンダリングバージョンのページと、そのページを'ハイドレート(hydrate)'しクライアントサイドルーターを初期化するJavaScriptが提供されます。それ以降、他のページへのナビゲーションは全てクライアント側で処理され、ページの共通部分を再レンダリングする必要がなくなるため、高速でアプリのような操作感になります。
+`+page.svelte` コンポーネントはアプリのページを定義します。デフォルトでは、ページは最初のリクエストではサーバー ([SSR](/docs/appendix#ssr)) でレンダリングされ、その後のナビゲーションではブラウザ ([CSR](/docs/appendix#csr-and-spa)) でレンダリングされます。
 
-ファイル名でルート(**route**)が決まります。例えば、`src/routes/index.svelte` はサイトのルート(**root**)になります。
-
-```html
-/// file: src/routes/index.svelte
-<svelte:head>
-	<title>Welcome</title>
-</svelte:head>
-
+```svelte
+/// file: src/routes/+page.svelte
 <h1>Hello and welcome to my site!</h1>
-
 <a href="/about">About my site</a>
 ```
 
-`src/routes/about.svelte` と `src/routes/about/index.svelte` はどちらも `/about` ルート(route)になります。
-
-```html
-/// file: src/routes/about.svelte
-<svelte:head>
-	<title>About</title>
-</svelte:head>
-
+```svelte
+/// file: src/routes/about/+page.svelte
 <h1>About this site</h1>
 <p>TODO...</p>
-
 <a href="/">Home</a>
 ```
 
-> SvelteKit ではルート(routes)間のナビゲートに、フレームワーク固有の `<Link>` コンポーネントではなく、`<a>` 要素を使用します。
-
-動的なパラメータは `[カッコ]` を使用してエンコードされます。例えば、ブログ記事の場合は `src/routes/blog/[slug].svelte` のように定義することがあるでしょう。これらのパラメータは、[`load`](/docs/loading#input-params) 関数の中からアクセスできますし、[`page`](/docs/modules#$app-stores) ストアを使用してアクセスすることもできます。
-
-ルート(route)は動的なパラメータを複数持つことができます。例えば、`src/routes/[category]/[item].svelte` や `src/routes/[category]-[item].svelte` といった具合です。(パラメータは 'non-greedy' です; `x-y-z` のような曖昧なケースの場合、`category` は `x`、`item` は `y-z` になります。)
-
-### エンドポイント(Endpoints)
-
-エンドポイント(Endpoints)は `.js` (または `.ts`) ファイルに記述されるモジュールで、HTTP メソッドに対応する [Request handler](/docs/types#sveltejs-kit-requesthandler) 関数をエクスポートします。Request handler によって、サーバー上でのみ利用可能なデータ(例えば、データベースやファイルシステムにあるデータ) を読み書きできるようになります。
-
-その役割は、レスポンスを表す `{ status, headers, body }` オブジェクトを返すことです。
-
-```js
-/// file: src/routes/random.js
-/** @type {import('@sveltejs/kit').RequestHandler} */
-export async function GET() {
-	return {
-		status: 200,
-		headers: {
-			'access-control-allow-origin': '*'
-		},
-		body: {
-			number: Math.random()
-		}
-	};
-}
-```
-
-- `status` は [HTTP ステータスコード](https://httpstatusdogs.com) です:
-  - `2xx` — 成功レスポンス (デフォルトは `200`)
-  - `3xx` — リダイレクション (`location` ヘッダーも一緒に返す必要があります)
-  - `4xx` — クライアントエラー
-  - `5xx` — サーバーエラー
-- `headers` は上記のようなプレーンなオブジェクトにすることも、[`Headers`](https://developer.mozilla.org/ja/docs/Web/API/Headers) クラスのインスタンスにすることも可能です。
-- `body` はプレーンなオブジェクトにすることも可能ですし、もし何かエラーがあった場合は [`Error`](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Error) にすることも可能です。JSON にシリアライズされます
-
-`GET` や `HEAD` のレスポンスには `body` が含まれていなければなりませんが、その制約を超えて、3つのプロパティは全てオプションです。
-
-#### ページエンドポイント(Page endpoints)
-
-エンドポイントが(拡張子を除いて)ページと同じファイル名の場合、そのページはエンドポイントから、クライアントサイドナビゲーションの場合は `fetch` を通じて、SSR の場合は直接関数をコールすることで、プロパティ(props)を取得します。(もしページが [名前付きレイアウト(named layouts)](/docs/layouts#named-layouts) や [matchers](/docs/routing#advanced-routing-matching) の構文をそのファイル名に使用している場合、対応するページエンドポイントのファイル名にもそれらが含まれていなければなりません。)
-
-例えば、`src/routes/items/[id].svelte` というページがある場合…
-
 ```svelte
-/// file: src/routes/items/[id].svelte
+/// file: src/routes/blog/[slug]/+page.svelte
 <script>
-	// エンドポイントからデータが入力される
-	export let item;
+	/** @type {import('./$types').PageData} */
+	export let data;
 </script>
 
-<h1>{item.title}</h1>
+<h1>{data.title}</h1>
+<div>{@html data.content}</div>
 ```
 
-…ペアとなる `src/routes/items/[id].js` エンドポイント (`$lib` のインポートについては [後ほど](/docs/modules#$lib) 説明するのでご心配なく) は:
+> SvelteKit では、ルート(routes)間のナビゲーションに、フレームワーク固有の `<Link>` コンポーネントではなく、`<a>` 要素を使用します。
+
+#### +page.js
+
+ページではたびたび、レンダリングの前になんらかのデータを読み込む必要があります。これに対応するため、`load` 関数をエクスポートする `+page.js` (または、TypeScript をお使いの場合は `+page.ts`) モジュールを追加しています:
 
 ```js
-/// file: src/routes/items/[id].js
-// @filename: ambient.d.ts
-type Item = {};
+/// file: src/routes/blog/[slug]/+page.js
+import { error } from '@sveltejs/kit';
 
-declare module '$lib/database' {
-	export const get: (id: string) => Promise<Item>;
-}
-
-// @filename: __types/[id].d.ts
-import type { RequestHandler as GenericRequestHandler } from '@sveltejs/kit';
-export type RequestHandler<Body = any> = GenericRequestHandler<{ id: string }, Body>;
-
-// @filename: index.js
-// ---cut---
-import db from '$lib/database';
-
-/** @type {import('./__types/[id]').RequestHandler} */
-export async function GET({ params }) {
-	// `params.id` comes from [id].js
-	const item = await db.get(params.id);
-
-	if (item) {
+/** @type {import('./$types').PageLoad} */
+export function load({ params }) {
+	if (params.slug === 'hello-world') {
 		return {
-			status: 200,
-			headers: {},
-			body: { item }
+			title: 'Hello world!',
+			content: 'Welcome to our blog. Lorem ipsum dolor sit amet...'
 		};
 	}
 
-	return {
-		status: 404
-	};
+	throw error(404, 'Not found');
 }
 ```
 
-> 上記の `GET` 関数の型は `./__types/[id].d.ts` から取得できますが、このファイルは SvelteKit が ([`rootDirs`](https://www.typescriptlang.org/tsconfig#rootDirs) オプションを使用し、[`outDir`](/docs/configuration#outdir) の中に) 生成し、 `params` にアクセスするときの型安全性を提供します。詳細は [generated types](/docs/types#generated-types) セクションをご参照ください。
+この関数は `+page.svelte` とともに実行されます。サーバーサイドレンダリング中はサーバーで実行され、クライアントサイドナビゲーション中はブラウザで実行されます。API の詳細は [`load`](/docs/load) をご参照ください。
 
-ページの代わりに生データ(raw data)を取得するには、リクエストに `accept: application/json` ヘッダーを含めるか、もしくは、お手軽に `/__data.json` を URL に付与します。例えば、`/items/[id]/__data.json` です。
+`page.js` では、`load` だけでなくページの動作(behaviour)を設定するための値をエクスポートすることができます:
 
-#### スタンドアロンエンドポイント(Standalone endpoints)
+- `export const prerender = true` または `false` により、[`config.kit.prerender.default`](/docs/configuration#prerender) を上書き(override)します。
+- `export const hydrate = true` または `false` により、 [`config.kit.browser.hydrate`](/docs/configuration#browser) を上書き(override)します。
+- `export const router = true` または `false` により、 [`config.kit.browser.router`](/docs/configuration#browser) 上書き(override)します。
 
-大抵の場合、エンドポイント(endpoints)はペアになっているページ(page)にデータを提供するために存在します。しかし、ページとは独立して存在することもできます。スタンドアロンエンドポイント(Standalone endpoints)は返す `body` の型についてより柔軟性があり、オブジェクトや [`Error`](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Error) のインスタンスに加えて、[`Uint8Array`](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array) や [`ReadableStream`](https://developer.mozilla.org/ja/docs/Web/API/ReadableStream) を返すことができます。
+#### +page.server.js
 
-スタンドアロンエンドポイントには必要に応じてファイル拡張子を付けることができますし、付けなければ直接アクセスすることができます:
-
-| ファイル名                      | エンドポイント |
-| ----------------------------- | ---------- |
-| src/routes/data/index.json.js | /data.json |
-| src/routes/data.json.js       | /data.json |
-| src/routes/data/index.js      | /data      |
-| src/routes/data.js            | /data      |
-
-#### POST, PUT, PATCH, DELETE
-
-エンドポイント(Endpoints)は、HTTP メソッドに対応する関数をエクスポートすることで、`GET` だけでなく任意の HTTP メソッドを扱うことができます:
+`load` 関数をサーバー上でのみ実行できるようにしたい場合 — 例えば、データベースからデータを取得したり、API キーのようなプライベートな[環境変数](/docs/modules#$env-static-private)にアクセスしたりする必要がある場合 — `+page.js` を `+page.server.js` にリネームし、`PageLoad` 型を `PageServerLoad` に変更します。
 
 ```js
-// @noErrors
-export function POST(event) {...}
-export function PUT(event) {...}
-export function PATCH(event) {...}
-export function DELETE(event) {...}
-```
+/// file: src/routes/blog/[slug]/+page.server.js
 
-These functions can, like `GET`, return a `body` that will be passed to the page as props. Whereas 4xx/5xx responses from `GET` will result in an error page rendering, similar responses to non-GET requests do not, allowing you to do things like render form validation errors:
-`GET` などの関数はプロパティ(props)としてページに渡される `body` を返すことができます。`GET` からの 4xx/5xx レスポンスはエラーページのレンダリングとなりますが、GET 以外のリクエストに対する同様のレスポンスではそうならないため、フォームバリデーションエラーのレンダリングのようなことを行うことができます:
-
-```js
-/// file: src/routes/items.js
-// @filename: ambient.d.ts
-type Item = {
-	id: string;
-};
-type ValidationError = {};
-
-declare module '$lib/database' {
-	export const list: () => Promise<Item[]>;
-	export const create: (request: Request) => Promise<[Record<string, ValidationError>, Item]>;
-}
-
-// @filename: __types/items.d.ts
-import type { RequestHandler as GenericRequestHandler } from '@sveltejs/kit';
-export type RequestHandler<Body = any> = GenericRequestHandler<{}, Body>;
-
-// @filename: index.js
-// ---cut---
-import * as db from '$lib/database';
-
-/** @type {import('./__types/items').RequestHandler} */
-export async function GET() {
-	const items = await db.list();
-
-	return {
-		body: { items }
-	};
-}
-
-/** @type {import('./__types/items').RequestHandler} */
-export async function POST({ request }) {
-	const [errors, item] = await db.create(request);
-
-	if (errors) {
-		// バリデーションエラーを返します
-		return {
-			status: 400,
-			body: { errors }
-		};
-	}
-
-	// 新たに作成された item にリダイレクトします
-	return {
-		status: 303,
-		headers: {
-			location: `/items/${item.id}`
-		}
-	};
-}
-```
-
-```svelte
-/// file: src/routes/items.svelte
-<script>
-	// ページは通常、`GET` からのプロパティ(props)にアクセスします…
-	export let items;
-
-	// …それに加えて、POST リクエストに応答してページがレンダリングされるときに
-	// `POST` からプロパティを取得します
-	// 例えば、以下のフォームをサブミットしたあとです
-	export let errors;
-</script>
-
-{#each items as item}
-	<Preview item={item}/>
-{/each}
-
-<form method="post">
-	<input name="title">
-
-	{#if errors?.title}
-		<p class="error">{errors.title}</p>
-	{/if}
-
-	<button type="submit">Create item</button>
-</form>
-```
-
-#### Body parsing
-
-`request` オブジェクトは標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) クラスのインスタンスです。そのため、簡単に request の body にアクセスできます:
-
-```js
 // @filename: ambient.d.ts
 declare global {
-	const create: (data: any) => any;
+	const getPostFromDatabase: (slug: string) => {
+		title: string;
+		content: string;
+	}
 }
 
 export {};
 
 // @filename: index.js
 // ---cut---
-/** @type {import('@sveltejs/kit').RequestHandler} */
-export async function POST({ request }) {
-	const data = await request.formData(); // or .json(), or .text(), etc
+import { error } from '@sveltejs/kit';
 
-	await create(data);
-	return { status: 201 };
+/** @type {import('./$types').PageServerLoad} */
+export async function load({ params }) {
+	const post = await getPostFromDatabase(params.slug);
+
+	if (post) {
+		return post;
+	}
+
+	throw error(404, 'Not found');
 }
 ```
 
-#### Setting cookies
+クライアントサイドナビゲーション中は、SvelteKit は `fetch` を使用してデータを読み込みます。つまり、その戻り値は JSON としてシリアライズ可能でなければなりません。
 
-エンドポイント(Endpoints) は `set-cookie` を含む `headers` オブジェクトを返すことで、Cookie を設定することができます。複数の Cookie を同時に設定するには、配列を返します:
+#### Actions
+
+`+page.server.js` は、`POST`、`PATCH`、`PUT`、`DELETE` といった HTTP メソッドに対応した _actions_ を宣言することもできます。これらのいずれかのメソッドを使用してページにリクエストを行うと、ページをレンダリングする前に対応するアクションを呼び出します。
+
+バリデーションエラー (validation errors) が発生した場合、action は `{ status?, errors }` オブジェクトを返すことができます (`status` はデフォルトでは `400` です)。また、ユーザーを他のページにリダイレクトするのに、オプションで `{ location }` オブジェクトを返すことができます:
 
 ```js
+/// file: src/routes/login/+page.server.js
+
 // @filename: ambient.d.ts
-const cookie1: string;
-const cookie2: string;
+declare global {
+	const createSessionCookie: (userid: string) => string;
+	const hash: (content: string) => string;
+	const db: {
+		findUser: (name: string) => Promise<{
+			id: string;
+			username: string;
+			password: string;
+		}>
+	}
+}
+
+export {};
 
 // @filename: index.js
 // ---cut---
-/** @type {import('@sveltejs/kit').RequestHandler} */
-export function GET() {
+import { error } from '@sveltejs/kit';
+
+/** @type {import('./$types').Action} */
+export async function POST({ request, setHeaders, url }) {
+	const values = await request.formData();
+
+	const username = /** @type {string} */ (values.get('username'));
+	const password = /** @type {string} */ (values.get('password'));
+
+	const user = await db.findUser(username);
+
+	if (!user) {
+		return {
+			status: 403,
+			errors: {
+				username: 'No user with this username'
+			}
+		};
+	}
+
+	if (user.password !== hash(password)) {
+		return {
+			status: 403,
+			errors: {
+				password: 'Incorrect password'
+			}
+		};
+	}
+
+	setHeaders({
+		'set-cookie': createSessionCookie(user.id)
+	});
+
 	return {
-		headers: {
-			'set-cookie': [cookie1, cookie2]
-		}
+		location: url.searchParams.get('redirectTo') ?? '/'
 	};
 }
 ```
 
-#### HTTP method overrides
+バリデーションエラー(validation `errors`) が返される場合は、`+page.svelte` の中で `export let errors` として使用できます。
 
-HTML `<form>` 要素は、ネイティブでは `GET` と `POST` メソッドのみをサポートしています。例えば `PUT` や `DELETE` などのその他のメソッドを許可するには、それを [configuration](/docs/configuration#methodoverride) で指定し、`_method=VERB` パラメータ (パラメータ名は設定で変更できます) を form の `action` に追加してください:
+> actions の API は近い将来変更される可能性があります: https://github.com/sveltejs/kit/discussions/5875
 
-```js
-/// file: svelte.config.js
-/** @type {import('@sveltejs/kit').Config} */
-const config = {
-	kit: {
-		methodOverride: {
-			allowed: ['PUT', 'PATCH', 'DELETE']
-		}
-	}
-};
+### +error
 
-export default config;
+`load` 中にエラーが発生した場合、SvelteKit はデフォルトのエラーページをレンダリングします。`+error.svelte` を追加することで、ルート(route) ごとにエラーページをカスタマイズすることができます:
+
+```svelte
+/// file: src/routes/blog/[slug]/+error.svelte
+<script>
+	import { page } from '$app/stores';
+</script>
+
+<h1>{$page.status}: {$page.error.message}</h1>
+```
+
+SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラー境界 (error boundary) を探します — もし上記のファイルが存在しない場合は、デフォルトのエラーページをレンダリングする前に `src/routes/blog/+error.svelte` を探しに行き、その次に `src/routes/+error.svelte` を探します。
+
+### +layout
+
+これまで、ページを完全に独立したコンポーネントとして扱ってきました — ナビゲーションを行うと、既存の `+page.svelte` コンポーネントが破棄され、新しいページコンポーネントで置き換えられます。
+
+しかし多くのアプリでは、トップレベルのナビゲーションやフッターのように _全ての_ ページで表示されるべき要素があります。全ての `+page.svelte` にそれらを繰り返し配置する代わりに、_レイアウト(layouts)_ に配置することができます。
+
+#### +layout.svelte
+
+全てのページに適用するレイアウトを作成するには、`src/routes/+layout.svelte` というファイルを作成します。デフォルトのレイアウト (あなたが作成していない場合に SvelteKit が使用するもの) は以下のようなものです…
+
+```html
+<slot></slot>
+```
+
+…しかし、お望みのマークアップ(markup)、スタイル(styles)、動作(behaviour)を追加することができます。唯一の要求事項は、コンポーネントにページコンテンツのための `<slot>` を含めることです。例えば、nav bar を追加してみましょう:
+
+```html
+/// file: src/routes/+layout.svelte
+<nav>
+	<a href="/">Home</a>
+	<a href="/about">About</a>
+	<a href="/settings">Settings</a>
+</nav>
+
+<slot></slot>
+```
+
+If we create pages for `/`, `/about` and `/settings`...
+`/`、`/about`、`/settings` のためのページを作成する場合…
+
+```html
+/// file: src/routes/+page.svelte
+<h1>Home</h1>
 ```
 
 ```html
-<form method="post" action="/todos/{id}?_method=PUT">
-	<!-- form elements -->
-</form>
+/// file: src/routes/about/+page.svelte
+<h1>About</h1>
 ```
 
-> ネイティブの `<form>` の挙動を利用することで、JavaScript が失敗したり無効になっている場合でもアプリが動作し続けられます。
-
-### プライベートモジュール
-
-名前が `_` や `.` で始まるファイルやディレクトリ([`.well-known`](https://en.wikipedia.org/wiki/Well-known_URI) は除く) はデフォルトでプライベートで、ルート(routes)を作成しません(ルートを作成するファイルからインポートすることは可能です)。どのモジュールをパブリックまたはプライベートとみなすかについては [`ルート(routes)`](/docs/configuration#routes) 設定で設定することができます。
-
-### 高度なルーティング
-
-#### Restパラメータ
-
-ルート(route) セグメントの数がわからない場合は、rest 構文を使用することができます。例えば GitHub のファイルビューアのようなものを実装する場合には…
-
-```bash
-/[org]/[repo]/tree/[branch]/[...file]
+```html
+/// file: src/routes/settings/+page.svelte
+<h1>Settings</h1>
 ```
 
-…この場合、`/sveltejs/kit/tree/master/documentation/docs/01-routing.md` をリクエストすると、以下のパラメータをページで使うことができます。
+… nav は常に表示され、3つのページのための a 要素をそれぞれクリックしても `<h1>` が置き換わるだけです。
+
+レイアウトは _ネスト_ させることができます。例えば、単一の `/settings` ページだけでなく、`/settings/profile` や `/settings/notifications` のような共有のサブメニューを持つネストしたページがあるとします (実例としては、[github.com/settings](https://github.com/settings) をご参照ください)。
+
+`/settings` 配下のページにのみ適用されるレイアウトを作成することができます (トップレベルの nav を持つ最上位のレイアウト(root layout)を継承しています):
+
+```svelte
+/// file: src/routes/settings/+layout.svelte
+<script>
+	/** @type {import('./$types').LayoutData} */
+	export let data;
+</script>
+
+<h1>Settings</h1>
+
+<div class="submenu">
+	{#each data.sections as section}
+		<a href="/settings/{section.slug}">{section.title}</a>
+	{/each}
+</div>
+
+<slot></slot>
+```
+
+#### +layout.js
+
+`+page.svelte` が `+page.js` からデータを読み込むように、`+layout.svelte` コンポーネントは `+layout.js` の [`load`](/docs/load) 関数からデータを取得することができます。
 
 ```js
-// @noErrors
-{
-	org: 'sveltejs',
-	repo: 'kit',
-	branch: 'master',
-	file: 'documentation/docs/01-routing.md'
-}
-```
-
-> `src/routes/a/[...rest]/z.svelte` は `/a/z` (つまり、パラメータがない場合) にマッチしますし、`/a/b/z` や `/a/b/c/z` などにもマッチします。rest パラメータの値が有効であることを、例えば [matcher](#advanced-routing-matching) などを使用して、確実にチェックしてください。
-
-#### Matching
-
-`src/routes/archive/[page]` のようなルート(route)は `/archive/3` にマッチしますが、`/archive/potato` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"3"` や `"potato"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](/docs/configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
-
-```js
-/// file: src/params/integer.js
-/** @type {import('@sveltejs/kit').ParamMatcher} */
-export function match(param) {
-	return /^\d+$/.test(param);
-}
-```
-
-…そしてルート(routes)を拡張します:
-
-```diff
--src/routes/archive/[page]
-+src/routes/archive/[page=integer]
-```
-
-もしパス名がマッチしない場合、SvelteKit は (後述のソート順の指定に従って) 他のルートでマッチするか試行し、どれにもマッチしない場合は最終的に 404 を返します。
-
-> Matcher は サーバーとブラウザの両方で動作します。
-
-#### ソート
-
-あるパスに対し、マッチするルート(routes)は複数でも構いません。例えば、これらのルート(routes)はどれも `/foo-abc` にマッチします:
-
-```bash
-src/routes/[...catchall].svelte
-src/routes/[a].js
-src/routes/[b].svelte
-src/routes/foo-[c].svelte
-src/routes/foo-abc.svelte
-```
-
-SvelteKit は、どのルート(route)に対してリクエストされているのかを判断しなければなりません。そのため、以下のルールに従ってこれらをソートします…
-
-- より詳細・明確(specific)なルート(routes)ほど、より優先度が高い (例えば、動的なパラメーターが1つあるルートより、パラメーターのないルートのほうがより詳細・明確(specific)である、など)
-- スタンドアロンエンドポイント(Standalone endpoints)は、同じ詳細度(specificity)のページよりも優先度が高い
-- [matchers](#advanced-routing-matching) 付きのパラメーター (`[name=type]`) は matchers なしのパラメーター (`[name]`) よりも優先度が高い
-- Rest パラメーターは最も優先度が低い
-- 優先度が同じ場合はアルファベット順で解決される
-
-…この順序で並べると、`/foo-abc` の場合は `src/routes/foo-abc.svelte` を呼び出し、`/foo-def` の場合は `src/routes/foo-[c].svelte` を呼び出します:
-
-```bash
-src/routes/foo-abc.svelte
-src/routes/foo-[c].svelte
-src/routes/[a].js
-src/routes/[b].svelte
-src/routes/[...catchall].svelte
-```
-
-#### Encoding
-
-ファイル名は URI デコードされるので、例えば `%40[username].svelte` は `@` で始まる文字にマッチします:
-
-```js
-// @filename: ambient.d.ts
-declare global {
-	const assert: {
-		equal: (a: any, b: any) => boolean;
+/// file: src/routes/settings/+layout.js
+/** @type {import('./$types').LayoutLoad} */
+export function load() {
+	return {
+		sections: [
+			{ slug: 'profile', title: 'Profile' },
+			{ slug: 'notifications', title: 'Notifications' }
+		]
 	};
 }
-
-export {};
-
-// @filename: index.js
-// ---cut---
-assert.equal(
-	decodeURIComponent('%40[username].svelte'),
-	'@[username].svelte'
-);
 ```
 
-`%` 文字を表すには `%25` を使用してください。そうしないと、不正確な結果となります。
+`+page.js` とは異なり、`+layout.js` は `prerender`、`hydrate`、`router` をエクスポートできません。これらはページレベルのオプションだからです。
+
+レイアウトの `load` 関数から返されるデータは全ての子ページで利用することができます:
+
+```svelte
+/// file: src/routes/settings/profile/+page.svelte
+<script>
+	/** @type {import('./$types').PageData} */
+	export let data;
+
+	console.log(data.sections); // [{ slug: 'profile', title: 'Profile' }, ...]
+</script>
+```
+
+> しばしば、ページ間をナビゲーションしているときにレイアウトデータが変更されないことがあります。SvelteKit は必要に応じてインテリジェントに [`load`](/docs/load) 関数を再実行します。
+
+#### +layout.server.js
+
+サーバー上でレイアウトの `load` 関数を実行するためには、それを `+layout.server.js` に移動し、`LayoutLoad` 型を `LayoutServerLoad` に変更します。
+
+### +server
+
+ページと同様に、`+server.js` ファイル (よく 'API route' または 'endpoint' とも呼ばれる) でルート(routes) を定義でき、これによってレスポンスを完全にコントロールすることができます。`+server.js` ファイル (または `+server.ts`) は `GET`、`POST`、`PATCH`、`PUT`、`DELETE` などの HTTP verbs に対応する関数をエクスポートします。これは `RequestEvent` を引数に取り、[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) オブジェクトを返します。
+
+例えば、`GET` ハンドラーを使用した `/api/random-number` ルート(route)を作成できます:
+
+```js
+/// file: src/routes/api/random-number/+server.js
+import { error } from '@sveltejs/kit';
+
+/** @type {import('./$types').RequestHandler} */
+export function GET({ url }) {
+	const min = Number(url.searchParams.get('min') ?? '0');
+	const max = Number(url.searchParams.get('max') ?? '1');
+
+	const d = max - min;
+
+	if (isNaN(d) || d < 0) {
+		throw error(400, 'min and max must be numbers, and min must be less than max');
+	}
+
+	const random = min + Math.random() * d;
+
+	return new Response(String(random));
+}
+```
+
+`Response` の第一引数には [`ReadableStream`](https://developer.mozilla.org/ja/docs/Web/API/ReadableStream) を指定することができ、大量のデータをストリームしたり、server-sent events を作成したりすることができます (AWS Lambda のような、レスポンスをバッファするプラットフォームにデプロイする場合は除きます)。
+
+You can use the `error`, `redirect` and `json` methods from `@sveltejs/kit` for convenience (but you don't have to). Note that `throw error(..)` only returns a plain text error response.
+
+### $types
+
+これまでの例を通してずっと、`$types.d.ts` ファイルからインポートしてきました。これは、TypeScript (または JavaScript を JSDoc の型アノテーションと) 使用している場合に最上位のファイル(root files)を扱う際に型の安全性をもたらすために SvelteKit が隠しディレクトリに作成するファイルです。
+
+例えば、`export let data` に `PageData` (または `LayoutData` の場合は `+layout.svelte` ファイル) にアノテーションを付けると、`data` の型は `load` の戻り値であると TypeScript に伝えることができます:
+
+```svelte
+/// file: src/routes/blog/[slug]/+page.svelte
+<script>
+	/** @type {import('./$types').PageData} */
+	export let data;
+</script>
+```
+
+`load` 関数に `PageLoad`、`PageServerLoad`、`LayoutLoad`、`LayoutServerLoad` (それぞれ `+page.js`、`+page.server.js`、`+layout.js`、`+layout.server.js`) というアノテーションを付けると、`params` と戻り値が正しく型付けされることが保証されるでしょう。
+
+### その他のファイル
+
+ルート(route)ディレクトリ内のその他のファイルは SvelteKit から無視されます。つまり、コンポーネントやユーティリティモジュールを、それらを必要とするルート(routes)に配置することができます。
+
+コンポーネントやモジュールが複数のルート(routes)から必要な場合、[`$lib`](/docs/modules#$lib) にそれらを配置すると良いでしょう。

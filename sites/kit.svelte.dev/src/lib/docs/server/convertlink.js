@@ -4,20 +4,22 @@ const docs_introduction = new Map([
 	['エディタのセットアップ', 'Editor setup']
 ]);
 
-const docs_routing = new Map([
-	['プライベートモジュール', 'Private modules'],
-	['高度なルーティング', 'Advanced routing'],
-	['Restパラメータ', 'Rest parameters'],
-	['ソート', 'Sorting']
-]);
-
 const docs_project_structure = new Map([
 	['プロジェクトファイル', 'Project files'],
-	['その他のファイル', 'Other files'],
+	['その他のファイル', 'Other files']
 ]);
 
-const docs_layouts = new Map([
-	['エラーページ', 'Error pages']
+const docs_routing = new Map([
+	['その他のファイル', 'Other files']
+]);
+
+const docs_advanced_routing = new Map([
+	['Restパラメータ', 'Rest parameters']
+]);
+
+const docs_load = new Map([
+	['Inputプロパティ', 'Input properties'],
+	['Inputメソッド', 'Input methods'],
 ]);
 
 const docs_adapters = new Map([
@@ -42,6 +44,10 @@ const docs_seo = new Map([
 const docs_assets = new Map([
 	['ハッシュ化', 'Hashing'],
 	['最適化', 'Optimization']
+]);
+
+const docs_accessibility = new Map([
+	['参考文献', 'Further reading']
 ]);
 
 const docs_migrating = new Map([
@@ -92,8 +98,10 @@ export function convert_link(label, file, heading) {
 				return docs_project_structure.get(heading) || heading;
 			case '03-routing.md':
 				return docs_routing.get(heading) || heading;
-			case '04-layouts.md':
-				return docs_layouts.get(heading) || heading;
+			case '04-advanced-routing.md':
+				return docs_advanced_routing.get(heading) || heading;
+			case '05-load.md':
+				return docs_load.get(heading) || heading;
 			case '11-adapters.md':
 				return docs_adapters.get(heading) || heading;
 			case '12-page-options.md':
@@ -104,6 +112,8 @@ export function convert_link(label, file, heading) {
 				return docs_seo.get(heading) || heading;
 			case '18-assets.md':
 				return docs_assets.get(heading) || heading;
+			case '19-accessibility.md':
+				return docs_accessibility.get(heading) || heading;
 			case '80-migrating.md':
 				return docs_migrating.get(heading) || heading;
 			case '90-additional-resources.md':
