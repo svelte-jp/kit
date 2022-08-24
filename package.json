@@ -43,7 +43,7 @@
 		"textlint-rule-no-mix-dearu-desumasu": "^4.0.1",
 		"textlint-rule-preset-jtf-style": "^2.3.8"
 	},
-	"packageManager": "pnpm@7.9.3",
+	"packageManager": "pnpm@7.9.4",
 	"engines": {
 		"pnpm": "^7.0.0"
 	},

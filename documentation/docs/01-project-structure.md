@@ -33,7 +33,7 @@ my-project/
 
 `src` ディレクトリには、プロジェクトの中身が格納します。
 
-- `lib` にはあなたのライブラリのコードを格納します。格納されたコードは [`$lib`](/docs/modules#$lib) エイリアスを使用してインポートしたり、[`svelte-kit package`](/docs/packaging) を使用して配布用にパッケージングすることができます。
+- `lib` にはあなたのライブラリのコードを格納します。格納されたコードは [`$lib`](/docs/modules#$lib) エイリアスを使用してインポートしたり、[`svelte-package`](/docs/packaging) を使用して配布用にパッケージングすることができます。
 - `params` にはアプリに必要な [param matchers](/docs/advanced-routing#matching) を格納します
 - `routes` にはアプリケーションの [ルート(routes)](/docs/routing) を格納します
 - `app.html` はページのテンプレートで、以下のプレースホルダーを含む HTML document です:

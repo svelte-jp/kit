@@ -100,7 +100,7 @@ export function load({ routeId }) {
 
 #### depends
 
-この関数は指定した URL に対する _依存(dependency)_ を宣言します。これにより、`load` の再実行をさせる [`invalidate()`](/docs/modules#$app-navigation-invalidate) を後で使用できるようになります。
+This function declares that the `load` function has a _dependency_ on one or more URLs, which can subsequently be used with [`invalidate()`](/docs/modules#$app-navigation-invalidate) to cause `load` to rerun.
 
 `fetch` が `depends` を呼び出すので、これが必要になることはほとんどありません。これが必要になるのは、`fetch` をバイパスするカスタムの API クライアントを使用している場合のみです。
 
@@ -351,6 +351,8 @@ export function load({ locals }) {
 SvelteKit は、ナビゲーション中に `load` 関数の不必要な再実行を避けるために、各 `load` 関数の依存関係(dependencies)を追跡します。例えば、あるページから別のページにナビゲーションするとき、最上位の `+layout.js` の `load` 関数が参照する `url` や `params` のメンバーが直前のナビゲーションから変わっていなければ、再実行する必要はありません。
 
 [`invalidate(url)`](/docs/modules#$app-navigation-invalidate) を使用すると、実行済みのリソース(the invalidated resource)に依存する `load` 関数を再実行することができます (暗黙的には [`fetch`](#fetch) を介して、または明示的に [`depends`](#depends) を介して)。引数なしで `invalidate()` を呼び出すことで、 _全ての_ `load` 関数 を再実行(invalidate)することもできます。
+
+If a `load` function is triggered to rerun, the page will not remount — instead, it will update with the new `data`.
 
 ### 状態の共有(Shared state)
 

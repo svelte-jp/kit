@@ -133,7 +133,7 @@ export async function load({ params, fetch }) {
 		"preserveValueImports": true,
 
 		// This ensures both `vite build`
-		// and `svelte-kit package` work correctly
+		// and `svelte-package` work correctly
 		"lib": ["esnext", "DOM", "DOM.Iterable"],
 		"moduleResolution": "node",
 		"module": "esnext",

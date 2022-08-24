@@ -327,6 +327,8 @@ export function GET({ url }) {
 
 `Response` の第一引数には [`ReadableStream`](https://developer.mozilla.org/ja/docs/Web/API/ReadableStream) を指定することができ、大量のデータをストリームしたり、server-sent events を作成したりすることができます (AWS Lambda のような、レスポンスをバッファするプラットフォームにデプロイする場合は除きます)。
 
+You can use the `error`, `redirect` and `json` methods from `@sveltejs/kit` for convenience (but you don't have to). Note that `throw error(..)` only returns a plain text error response.
+
 ### $types
 
 これまでの例を通してずっと、`$types.d.ts` ファイルからインポートしてきました。これは、TypeScript (または JavaScript を JSDoc の型アノテーションと) 使用している場合に最上位のファイル(root files)を扱う際に型の安全性をもたらすために SvelteKit が隠しディレクトリに作成するファイルです。
