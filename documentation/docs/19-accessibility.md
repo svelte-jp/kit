@@ -2,19 +2,19 @@
 title: Accessibility
 ---
 
-SvelteKit strives to provide an accessible platform for your app by default. Svelte's [compile-time accessibility checks](https://svelte.dev/docs#accessibility-warnings) will also apply to any SvelteKit application you build.
+SvelteKit は、アプリにアクセシブルなプラットフォームをデフォルトで提供するよう努めています。Svelte の [コンパイル時のアクセシビリティチェック(compile-time accessibility checks)](https://svelte.jp/docs#accessibility-warnings) は、あなたがビルドする SvelteKit アプリケーションにも適用されます。
 
-Here's how SvelteKit's built-in accessibility features work and what you need to do to help these features to work as well as possible. Keep in mind that while SvelteKit provides an accessible foundation, you are still responsible for making sure your application code is accessible. If you're new to accessibility, see the ["further reading"](/docs/accessibility#further-reading) section of this guide for additional resources.
+ここでは、SvelteKit の組み込みのアクセシビリティ(accessibility)機能がどのように動作するか、そしてこれらの機能が可能な限りうまく動作するようにするために必要なことについて説明します。SvelteKit はアクセシブルな基盤を提供しますが、アプリケーションのコードをアクセシブルにするのはあなたの責任であることを覚えておいてください。もし、アクセシビリティ(accessibility)についてよく知らないのであれば、このガイドの ["参考文献"](/docs/accessibility#further-reading) セクションで、その他のリソースを参照してください。
 
-We recognize that accessibility can be hard to get right. If you want to suggest improvements to how SvelteKit handles accessibility, please [open a GitHub issue](https://github.com/sveltejs/kit/issues).
+私たちは、アクセシビリティ(accessibility)を正しく行うのは難しいことだと認識しています。SvelteKit のアクセシビリティ対応について改善を提案したい方は、[GitHub issue を作成](https://github.com/sveltejs/kit/issues) してください。
 
 ### Route announcements
 
-In traditional server-rendered applications, every navigation (e.g. clicking on an `<a>` tag) triggers a full page reload. When this happens, screen readers and other assistive technology will read out the new page's title so that users understand that the page has changed.
+旧来のサーバーレンダリングアプリケーションでは、全てのナビゲーション (例えば、`<a>` タグをクリックするなど) で、ページのフルリロードを引き起こします。これが起こると、スクリーンリーダーやその他の支援技術が新しいページのタイトルを読み上げ、それによってユーザーはページが変更されたことを理解します。
 
-Since navigation between pages in SvelteKit happens without reloading the page (known as [client-side routing](/docs/appendix#routing)), SvelteKit injects a [live region](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions) onto the page that will read out the new page name after each navigation. This determines the page name to announce by inspecting the `<title>` element.
+SvelteKit では、ページ間のナビゲーションではページのリロードが発生しないため ([クライアントサイドルーティング](/docs/appendix#routing)として知られる)、SvelteKit はナビゲーションごとに新しいページ名が読み上げられるように[ライブリージョン](https://developer.mozilla.org/ja/docs/Web/Accessibility/ARIA/ARIA_Live_Regions)をページに注入します。これは、`<title>` 要素を検査することで、アナウンスするページ名を決定します。
 
-Because of this behavior, every page in your app should have a unique, descriptive title. In SvelteKit, you can do this by placing a `<svelte:head>` element on each page:
+この動作のために、アプリの全ページにユニークで説明的なタイトルを付けるべきです。SvelteKit では、各ページに `<svelte:head>` 要素を配置することでこれを行うことができます:
 
 ```svelte
 /// file: src/routes/+page.svelte
@@ -23,13 +23,13 @@ Because of this behavior, every page in your app should have a unique, descripti
 </svelte:head>
 ```
 
-This will allow screen readers and other assistive technology to identify the new page after a navigation occurs. Providing a descriptive title is also important for [SEO](/docs/seo#manual-setup-title-and-meta).
+これにより、スクリーンリーダーやその他の支援技術が、ナビゲーション後に新しいページを識別することができるようになります。説明的なタイトルを提供することは、[SEO](/docs/seo#manual-setup-title-and-meta) にとっても重要なことです。
 
 ### Focus management
 
-In traditional server-rendered applications, every navigation will reset focus to the top of the page. This ensures that people browsing the web with a keyboard or screen reader will start interacting with the page from the beginning.
+旧来のサーバーレンダリングアプリケーションでは、ナビゲーションでフォーカスがページのトップにリセットされます。これによって、キーボードやスクリーンリーダーを使用して web をブラウジングする方が、ページの先頭からやり取りできるようになります。
 
-To simulate this behavior during client-side routing, SvelteKit focuses the `<body>` element after each navigation. If you want to customize this behavior, you can implement custom focus management logic using the `afterNavigate` hook:
+クライアントサイドルーティング中にこの動作をシミュレートするために、SvelteKit は各ナビゲーション後に `<body>` 要素にフォーカスします。この動作をカスタマイズしたい場合は、`afterNavigate` hook を使用してカスタムのフォーカスマネジメントロジックを実装することができます:
 
 ```js
 /// <reference types="@sveltejs/kit" />
@@ -43,18 +43,18 @@ afterNavigate(() => {
 });
 ```
 
-You can also programmatically navigate to a different page using the [`goto`](/docs/modules#$app-navigation-goto) function. By default, this will have the same client-side routing behavior as clicking on a link. However, `goto` also accepts a `keepfocus` option that will preserve the currently-focused element instead of resetting focus. If you enable this option, make sure the currently-focused element still exists on the page after navigation. If the element no longer exists, the user's focus will be lost, making for a confusing experience for assistive technology users.
+[`goto`](/docs/modules#$app-navigation-goto) 関数を使用して、プログラムで別のページにナビゲーションさせることもできます。デフォルトでは、これはクライアントサイドルーティングでリンクをクリックするのと同じ動作です。しかし `goto` は、`keepfocus` オプション を受け付けます。このオプションは、フォーカスをリセットする代わりに、現在フォーカスされている要素にフォーカスを保持したままにします。このオプションを有効にする場合は、現在フォーカスされている要素がナビゲーション後にもまだ存在することを確かめてください。もしその要素が存在しなければ、ユーザーのフォーカスは失われ、支援技術のユーザーにとって混乱した体験になります。
 
 ### The "lang" attribute
 
-By default, SvelteKit's page template sets the default language of the document to English. If your content is not in English, you should update the `<html>` element in `src/app.html` to have the correct [`lang`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/lang#accessibility) attribute. This will ensure that any assistive technology reading the document uses the correct pronunciation. For example, if your content is in German, you should update `app.html` to the following:
+デフォルトでは、SvelteKit のページテンプレートには、ドキュメントのデフォルト言語に英語が設定されています。もしコンテンツが英語でない場合、`src/app.html` の `<html>` 要素を更新し、正しい [`lang`](https://developer.mozilla.org/ja/docs/Web/HTML/Global_attributes/lang#accessibility) 属性を持たせる必要があります。これによって、ドキュメントを読む支援技術が正しい発音を使えるようになります。例えば、コンテンツがドイツ語の場合、`app.html` を以下のように更新してください:
 
 ```html
 /// file: src/app.html
 <html lang="de">
 ```
 
-If your content is available in multiple languages, you should set the `lang` attribute based on the language of the current page. You can do this with SvelteKit's [handle hook](/docs/hooks#handle):
+コンテンツが複数の言語で使用可能な場合、開いているページの言語に基づいて `lang` 属性を設定できるようにする必要があります。これは、SvelteKit の [handle hook](/docs/hooks#handle) を使用して行うことができます:
 
 ```html
 /// file: src/app.html
@@ -79,9 +79,9 @@ export function handle({ event, resolve }) {
 }
 ```
 
-### Further reading
+### 参考文献
 
-For the most part, building an accessible SvelteKit app is the same as building an accessible web app. You should be able to apply information from the following general accessibility resources to any web experience you build:
+ほとんどの場合、アクセシブルな SvelteKit アプリを構築するのはアクセシブルな Web アプリを構築するのと同じです。以下の一般的なアクセシビリティ(accessibility)に関するリソースから得られる情報は、どんな Web エクスペリエンスを構築する場合でも適用できるはずです
 
 - [MDN Web Docs: Accessibility](https://developer.mozilla.org/en-US/docs/Learn/Accessibility)
 - [The A11y Project](https://www.a11yproject.com/)

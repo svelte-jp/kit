@@ -189,8 +189,8 @@ export interface HandleError {
 }
 
 /**
- * The generic form of `PageLoad` and `LayoutLoad`. You should import those from `./$types` (see [generated types](https://kit.svelte.dev/docs/types#generated-types))
- * rather than using `Load` directly.
+ * `PageLoad` と `LayoutLoad` のジェネリックなフォームです。`Load` を直接使用するのではなく、`./$types` ([generated types](https://kit.svelte.jp/docs/types#generated-types) 参照) から
+ * インポートしてください。
  */
 export interface Load<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
@@ -248,9 +248,9 @@ export interface RequestEvent<
 }
 
 /**
- * A `(event: RequestEvent) => Response` function exported from a +server.js file that corresponds to an HTTP verb (`GET`, `PUT`, `PATCH`, etc) and handles requests with that method.
+ * `(event: RequestEvent) => Response` という関数で、+server.js ファイルからエクスポートされます。HTTP verb (`GET`, `PUT`, `PATCH`, etc) に対応しており、それぞれの HTTP メソッドのリクエストを処理します。
  *
- * It receives `Params` as the first generic argument, which you can skip by using [generated types](/docs/types#generated-types) instead.
+ * 1つめのジェネリックな引数(first generic argument)として `Params` を受け取りますが、代わりに [generated types](/docs/types#generated-types) を使うことでこれをスキップすることができます。
  */
 export interface RequestHandler<Params extends Record<string, string> = Record<string, string>> {
 	(event: RequestEvent<Params>): MaybePromise<Response>;
@@ -290,8 +290,8 @@ export interface SSRManifest {
 }
 
 /**
- * The generic form of `PageServerLoad` and `LayoutServerLoad`. You should import those from `./$types` (see [generated types](https://kit.svelte.dev/docs/types#generated-types))
- * rather than using `ServerLoad` directly.
+ * `PageServerLoad` と `LayoutServerLoad` のジェネリックなフォームです。`ServerLoad` を直接使用するのではなく、`./$types` ([generated types](https://kit.svelte.jp/docs/types#generated-types) を参照) から
+ * インポートしてください。
  */
 export interface ServerLoad<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
@@ -322,21 +322,21 @@ export interface Action<
 // breaking the site
 
 /**
- * Creates an `HttpError` object with an HTTP status code and an optional message.
- * This object, if thrown during request handling, will cause SvelteKit to
- * return an error response without invoking `handleError`
+ * HTTP ステータスコードとオプションのメッセージで `HttpError` オブジェクトを作成します。
+ * リクエストの処理中にこのオブジェクトがスローされると、SvelteKit は
+ * `handleError` を呼ばずにエラーレスポンス(error response)を返します。
  * @param {number} status
  * @param {string | undefined} [message]
  */
 export function error(status: number, message?: string | undefined): HttpError;
 
 /**
- * Creates a `Redirect` object. If thrown during request handling, SvelteKit will
- * return a redirect response.
+ * `Redirect` オブジェクトを作成します。リクエストの処理中にスローされると、SvelteKit は
+ * リダイレクトレスポンス(redirect response)を返します。
  */
 export function redirect(status: number, location: string): Redirect;
 
 /**
- * Generates a JSON `Response` object from the supplied data.
+ * 与えられた data から JSON `Response` オブジェクトを生成します。
  */
 export function json(data: any, init?: ResponseInit): Response;

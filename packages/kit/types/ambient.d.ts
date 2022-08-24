@@ -151,7 +151,7 @@ declare module '$app/navigation' {
 		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
 	): Promise<void>;
 	/**
-	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` する場合や、invalidate されたリソースがページそのものだったときにページエンドポイントからデータを再フェッチする場合に再実行させます。If no argument is given, all resources will be invalidated. それに続いてページが更新されたときに解決される `Promise` を返します。
+	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` している場合は `load` 関数を再実行し、無効化(invalidate) されたリソースがページそのものの場合はページエンドポイントからデータを再取得させます。引数なしの場合、全てのリソースが 無効化・再実行(invalidate) されます。ページが更新されたときに解決される `Promise` を返します。
 	 * @param dependency The invalidated resource
 	 */
 	export function invalidate(dependency?: string | ((href: string) => boolean)): Promise<void>;
@@ -206,7 +206,6 @@ declare module '$app/paths' {
 	/**
 	 * [`config.kit.paths.assets`](https://kit.svelte.jp/docs/configuration#paths) にマッチする絶対パス(absolute path)です。
 	 *
-	 * > If a value for `config.kit.paths.assets` is specified, it will be replaced with `'/_svelte_kit_assets'` during `vite dev` or `vite preview`, since the assets don't yet live at their eventual URL.
 	 * > `config.kit.paths.assets` に値が設定された場合でも、`vite dev` や `vite preview` のときは `'/_svelte_kit_assets'` で置き換えられます。なぜなら、アセットはまだその最終的な URL に存在しないからです。
 	 */
 	export const assets: `https://${string}` | `http://${string}`;
@@ -217,34 +216,34 @@ declare module '$app/paths' {
  * import { getStores, navigating, page, updated } from '$app/stores';
  * ```
  *
- * Stores on the server are _contextual_ — they are added to the [context](https://svelte.dev/tutorial/context-api) of your root component. This means that `page` is unique to each request, rather than shared between multiple requests handled by the same server simultaneously.
+ * サーバー上のストア(Store)は _コンテクスチュアル(contextual)_ で、ルート(root)コンポーネントの [context](https://svelte.jp/tutorial/context-api) に追加されます。つまり、`page` はリクエストごとにユニークであり、同じサーバーで同時に処理される複数のリクエスト感で共有されません。
  *
- * Because of that, you must subscribe to the stores during component initialization (which happens automatically if you reference the store value, e.g. as `$page`, in a component) before you can use them.
+ * そのため、ストアを使用するためには、コンポーネントの初期化の際にそのストアをサブスクライブする必要があります (コンポーネント内で `$page` という形でストアの値を参照する場合、自動的にそうなります)。
  *
- * In the browser, we don't need to worry about this, and stores can be accessed from anywhere. Code that will only ever run on the browser can refer to (or subscribe to) any of these stores at any time.
+ * ブラウザでは、これを心配する必要はありません。ストアはどこからでもアクセスできます。ブラウザ上でのみ実行されるコードは、いつでもこれらのストアを参照 (またはサブスクライブ) することができます。
  */
 declare module '$app/stores' {
 	import { Readable } from 'svelte/store';
 	import { Navigation, Page } from '@sveltejs/kit';
 
 	/**
-	 * A readable store whose value contains page data.
+	 * ページのデータの値を含む読み取り可能なストア(readable store)です。
 	 */
 	export const page: Readable<Page>;
 	/**
-	 * 読み取り可能なストアです。
+	 * 読み取り可能なストア(readable store)です。
 	 * ナビゲーションを開始すると、その値は `{ from: URL, to: URL }` となります。
 	 * ナビゲーションが終了すると、その値は `null` に戻ります。
 	 */
 	export const navigating: Readable<Navigation | null>;
 	/**
-	 *  A readable store whose initial value is `false`. If [`version.pollInterval`](https://kit.svelte.dev/docs/configuration#version) is a non-zero value, SvelteKit will poll for new versions of the app and update the store value to `true` when it detects one. `updated.check()` will force an immediate check, regardless of polling.
+	 * 読み取り可能なストア(readable store)で、初期値は `false` です。[`version.pollInterval`](https://kit.svelte.jp/docs/configuration#version) が 0 以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` に更新します。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
 	 */
 	export const updated: Readable<boolean> & { check: () => boolean };
 
 	/**
-	 * A function that returns all of the contextual stores. On the server, this must be called during component initialization.
-	 * Only use this if you need to defer store subscription until after the component has mounted, for some reason.
+	 * 全てのコンテクスチュアルなストア(contextual stores)を返す関数です。サーバー上では、コンポーネントの初期化時に呼び出す必要があります。
+	 * 何らかの理由で、コンポーネントのマウント後までストアのサブスクライブを遅延させたい場合にのみ、これを使用してください。
 	 */
 	export function getStores(): {
 		navigating: typeof navigating;

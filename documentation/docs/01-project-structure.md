@@ -34,12 +34,12 @@ my-project/
 `src` ディレクトリには、プロジェクトの中身が格納します。
 
 - `lib` にはあなたのライブラリのコードを格納します。格納されたコードは [`$lib`](/docs/modules#$lib) エイリアスを使用してインポートしたり、[`svelte-kit package`](/docs/packaging) を使用して配布用にパッケージングすることができます。
-- `params` contains any [param matchers](/docs/advanced-routing#matching) your app needs
-- `routes` contains the [routes](/docs/routing) of your application
+- `params` にはアプリに必要な [param matchers](/docs/advanced-routing#matching) を格納します
+- `routes` にはアプリケーションの [ルート(routes)](/docs/routing) を格納します
 - `app.html` はページのテンプレートで、以下のプレースホルダーを含む HTML document です:
   - `%sveltekit.head%` — アプリに必要な `<link>` 要素や `<script>` 要素、`<svelte:head>` コンテンツ 
   - `%sveltekit.body%` — レンダリングされたページのためのマークアップ
-  - `%sveltekit.assets%` — either [`paths.assets`](/docs/configuration#paths), if specified, or a relative path to [`paths.base`](/docs/configuration#base)
+  - `%sveltekit.assets%` — [`paths.assets`](/docs/configuration#paths) が指定されている場合は [`paths.assets`](/docs/configuration#paths)、指定されていない場合は [`paths.base`](/docs/configuration#base) への相対パス
   - `%sveltekit.nonce%` — マニュアルで含めるリンクやスクリプトの [CSP](/docs/configuration#csp) ノンス (使用する場合)
 - `hooks.js` (optional) アプリケーションの [hooks](/docs/hooks)
 - `service-worker.js` (optional) [service worker](/docs/service-workers)
@@ -52,7 +52,7 @@ TypeScript を使用している場合、`.js` の代わりに `.ts` ファイ�
 
 #### tests
 
-If you chose to add tests to your project during `npm create svelte@latest`, they will live in this directory.
+`npm create svelte@latest` の実行時、プロジェクトにテストを追加することを選択した場合、このディレクトリに格納されます。
 
 #### package.json
 

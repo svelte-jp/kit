@@ -6,7 +6,7 @@ title: Anchor options
 
 SvelteKit はコード分割によってアプリを小さなチャンク(1ルート(route)につき1つ)に分割し、高速なスタートアップタイムを実現しています。
 
-For _dynamic_ routes, such as our `src/routes/blog/[slug]/+page.svelte` example, that's not enough. In order to render the blog post, we need to fetch the data for it, and we can't do that until we know what `slug` is. In the worst case, that could cause lag as the browser waits for the data to come back from the server.
+_動的_ なルートにとって、例えば `src/routes/blog/[slug]/+page.svelte` のような例では、それでは不十分です。ブログ記事のレンダリングのためには、そのデータをフェッチする必要がありますが、`slug` が何かわかるまでこれを行えません。最悪の場合、サーバーからデータが戻ってくるのをブラウザが待つので遅延が発生します。
 
 データを _プリフェッチ(prefetch)_ することでそれを軽減できます。リンクに `sveltekit:prefetch` 属性を追加します…
 

@@ -1,16 +1,16 @@
 ---
-title: Advanced routing
+title: 高度なルーティング
 ---
 
-### Rest parameters
+### Restパラメータ
 
-If the number of route segments is unknown, you can use rest syntax — for example you might implement GitHub's file viewer like so...
+ルートセグメント(route segments)の数がわからない場合は、rest 構文を使用することができます。例えば GitHub のファイルビューアのようなものを実装する場合は…
 
 ```bash
 /[org]/[repo]/tree/[branch]/[...file]
 ```
 
-...in which case a request for `/sveltejs/kit/tree/master/documentation/docs/04-advanced-routing.md` would result in the following parameters being available to the page:
+…この場合、`/sveltejs/kit/tree/master/documentation/docs/04-advanced-routing.md` をリクエストすると、以下のパラメータをページで使うことができます:
 
 ```js
 // @noErrors
@@ -22,7 +22,7 @@ If the number of route segments is unknown, you can use rest syntax — for exam
 }
 ```
 
-This also allows you to render custom 404s. Given these routes...
+これでカスタムの 404 をレンダリングすることもできます。これらのルート(routes)がある場合…
 
 ```
 src/routes/
@@ -34,7 +34,7 @@ src/routes/
 └ +error.svelte
 ```
 
-...the `marx-brothers/+error.svelte` file will _not_ be rendered if you visit `/marx-brothers/karl`, because no route was matched. If you want to render the nested error page, you should create a route that matches any `/marx-brothers/*` request, and return a 404 from it:
+…もし `/marx-brothers/karl` にリクエストしても、`marx-brothers/+error.svelte` ファイルはレンダリング _されません_ 。なぜならどのルート(route) にもマッチしないからです。もしネストしたエラーページをレンダリングしたければ、どんな `/marx-brothers/*` リクエストにもマッチするルート(route)を作成し、そこから 404 を返すようにしてください:
 
 ```diff
 src/routes/
@@ -47,11 +47,11 @@ src/routes/
 └ +error.svelte
 ```
 
-> `src/routes/a/[...rest]/z/+page.svelte` will match `/a/z` (i.e. there's no parameter at all) as well as `/a/b/z` and `/a/b/c/z` and so on. Make sure you check that the value of the rest parameter is valid, for example using a [matcher](#advanced-routing-matching).
+> `src/routes/a/[...rest]/z/+page.svelte` は `/a/z` (つまり、パラメータがない場合) にマッチしますし、`/a/b/z` や `/a/b/c/z` などにも同様にマッチします。rest パラメータの値が有効であることを、例えば [matcher](#advanced-routing-matching) などを使用して、確実にチェックしてください。
 
-### Matching
+### マッチング(Matching)
 
-A route like `src/routes/archive/[page]` would match `/archive/3`, but it would also match `/archive/potato`. We don't want that. You can ensure that route parameters are well-formed by adding a _matcher_ — which takes the parameter string (`"3"` or `"potato"`) and returns `true` if it is valid — to your [`params`](/docs/configuration#files) directory...
+`src/routes/archive/[page]` のようなルート(route)は `/archive/3` にマッチしますが、`/archive/potato` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"3"` や `"potato"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](/docs/configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
 
 ```js
 /// file: src/params/integer.js
@@ -61,20 +61,20 @@ export function match(param) {
 }
 ```
 
-...and augmenting your routes:
+…そしてルート(routes)を拡張します:
 
 ```diff
 -src/routes/archive/[page]
 +src/routes/archive/[page=integer]
 ```
 
-If the pathname doesn't match, SvelteKit will try to match other routes (using the sort order specified below), before eventually returning a 404.
+もしパス名がマッチしない場合、SvelteKit は (後述のソート順の指定に従って) 他のルートでマッチするか試行し、どれにもマッチしない場合は最終的に 404 を返します。
 
-> Matchers run both on the server and in the browser.
+> Matcher は サーバーとブラウザの両方で動作します。
 
-### Sorting
+### ソート(Sorting)
 
-It's possible for multiple routes to match a given path. For example each of these routes would match `/foo-abc`:
+あるパスに対し、マッチするルート(routes)は複数でも構いません。例えば、これらのルート(routes)はどれも `/foo-abc` にマッチします:
 
 ```bash
 src/routes/[...catchall]/+page.svelte
@@ -84,15 +84,15 @@ src/routes/foo-[c]/+page.svelte
 src/routes/foo-abc/+page.svelte
 ```
 
-SvelteKit needs to know which route is being requested. To do so, it sorts them according to the following rules...
+SvelteKit は、どのルート(route)に対してリクエストされているのかを判断しなければなりません。そのため、以下のルールに従ってこれらをソートします…
 
-- More specific routes are higher priority (e.g. a route with no parameters is more specific than a route with one dynamic parameter, and so on)
-- `+server` files have higher priority than `+page` files
-- Parameters with [matchers](#advanced-routing-matching) (`[name=type]`) are higher priority than those without (`[name]`)
-- Rest parameters have lowest priority
-- Ties are resolved alphabetically
+- より詳細・明確(specific)なルート(routes)ほど、より優先度が高い (例えば、動的なパラメータが1つあるルートより、パラメータのないルートのほうがより詳細・明確(specific)である、など)
+- `+server` ファイルは `+page` ファイルより優先度が高い
+- [matchers](#advanced-routing-matching) 付きのパラメータ (`[name=type]`) は matchers なしのパラメータ (`[name]`) よりも優先度が高い
+- Rest パラメータは最も優先度が低い
+- 優先度が同じ場合はアルファベット順で解決される
 
-...resulting in this ordering, meaning that `/foo-abc` will invoke `src/routes/foo-abc/+page.svelte`, and `/foo-def` will invoke `src/routes/foo-[c]/+page.svelte` rather than less specific routes:
+…この順序で並べると、`/foo-abc` の場合は `src/routes/foo-abc/+page.svelte` を呼び出し、`/foo-def` の場合は `src/routes/foo-[c]/+page.svelte` を呼び出します:
 
 ```bash
 src/routes/foo-abc/+page.svelte
@@ -102,9 +102,9 @@ src/routes/[b]/+page.svelte
 src/routes/[...catchall]/+page.svelte
 ```
 
-### Encoding
+### エンコード(Encoding)
 
-Directory names are URI-decoded, meaning that (for example) a directory like `%40[username]` would match characters beginning with `@`:
+ディレクトリ名は URI デコードされるので、例えば `%40[username]` のようなディレクトリは `@` で始まる文字にマッチします:
 
 ```js
 // @filename: ambient.d.ts
@@ -124,11 +124,11 @@ assert.equal(
 );
 ```
 
-To express a `%` character, use `%25`, otherwise the result will be malformed.
+`%` 文字を表すには `%25` を使用してください。そうしないと、不正確な結果となります。
 
-### Named layouts
+### 名前付きレイアウト(Named layouts)
 
-Some parts of your app might need something other than the default layout. For these cases you can create _named layouts_...
+アプリには、デフォルトのレイアウトとは違うレイアウトが必要になる部分もあるでしょう。そういったケースには、 _名前付きレイアウト(named layouts)_ を作成することができます…
 
 ```svelte
 /// file: src/routes/+layout-foo.svelte
@@ -137,20 +137,20 @@ Some parts of your app might need something other than the default layout. For t
 </div>
 ```
 
-...and then use them by referencing the layout name (`foo`, in the example above) in the filename:
+…そしてファイル名にあるレイアウトの名前(上記の例では `foo`) を参照し、それを使用します:
 
 ```svelte
 /// file: src/routes/my-special-page/+page@foo.svelte
 <h1>I am inside +layout-foo</h1>
 ```
 
-> Named layout should only be referenced from Svelte files
+> 名前付きレイアウト(Named layout)は Svelte ファイルからのみ参照するようにしてください
 
-Named layouts are very powerful, but it can take a minute to get your head round them. Don't worry if this doesn't make sense all at once.
+名前付きレイアウト(Named layouts)はとてもパワフルですが、理解するのに少し時間がかかるかもしれません。一度で理解できなくてもご心配なく。
 
-#### Scoping
+#### スコープ(Scoping)
 
-Named layouts can be created at any depth, and will apply to any components in the same subtree. For example, `+layout-foo` will apply to `/x/one` and `/x/two`, but not `/x/three` or `/four`:
+名前付きレイアウト(Named layouts)は任意の深さに作成することができ、同じサブツリーにあるどのコンポーネントにも適用されます。例えば、 `+layout-foo` は `/x/one` と `/x/two` に適用されますが、`/x/three` や `/four` には適用されません:
 
 ```bash
 src/routes/
@@ -162,9 +162,9 @@ src/routes/
 └ four/+page@foo.svelte        # ❌ page has `@foo`, but +layout-foo is not 'in scope'
 ```
 
-#### Inheritance chains
+#### 継承チェーン(Inheritance chains)
 
-Layouts can themselves choose to inherit from named layouts, from the same directory or a parent directory. For example, `x/y/+layout@root.svelte` is the default layout for `/x/y` (meaning `/x/y/one`, `/x/y/two` and `/x/y/three` all inherit from it) because it has no name. Because it specifies `@root`, it will inherit directly from the nearest `+layout-root.svelte`, skipping `+layout.svelte` and `x/+layout.svelte`.
+レイアウトは、同じディレクトリまたは親ディレクトリにある名前付きレイアウト(named layouts)を継承するかどうか選択できます。例えば `x/y/+layout@root.svelte` には名前が付いていないため、`/x/y` のデフォルトのレイアウトです (つまり、`/x/y/one`、`/x/y/two`、`/x/y/three` はどれもこのレイアウトを継承します)。`@root` を指定しているため、もっとも近くにある `+layout-root.svelte` を直接継承することになり、`+layout.svelte` と `x/+layout.svelte` をスキップします。
 
 ```
 src/routes/
@@ -179,9 +179,9 @@ src/routes/
 └ +layout-root.svelte
 ```
 
-> In the case where `+layout-root.svelte` contains a lone `<slot />`, this effectively means we're able to 'reset' to a blank layout for any page or nested layout in the app by adding `@root`.
+> `+layout-root.svelte` が単独の `<slot />` のみを含んでいる場合、アプリ内のネストレイアウト(nested layout)に `@root` を付けることで、任意のページをブランクレイアウトに 'リセット' することができます。
 
-If no parent is specified, a layout will inherit from the nearest default (i.e. unnamed) layout _above_ it in the tree. In some cases, it's helpful for a named layout to inherit from a default layout _alongside_ it in the tree, such as `+layout-root.svelte` inheriting from `+layout.svelte`. We can do this by explicitly specifying `@default`, allowing `/x/y/one` and siblings to use the app's default layout without using `x/+layout.svelte`:
+親が指定されていない場合、レイアウトはツリー上もっとも近くにあるデフォルトのレイアウト(つまり名前が付いていないレイアウト)を継承することになります。例えば `+layout-root.svelte` が `+layout.svelte` を継承するように、名前付きレイアウト(named layout)がそのツリーに並ぶデフォルトレイアウトを継承していると便利な場合があります。明示的に `@default` を指定することでこれができ、`/x/y/one` とその兄弟がアプリのデフォルトのレイアウトを使用するのに `x/+layout.svelte` を使う必要がなくなります:
 
 ```diff
 src/routes/
@@ -197,4 +197,4 @@ src/routes/
 +└ +layout-root@default.svelte
 ```
 
-> `default` is a reserved name — in other words, you can't have a `+layout-default.svelte` file.
+> `default` は予約済の名前です。言い換えると、`+layout-default.svelte` というファイルを使用することはできないということです。

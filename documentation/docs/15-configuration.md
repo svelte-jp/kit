@@ -120,7 +120,7 @@ const config = {
 
 > ビルトインの `$lib` エイリアスはパッケージングで使用されるため、`config.kit.files.lib` でコントロールされています。
 
-> You will need to run `npm run dev` to have SvelteKit automatically generate the required alias configuration in `jsconfig.json` or `tsconfig.json`.
+> SvelteKit が必要なエイリアス設定を `jsconfig.json` または `tsconfig.json` に自動的に生成するためには、`npm run dev` を実行する必要があります。
 
 ### appDir
 

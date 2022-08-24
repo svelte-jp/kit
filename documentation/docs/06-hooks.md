@@ -25,7 +25,7 @@ export async function handle({ event, resolve }) {
 
 > 静的アセット(プリレンダリング済みのページを含む)に対するリクエストは SvelteKit では処理されません。
 
-If unimplemented, defaults to `({ event, resolve }) => resolve(event)`. To add custom data to the request, which is passed to handlers in `+server.js` and server-only `load` functions, populate the `event.locals` object, as shown below.
+未実装の場合、デフォルトは `({ event, resolve }) => resolve(event)` となります。カスタムデータをリクエストに追加し、`+server.js` のハンドラーやサーバー専用の `load` 関数に渡すには、以下のように `event.locals` オブジェクトに埋め込んでください。
 
 ```js
 /// file: src/hooks.js
@@ -83,7 +83,7 @@ export async function handle({ event, resolve }) {
 
 ### handleError
 
-If an error is thrown during loading or rendering, this function will be called with the `error` and the `event` that caused it. This allows you to send data to an error tracking service, or to customise the formatting before printing the error to the console.
+ロード中またはレンダリング中にエラーがスローされた場合、この関数は `error` とそれを引き起こした `event` を渡されて呼び出されます。これにより、エラートラッキングサービスにデータを送ったり、エラーをコンソールにプリントする前にフォーマットをカスタマイズすることができます。
 
 開発中、もし Svelte コードで構文エラーが発生した場合、エラー場所をハイライトする `frame` プロパティが追加されます。
 
@@ -103,7 +103,7 @@ export function handleError({ error, event }) {
 }
 ```
 
-> `handleError` is only called for _unexpected_ errors. It is not called for errors created with the [`error`](/docs/modules#sveltejs-kit-error) function imported from `@sveltejs/kit`, as these are _expected_ errors.
+> `handleError` は _予期せぬ_ エラー の場合にのみ呼び出されます。`@sveltejs/kit` からインポートされる [`error`](/docs/modules#sveltejs-kit-error) 関数で作成されたエラーは _想定される_ エラーであるため、これは呼び出されません。
 
 ### externalFetch
 

@@ -2,19 +2,19 @@
 title: Packaging
 ---
 
-> `svelte-package` is currently experimental. Non-backward compatible changes may occur in any future release.
+> `svelte-package` は現時点では experimental です。将来のリリースで後方互換性のない変更が行われる可能性があります。
 
-You can use SvelteKit to build apps as well as component libraries, using the `@sveltejs/package` package (`npm create svelte` has an option to set this up for you).
+SvelteKit では、アプリを構築するだけでなく、`@sveltejs/package` パッケージを使用してコンポーネントライブラリを構築することもできます (`npm create svelte` にはこれを設定するためのオプションがあります)。
 
 アプリを作成するとき、`src/routes` のコンテンツが公開される部分となります。[`src/lib`](/docs/modules#$lib) にはアプリの内部ライブラリが含まれます。
 
 SvelteKit コンポーネントライブラリは、SvelteKitアプリと全く同じ構造を持ちますが、`src/lib` も公開される点が異なります。`src/routes` はライブラリに付随するドキュメントやデモサイトにもできますし、開発中に使用できるサンドボックスにもできます。
 
-Running the `svelte-package` command from `@sveltejs/package` will take the contents of `src/lib` and generate a `package` directory (which can be [configured](/docs/configuration#package)) containing the following:
+`@sveltejs/package` の `svelte-package` コマンドを実行すると、`src/lib` のコンテンツを使用して、以下を含む `package` ディレクトリ ([変更可能](/docs/configuration#package)) を生成します:
 
-- All the files in `src/lib`, unless you [configure](/docs/configuration#package) custom `include`/`exclude` options. Svelte components will be preprocessed, TypeScript files will be transpiled to JavaScript.
-- Type definitions (`d.ts` files) which are generated for Svelte, JavaScript and TypeScript files. You need to install `typescript >= 4.0.0` for this. Type definitions are placed next to their implementation, hand-written `d.ts` files are copied over as is. You can [disable generation](/docs/configuration#package), but we strongly recommend against it.
-- A `package.json` copied from the project root with all fields except `"scripts"`, `"publishConfig.directory"` and `"publishConfig.linkDirectory"`. The `"dependencies"` field is included, which means you should add packages that you only need for your documentation or demo site to `"devDependencies"`. A `"type": "module"` and an `"exports"` field will be added if it's not defined in the original file.
+- カスタムで `include`/`exclude` オプションを [設定](/docs/configuration#package) しない限り、`src/lib` にある全てのファイルが含まれます。Svelte コンポーネントはプリプロセスされ、TypeScript ファイルは JavaScript にトランスパイルされます。
+- Svelte、JavaScript、TypeScriptファイルのために生成される型定義 (`d.ts` ファイル)。これには `typescript >= 4.0.0` をインストールする必要があります。型定義は実装の隣に置かれ、手書きの `d.ts` ファイルはそのままコピーされます。[生成を無効化](/docs/configuration#package) するこおtもできますが、あまりおすすめしません。
+- プロジェクトのルート(root)からコピーされた `package.json` から、`"scripts"`、`"publishConfig.directory"`、`"publishConfig.linkDirectory"` フィールドを取り除いたもの。`"dependencies"` フィールドは含まれているため、ドキュメントやデモサイトにのみ必要なパッケージは `"devDependencies"` に追加してください。`"type": "module"` と `"exports"` フィールドは、オリジナルのファイルで定義されていない場合に追加されます。
 
 `"exports"` フィールドにはパッケージのエントリーポイントが含まれます。デフォルトでは、アンダースコアで始まるファイル(またはアンダースコアで始まるディレクトリにあるファイル)を除いて、`src/lib` にある全てのファイルをエントリーポイントとして扱いますが、この動作は [設定可能](/docs/configuration#package) です。もし `src/lib/index.js` や `src/lib/index.svelte` ファイルがある場合は、それがパッケージルートとして扱われます。
 
@@ -50,6 +50,6 @@ npm publish ./package
 
 ### 注意事項
 
-All relative file imports need to be fully specified, adhering to Node's ESM algorithm. This means you cannot import the file `src/lib/something/index.js` like `import { something } from './something`, instead you need to import it like this: `import { something } from './something/index.js`. If you are using TypeScript, you need to import `.ts` files the same way, but using a `.js` file ending, _not_ a `.ts` file ending (this isn't under our control, the TypeScript team has made that decision). Setting `"moduleResolution": "NodeNext"` in your `tsconfig.json` or `jsconfig.json` will help you with this.
+相対ファイルのインポートはすべて、Node の ESM アルゴリズムに従って完全に指定する必要があります。つまり、`src/lib/something/index.js` ファイルを `import { something } from './something` のようにインポートすることはできません。代わりに、`import { something } from './something/index.js` というようにインポートする必要があります。TypeScript を使用している場合は、`.ts` ファイルを同じ方法でインポートする必要がありますが、ファイルの末尾は `.ts` ではなく `.js` を使用します (これは我々の管理下ではんはく、TypeScript チームが決定したことです)。`tsconfig.json` または `jsconfig.json` で `"moduleResolution": "NodeNext"` と設定することで、この問題を解決できます。
 
-This is a relatively experimental feature and is not yet fully implemented. All files except Svelte files (preprocessed) and TypeScript files (transpiled to JavaScript) are copied across as-is.
+比較的、これは実験的な機能であり、まだ完全に実装されていません。Svelte ファイル(プリプロセス済)と TypeScript ファイル(JavaScriptにトランスパイル済)を除き、全てのファイルはそのままコピーされます。

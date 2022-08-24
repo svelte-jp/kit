@@ -4,7 +4,7 @@ title: Page options
 
 デフォルトでは、SvelteKitはまずサーバーでコンポーネントをレンダリングし、それをHTMLとしてクライアントに送信します。それからブラウザ上でコンポーネントをサイドレンダリングし、**ハイドレーション(hydration)** と呼ばれるプロセスでそれをインタラクティブにします。そのため、コンポーネントをサーバーとブラウザのどちらでも実行できるようにしておく必要があります。その後で、SvelteKit は後続のナビゲーションを引き継ぐ [**ルーター**](/docs/routing) を初期化します。
 
-You can control each of these on a per-app (via `svelte.config.js`) or per-page (via `+page.js` or `+page.server.js`) basis. If both are specified, per-page settings override per-app settings in case of conflicts.
+基本的に、これらは (`svelte.config.js` を介して) アプリ単位で、または (`+page.js` もしくは `+page.server.js` を介して) ページ単位で制御することができます。もし両方とも設定されていてその設定がコンフリクトしている場合、アプリ単位の設定よりページ単位の設定が優先されます。
 
 ### router
 
@@ -58,14 +58,14 @@ export const prerender = false;
 
 > 全てのページがプリレンダリングに適しているわけではありません。プリレンダリングされたコンテンツは全てのユーザーに表示されます。もちろん、プリレンダリングされたページの `onMount` でパーソナライズされたデータをフェッチできますが、ブランクの初期コンテンツやローディングインジケーターにより、ユーザエクスペリエンスが低下してしまう可能性があります。
 
-Note that you can still prerender pages that load data based on the page's parameters, such as a `src/routes/blog/[slug]/+page.svelte` route.
+`src/routes/blog/[slug]/+page.svelte` ルート(route)のような、ページのパラメータを元にデータをロードするページもプリレンダリングができることにご注意ください。
 
-Accessing [`url.searchParams`](/docs/load#input-url) during prerendering is forbidden. If you need to use it, ensure you are only doing so in the browser (for example in `onMount`).
+プリレンダリング中に [`url.searchParams`](/docs/load#input-url) にアクセスすることは禁止されています。もし使う必要があるなら、ブラウザの中だけで行うようにしてください (例えば `onMount` の中で)。
 
 #### ルートの衝突(Route conflicts)
 
-Because prerendering writes to the filesystem, it isn't possible to have two endpoints that would cause a directory and a file to have the same name. For example, `src/routes/foo/+server.js` and `src/routes/foo/bar/+server.js` would try to create `foo` and `foo/bar`, which is impossible.
+プリレンダリングはファイルシステムに書き込むため、ディレクトリとファイルが同じ名前になるエンドポイントを2つ持つことはできません。例えば、`src/routes/foo/+server.js` と `src/routes/foo/bar/+server.js` の場合は、`foo` と `foo/bar` を作成しようとしますが、これは不可能です。
 
-For that reason among others, it's recommended that you always include a file extension — `src/routes/foo.json/+server.js` and `src/routes/foo/bar.json/+server.js` would result in `foo.json` and `foo/bar.json` files living harmoniously side-by-side.
+このため(他にも理由はありますが)、常に拡張子を付けておくことを推奨します — `src/routes/foo.json/+server.js` と `src/routes/foo/bar.json/+server.js` は、`foo.json` と `foo/bar.json` ファイルが並んで調和して共存できます。
 
 _ページ_ では、`foo` の代わりに `foo/index.html` と書き込むことでこの問題を回避しています。
