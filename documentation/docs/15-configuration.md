@@ -175,7 +175,7 @@ export default config;
 
 環境変数の設定です:
 
-- `dir` — the directory to search for `.env` files. Defaults to `process.cwd()`.
+- `dir` — `.env` ファイルを検索するディレクトリです。デフォルトは `process.cwd()` です。
 - `publicPrefix` — クライアントサイドのコードに公開しても安全であることを示す接頭辞です。[`$env/static/public`](/docs/modules#$env-static-public) と [`$env/dynamic/public`](/docs/modules#$env-dynamic-public) をご参照ください。Vite の環境変数のハンドリングを使用する場合は、Vite の [`envPrefix`](https://ja.vitejs.dev/config/shared-options.html#envprefix) を別途設定する必要があることにご注意ください。もっとも、通常はこの機能を使用する必要はありません。
 
 ### files

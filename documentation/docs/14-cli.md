@@ -8,7 +8,7 @@ SvelteKit プロジェクトは [Vite](https://ja.vitejs.dev) を使用してい
 - `vite build` — アプリの本番バージョンをビルドします
 - `vite preview` — ローカルで本番バージョンを実行します
 
-However SvelteKit includes its own CLI for initialising your project:
+しかしながら SvelteKit には、プロジェクト初期化のための CLI も含まれています:
 
 ### svelte-kit sync
 
