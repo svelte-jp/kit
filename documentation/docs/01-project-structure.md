@@ -25,7 +25,7 @@ my-project/
 └ vite.config.js
 ```
 
-また、`.gitignore`、`.npmrc` などの共通ファイルもあります (もし `npm create svelte@latest` の実行時にプションを選択した場合は `.prettierrc` や `.eslintrc.cjs` などもあるでしょう)。
+また、`.gitignore`、`.npmrc` などの共通ファイルもあります (もし `npm create svelte@latest` の実行時にオプションを選択した場合は `.prettierrc` や `.eslintrc.cjs` などもあるでしょう)。
 
 ### プロジェクトファイル
 
