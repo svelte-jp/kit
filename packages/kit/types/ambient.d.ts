@@ -200,7 +200,7 @@ declare module '$app/navigation' {
  */
 declare module '$app/paths' {
 	/**
-	 * [`config.kit.paths.base`](https://kit.svelte.jp/docs/configuration#paths) にマッチする文字列です。先頭は `/` で始まる必要があり、末尾を `/` にしてはいかません (例: `/base-path`)。空文字(empty string)の場合はこのルールに該当しません。
+	 * [`config.kit.paths.base`](https://kit.svelte.jp/docs/configuration#paths) にマッチする文字列です。先頭は `/` で始まる必要があり、末尾を `/` にしてはいけません (例: `/base-path`)。空文字(empty string)の場合はこのルールに該当しません。
 	 */
 	export const base: `/${string}`;
 	/**
