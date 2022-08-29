@@ -38,7 +38,7 @@ my-project/
 - `routes` にはアプリケーションの [ルート(routes)](/docs/routing) を格納します
 - `app.html` はページのテンプレートで、以下のプレースホルダーを含む HTML document です:
   - `%sveltekit.head%` — アプリに必要な `<link>` 要素や `<script>` 要素、`<svelte:head>` コンテンツ 
-  - `%sveltekit.body%` — レンダリングされたページのためのマークアップ
+  - `%sveltekit.body%` — レンダリングされるページのためのマークアップです。Typically this lives inside a `<div>` or other element, rather than directly inside `<body>`, to prevent bugs caused by browser extensions injecting elements that are then destroyed by the hydration process
   - `%sveltekit.assets%` — [`paths.assets`](/docs/configuration#paths) が指定されている場合は [`paths.assets`](/docs/configuration#paths)、指定されていない場合は [`paths.base`](/docs/configuration#base) への相対パス
   - `%sveltekit.nonce%` — マニュアルで含めるリンクやスクリプトの [CSP](/docs/configuration#csp) ノンス (使用する場合)
 - `hooks.js` (optional) アプリケーションの [hooks](/docs/hooks)

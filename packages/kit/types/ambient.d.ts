@@ -7,6 +7,8 @@
  * declare namespace App {
  * 	interface Locals {}
  *
+ * 	interface PageData {}
+ *
  * 	interface Platform {}
  *
  * 	interface PrivateEnv {}
@@ -48,6 +50,13 @@ declare namespace App {
 	export interface Locals {}
 
 	/**
+	 * Defines the common shape of the [$page.data store](https://kit.svelte.dev/docs/modules#$app-stores-page) - that is, the data that is shared between all pages.
+	 * The `Load` and `ServerLoad` functions in `./$types` will be narrowed accordingly.
+	 * Use optional properties for data that is only present on specific pages. Do not add an index signature (`[key: string]: any`).
+	 */
+	export interface PageData {}
+
+	/**
 	 * adapter が `event.platform` で [プラットフォーム固有の情報](https://kit.svelte.jp/docs/adapters#supported-environments-platform-specific-context) を提供する場合、ここでそれを指定することができます。
 	 */
 	export interface Platform {}
@@ -65,10 +74,10 @@ declare namespace App {
 
 /**
  * ```ts
- * import { browser, dev, prerendering } from '$app/env';
+ * import { browser, dev, prerendering } from '$app/environment';
  * ```
  */
-declare module '$app/env' {
+declare module '$app/environment' {
 	/**
 	 * アプリがブラウザで動作している場合 `true` です。
 	 */
@@ -151,7 +160,7 @@ declare module '$app/navigation' {
 		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
 	): Promise<void>;
 	/**
-	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` している場合は `load` 関数を再実行し、無効化(invalidate) されたリソースがページそのものの場合はページエンドポイントからデータを再取得させます。引数なしの場合、全てのリソースが 無効化・再実行(invalidate) されます。ページが更新されたときに解決される `Promise` を返します。
+	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` している場合は `load` 関数を再実行します。引数なしの場合、全てのリソースが 無効化・再実行(invalidate) されます。ページが更新されたときに解決される `Promise` を返します。
 	 * @param dependency The invalidated resource
 	 */
 	export function invalidate(dependency?: string | ((href: string) => boolean)): Promise<void>;

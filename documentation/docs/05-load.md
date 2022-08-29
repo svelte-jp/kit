@@ -4,7 +4,7 @@ title: Loading data
 
 [`+page.svelte`](/docs/routing#page-page-svelte) や [`+layout.svelte`](/docs/routing#layout-layout-svelte) は `load` 関数からその `data` を取得します。
 
-もし `load` 関数が `+page.js` や `+layout.js` に定義されている場合は、サーバーとブラウザのどちらでも実行されます。代わりに `+page.server.js` や `+layout.server.js` に定義されている場合はサーバー上でのみ実行され、例えばデータベースにコールしたりプライベートな [環境変数](/docs/modules#$env-static-private) にアクセスすることができます。ただし、JSON としてシリアライズされたデータを返さなければなりません。
+もし `load` 関数が `+page.js` や `+layout.js` に定義されている場合は、サーバーとブラウザのどちらでも実行されます。代わりに `+page.server.js` や `+layout.server.js` に定義されている場合はサーバー上でのみ実行され、例えばデータベースにコールしたりプライベートな [環境変数](/docs/modules#$env-static-private) にアクセスすることができます。ただし、JSON としてシリアライズされたデータを返さなければなりません。In both cases, the return value (if there is one) must be an object.
 
 ```js
 /// file: src/routes/+page.js
@@ -257,7 +257,7 @@ export async function load({ setHeaders }) {
 
 ### Output
 
-返される `data` オブジェクトにある promise は、それらがトップレベルのプロパティである場合、解決されます。これにより、ウォーターフォールを作ることなく、簡単に複数のプロミスを返すことができます:
+The returned `data`, if any, must be an object of values. For a server-only `load` function, these values must be JSON-serializable. Top-level promises will be awaited, which makes it easy to return multiple promises without creating a waterfall:
 
 ```js
 // @filename: $types.d.ts
@@ -328,6 +328,8 @@ _予期せぬ_ エラーがスローされた場合、SvelteKit は [`handleErro
 
 ユーザーをリダイレクトするには、`@sveltejs/kit` からインポートできる `redirect` ヘルパーを使用して、ステータスコード `3xx` と一緒にリダイレクト先の location を指定します。
 
+> There is a known bug with `redirect`: it will currently fail during client-side navigation, due to [#5952](https://github.com/sveltejs/kit/issues/5952)
+
 ```diff
 /// file: src/routes/admin/+layout.server.js
 -import { error } from '@sveltejs/kit';
@@ -350,9 +352,15 @@ export function load({ locals }) {
 
 SvelteKit は、ナビゲーション中に `load` 関数の不必要な再実行を避けるために、各 `load` 関数の依存関係(dependencies)を追跡します。例えば、あるページから別のページにナビゲーションするとき、最上位の `+layout.js` の `load` 関数が参照する `url` や `params` のメンバーが直前のナビゲーションから変わっていなければ、再実行する必要はありません。
 
-[`invalidate(url)`](/docs/modules#$app-navigation-invalidate) を使用すると、実行済みのリソース(the invalidated resource)に依存する `load` 関数を再実行することができます (暗黙的には [`fetch`](#fetch) を介して、または明示的に [`depends`](#depends) を介して)。引数なしで `invalidate()` を呼び出すことで、 _全ての_ `load` 関数 を再実行(invalidate)することもできます。
+A `load` function will re-run in the following situations:
 
-`load` 関数の再実行がトリガーされても、ページは再マウントされません — 代わりに、新しい `data` で更新されます。
+- It references a property of `params` whose value has changed
+- It references a property of `url` (such as `url.pathname` or `url.search`) whose value has changed
+- It calls `await parent()` and a parent `load` function re-ran
+- It declared a dependency on a specific URL via [`fetch`](#fetch) or [`depends`](#depends), and that URL was marked invalid with [`invalidate(url)`](/docs/modules#$app-navigation-invalidate)
+- All active `load` functions were forcibly re-run with [`invalidate()`](/docs/modules#$app-navigation-invalidate)
+
+If a `load` function is triggered to re-run, the page will not remount — instead, it will update with the new `data`. This means that components' internal state is preserved. If this isn't want you want, you can reset whatever you need to reset inside an [`afterNavigate`](/docs/modules#$app-navigation-afternavigate) callback, and/or wrap your component in a [`{#key ...}`](https://svelte.dev/docs#template-syntax-key) block.
 
 ### 状態の共有(Shared state)
 

@@ -48,7 +48,7 @@ export default config;
 ```js
 /// <reference types="@sveltejs/kit" />
 // ---cut---
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 
 if (browser) {
 	// client-only code here

@@ -2,7 +2,7 @@
 title: アセットハンドリング
 ---
 
-### Importing
+### Caching and inlining
 
 パフォーマンス改善のため、[Vite はインポートされたアセットを自動的に処理します](https://vitejs.dev/guide/assets.html)。ハッシュがファイル名に追加されるのでキャッシュできるようになり、`assetsInlineLimit` より小さいアセットはインライン化されます。
 
@@ -14,7 +14,7 @@ title: アセットハンドリング
 <img alt="The project logo" src={logo} />
 ```
 
-マークアップから直接アセットを参照したければ、[svelte-preprocess-import-assets](https://github.com/bluwy/svelte-preprocess-import-assets) や [svelte-image](https://github.com/matyunya/svelte-image) などのプリプロセッサをお使い頂けます。
+マークアップから直接アセットを参照したければ、[svelte-preprocess-import-assets](https://github.com/bluwy/svelte-preprocess-import-assets) などのプリプロセッサをお使い頂けます。
 
 CSS 関数の `url()` でインクルードされたアセットの場合は、[`experimental.useVitePreprocess`](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/config.md#usevitepreprocess) オプションが役立つでしょう:
 
@@ -29,6 +29,6 @@ export default {
 };
 ```
 
-### 最適化
+### Transforming
 
-`.webp` や `.avif` などの圧縮イメージフォーマットや、デバイスのスクリーンに基づいて異なるサイズをサーブするレスポンシブイメージを利用したいことがあるかもしれません。プロジェクトに静的に含まれるイメージについては、[svimg](https://github.com/xiphux/svimg) のようなプリプロセッサや、[vite-imagetools](https://github.com/JonasKruckenberg/imagetools) のような Vite プラグインを使用することができます。
+You may wish to transform your images to output compressed image formats such as `.webp` or `.avif`, responsive images with different sizes for different devices, or images with the EXIF data stripped for privacy. For images that are included statically, you may use a Vite plugin such as [vite-imagetools](https://github.com/JonasKruckenberg/imagetools). You may also consider a CDN, which can serve the appropriate transformed image based on the `Accept` HTTP header and query string parameters.
