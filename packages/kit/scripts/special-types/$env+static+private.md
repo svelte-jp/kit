@@ -1,18 +1,18 @@
-Environment variables [loaded by Vite](https://vitejs.dev/guide/env-and-mode.html#env-files) from `.env` files and `process.env`. Like [`$env/dynamic/private`](https://kit.svelte.dev/docs/modules#$env-dynamic-private), this module cannot be imported into client-side code. This module only includes variables that _do not_ begin with [`config.kit.env.publicPrefix`](https://kit.svelte.dev/docs/configuration#kit-env-publicprefix).
+`.env` ファイルや `process.env` から [Vite が読み込む](https://vitejs.dev/guide/env-and-mode.html#env-files) 環境変数です。[`$env/dynamic/private`](https://kit.svelte.jp/docs/modules#$env-dynamic-private) と同様に、このモジュールはクライアントサイドコードからはインポートできません。このモジュールは [`config.kit.env.publicPrefix`](https://kit.svelte.jp/docs/configuration#kit-env-publicprefix) で始まらない変数のみを含んでいます。
 
-_Unlike_ [`$env/dynamic/private`](https://kit.svelte.dev/docs/modules#$env-dynamic-private), the values exported from this module are statically injected into your bundle at build time, enabling optimisations like dead code elimination.
+[`$env/dynamic/private`](https://kit.svelte.jp/docs/modules#$env-dynamic-private) とは _異なり_ 、このモジュールからエクスポートされた値はビルド時に静的に注入され、デッドコードの排除などの最適化が可能になります。
 
 ```ts
 import { API_KEY } from '$env/static/private';
 ```
 
-Note that all environment variables referenced in your code should be declared (for example in an `.env` file), even if they don't have a value until the app is deployed:
+コード内で参照される環境変数は、たとえアプリがデプロイされるまで値を持たない場合でも、すべて (例えば `.env` ファイルで) 宣言する必要があることに注意してください。:
 
 ```
 MY_FEATURE_FLAG=""
 ```
 
-You can override `.env` values from the command line like so:
+このように、コマンドラインから `.env` の値を上書きすることができます:
 
 ```bash
 MY_FEATURE_FLAG="enabled" npm run dev
