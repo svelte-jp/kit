@@ -106,7 +106,7 @@ export async function load({ params }) {
 }
 ```
 
-クライアントサイドナビゲーション中は、SvelteKit は `fetch` を使用してデータを読み込みます。つまり、その戻り値は JSON としてシリアライズ可能でなければなりません。
+クライアントサイドナビゲーション中は、SvelteKit はサーバーからこのデータを読み込みます。つまり、その戻り値は [devalue](https://github.com/rich-harris/devalue) によってシリアライズできなければなりません。
 
 #### Actions
 

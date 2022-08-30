@@ -10,7 +10,7 @@ title: Web standards
 
 ### Fetch APIs
 
-SvelteKit は、ネットワーク越しにデータを取得するために [`fetch`](https://developer.mozilla.org/ja/docs/Web/API/fetch) を使用します。ブラウザだけでなく、[hooks](/docs/hooks) や [エンドポイント(endpoint)](/docs/routing#endpoints) の中でも使用することができます。
+SvelteKit は、ネットワーク越しにデータを取得するために [`fetch`](https://developer.mozilla.org/ja/docs/Web/API/fetch) を使用します。ブラウザだけでなく、[hooks](/docs/hooks) や [サーバールート(server routes)](/docs/routing#server) の中でも使用することができます。
 
 > [`load`](/docs/load) 関数の中では特別なバージョンの `fetch` を使用することができ、サーバーサイドレンダリング中に、HTTP をコールすることなく、クレデンシャルを保持したまま、直接エンドポイント(endpoints)を呼び出すことができます。(`load` の外側のサーバーサイドコードでクレデンシャル付きの fetch を行う場合は、明示的に `cookie` や `authorization` ヘッダーなどを渡さなければなりません。) また、通常のサーバーサイドの `fetch` では絶対パスの URL が必要となりますが、特別なバージョンの `fetch` では相対パスのリクエストが可能です。
 
@@ -18,7 +18,7 @@ SvelteKit は、ネットワーク越しにデータを取得するために [`f
 
 #### Request
 
-[`Request`](https://developer.mozilla.org/ja/docs/Web/API/Request) のインスタンスは [hooks](/docs/hooks) や [エンドポイント(endpoint)](/docs/routing#endpoints) で `event.request` という形でアクセスすることができます。これには `request.json()` や `request.formData()` など、例えばエンドポイントに送られたデータを取得するための便利なメソッドが含まれています。
+[`Request`](https://developer.mozilla.org/ja/docs/Web/API/Request) のインスタンスは [hooks](/docs/hooks) や [サーバールート(server routes)](/docs/routing#server) で `event.request` という形でアクセスすることができます。これには `request.json()` や `request.formData()` など、例えばエンドポイントに送られたデータを取得するための便利なメソッドが含まれています。
 
 #### Response
 
@@ -51,7 +51,7 @@ export function GET(event) {
 
 ### URL APIs
 
-URL は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) インターフェイスで表現され、`origin` や `pathname` のような便利なプロパティが含まれています (ブラウザでは `hash` なども)。このインターフェイスは、[hooks](/docs/hooks) と [エンドポイント(endpoints)](/docs/routing#endpoints) では `event.url`、[ページ(pages)](/docs/routing#pages) では [`$page.url`](/docs/modules#$app-stores)、[`beforeNavigate` と `afterNavigate`](/docs/modules#$app-navigation) では `from` と `to`、など、様々な場所で使われています。
+URL は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) インターフェイスで表現され、`origin` や `pathname` のような便利なプロパティが含まれています (ブラウザでは `hash` なども)。このインターフェイスは、[hooks](/docs/hooks) と [サーバールート(server routes)](/docs/routing#server) では `event.url`、[ページ(pages)](/docs/routing#pages) では [`$page.url`](/docs/modules#$app-stores)、[`beforeNavigate` と `afterNavigate`](/docs/modules#$app-navigation) では `from` と `to`、など、様々な場所で使われています。
 
 #### URLSearchParams
 

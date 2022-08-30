@@ -4,7 +4,7 @@ title: Loading data
 
 [`+page.svelte`](/docs/routing#page-page-svelte) や [`+layout.svelte`](/docs/routing#layout-layout-svelte) は `load` 関数からその `data` を取得します。
 
-もし `load` 関数が `+page.js` や `+layout.js` に定義されている場合は、サーバーとブラウザのどちらでも実行されます。代わりに `+page.server.js` や `+layout.server.js` に定義されている場合はサーバー上でのみ実行され、例えばデータベースにコールしたりプライベートな [環境変数](/docs/modules#$env-static-private) にアクセスすることができます。ただし、JSON としてシリアライズされたデータを返さなければなりません。In both cases, the return value (if there is one) must be an object.
+もし `load` 関数が `+page.js` や `+layout.js` に定義されている場合は、サーバーとブラウザのどちらでも実行されます。代わりに `+page.server.js` や `+layout.server.js` に定義されている場合はサーバー上でのみ実行され、例えばデータベースにコールしたりプライベートな [環境変数](/docs/modules#$env-static-private) にアクセスすることができます。ただし、[devalue](https://github.com/rich-harris/devalue) でシリアライズされたデータのみを返すことができます。どちらの場合でも、戻り値は (もしあれば) オブジェクトでなければなりません。
 
 ```js
 /// file: src/routes/+page.js
@@ -256,7 +256,7 @@ export async function load({ setHeaders }) {
 
 ### Output
 
-返される `data` は、それがなんであれ、値のオブジェクトでなければなりません。サーバー専用の `load` 関数の場合、これらの値は JSON シリアライズ 可能でなければなりません。トップレベルの promise は await されるので、ウォーターフォールを作ることなく、複数の promise を簡単に返すことができます:
+返される `data` は、それがなんであれ、値のオブジェクトでなければなりません。サーバー専用の `load` 関数の場合、これらの値は [devalue](https://github.com/rich-harris/devalue) でシリアライズできなければなりません。トップレベルの promise は await されるので、ウォーターフォールを作ることなく、複数の promise を簡単に返すことができます:
 
 ```js
 // @filename: $types.d.ts
@@ -326,8 +326,6 @@ _予期せぬ_ エラーがスローされた場合、SvelteKit は [`handleErro
 ### リダイレクト(Redirects)
 
 ユーザーをリダイレクトするには、`@sveltejs/kit` からインポートできる `redirect` ヘルパーを使用して、ステータスコード `3xx` と一緒にリダイレクト先の location を指定します。
-
-> `redirect` に関する既知のバグ : 現在、クライアントサイドナビゲーションで失敗します [#5952](https://github.com/sveltejs/kit/issues/5952)
 
 ```diff
 /// file: src/routes/admin/+layout.server.js
