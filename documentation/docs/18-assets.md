@@ -2,7 +2,7 @@
 title: アセットハンドリング
 ---
 
-### Caching and inlining
+### キャッシュとインライン化(Caching and inlining)
 
 パフォーマンス改善のため、[Vite はインポートされたアセットを自動的に処理します](https://vitejs.dev/guide/assets.html)。ハッシュがファイル名に追加されるのでキャッシュできるようになり、`assetsInlineLimit` より小さいアセットはインライン化されます。
 
@@ -29,6 +29,6 @@ export default {
 };
 ```
 
-### Transforming
+### 変換(Transforming)
 
-You may wish to transform your images to output compressed image formats such as `.webp` or `.avif`, responsive images with different sizes for different devices, or images with the EXIF data stripped for privacy. For images that are included statically, you may use a Vite plugin such as [vite-imagetools](https://github.com/JonasKruckenberg/imagetools). You may also consider a CDN, which can serve the appropriate transformed image based on the `Accept` HTTP header and query string parameters.
+イメージを変換して、`.webp` や `.avif` などの圧縮イメージフォーマットに変換したり、デバイスごとに異なるサイズのレスポンシブイメージを出力したり、プライバシーのために EXIF データを取り除いたイメージを出力したいことがあるかもしれません。静的に含まれるイメージについては、[vite-imagetools](https://github.com/JonasKruckenberg/imagetools) などの Vite プラグインを使用することができます。HTTP ヘッダーやクエリ文字列パラメータに基づいて適切に変換されたイメージを提供できる CDN を検討することもできます。

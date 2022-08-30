@@ -128,11 +128,11 @@ assert.equal(
 
 ### Advanced layouts
 
-By default, the _layout hierarchy_ mirrors the _route hierarchy_. In some cases, that might not be what you want.
+デフォルトでは、 _レイアウトの階層_ が _ルート(route)の階層_ に反映されます。場合によっては、そうしたくないこともあるかもしれません。
 
 #### (group)
 
-Perhaps you have some routes that are 'app' routes that should have one layout (e.g. `/dashboard` or `/item`), and others that are 'marketing' routes that should have a different layout (`/blog` or `/testimonials`). We can group these routes with a directory whose name is wrapped in parentheses — unlike normal directories, `(app)` and `(marketing)` do not affect the URL pathname of the routes inside them:
+'アプリ' のルート(routes)としてのレイアウト (例えば `/dashboard` や `/item`) が1つあり、'マーケティング' のルート(routes)としての別のレイアウト (`/blog` や `/testimonials`) があるかもしれません。これらのルート(routes)を、ディレクトリの名前を括弧でくくることでグループ化することができます。通常のディレクトリとは異なり、`(app)` や `(marketing)` はそれらの中のルート(routes)の URL パス名には影響しません:
 
 ```diff
 src/routes/
@@ -148,13 +148,13 @@ src/routes/
 └ +layout.svelte
 ```
 
-You can also put a `+page` directly inside a `(group)`, for example if `/` should be an `(app)` or a `(marketing)` page.
+`+page` を `(group)` の中に直接配置することもできます (例えば、`/` が `(app)` や `(marketing)` のページであるべき場合など)。
 
-Pages and layouts inside groups — as in any other directory — will inherit layouts above them, unless they _break out_ of the layout hierarchy as shown in the next section. In the above example, `(app)/+layout.svelte` and `(marketing)/+layout.svelte` both inherit `+layout.svelte`.
+次のセクションで示すように、グループの中にあるページとレイアウトは他のディレクトリと同様、レイアウトの階層から外れない限り、その上のレイアウトを継承します。上記の例では、`(app)/+layout.svelte` と `(marketing)/+layout.svelte` はどちらも `+layout.svelte` を継承します。
 
 #### +page@
 
-Conversely, some routes of your app might need to break out of the layout hierarchy. Let's add an `/item/[id]/embed` route inside the `(app)` group from the previous example:
+逆に、アプリのルート(routes)によっては、レイアウトの階層から外す必要があるものがあるかもしれません。先程の例の `(app)` グループの中に `/item/[id]/embed` を追加してみましょう:
 
 ```diff
 src/routes/
@@ -169,7 +169,7 @@ src/routes/
 └ +layout.svelte
 ```
 
-Ordinarily, this would inherit the root layout, the `(app)` layout, the `item` layout and the `[id]` layout. We can reset to one of those layouts by appending `@` followed by the segment name — or, for the root layout, the empty string. In this example, we can choose from `+page@.svelte`, `+page@(app).svelte`, `+page@item.svelte` or `+page@[id].svelte`:
+通常、これは最上位のレイアウト(root layout)と `(app)` レイアウトと `item` レイアウトと `[id]` レイアウトを継承します。`@` と、その後ろにセグメント名 (最上位のレイアウト(root layout)の場合は空文字列(empty string)) を追加することで、これらのレイアウトのどれかにリセットすることができます。この例では、`+page@.svelte`、`+page@(app).svelte`、`+page@item.svelte`、`+page@[id].svelte` から選択することができます:
 
 ```diff
 src/routes/
@@ -186,11 +186,11 @@ src/routes/
 
 #### +layout@
 
-Like pages, layouts can _themselves_ break out of their parent layout hierarchy, using the same technique. For example, a `+layout@.svelte` component would reset the hierarchy for all its child routes.
+ページと同じように、同じ方法でレイアウト _自体_ をその親のレイアウトの階層から外すことができます。例えば、`+layout@.svelte` コンポーネントはその全ての子ルート(routes)の階層をリセットします。
 
-#### When to use layout groups
+#### レイアウトグループを使うときは
 
-Not all use cases are suited for layout grouping, nor should you feel compelled to use them. It might be that your use case would result in complex `(group)` nesting, or that you don't want to introduce a `(group)` for a single outlier. It's perfectly fine to use other means such as composition (reusable `load` functions or Svelte components) or if-statements to achieve what you want. The following example shows a layout that rewinds to the root layout and reuses components and functions that other layouts can also use:
+全てのユースケースがレイアウトのグループ化に適しているわけではありませんし、無理に使用する必要もありません。あなたのユースケースが複雑な `(group)` のネストになってしまうかもしれませんし、たった1つの例外ケースのために `(group)` を導入したくないかもしれません。コンポジション (再利用可能な `load` 関数や Svelte コンポーネント) や if 文など、他の手段を使用してやりたいことを実現するのは全く問題ありません。以下の例では、最上位のレイアウト(root layout)に戻し、他のレイアウトでも使用できるコンポーネントや関数を再利用したレイアウトを示しています:
 
 ```svelte
 /// file: src/routes/nested/route/+layout@.svelte

@@ -50,9 +50,9 @@ declare namespace App {
 	export interface Locals {}
 
 	/**
-	 * Defines the common shape of the [$page.data store](https://kit.svelte.dev/docs/modules#$app-stores-page) - that is, the data that is shared between all pages.
-	 * The `Load` and `ServerLoad` functions in `./$types` will be narrowed accordingly.
-	 * Use optional properties for data that is only present on specific pages. Do not add an index signature (`[key: string]: any`).
+	 * [$page.data store](https://kit.svelte.jp/docs/modules#$app-stores-page) の共通の形、つまり全てのページ間で共有されるデータを定義します。
+	 * `./$types` にある `Load` と `ServerLoad` 関数が絞り込まれます。
+	 * 特定のページにしか存在しないデータについては、オプションのプロパティを使用してください。インデックスシグネチャ (`[key: string]: any`) を追加しないでください。
 	 */
 	export interface PageData {}
 
