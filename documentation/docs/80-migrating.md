@@ -73,14 +73,14 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 
 #### 名前が変わったファイル
 
-Routes now are made up of the folder name exclusively to remove ambiguity, the folder names leading up to a `+page.svelte` correspond to the route. See [the routing docs](/docs/routing) for an overview. The following shows a old/new comparison:
+ルート(Routes)は曖昧さをなくすためフォルダ名のみで構成されるようになり、`+page.svelte` までのフォルダ名がルート(route)に対応するようになりました。概要は [ルーティングのドキュメント](/docs/routing) をご参照ください。以下は 新/旧 の比較です:
 
 | Old                       | New                       |
 | ------------------------- | ------------------------- |
 | routes/about/index.svelte | routes/about/+page.svelte |
 | routes/about.svelte       | routes/about/+page.svelte |
 
-Your custom error page component should be renamed from `_error.svelte` to `+error.svelte`. Any `_layout.svelte` files should likewise be renamed `+layout.svelte`. [Any other files are ignored](https://kit.svelte.dev/docs/routing#other-files).
+カスタムのエラーページコンポーネントは `_error.svelte` から `+error.svelte` にリネームしてください。また、どの `_layout.svelte` ファイルも、同様に `+layout.svelte` にリネームしてください。[その他のファイルは無視されます](https://kit.svelte.jp/docs/routing#other-files).
 
 #### Imports
 
@@ -96,7 +96,7 @@ Your custom error page component should be renamed from `_error.svelte` to `+err
 
 この関数は `preload` から [`load`](/docs/load) にリネームされ、その API が変更されました。2 つの引数 — `page` と `session` — の代わりに、両方を 1 つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
 
-There is no more `this` object, and consequently no `this.fetch`, `this.error` or `this.redirect`. Instead, you can get [`fetch`](https://kit.svelte.dev/docs/load#input-methods-fetch) from the input methods, and both [`error`](https://kit.svelte.dev/docs/load#errors) and [`redirect`](https://kit.svelte.dev/docs/load#redirects) are now thrown.
+`this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。代わりに、[`fetch`](https://kit.svelte.jp/docs/load#input-methods-fetch) を input メソッドから使用できるようになり、[`error`](https://kit.svelte.jp/docs/load#errors) と [`redirect`](https://kit.svelte.jp/docs/load#redirects) の両方がスローされるようになりました。.
 
 #### Stores
 
