@@ -126,75 +126,97 @@ assert.equal(
 
 `%` 文字を表すには `%25` を使用してください。そうしないと、不正確な結果となります。
 
-### 名前付きレイアウト(Named layouts)
+### Advanced layouts
 
-アプリには、デフォルトのレイアウトとは違うレイアウトが必要になる部分もあるでしょう。そういったケースには、 _名前付きレイアウト(named layouts)_ を作成することができます…
+デフォルトでは、 _レイアウトの階層_ が _ルート(route)の階層_ に反映されます。場合によっては、そうしたくないこともあるかもしれません。
 
-```svelte
-/// file: src/routes/+layout-foo.svelte
-<div class="foo">
-	<slot></slot>
-</div>
-```
+#### (group)
 
-…そしてファイル名にあるレイアウトの名前(上記の例では `foo`) を参照し、それを使用します:
-
-```svelte
-/// file: src/routes/my-special-page/+page@foo.svelte
-<h1>I am inside +layout-foo</h1>
-```
-
-> 名前付きレイアウト(Named layout)は Svelte ファイルからのみ参照するようにしてください
-
-名前付きレイアウト(Named layouts)はとてもパワフルですが、理解するのに少し時間がかかるかもしれません。一度で理解できなくてもご心配なく。
-
-#### スコープ(Scoping)
-
-名前付きレイアウト(Named layouts)は任意の深さに作成することができ、同じサブツリーにあるどのコンポーネントにも適用されます。例えば、 `+layout-foo` は `/x/one` と `/x/two` に適用されますが、`/x/three` や `/four` には適用されません:
-
-```bash
-src/routes/
-├ x/
-│ ├ +layout-foo.svelte
-│ ├ one/+page@foo.svelte       # ✅ page has `@foo`
-│ ├ two/+page@foo.svelte       # ✅ page has `@foo`
-│ └ three/+page.svelte         # ❌ page does not have `@foo`
-└ four/+page@foo.svelte        # ❌ page has `@foo`, but +layout-foo is not 'in scope'
-```
-
-#### 継承チェーン(Inheritance chains)
-
-レイアウトは、同じディレクトリまたは親ディレクトリにある名前付きレイアウト(named layouts)を継承するかどうか選択できます。例えば `x/y/+layout@root.svelte` には名前が付いていないため、`/x/y` のデフォルトのレイアウトです (つまり、`/x/y/one`、`/x/y/two`、`/x/y/three` はどれもこのレイアウトを継承します)。`@root` を指定しているため、もっとも近くにある `+layout-root.svelte` を直接継承することになり、`+layout.svelte` と `x/+layout.svelte` をスキップします。
-
-```
-src/routes/
-├ x/
-│ ├ y/
-│ │ ├ +layout@root.svelte
-│ │ ├ one/+page.svelte
-│ │ ├ two/+page.svelte
-│ │ └ three/+page.svelte
-│ └ +layout.svelte
-├ +layout.svelte
-└ +layout-root.svelte
-```
-
-> `+layout-root.svelte` が単独の `<slot />` のみを含んでいる場合、アプリ内のネストレイアウト(nested layout)に `@root` を付けることで、任意のページをブランクレイアウトに 'リセット' することができます。
-
-親が指定されていない場合、レイアウトはツリー上もっとも近くにあるデフォルトのレイアウト(つまり名前が付いていないレイアウト)を継承することになります。例えば `+layout-root.svelte` が `+layout.svelte` を継承するように、名前付きレイアウト(named layout)がそのツリーに並ぶデフォルトレイアウトを継承していると便利な場合があります。明示的に `@default` を指定することでこれができ、`/x/y/one` とその兄弟がアプリのデフォルトのレイアウトを使用するのに `x/+layout.svelte` を使う必要がなくなります:
+'アプリ' のルート(routes)としてのレイアウト (例えば `/dashboard` や `/item`) が1つあり、'マーケティング' のルート(routes)としての別のレイアウト (`/blog` や `/testimonials`) があるかもしれません。これらのルート(routes)を、ディレクトリの名前を括弧でくくることでグループ化することができます。通常のディレクトリとは異なり、`(app)` や `(marketing)` はそれらの中のルート(routes)の URL パス名には影響しません:
 
 ```diff
 src/routes/
-├ x/
-│ ├ y/
-│ │ ├ +layout@root.svelte
-│ │ ├ one/+page.svelte
-│ │ ├ two/+page.svelte
-│ │ └ three/+page.svelte
++│ (app)/
+│ ├ dashboard/
+│ ├ item/
 │ └ +layout.svelte
-├ +layout.svelte
--└ +layout-root.svelte
-+└ +layout-root@default.svelte
++│ (marketing)/
+│ ├ about/
+│ ├ testimonials/
+│ └ +layout.svelte
+├ admin/
+└ +layout.svelte
 ```
 
-> `default` は予約済の名前です。言い換えると、`+layout-default.svelte` というファイルを使用することはできないということです。
+`+page` を `(group)` の中に直接配置することもできます (例えば、`/` が `(app)` や `(marketing)` のページであるべき場合など)。
+
+次のセクションで示すように、グループの中にあるページとレイアウトは他のディレクトリと同様、レイアウトの階層から外れない限り、その上のレイアウトを継承します。上記の例では、`(app)/+layout.svelte` と `(marketing)/+layout.svelte` はどちらも `+layout.svelte` を継承します。
+
+#### +page@
+
+逆に、アプリのルート(routes)によっては、レイアウトの階層から外す必要があるものがあるかもしれません。先程の例の `(app)` グループの中に `/item/[id]/embed` を追加してみましょう:
+
+```diff
+src/routes/
+├ (app)/
+│ ├ item/
+│ │ ├ [id]/
+│ │ │ ├ embed/
++│ │ │ │ └ +page.svelte
+│ │ │ └ +layout.svelte
+│ │ └ +layout.svelte
+│ └ +layout.svelte
+└ +layout.svelte
+```
+
+通常、これは最上位のレイアウト(root layout)と `(app)` レイアウトと `item` レイアウトと `[id]` レイアウトを継承します。`@` と、その後ろにセグメント名 (最上位のレイアウト(root layout)の場合は空文字列(empty string)) を追加することで、これらのレイアウトのどれかにリセットすることができます。この例では、`+page@.svelte`、`+page@(app).svelte`、`+page@item.svelte`、`+page@[id].svelte` から選択することができます:
+
+```diff
+src/routes/
+├ (app)/
+│ ├ item/
+│ │ ├ [id]/
+│ │ │ ├ embed/
++│ │ │ │ └ +page@(app).svelte
+│ │ │ └ +layout.svelte
+│ │ └ +layout.svelte
+│ └ +layout.svelte
+└ +layout.svelte
+```
+
+#### +layout@
+
+ページと同じように、同じ方法でレイアウト _自体_ をその親のレイアウトの階層から外すことができます。例えば、`+layout@.svelte` コンポーネントはその全ての子ルート(routes)の階層をリセットします。
+
+#### レイアウトグループを使うときは
+
+全てのユースケースがレイアウトのグループ化に適しているわけではありませんし、無理に使用する必要もありません。あなたのユースケースが複雑な `(group)` のネストになってしまうかもしれませんし、たった1つの例外ケースのために `(group)` を導入したくないかもしれません。コンポジション (再利用可能な `load` 関数や Svelte コンポーネント) や if 文など、他の手段を使用してやりたいことを実現するのは全く問題ありません。以下の例では、最上位のレイアウト(root layout)に戻し、他のレイアウトでも使用できるコンポーネントや関数を再利用したレイアウトを示しています:
+
+```svelte
+/// file: src/routes/nested/route/+layout@.svelte
+<script>
+	import ReusableLayout from '$lib/ReusableLayout.svelte';
+	export let data;
+</script>
+
+<ReusableLayout {data}>
+	<slot />
+</ReusableLayout>
+```
+
+```js
+/// file: src/routes/nested/route/+layout.js
+// @filename: ambient.d.ts
+declare module "$lib/reusable-load-function" {
+	export function reusableLoad(event: import('@sveltejs/kit').LoadEvent): Promise<Record<string, any>>;
+}
+// @filename: index.js
+// ---cut---
+import { reusableLoad } from '$lib/reusable-load-function';
+
+/** @type {import('./$types').PageLoad} */
+export function load(event) {
+	// Add additional logic here, if needed
+	return reusableLoad(event);
+}
+```

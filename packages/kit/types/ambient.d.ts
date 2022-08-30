@@ -7,15 +7,13 @@
  * declare namespace App {
  * 	interface Locals {}
  *
+ * 	interface PageData {}
+ *
  * 	interface Platform {}
- *
- * 	interface PrivateEnv {}
- *
- * 	interface PublicEnv {}
  * }
  * ```
  *
- * これらのインターフェースを作成することによって、`env`、`event.locals`、`event.platform` を使用する際に型の安全性を確保することができます。
+ * これらのインターフェースを作成することによって、`event.locals`、`event.platform`、`load` 関数の `data` を使用する際に型の安全性を確保することができます。
  *
  * アンビエント宣言(ambient declaration)ファイルであるため、`import` 文を使用するときには注意が必要です。`import` を
  * トップレベルに追加すると、宣言ファイル (declaration file) はアンビエント (ambient) とはみなされなくなるため、他のファイルでこれらの型付けにアクセスできなくなります。
@@ -48,27 +46,24 @@ declare namespace App {
 	export interface Locals {}
 
 	/**
+	 * [$page.data store](https://kit.svelte.jp/docs/modules#$app-stores-page) の共通の形、つまり全てのページ間で共有されるデータを定義します。
+	 * `./$types` にある `Load` と `ServerLoad` 関数が絞り込まれます。
+	 * 特定のページにしか存在しないデータについては、オプションのプロパティを使用してください。インデックスシグネチャ (`[key: string]: any`) を追加しないでください。
+	 */
+	export interface PageData {}
+
+	/**
 	 * adapter が `event.platform` で [プラットフォーム固有の情報](https://kit.svelte.jp/docs/adapters#supported-environments-platform-specific-context) を提供する場合、ここでそれを指定することができます。
 	 */
 	export interface Platform {}
-
-	/**
-	 * `$env/dynamic/private` からエクスポートされる動的な環境変数を定義する interface です。
-	 */
-	export interface PrivateEnv extends Record<string, string> {}
-
-	/**
-	 * `$env/dynamic/public` からエクスポートされる動的な環境変数を定義する interface です。
-	 */
-	export interface PublicEnv extends Record<string, string> {}
 }
 
 /**
  * ```ts
- * import { browser, dev, prerendering } from '$app/env';
+ * import { browser, dev, prerendering } from '$app/environment';
  * ```
  */
-declare module '$app/env' {
+declare module '$app/environment' {
 	/**
 	 * アプリがブラウザで動作している場合 `true` です。
 	 */
@@ -83,39 +78,6 @@ declare module '$app/env' {
 	 * プリレンダリング時は `true`、それ以外の場合は `false` です。
 	 */
 	export const prerendering: boolean;
-}
-
-/**
- * このモジュールは、実行中のプラットフォームで定義された、実行時の環境変数へのアクセスを提供します。例えば、
- * [`adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) を使用している場合 (または
- * [`vite preview`](https://kit.svelte.jp/docs/cli) の実行中の場合)、これは `process.env` と同じです。このモジュールは
- * [`config.kit.env.publicPrefix`](https://kit.svelte.jp/docs/configuration#kit-env-publicprefix) で始まらない変数のみを含んでいます。
- *
- * このモジュールはクライアントサイドのコードにインポートできません。
- *
- * ```ts
- * import { env } from '$env/dynamic/private';
- * console.log(env.DEPLOYMENT_SPECIFIC_VARIABLE);
- * ```
- */
-declare module '$env/dynamic/private' {
-	export let env: App.PrivateEnv;
-}
-
-/**
- * [`$env/dynamic/private`](https://kit.svelte.jp/docs/modules#$env-dynamic-private) と似ていますが、
- * [`config.kit.env.publicPrefix`](https://kit.svelte.jp/docs/configuration#kit-env-publicprefix) で始まる変数のみを含んでいるため
- * (デフォルトは `PUBLIC_`)、クライアントサイドのコードに安全に公開することができます。
- *
- * パブリックで動的な環境変数は全てサーバーからクライアントに送られるため、より大きなネットワークリクエストを引き起こすことにご注意ください。可能であれば、代わりに `$env/static/public` をお使いください。
- *
- * ```ts
- * import { env } from '$env/dynamic/public';
- * console.log(env.PUBLIC_DEPLOYMENT_SPECIFIC_VARIABLE);
- * ```
- */
-declare module '$env/dynamic/public' {
-	export let env: App.PublicEnv;
 }
 
 /**
@@ -151,7 +113,7 @@ declare module '$app/navigation' {
 		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
 	): Promise<void>;
 	/**
-	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` している場合は `load` 関数を再実行し、無効化(invalidate) されたリソースがページそのものの場合はページエンドポイントからデータを再取得させます。引数なしの場合、全てのリソースが 無効化・再実行(invalidate) されます。ページが更新されたときに解決される `Promise` を返します。
+	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` している場合は `load` 関数を再実行します。引数なしの場合、全てのリソースが 無効化・再実行(invalidate) されます。ページが更新されたときに解決される `Promise` を返します。
 	 * @param dependency The invalidated resource
 	 */
 	export function invalidate(dependency?: string | ((href: string) => boolean)): Promise<void>;
@@ -160,7 +122,7 @@ declare module '$app/navigation' {
 	 *  1. そのページのコードが取得され読み込まれていることを確認し、
 	 *  2. そのページの load 関数を適切なオプションで呼び出します。
 	 *
-	 * `sveltekit:prefetch` が使用された `<a>` 要素をユーザーがタップまたはマウスオーバーしたときに SvelteKit がトリガーする動作と同じです。
+	 * `data-sveltekit-prefetch` が使用された `<a>` 要素をユーザーがタップまたはマウスオーバーしたときに SvelteKit がトリガーする動作と同じです。
 	 * 次のナビゲーション先が `href` である場合、load から返される値が使われるので、ナビゲーションを瞬時に行うことができます。
 	 * プリフェッチが完了したときに解決される Promise を返します。
 	 *

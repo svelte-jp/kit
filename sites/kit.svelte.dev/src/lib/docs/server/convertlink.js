@@ -14,7 +14,8 @@ const docs_routing = new Map([
 ]);
 
 const docs_advanced_routing = new Map([
-	['Restパラメータ', 'Rest parameters']
+	['Restパラメータ', 'Rest parameters'],
+	['レイアウトグループを使うときは', 'When to use layout groups']
 ]);
 
 const docs_load = new Map([
@@ -42,8 +43,6 @@ const docs_seo = new Map([
 ]);
 
 const docs_assets = new Map([
-	['ハッシュ化', 'Hashing'],
-	['最適化', 'Optimization']
 ]);
 
 const docs_accessibility = new Map([

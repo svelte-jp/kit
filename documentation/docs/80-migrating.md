@@ -44,7 +44,7 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 
 #### src/client.js
 
-SvelteKit にはこのファイルに相当するものはありません。カスタムロジック(`sapper.start(...)` 以降) は、`__layout.svelte` ファイルの `onMount` コールバック内に記述してくさい。
+SvelteKit にはこのファイルに相当するものはありません。カスタムロジック(`sapper.start(...)` 以降) は、`+layout.svelte` ファイルで、`onMount` コールバック内に記述してくさい。
 
 #### src/server.js
 
@@ -73,7 +73,14 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 
 #### 名前が変わったファイル
 
-カスタムエラーページコンポーネントを `_error.svelte` から `__error.svelte` にリネームしてください。同様に、`_layout.svelte` ファイルも `__layout.svelte` にリネームしてください。SvelteKit では二重のアンダースコアの接頭辞をリザーブしています。[プライベートモジュール](/docs/routing#private-modules)にはまだ接頭辞として `_` を 1 つ付けます([`ルート(routes)`](/docs/configuration#routes)コンフィグで変更可能です)。
+ルート(Routes)は曖昧さをなくすためフォルダ名のみで構成されるようになり、`+page.svelte` までのフォルダ名がルート(route)に対応するようになりました。概要は [ルーティングのドキュメント](/docs/routing) をご参照ください。以下は 新/旧 の比較です:
+
+| Old                       | New                       |
+| ------------------------- | ------------------------- |
+| routes/about/index.svelte | routes/about/+page.svelte |
+| routes/about.svelte       | routes/about/+page.svelte |
+
+カスタムのエラーページコンポーネントは `_error.svelte` から `+error.svelte` にリネームしてください。また、どの `_layout.svelte` ファイルも、同様に `+layout.svelte` にリネームしてください。[その他のファイルは無視されます](https://kit.svelte.jp/docs/routing#other-files).
 
 #### Imports
 
@@ -89,9 +96,7 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 
 この関数は `preload` から [`load`](/docs/load) にリネームされ、その API が変更されました。2 つの引数 — `page` と `session` — の代わりに、両方を 1 つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
 
-`this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。プロパティ(props)を直接返す代わりに、`load` は `props` やその他様々なものを _含む_ オブジェクトを返すようになりました。
-
-最後に、もしページに `load` メソッドがある場合は、必ず何かを返すようにしてください。そうしないと `Not found` になります。
+`this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。代わりに、[`fetch`](https://kit.svelte.jp/docs/load#input-methods-fetch) を input メソッドから使用できるようになり、[`error`](https://kit.svelte.jp/docs/load#errors) と [`redirect`](https://kit.svelte.jp/docs/load#redirects) の両方がスローされるようになりました。.
 
 #### Stores
 
@@ -127,12 +132,12 @@ Sapper では、相対 URL は、現在のページに対してではなく、ba
 
 #### &lt;a&gt; attributes
 
-- `sapper:prefetch` は現在 `sveltekit:prefetch` になりました
-- `sapper:noscroll` は現在 `sveltekit:noscroll` になりました
+- `sapper:prefetch` is now `data-sveltekit-prefetch`
+- `sapper:noscroll` is now `data-sveltekit-noscroll`
 
 ### Endpoints
 
-Sapper では、'server routes' (現在は [エンドポイント(endpoints)](/docs/routing#endpoints) と呼ばれる) は、Node の `http` モジュール によって公開される `req` と `res` オブジェクト(または Polka や Express などのフレームワークが提供するその拡張版) を受け取っていました。
+Sapper では、[サーバールート(server routes)](/docs/routing#server) は、Node の `http` モジュール によって公開される `req` と `res` オブジェクト(または Polka や Express などのフレームワークが提供するその拡張版) を受け取っていました。
 
 SvelteKit は、アプリが動作する場所に依存しないように設計されています(Node サーバーで動作し、サーバーレスプラットフォームや Cloudflare Worker でも同様に動作します)。そのため、もう `req` と `res` を直接扱いません。エンドポイントを、新しいシグネチャに合わせて更新する必要があります。
 
@@ -154,7 +159,7 @@ declare module 'html-minifier';
 // @filename: index.js
 // ---cut---
 import { minify } from 'html-minifier';
-import { prerendering } from '$app/env';
+import { prerendering } from '$app/environment';
 
 const minification_options = {
 	collapseBooleanAttributes: true,

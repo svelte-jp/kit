@@ -106,7 +106,7 @@ export async function load({ params }) {
 }
 ```
 
-クライアントサイドナビゲーション中は、SvelteKit は `fetch` を使用してデータを読み込みます。つまり、その戻り値は JSON としてシリアライズ可能でなければなりません。
+クライアントサイドナビゲーション中は、SvelteKit はサーバーからこのデータを読み込みます。つまり、その戻り値は [devalue](https://github.com/rich-harris/devalue) によってシリアライズできなければなりません。
 
 #### Actions
 
@@ -300,7 +300,7 @@ export function load() {
 
 ### +server
 
-ページと同様に、`+server.js` ファイル (よく 'API route' または 'endpoint' とも呼ばれる) でルート(routes) を定義でき、これによってレスポンスを完全にコントロールすることができます。`+server.js` ファイル (または `+server.ts`) は `GET`、`POST`、`PATCH`、`PUT`、`DELETE` などの HTTP verbs に対応する関数をエクスポートします。これは `RequestEvent` を引数に取り、[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) オブジェクトを返します。
+ページと同様に、`+server.js` ファイル (よく 'API ルート(API route)' または 'エンドポイント(endpoint)' とも呼ばれる) でルート(routes) を定義でき、これによってレスポンスを完全にコントロールすることができます。`+server.js` ファイル (または `+server.ts`) は `GET`、`POST`、`PATCH`、`PUT`、`DELETE` などの HTTP verbs に対応する関数をエクスポートします。これは `RequestEvent` を引数に取り、[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) オブジェクトを返します。
 
 例えば、`GET` ハンドラーを使用した `/api/random-number` ルート(route)を作成できます:
 

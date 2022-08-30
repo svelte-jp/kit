@@ -4,7 +4,7 @@ title: Loading data
 
 [`+page.svelte`](/docs/routing#page-page-svelte) や [`+layout.svelte`](/docs/routing#layout-layout-svelte) は `load` 関数からその `data` を取得します。
 
-もし `load` 関数が `+page.js` や `+layout.js` に定義されている場合は、サーバーとブラウザのどちらでも実行されます。代わりに `+page.server.js` や `+layout.server.js` に定義されている場合はサーバー上でのみ実行され、例えばデータベースにコールしたりプライベートな [環境変数](/docs/modules#$env-static-private) にアクセスすることができます。ただし、JSON としてシリアライズされたデータを返さなければなりません。
+もし `load` 関数が `+page.js` や `+layout.js` に定義されている場合は、サーバーとブラウザのどちらでも実行されます。代わりに `+page.server.js` や `+layout.server.js` に定義されている場合はサーバー上でのみ実行され、例えばデータベースにコールしたりプライベートな [環境変数](/docs/modules#$env-static-private) にアクセスすることができます。ただし、[devalue](https://github.com/rich-harris/devalue) でシリアライズされたデータのみを返すことができます。どちらの場合でも、戻り値は (もしあれば) オブジェクトでなければなりません。
 
 ```js
 /// file: src/routes/+page.js
@@ -22,8 +22,7 @@ export function load(event) {
 
 #### data
 
-Very rarely, you might need both a `+page.js` and a `+page.server.js` (or the `+layout` equivalent). In these cases, the `data` for `+page.svelte` comes from `+page.js`, which in turn receives `data` from the server:
-ごくまれに、`+page.js` と `+page.server.js` の両方が必要になることがあります (`+layout` も同様)。このような場合、`+page.js` はサーバーから `data` を受け取り、その後に `+page.svelte` に `data` を渡します:
+ごくまれに、`+page.js` と `+page.server.js` (または `+layout` と同等のもの) の両方が必要になることがあります。このような場合、`+page.js` はサーバーから `data` を受け取り、その後に `+page.svelte` に `data` を渡します:
 
 ```js
 /// file: src/routes/my-route/+page.server.js
@@ -257,7 +256,7 @@ export async function load({ setHeaders }) {
 
 ### Output
 
-返される `data` オブジェクトにある promise は、それらがトップレベルのプロパティである場合、解決されます。これにより、ウォーターフォールを作ることなく、簡単に複数のプロミスを返すことができます:
+返される `data` は、それがなんであれ、値のオブジェクトでなければなりません。サーバー専用の `load` 関数の場合、これらの値は [devalue](https://github.com/rich-harris/devalue) でシリアライズできなければなりません。トップレベルの promise は await されるので、ウォーターフォールを作ることなく、複数の promise を簡単に返すことができます:
 
 ```js
 // @filename: $types.d.ts
@@ -350,9 +349,15 @@ export function load({ locals }) {
 
 SvelteKit は、ナビゲーション中に `load` 関数の不必要な再実行を避けるために、各 `load` 関数の依存関係(dependencies)を追跡します。例えば、あるページから別のページにナビゲーションするとき、最上位の `+layout.js` の `load` 関数が参照する `url` や `params` のメンバーが直前のナビゲーションから変わっていなければ、再実行する必要はありません。
 
-[`invalidate(url)`](/docs/modules#$app-navigation-invalidate) を使用すると、実行済みのリソース(the invalidated resource)に依存する `load` 関数を再実行することができます (暗黙的には [`fetch`](#fetch) を介して、または明示的に [`depends`](#depends) を介して)。引数なしで `invalidate()` を呼び出すことで、 _全ての_ `load` 関数 を再実行(invalidate)することもできます。
+`load` 関数は以下の状況で再実行されます:
 
-`load` 関数の再実行がトリガーされても、ページは再マウントされません — 代わりに、新しい `data` で更新されます。
+- 参照している `params` プロパティの値が変更された場合
+- 参照している `url` プロパティ (`url.pathname` や `url.search`) の値が変更された場合
+- `await parent()` を呼び出していて、親の `load` 関数が再実行された場合
+- [`fetch`](#fetch) や [`depends`](#depends) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](/docs/modules#$app-navigation-invalidate) で無効 (invalid) であるとマークされた場合
+- [`invalidate()`](/docs/modules#$app-navigation-invalidate) によって全ての有効な `load` 関数が強制的に再実行された場合
+
+`load` 関数の再実行がトリガーされた場合、ページは再マウントされません。その代わり、新しい `data` で更新されます。つまり、コンポーネントの内部状態は保持されるということです。これがお望みでなければ、[`afterNavigate`](/docs/modules#$app-navigation-afternavigate) コールバックの中でリセットすることができますし、コンポーネントを [`{#key ...}`](https://svelte.jp/docs#template-syntax-key) ブロックでくくることもできます。
 
 ### 状態の共有(Shared state)
 

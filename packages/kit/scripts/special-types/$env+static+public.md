@@ -1,6 +1,6 @@
-Similar to [`$env/static/private`](https://kit.svelte.dev/docs/modules#$env-static-private), except that it only includes environment variables that begin with [`config.kit.env.publicPrefix`](https://kit.svelte.dev/docs/configuration#kit-env-publicprefix) (which defaults to `PUBLIC_`), and can therefore safely be exposed to client-side code.
+[`$env/static/private`](https://kit.svelte.jp/docs/modules#$env-static-private) と似ていますが、[`config.kit.env.publicPrefix`](https://kit.svelte.jp/docs/configuration#kit-env-publicprefix) (デフォルトは `PUBLIC_`) で始まる変数のみを含んでおり、クライアントサイドのコードに安全に公開することができます。
 
-Values are replaced statically at build time.
+値はビルド時に静的に置き換えられます。
 
 ```ts
 import { PUBLIC_BASE_URL } from '$env/static/public';
