@@ -83,20 +83,13 @@ export async function GET() {
 
 #### AMP
 
-現代の web 開発における不幸な現実として、サイトの [Accelerated Mobile Pages (AMP)](https://amp.dev/) バージョンを作らなければならないときがある、というのがあります。SvelteKit では、以下の [コンフィグレーション](/docs/configuration) オプションを設定することでこれを実現することができます…
+現代の web 開発における不幸な現実として、サイトの [Accelerated Mobile Pages (AMP)](https://amp.dev/) バージョンを作らなければならないときがある、というのがあります。SvelteKit では、[`inlineStyleThreshold`](/docs/configuration#inlinestylethreshold) オプションを設定することでこれを実現することができます…
 
 ```js
 /// file: svelte.config.js
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		// the combination of these options
-		// disables JavaScript
-		browser: {
-			hydrate: false,
-			router: false
-		},
-
 		// since <link rel="stylesheet"> isn't
 		// allowed, inline all styles
 		inlineStyleThreshold: Infinity
@@ -106,7 +99,14 @@ const config = {
 export default config;
 ```
 
-…そして `@sveltejs/amp` から `transform` をインポートし、`transformPageChunk` とともに使用して、HTML を変換します:
+...disabling `csr` in your root `+layout.js`/`+layout.server.js`...
+
+```js
+/// file: src/routes/+layout.server.js
+export const csr = false;
+```
+
+...and transforming the HTML using `transformPageChunk` along with `transform` imported from `@sveltejs/amp`:
 
 ```js
 import * as amp from '@sveltejs/amp';

@@ -69,9 +69,11 @@ export function load({ params }) {
 
 `page.js` では、`load` だけでなくページの動作(behaviour)を設定するための値をエクスポートすることができます:
 
-- `export const prerender = true` または `false` により、[`config.kit.prerender.default`](/docs/configuration#prerender) を上書き(override)します。
-- `export const hydrate = true` または `false` により、 [`config.kit.browser.hydrate`](/docs/configuration#browser) を上書き(override)します。
-- `export const router = true` または `false` により、 [`config.kit.browser.router`](/docs/configuration#browser) 上書き(override)します。
+- `export const prerender = true` または `false` または `'auto'`
+- `export const ssr = true` または `false`
+- `export const csr = true` または `false`
+
+これらに関するより詳しい情報は [page options](/docs/page-options) をご覧ください。
 
 #### +page.server.js
 
@@ -108,74 +110,9 @@ export async function load({ params }) {
 
 クライアントサイドナビゲーション中は、SvelteKit はサーバーからこのデータを読み込みます。つまり、その戻り値は [devalue](https://github.com/rich-harris/devalue) によってシリアライズできなければなりません。
 
-#### Actions
+`+page.js` のように、`+page.server.js` は [page options](/docs/page-options) (`prerender`、`ssr`、`csr`) をエクスポートできます。
 
-`+page.server.js` は、`POST`、`PATCH`、`PUT`、`DELETE` といった HTTP メソッドに対応した _actions_ を宣言することもできます。これらのいずれかのメソッドを使用してページにリクエストを行うと、ページをレンダリングする前に対応するアクションを呼び出します。
-
-バリデーションエラー (validation errors) が発生した場合、action は `{ status?, errors }` オブジェクトを返すことができます (`status` はデフォルトでは `400` です)。また、ユーザーを他のページにリダイレクトするのに、オプションで `{ location }` オブジェクトを返すことができます:
-
-```js
-/// file: src/routes/login/+page.server.js
-
-// @filename: ambient.d.ts
-declare global {
-	const createSessionCookie: (userid: string) => string;
-	const hash: (content: string) => string;
-	const db: {
-		findUser: (name: string) => Promise<{
-			id: string;
-			username: string;
-			password: string;
-		}>
-	}
-}
-
-export {};
-
-// @filename: index.js
-// ---cut---
-import { error } from '@sveltejs/kit';
-
-/** @type {import('./$types').Action} */
-export async function POST({ request, setHeaders, url }) {
-	const values = await request.formData();
-
-	const username = /** @type {string} */ (values.get('username'));
-	const password = /** @type {string} */ (values.get('password'));
-
-	const user = await db.findUser(username);
-
-	if (!user) {
-		return {
-			status: 403,
-			errors: {
-				username: 'No user with this username'
-			}
-		};
-	}
-
-	if (user.password !== hash(password)) {
-		return {
-			status: 403,
-			errors: {
-				password: 'Incorrect password'
-			}
-		};
-	}
-
-	setHeaders({
-		'set-cookie': createSessionCookie(user.id)
-	});
-
-	return {
-		location: url.searchParams.get('redirectTo') ?? '/'
-	};
-}
-```
-
-バリデーションエラー(validation `errors`) が返される場合は、`+page.svelte` の中で `export let errors` として使用できます。
-
-> actions の API は近い将来変更される可能性があります: https://github.com/sveltejs/kit/discussions/5875
+また、`+page.server.js` ファイルは _actions_ をエクスポートできます。`load` がサーバーからデータを読み取る場合、`actions` は `<form>` 要素を使用してサーバーにデータを書き込むことができます。これらの使い方を学ぶには、[form actions](/docs/form-actions) セクションをご参照ください。
 
 ### +error
 
@@ -190,7 +127,7 @@ export async function POST({ request, setHeaders, url }) {
 <h1>{$page.status}: {$page.error.message}</h1>
 ```
 
-SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラー境界 (error boundary) を探します — もし上記のファイルが存在しない場合は、デフォルトのエラーページをレンダリングする前に `src/routes/blog/+error.svelte` を探しに行き、その次に `src/routes/+error.svelte` を探します。
+SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラー境界 (error boundary) を探します — もし上記のファイルが存在しない場合は、デフォルトのエラーページをレンダリングする前に `src/routes/blog/+error.svelte` を探しに行き、その次に `src/routes/+error.svelte` を探します。If _that_ fails, SvelteKit will bail out and render a static fallback error page, which you can customise by creating a `src/error.html` file.
 
 ### +layout
 
@@ -278,7 +215,7 @@ export function load() {
 }
 ```
 
-`+page.js` とは異なり、`+layout.js` は `prerender`、`hydrate`、`router` をエクスポートできません。これらはページレベルのオプションだからです。
+`+layout.js` が [page options](/docs/page-options) (`prerender`、`ssr`、`csr`) をエクスポートする場合、それは子ページのデフォルトとしても使用されます。
 
 レイアウトの `load` 関数から返されるデータは全ての子ページで利用することができます:
 
@@ -297,6 +234,8 @@ export function load() {
 #### +layout.server.js
 
 サーバー上でレイアウトの `load` 関数を実行するためには、それを `+layout.server.js` に移動し、`LayoutLoad` 型を `LayoutServerLoad` に変更します。
+
+Like `+layout.js`, `+layout.server.js` can export [page options](/docs/page-options) — `prerender`, `ssr` and `csr`.
 
 ### +server
 

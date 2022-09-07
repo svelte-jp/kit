@@ -97,11 +97,11 @@ function kit() {
 	/** @type {import('types').Prerendered} */
 	let prerendered;
 
+	/** @type {import('types').PrerenderMap} */
+	let prerender_map;
+
 	/** @type {import('types').BuildData} */
 	let build_data;
-
-	/** @type {Set<string>} */
-	let illegal_imports;
 
 	/** @type {string | undefined} */
 	let deferred_warning;
@@ -209,13 +209,6 @@ function kit() {
 				client_out_dir: `${svelte_config.kit.outDir}/output/client`
 			};
 
-			illegal_imports = new Set([
-				'/@id/__x00__$env/dynamic/private', //dev
-				'\0$env/dynamic/private', // prod
-				'/@id/__x00__$env/static/private', // dev
-				'\0$env/static/private' // prod
-			]);
-
 			if (is_build) {
 				manifest_data = (await sync.all(svelte_config, config_env.mode)).manifest_data;
 
@@ -296,9 +289,15 @@ function kit() {
 				case '\0$env/static/public':
 					return create_static_module('$env/static/public', env.public);
 				case '\0$env/dynamic/private':
-					return create_dynamic_module('private');
+					return create_dynamic_module(
+						'private',
+						vite_config_env.command === 'serve' ? env.private : undefined
+					);
 				case '\0$env/dynamic/public':
-					return create_dynamic_module('public');
+					return create_dynamic_module(
+						'public',
+						vite_config_env.command === 'serve' ? env.public : undefined
+					);
 			}
 		},
 
@@ -352,7 +351,7 @@ function kit() {
 						prevent_illegal_rollup_imports(
 							this.getModuleInfo.bind(this),
 							module_node,
-							illegal_imports
+							vite.normalizePath(svelte_config.kit.files.lib)
 						);
 					}
 				});
@@ -419,7 +418,6 @@ function kit() {
 						[
 							vite_config.build.outDir,
 							results_path,
-							manifest_path,
 							'' + verbose,
 							JSON.stringify({ ...env.private, ...env.public })
 						],
@@ -432,12 +430,16 @@ function kit() {
 						if (code) {
 							reject(new Error(`Prerendering failed with code ${code}`));
 						} else {
-							prerendered = JSON.parse(fs.readFileSync(results_path, 'utf8'), (key, value) => {
+							const results = JSON.parse(fs.readFileSync(results_path, 'utf8'), (key, value) => {
 								if (key === 'pages' || key === 'assets' || key === 'redirects') {
 									return new Map(value);
 								}
 								return value;
 							});
+
+							prerendered = results.prerendered;
+							prerender_map = new Map(results.prerender_map);
+
 							fulfil(undefined);
 						}
 					});
@@ -476,7 +478,7 @@ function kit() {
 
 				if (svelte_config.kit.adapter) {
 					const { adapt } = await import('../../core/adapt/index.js');
-					await adapt(svelte_config, build_data, prerendered, { log });
+					await adapt(svelte_config, build_data, prerendered, prerender_map, { log });
 				} else {
 					console.log(colors.bold().yellow('\nNo adapter specified'));
 
@@ -505,7 +507,7 @@ function kit() {
 				if (deferred_warning) console.error('\n' + deferred_warning);
 			};
 
-			return await dev(vite, vite_config, svelte_config, illegal_imports);
+			return await dev(vite, vite_config, svelte_config);
 		},
 
 		/**

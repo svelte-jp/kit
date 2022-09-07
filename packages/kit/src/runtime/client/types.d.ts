@@ -1,8 +1,10 @@
+import { applyAction } from '$app/forms';
 import {
 	afterNavigate,
 	beforeNavigate,
 	goto,
 	invalidate,
+	invalidateAll,
 	prefetch,
 	prefetchRoutes
 } from '$app/navigation';
@@ -17,8 +19,10 @@ export interface Client {
 	disable_scroll_handling: () => void;
 	goto: typeof goto;
 	invalidate: typeof invalidate;
+	invalidateAll: typeof invalidateAll;
 	prefetch: typeof prefetch;
 	prefetch_routes: typeof prefetchRoutes;
+	apply_action: typeof applyAction;
 
 	// private API
 	_hydrate: (opts: {
@@ -28,27 +32,21 @@ export interface Client {
 		params: Record<string, string>;
 		routeId: string | null;
 		data: Array<import('types').ServerDataNode | null>;
-		errors: Record<string, any> | null;
+		form: Record<string, any> | null;
 	}) => Promise<void>;
 	_start_router: () => void;
 }
 
 export type NavigationIntent = {
-	/**
-	 * `url.pathname + url.search`
-	 */
+	/** `url.pathname + url.search`  */
 	id: string;
-	/**
-	 * The route parameters
-	 */
+	/** Whether we are invalidating or navigating */
+	invalidating: boolean;
+	/** The route parameters */
 	params: Record<string, string>;
-	/**
-	 * The route that matches `path`
-	 */
+	/** The route that matches `path` */
 	route: CSRRoute;
-	/**
-	 * The destination URL
-	 */
+	/** The destination URL */
 	url: URL;
 };
 
@@ -79,10 +77,11 @@ export interface DataNode {
 	uses: Uses;
 }
 
-export type NavigationState = {
+export interface NavigationState {
 	branch: Array<BranchNode | undefined>;
 	error: HttpError | Error | null;
 	params: Record<string, string>;
+	route: CSRRoute | null;
 	session_id: number;
 	url: URL;
-};
+}

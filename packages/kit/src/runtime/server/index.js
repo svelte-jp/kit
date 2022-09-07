@@ -1,46 +1,39 @@
+import * as cookie from 'cookie';
 import { render_endpoint } from './endpoint.js';
 import { render_page } from './page/index.js';
 import { render_response } from './page/render.js';
 import { respond_with_error } from './page/respond_with_error.js';
 import { coalesce_to_error } from '../../utils/error.js';
-import { serialize_error, GENERIC_ERROR } from './utils.js';
+import { GENERIC_ERROR, handle_fatal_error } from './utils.js';
 import { decode_params, disable_search, normalize_path } from '../../utils/url.js';
 import { exec } from '../../utils/routing.js';
-import { negotiate } from '../../utils/http.js';
 import { render_data } from './data/index.js';
 import { DATA_SUFFIX } from '../../constants.js';
+import { get_cookies } from './cookie.js';
 
 /* global __SVELTEKIT_ADAPTER_NAME__ */
 
 /** @param {{ html: string }} opts */
 const default_transform = ({ html }) => html;
 
+const default_filter = () => false;
+
 /** @type {import('types').Respond} */
 export async function respond(request, options, state) {
 	let url = new URL(request.url);
 
-	const { parameter, allowed } = options.method_override;
-	const method_override = url.searchParams.get(parameter)?.toUpperCase();
+	if (options.csrf.check_origin) {
+		const type = request.headers.get('content-type')?.split(';')[0];
 
-	if (method_override) {
-		if (request.method === 'POST') {
-			if (allowed.includes(method_override)) {
-				request = new Proxy(request, {
-					get: (target, property, _receiver) => {
-						if (property === 'method') return method_override;
-						return Reflect.get(target, property, target);
-					}
-				});
-			} else {
-				const verb = allowed.length === 0 ? 'enabled' : 'allowed';
-				const body = `${parameter}=${method_override} is not ${verb}. See https://kit.svelte.dev/docs/configuration#methodoverride`;
+		const forbidden =
+			request.method === 'POST' &&
+			request.headers.get('origin') !== url.origin &&
+			(type === 'application/x-www-form-urlencoded' || type === 'multipart/form-data');
 
-				return new Response(body, {
-					status: 400
-				});
-			}
-		} else {
-			throw new Error(`${parameter}=${method_override} is only allowed with POST requests`);
+		if (forbidden) {
+			return new Response(`Cross-site ${request.method} form submissions are forbidden`, {
+				status: 403
+			});
 		}
 	}
 
@@ -100,16 +93,16 @@ export async function respond(request, options, state) {
 		}
 	}
 
-	/** @type {import('types').ResponseHeaders} */
+	/** @type {Record<string, string>} */
 	const headers = {};
 
-	/** @type {string[]} */
-	const cookies = [];
+	const { cookies, new_cookies } = get_cookies(request, url);
 
 	if (state.prerendering) disable_search(url);
 
 	/** @type {import('types').RequestEvent} */
 	const event = {
+		cookies,
 		getClientAddress:
 			state.getClientAddress ||
 			(() => {
@@ -128,15 +121,9 @@ export async function respond(request, options, state) {
 				const value = new_headers[key];
 
 				if (lower === 'set-cookie') {
-					const new_cookies = /** @type {string[]} */ (Array.isArray(value) ? value : [value]);
-
-					for (const cookie of new_cookies) {
-						if (cookies.includes(cookie)) {
-							throw new Error(`"${key}" header already has cookie with same value`);
-						}
-
-						cookies.push(cookie);
-					}
+					throw new Error(
+						`Use \`event.cookie.set(name, value, options)\` instead of \`event.setHeaders\` to set cookies`
+					);
 				} else if (lower in headers) {
 					throw new Error(`"${key}" header is already set`);
 				} else {
@@ -187,183 +174,166 @@ export async function respond(request, options, state) {
 
 	/** @type {import('types').RequiredResolveOptions} */
 	let resolve_opts = {
-		ssr: true,
-		transformPageChunk: default_transform
+		transformPageChunk: default_transform,
+		filterSerializedResponseHeaders: default_filter
 	};
 
-	// TODO match route before calling handle?
+	/**
+	 *
+	 * @param {import('types').RequestEvent} event
+	 * @param {import('types').ResolveOptions} [opts]
+	 */
+	async function resolve(event, opts) {
+		try {
+			if (opts) {
+				// TODO remove for 1.0
+				if ('transformPage' in opts) {
+					throw new Error(
+						'transformPage has been replaced by transformPageChunk — see https://github.com/sveltejs/kit/pull/5657 for more information'
+					);
+				}
+
+				if ('ssr' in opts) {
+					throw new Error(
+						'ssr has been removed, set it in the appropriate +layout.js instead. See the PR for more information: https://github.com/sveltejs/kit/pull/6197'
+					);
+				}
+
+				resolve_opts = {
+					transformPageChunk: opts.transformPageChunk || default_transform,
+					filterSerializedResponseHeaders: opts.filterSerializedResponseHeaders || default_filter
+				};
+			}
+
+			if (state.prerendering?.fallback) {
+				return await render_response({
+					event,
+					options,
+					state,
+					page_config: { ssr: false, csr: true },
+					status: 200,
+					error: null,
+					branch: [],
+					fetched: [],
+					cookies: [],
+					resolve_opts
+				});
+			}
+
+			if (route) {
+				/** @type {Response} */
+				let response;
+
+				if (is_data_request) {
+					response = await render_data(event, route, options, state);
+				} else if (route.page) {
+					response = await render_page(event, route, route.page, options, state, resolve_opts);
+				} else if (route.endpoint) {
+					response = await render_endpoint(event, await route.endpoint(), state);
+				} else {
+					// a route will always have a page or an endpoint, but TypeScript
+					// doesn't know that
+					throw new Error('This should never happen');
+				}
+
+				if (!is_data_request) {
+					// we only want to set cookies on __data.js requests, we don't
+					// want to cache stuff erroneously etc
+					for (const key in headers) {
+						const value = headers[key];
+						response.headers.set(key, /** @type {string} */ (value));
+					}
+				}
+
+				for (const new_cookie of new_cookies) {
+					response.headers.append(
+						'set-cookie',
+						cookie.serialize(new_cookie.name, new_cookie.value, new_cookie.options)
+					);
+				}
+
+				// respond with 304 if etag matches
+				if (response.status === 200 && response.headers.has('etag')) {
+					let if_none_match_value = request.headers.get('if-none-match');
+
+					// ignore W/ prefix https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match#directives
+					if (if_none_match_value?.startsWith('W/"')) {
+						if_none_match_value = if_none_match_value.substring(2);
+					}
+
+					const etag = /** @type {string} */ (response.headers.get('etag'));
+
+					if (if_none_match_value === etag) {
+						const headers = new Headers({ etag });
+
+						// https://datatracker.ietf.org/doc/html/rfc7232#section-4.1
+						for (const key of ['cache-control', 'content-location', 'date', 'expires', 'vary']) {
+							const value = response.headers.get(key);
+							if (value) headers.set(key, value);
+						}
+
+						return new Response(undefined, {
+							status: 304,
+							headers
+						});
+					}
+				}
+
+				return response;
+			}
+
+			if (state.initiator === GENERIC_ERROR) {
+				return new Response('Internal Server Error', {
+					status: 500
+				});
+			}
+
+			// if this request came direct from the user, rather than
+			// via a `fetch` in a `load`, render a 404 page
+			if (!state.initiator) {
+				return await respond_with_error({
+					event,
+					options,
+					state,
+					status: 404,
+					error: new Error(`Not found: ${event.url.pathname}`),
+					resolve_opts
+				});
+			}
+
+			if (state.prerendering) {
+				return new Response('not found', { status: 404 });
+			}
+
+			// we can't load the endpoint from our own manifest,
+			// so we need to make an actual HTTP request
+			return await fetch(request);
+		} catch (e) {
+			const error = coalesce_to_error(e);
+			return handle_fatal_error(event, options, error);
+		} finally {
+			event.cookies.set = () => {
+				throw new Error('Cannot use `cookies.set(...)` after the response has been generated');
+			};
+
+			event.setHeaders = () => {
+				throw new Error('Cannot use `setHeaders(...)` after the response has been generated');
+			};
+		}
+	}
 
 	try {
-		const response = await options.hooks.handle({
+		return await options.hooks.handle({
 			event,
-			resolve: async (event, opts) => {
-				if (opts) {
-					// TODO remove for 1.0
-					// @ts-expect-error
-					if (opts.transformPage) {
-						throw new Error(
-							'transformPage has been replaced by transformPageChunk — see https://github.com/sveltejs/kit/pull/5657 for more information'
-						);
-					}
-
-					resolve_opts = {
-						ssr: opts.ssr !== false,
-						transformPageChunk: opts.transformPageChunk || default_transform
-					};
-				}
-
-				if (state.prerendering?.fallback) {
-					return await render_response({
-						event,
-						options,
-						state,
-						page_config: { router: true, hydrate: true },
-						status: 200,
-						error: null,
-						branch: [],
-						fetched: [],
-						validation_errors: undefined,
-						cookies: [],
-						resolve_opts: {
-							...resolve_opts,
-							ssr: false
-						}
-					});
-				}
-
-				if (route) {
-					/** @type {Response} */
-					let response;
-
-					if (is_data_request) {
-						response = await render_data(event, route, options, state);
-					} else if (route.page) {
-						response = await render_page(event, route, route.page, options, state, resolve_opts);
-					} else if (route.endpoint) {
-						response = await render_endpoint(event, await route.endpoint());
-					} else {
-						// a route will always have a page or an endpoint, but TypeScript
-						// doesn't know that
-						throw new Error('This should never happen');
-					}
-
-					if (!is_data_request) {
-						// we only want to set cookies on __data.js requests, we don't
-						// want to cache stuff erroneously etc
-						for (const key in headers) {
-							const value = headers[key];
-							response.headers.set(key, /** @type {string} */ (value));
-						}
-					}
-
-					for (const cookie of cookies) {
-						response.headers.append('set-cookie', cookie);
-					}
-
-					// respond with 304 if etag matches
-					if (response.status === 200 && response.headers.has('etag')) {
-						let if_none_match_value = request.headers.get('if-none-match');
-
-						// ignore W/ prefix https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match#directives
-						if (if_none_match_value?.startsWith('W/"')) {
-							if_none_match_value = if_none_match_value.substring(2);
-						}
-
-						const etag = /** @type {string} */ (response.headers.get('etag'));
-
-						if (if_none_match_value === etag) {
-							const headers = new Headers({ etag });
-
-							// https://datatracker.ietf.org/doc/html/rfc7232#section-4.1
-							for (const key of ['cache-control', 'content-location', 'date', 'expires', 'vary']) {
-								const value = response.headers.get(key);
-								if (value) headers.set(key, value);
-							}
-
-							return new Response(undefined, {
-								status: 304,
-								headers
-							});
-						}
-					}
-
-					return response;
-				}
-
-				if (state.initiator === GENERIC_ERROR) {
-					return new Response('Internal Server Error', {
-						status: 500
-					});
-				}
-
-				// if this request came direct from the user, rather than
-				// via a `fetch` in a `load`, render a 404 page
-				if (!state.initiator) {
-					return await respond_with_error({
-						event,
-						options,
-						state,
-						status: 404,
-						error: new Error(`Not found: ${event.url.pathname}`),
-						resolve_opts
-					});
-				}
-
-				if (state.prerendering) {
-					return new Response('not found', { status: 404 });
-				}
-
-				// we can't load the endpoint from our own manifest,
-				// so we need to make an actual HTTP request
-				return await fetch(request);
-			},
-
+			resolve,
 			// TODO remove for 1.0
 			// @ts-expect-error
 			get request() {
 				throw new Error('request in handle has been replaced with event' + details);
 			}
 		});
-
-		// TODO for 1.0, change the error message to point to docs rather than PR
-		if (response && !(response instanceof Response)) {
-			throw new Error('handle must return a Response object' + details);
-		}
-
-		return response;
 	} catch (/** @type {unknown} */ e) {
 		const error = coalesce_to_error(e);
-
-		options.handle_error(error, event);
-
-		const type = negotiate(event.request.headers.get('accept') || 'text/html', [
-			'text/html',
-			'application/json'
-		]);
-
-		if (is_data_request || type === 'application/json') {
-			return new Response(serialize_error(error, options.get_stack), {
-				status: 500,
-				headers: { 'content-type': 'application/json; charset=utf-8' }
-			});
-		}
-
-		// TODO is this necessary? should we just return a plain 500 at this point?
-		try {
-			return await respond_with_error({
-				event,
-				options,
-				state,
-				status: 500,
-				error,
-				resolve_opts
-			});
-		} catch (/** @type {unknown} */ e) {
-			const error = coalesce_to_error(e);
-
-			return new Response(options.dev ? error.stack : error.message, {
-				status: 500
-			});
-		}
+		return handle_fatal_error(event, options, error);
 	}
 }

@@ -1,5 +1,41 @@
 # create-svelte
 
+## 2.0.0-next.173
+
+### Patch Changes
+
+- [breaking] Replace `POST`/`PUT`/`PATCH`/`DELETE` in `+page.server.js` with `export const actions` ([#6469](https://github.com/sveltejs/kit/pull/6469))
+
+## 2.0.0-next.172
+
+### Patch Changes
+
+- Bump vite-plugin-svelte and required vite version ([#6583](https://github.com/sveltejs/kit/pull/6583))
+
+## 2.0.0-next.171
+
+### Patch Changes
+
+- Use `invalidateAll()` ([#6493](https://github.com/sveltejs/kit/pull/6493))
+
+## 2.0.0-next.170
+
+### Patch Changes
+
+- reorder create-svelte templates such that library is last ([#6481](https://github.com/sveltejs/kit/pull/6481))
+
+## 2.0.0-next.169
+
+### Patch Changes
+
+- Move `data-sveltekit-prefetch` to `<nav>` element ([#6442](https://github.com/sveltejs/kit/pull/6442))
+
+## 2.0.0-next.168
+
+### Patch Changes
+
+- [chore] bump ts version and ensure it works with latest changes ([#6428](https://github.com/sveltejs/kit/pull/6428))
+
 ## 2.0.0-next.167
 
 ### Patch Changes

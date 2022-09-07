@@ -107,20 +107,26 @@ const options = object(
 				return input;
 			}),
 
-			browser: validate({ hydrate: true, router: true }, (input, keypath) => {
-				const value = object({ hydrate: boolean(true), router: boolean(true) })(input, keypath);
-				if (!value.hydrate && value.router) {
-					throw new Error(
-						'config.kit.browser.router cannot be true if config.kit.browser.hydrate is false'
-					);
-				}
-				return value;
+			// TODO: remove this for the 1.0 release
+			browser: object({
+				hydrate: error(
+					(keypath) =>
+						`${keypath} has been removed. You can set it inside the top level +layout.js instead. See the PR for more information: https://github.com/sveltejs/kit/pull/6197`
+				),
+				router: error(
+					(keypath) =>
+						`${keypath} has been removed. You can set it inside the top level +layout.js instead. See the PR for more information: https://github.com/sveltejs/kit/pull/6197`
+				)
 			}),
 
 			csp: object({
 				mode: list(['auto', 'hash', 'nonce']),
 				directives,
 				reportOnly: directives
+			}),
+
+			csrf: object({
+				checkOrigin: boolean(true)
 			}),
 
 			// TODO: remove this for the 1.0 release
@@ -140,7 +146,12 @@ const options = object(
 				params: string(join('src', 'params')),
 				routes: string(join('src', 'routes')),
 				serviceWorker: string(join('src', 'service-worker')),
-				template: string(join('src', 'app.html'))
+				appTemplate: string(join('src', 'app.html')),
+				errorTemplate: string(join('src', 'error.html')),
+				// TODO: remove this for the 1.0 release
+				template: error(
+					() => 'config.kit.files.template has been renamed to config.kit.files.appTemplate'
+				)
 			}),
 
 			// TODO: remove this for the 1.0 release
@@ -160,20 +171,10 @@ const options = object(
 
 			inlineStyleThreshold: number(0),
 
-			methodOverride: object({
-				parameter: string('_method'),
-				allowed: validate([], (input, keypath) => {
-					if (!Array.isArray(input) || !input.every((method) => typeof method === 'string')) {
-						throw new Error(`${keypath} must be an array of strings`);
-					}
-
-					if (input.map((i) => i.toUpperCase()).includes('GET')) {
-						throw new Error(`${keypath} cannot contain "GET"`);
-					}
-
-					return input;
-				})
-			}),
+			methodOverride: error(
+				() =>
+					'Method overrides have been removed in favor of actions. See the PR for more information: https://github.com/sveltejs/kit/pull/6469'
+			),
 
 			moduleExtensions: string_array(['.js', '.ts']),
 
@@ -221,7 +222,10 @@ const options = object(
 					(keypath) =>
 						`${keypath} has been removed — it is now controlled by the trailingSlash option. See https://kit.svelte.dev/docs/configuration#trailingslash`
 				),
-				default: boolean(false),
+				default: error(
+					(keypath) =>
+						`${keypath} has been removed. You can set it inside the top level +layout.js instead. See the PR for more information: https://github.com/sveltejs/kit/pull/6197`
+				),
 				enabled: boolean(true),
 				entries: validate(['*'], (input, keypath) => {
 					if (!Array.isArray(input) || !input.every((page) => typeof page === 'string')) {
