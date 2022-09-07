@@ -88,16 +88,35 @@ declare module '$app/environment' {
 declare module '$app/forms' {
 	import type { ActionResult } from '@sveltejs/kit';
 
+	export type SubmitFunction<
+		Element extends HTMLFormElement | HTMLInputElement | HTMLButtonElement = HTMLFormElement,
+		Success extends Record<string, unknown> | undefined = Record<string, any>,
+		Invalid extends Record<string, unknown> | undefined = Record<string, any>
+	> = (input: {
+		data: FormData;
+		form: HTMLFormElement;
+		element: Element;
+		cancel: () => void;
+	}) =>
+		| void
+		| ((opts: {
+				data: FormData;
+				form: HTMLFormElement;
+				element: Element;
+				result: ActionResult<Success, Invalid>;
+		  }) => void);
+
 	/**
 	 * This action enhances a `<form>` element that otherwise would work without JavaScript.
 	 * @param form The form element
 	 * @param options Callbacks for different states of the form lifecycle
 	 */
 	export function enhance<
+		Element extends HTMLFormElement | HTMLInputElement | HTMLButtonElement = HTMLFormElement,
 		Success extends Record<string, unknown> | undefined = Record<string, any>,
 		Invalid extends Record<string, unknown> | undefined = Record<string, any>
 	>(
-		form: HTMLFormElement,
+		element: Element,
 		/**
 		 * Called upon submission with the given FormData.
 		 * If `cancel` is called, the form will not be submitted.
@@ -111,11 +130,7 @@ declare module '$app/forms' {
 		 * - redirects in case of a redirect response
 		 * - redirects to the nearest error page in case of an unexpected error
 		 */
-		submit?: (input: {
-			data: FormData;
-			form: HTMLFormElement;
-			cancel: () => void;
-		}) => void | ((result: ActionResult<Success, Invalid>) => void)
+		submit?: SubmitFunction<Element, Success, Invalid>
 	): { destroy: () => void };
 
 	/**
