@@ -2,15 +2,15 @@
 title: Link options
 ---
 
-In SvelteKit, `<a>` elements (rather than framework-specific `<Link>` components) are used to navigate between the routes of your app. If the user clicks on a link whose `href` is 'owned' by the app (as opposed to, say, a link to an external site) then SvelteKit will navigate to the new page by importing its code and then calling any `load` functions it needs to fetch data.
+SvelteKit では、アプリのルート(routes)間の移動に、(フレームワーク固有の `<Link>` コンポーネントではなく) `<a>` 要素を使用します。ユーザーが、`href` がアプリのものであるリンク (外部サイトではないリンク) をクリックする場合、SvelteKit はそのコードをインポートし、データを取得するために必要な `load` 関数を呼び出して、新しいページに移動します。
 
-You can customise the behaviour of links with `data-sveltekit-*` attributes. These can be applied to the `<a>` itself, or to a parent element.
+`data-sveltekit-*` 属性でリンクの挙動をカスタマイズすることができます。これらは `<a>` 自身やその親要素に適用することができます。
 
 ### data-sveltekit-prefetch
 
-To get a head start on importing the code and fetching the page's data, use the `data-sveltekit-prefetch` attribute, which will start loading everything as soon as the user hovers over the link (on a desktop) or touches it (on mobile), rather than waiting for the `click` event to trigger navigation. Typically, this buys us an extra couple of hundred milliseconds, which is the difference between a user interface that feels laggy, and one that feels snappy.
+コードのインポートとページのデータの取得を先取りするためには、`data-sveltekit-prefetch` 属性を使用します。これによって、ナビゲーションをトリガーする `click` イベントを待つのではなく、ユーザーがリンクをホバーしたり(デスクトップの場合)、タッチしたり(モバイルの場合)するとすぐにすべての読み込みを開始します。通常、これによって数百ミリ秒稼ぐことができ、この差は遅延を感じるインターフェースときびきび動くインターフェースの違いとなります。
 
-To apply this behaviour across the board, add the attribute to a parent element (or even the `<body>` in your `src/app.html`):
+この挙動を全体に適用するには、この属性を親要素 (または `src/app.html` の `<body>`) に追加してください:
 
 ```html
 /// file: src/routes/+layout.svelte
@@ -19,45 +19,47 @@ To apply this behaviour across the board, add the attribute to a parent element 
 </main>
 ```
 
-> You can also programmatically invoke `prefetch` from `$app/navigation`.
+> また、プログラムで `$app/navigation` の `prefetch` を呼び出すこともできます。 
 
 ### data-sveltekit-reload
 
 Occasionally, we need to tell SvelteKit not to handle a link, but allow the browser to handle it. Adding a `data-sveltekit-reload` attribute to a link...
+時には、SvelteKit にリンクを処理させないで、ブラウザに処理をさせる必要があります。`data-sveltekit-reload` 属性をリンクに追加すると…
 
 ```html
 <a data-sveltekit-reload href="/path">Path</a>
 ```
 
-...will cause a full-page navigation when the link is clicked.
+…リンクがクリックされたときにフルページナビゲーションが発生します。
 
-Links with a `rel="external"` attribute will receive the same treatment. In addition, they will be ignored during [prerendering](/docs/page-options#prerender).
+`rel="external"` 属性があるリンクも同様に扱われます。加えて、[プリレンダリング中](/docs/page-options#prerender) は無視されます。
 
 ### data-sveltekit-noscroll
 
-When navigating to internal links, SvelteKit mirrors the browser's default navigation behaviour: it will change the scroll position to 0,0 so that the user is at the very top left of the page (unless the link includes a `#hash`, in which case it will scroll to the element with a matching ID).
+内部のリンクに移動するとき、SvelteKit はブラウザのデフォルトのナビゲーションの挙動を模倣します: ユーザーがページの左上に来るように、スクロールポジションを 0,0 に変更します (リンクに `#hash` が含まれている場合は、ID が一致する要素までスクロールします)。
 
 In certain cases, you may wish to disable this behaviour. Adding a `data-sveltekit-noscroll` attribute to a link...
+特定のケースでは、この挙動を無効化したいことがあるでしょう。`data-sveltekit-noscroll` 属性をリンクに追加すると…
 
 ```html
 <a href="path" data-sveltekit-noscroll>Path</a>
 ```
 
-...will prevent scrolling after the link is clicked.
+…リンクがクリックされたあとのスクロールを中止します。
 
 ### Disabling options
 
-To disable any of these options inside an element where they have been enabled, use the `"off"` value:
+これらのオプションが有効になっている要素の中でこれらのオプションを無効にするには、`"off"` 値を使用します:
 
 ```html
 <div data-sveltekit-prefetch>
-	<!-- these links will be prefetched -->
+	<!-- これらのリンクはプリフェッチされます -->
 	<a href="/a">a</a>
 	<a href="/b">b</a>
 	<a href="/c">c</a>
 
 	<div data-sveltekit-prefetch="off">
-		<!-- these links will NOT be prefetched -->
+		<!-- これらのリンクはプリフェッチされません -->
 		<a href="/d">d</a>
 		<a href="/e">e</a>
 		<a href="/f">f</a>
@@ -65,10 +67,10 @@ To disable any of these options inside an element where they have been enabled, 
 </div>
 ```
 
-To apply an attribute to an element conditionally, do this:
+条件によって要素に属性を適用する場合は、このようにします:
 
 ```html
 <div data-sveltekit-reload={shouldReload ? '' : 'off'}>
 ```
 
-> This works because in HTML, `<element attribute>` is equivalent to `<element attribute="">`
+> HTML では `<element attribute>` と `<element attribute="">` が同等であるため、これがうまく動作します

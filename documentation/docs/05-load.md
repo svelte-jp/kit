@@ -105,7 +105,7 @@ export function load({ routeId }) {
 
 URL はロードされるページに対し、絶対パスか相対パスにすることできますが、[エンコード](https://developer.mozilla.org/ja/docs/Glossary/percent-encoding) されていなければなりません。
 
-Custom identifiers have to be prefixed with one or more lowercase letters followed by a colon to conform to the [URI specification](https://www.rfc-editor.org/rfc/rfc3986.html)
+カスタムの識別子(custom identifiers)は、[URI の仕様](https://www.rfc-editor.org/rfc/rfc3986.html) に準拠するために、1つ以上の小文字の後にコロンを付ける必要があります。
 
 ```js
 // @filename: ambient.d.ts
@@ -143,7 +143,7 @@ export async function load({ depends }) {
 - ページリクエストの `cookie` と `authorization` ヘッダーを継承するので、サーバー上でクレデンシャル付きのリクエストを行うことができます
 - サーバー上で、相対パスのリクエストを行うことができます (通常、`fetch` はサーバーのコンテキストで使用する場合にはオリジン付きの URL が必要です)
 - サーバーで動作している場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません
-- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。Note that headers will _not_ be serialized, unless explicitly included via [`filterSerializedResponseHeaders`](/docs/hooks#handle)
+- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](/docs/hooks#handle) で明示的に指定されない限り、シリアライズされないことにご注意ください
 - ハイドレーション中は、レスポンスは HTML から読み込まれ、一貫性が保証され、追加のネットワークリクエストを防ぎます
 
 > Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。

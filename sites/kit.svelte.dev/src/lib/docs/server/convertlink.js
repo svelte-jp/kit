@@ -23,6 +23,10 @@ const docs_load = new Map([
 	['Inputメソッド', 'Input methods'],
 ]);
 
+const docs_form_actions = new Map([
+	['action の解剖学', 'Anatomy of an action']
+]);
+
 const docs_adapters = new Map([
 	['サポートされている環境', 'Supported environments'],
 	['プラットフォーム固有の情報', 'Platform-specific context'],
@@ -101,6 +105,8 @@ export function convert_link(label, file, heading) {
 				return docs_advanced_routing.get(heading) || heading;
 			case '05-load.md':
 				return docs_load.get(heading) || heading;
+			case '06-form-actions.md':
+				return docs_form_actions.get(heading) || heading;
 			case '11-adapters.md':
 				return docs_adapters.get(heading) || heading;
 			case '12-page-options.md':

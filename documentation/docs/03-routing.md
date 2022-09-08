@@ -127,7 +127,7 @@ export async function load({ params }) {
 <h1>{$page.status}: {$page.error.message}</h1>
 ```
 
-SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラー境界 (error boundary) を探します — もし上記のファイルが存在しない場合は、デフォルトのエラーページをレンダリングする前に `src/routes/blog/+error.svelte` を探しに行き、その次に `src/routes/+error.svelte` を探します。If _that_ fails, SvelteKit will bail out and render a static fallback error page, which you can customise by creating a `src/error.html` file.
+SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラー境界 (error boundary) を探します — もし上記のファイルが存在しない場合は、デフォルトのエラーページをレンダリングする前に `src/routes/blog/+error.svelte` を探しに行き、その次に `src/routes/+error.svelte` を探します。もしそれも失敗した場合は、SvelteKit は静的なフォールバックエラーページをレンダリングします。これは `src/error.html` ファイルを作成することでカスタマイズ可能です。
 
 ### +layout
 
@@ -266,7 +266,7 @@ export function GET({ url }) {
 
 `Response` の第一引数には [`ReadableStream`](https://developer.mozilla.org/ja/docs/Web/API/ReadableStream) を指定することができ、大量のデータをストリームしたり、server-sent events を作成したりすることができます (AWS Lambda のような、レスポンスをバッファするプラットフォームにデプロイする場合は除きます)。
 
-You can use the `error`, `redirect` and `json` methods from `@sveltejs/kit` for convenience (but you don't have to). Note that `throw error(..)` only returns a plain text error response.
+便宜上、`@sveltejs/kit` の `error`、`redirect`、`json` メソッドを使用することは可能です (ただし、使用する必要はありません)。`throw error(..)` はプレーンテキストのエラーレスポンスのみを返すことにご注意ください。
 
 ### $types
 
