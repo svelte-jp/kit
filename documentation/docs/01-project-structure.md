@@ -14,6 +14,7 @@ my-project/
 │ ├ routes/
 │ │ └ [your routes]
 │ ├ app.html
+│ ├ error.html
 │ └ hooks.js
 ├ static/
 │ └ [your static assets]
@@ -41,6 +42,9 @@ my-project/
   - `%sveltekit.body%` — レンダリングされるページのためのマークアップです。通常、これは直接 `<body>` の中に置かれるのではなく、`<div>` または他の要素の中に置かれます。ブラウザ拡張(browser extensions)が要素を注入するのをハイドレーションプロセスが破壊してしまう、というバグを防ぐためです
   - `%sveltekit.assets%` — [`paths.assets`](/docs/configuration#paths) が指定されている場合は [`paths.assets`](/docs/configuration#paths)、指定されていない場合は [`paths.base`](/docs/configuration#base) への相対パス
   - `%sveltekit.nonce%` — マニュアルで含めるリンクやスクリプトの [CSP](/docs/configuration#csp) ノンス (使用する場合)
+- `error.html` (optional) 全てが失敗したときにレンダリングされるページです。以下のプレースホルダーを含めることができます:
+  - `%sveltekit.status%` — HTTP ステータス
+  - `%sveltekit.message%` — エラーメッセージ
 - `hooks.js` (optional) アプリケーションの [hooks](/docs/hooks)
 - `service-worker.js` (optional) [service worker](/docs/service-workers)
 

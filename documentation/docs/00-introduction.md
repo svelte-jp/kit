@@ -12,8 +12,8 @@ title: Introduction
 
 SvelteKitはとてもハイパフォーマンスなWebアプリを構築するためのフレームワークです。
 
-モダンなベストプラクティスを全て取り入れたアプリを構築するのは、恐ろしく複雑なことです。これらのプラクティスには、必要最小限のコードのみをロードするための[ビルドの最適化](https://ja.vitejs.dev/guide/features.html#%E3%83%93%E3%83%AB%E3%83%89%E3%81%AE%E6%9C%80%E9%81%A9%E5%8C%96)、[オフラインサポート](/docs/service-workers)、[プリフェッチ](/docs/a-options#sveltekit-prefetch) (ユーザーがナビゲーションを開始する前
-にページを取得すること)、[様々な設定が可能なレンダリング](/docs/page-options) (HTMLの生成を[サーバー上](/docs/appendix#ssr)で行うか[ブラウザ上](/docs/page-options#router)で行うか、それをランタイムで行うか[ビルド時](/docs/page-options#prerender)に行うかなど) が含まれています。SvelteKitが全ての退屈な作業を行ってくれるので、あなたはクリエイティブな作業に専念することができます。
+モダンなベストプラクティスを全て取り入れたアプリを構築するのは、恐ろしく複雑なことです。これらのプラクティスには、必要最小限のコードのみをロードするための[ビルドの最適化](https://ja.vitejs.dev/guide/features.html#%E3%83%93%E3%83%AB%E3%83%89%E3%81%AE%E6%9C%80%E9%81%A9%E5%8C%96)、[オフラインサポート](/docs/service-workers)、[プリフェッチ](/docs/link-options#data-sveltekit-prefetch) (ユーザーがナビゲーションを開始する前
+にページを取得すること)、[設定可能なレンダリング](/docs/page-options) (アプリのレンダリングを[サーバー上](/docs/appendix#ssr)で行うか[ブラウザ上](/docs/appendix#csr)で行うか、それをランタイムで行うか[ビルド時](/docs/page-options#prerender)に行うかなど) が含まれています。SvelteKitが全ての退屈な作業を行ってくれるので、あなたはクリエイティブな作業に専念することができます。
 
 [Vite](https://ja.vitejs.dev/) を [Svelte plugin](https://github.com/sveltejs/vite-plugin-svelte) 経由で使用しており、非常に高速で機能豊富な開発体験を提供します。[Hot Module Replacement (HMR)](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/config.md#hot)により、コードを変更すると即座にブラウザに反映されます。
 

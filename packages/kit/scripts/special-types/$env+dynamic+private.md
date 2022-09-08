@@ -6,3 +6,5 @@
 import { env } from '$env/dynamic/private';
 console.log(env.DEPLOYMENT_SPECIFIC_VARIABLE);
 ```
+
+> In `dev`, `$env/dynamic` always includes environment variables from `.env`. In `prod`, this behavior will depend on your adapter.

@@ -36,3 +36,33 @@ test.describe('$env', () => {
 		);
 	});
 });
+
+test.describe('server-only modules', () => {
+	test('server-only module is not statically importable from the client', async ({ request }) => {
+		const resp = await request.get('/server-only-modules/static-import');
+		expect(await resp.text()).toMatch(
+			/.*Error: Cannot import \$lib\/test.server.js into client-side code:.*/gs
+		);
+	});
+	test('server-only module is not dynamically importable from the client', async ({ request }) => {
+		const resp = await request.get('/server-only-modules/dynamic-import');
+		expect(await resp.text()).toMatch(
+			/.*Error: Cannot import \$lib\/test.server.js into client-side code:.*/gs
+		);
+	});
+});
+
+test.describe('server-only folder', () => {
+	test('server-only folder is not statically importable from the client', async ({ request }) => {
+		const resp = await request.get('/server-only-folder/static-import');
+		expect(await resp.text()).toMatch(
+			/.*Error: Cannot import \$lib\/server\/blah\/test.js into client-side code:.*/gs
+		);
+	});
+	test('server-only folder is not dynamically importable from the client', async ({ request }) => {
+		const resp = await request.get('/server-only-folder/dynamic-import');
+		expect(await resp.text()).toMatch(
+			/.*Error: Cannot import \$lib\/server\/blah\/test.js into client-side code:.*/gs
+		);
+	});
+});

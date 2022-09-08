@@ -82,18 +82,84 @@ declare module '$app/environment' {
 
 /**
  * ```ts
+ * import { enhance, applyAction } from '$app/forms';
+ * ```
+ */
+declare module '$app/forms' {
+	import type { ActionResult } from '@sveltejs/kit';
+
+	export type SubmitFunction<
+		Element extends HTMLFormElement | HTMLInputElement | HTMLButtonElement = HTMLFormElement,
+		Success extends Record<string, unknown> | undefined = Record<string, any>,
+		Invalid extends Record<string, unknown> | undefined = Record<string, any>
+	> = (input: {
+		data: FormData;
+		form: HTMLFormElement;
+		element: Element;
+		cancel: () => void;
+	}) =>
+		| void
+		| ((opts: {
+				data: FormData;
+				form: HTMLFormElement;
+				element: Element;
+				result: ActionResult<Success, Invalid>;
+		  }) => void);
+
+	/**
+	 * This action enhances a `<form>` element that otherwise would work without JavaScript.
+	 * @param form The form element
+	 * @param options Callbacks for different states of the form lifecycle
+	 */
+	export function enhance<
+		Element extends HTMLFormElement | HTMLInputElement | HTMLButtonElement = HTMLFormElement,
+		Success extends Record<string, unknown> | undefined = Record<string, any>,
+		Invalid extends Record<string, unknown> | undefined = Record<string, any>
+	>(
+		element: Element,
+		/**
+		 * Called upon submission with the given FormData.
+		 * If `cancel` is called, the form will not be submitted.
+		 * If a function is returned, that function is called with the response from the server.
+		 * If nothing is returned, the fallback will be used.
+		 *
+		 * If this function or its return value isn't set, it
+		 * - falls back to updating the `form` prop with the returned data if the action is one same page as the form
+		 * - updates `$page.status`
+		 * - invalidates all data in case of successful submission with no redirect response
+		 * - redirects in case of a redirect response
+		 * - redirects to the nearest error page in case of an unexpected error
+		 */
+		submit?: SubmitFunction<Element, Success, Invalid>
+	): { destroy: () => void };
+
+	/**
+	 * This action updates the `form` property of the current page with the given data and updates `$page.status`.
+	 * In case of an error, it redirects to the nearest error page.
+	 */
+	export function applyAction<
+		Success extends Record<string, unknown> | undefined = Record<string, any>,
+		Invalid extends Record<string, unknown> | undefined = Record<string, any>
+	>(result: ActionResult<Success, Invalid>): Promise<void>;
+}
+
+/**
+ * ```ts
  * import {
  * 	afterNavigate,
  * 	beforeNavigate,
  * 	disableScrollHandling,
  * 	goto,
  * 	invalidate,
+ * 	invalidateAll,
  * 	prefetch,
  * 	prefetchRoutes
  * } from '$app/navigation';
  * ```
  */
 declare module '$app/navigation' {
+	import { Navigation } from '@sveltejs/kit';
+
 	/**
 	 * ナビゲーション後のページ更新の時にこれが(例えば `onMount`、`afterNavigate` の中や action で)呼び出された場合、SvelteKit の組み込みのスクロール処理を無効にします。
 	 * ユーザーの期待する動きではなくなるため、一般的には推奨されません。
@@ -113,10 +179,25 @@ declare module '$app/navigation' {
 		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
 	): Promise<void>;
 	/**
-	 * 現在アクティブなページに属している `load` 関数が当該リソースを `fetch` している場合は `load` 関数を再実行します。引数なしの場合、全てのリソースが 無効化・再実行(invalidate) されます。ページが更新されたときに解決される `Promise` を返します。
-	 * @param dependency The invalidated resource
+	 * 現在アクティブなページに属している `load` 関数が `fetch` や `depends` を通じて当該の `url` に依存している場合は `load` 関数を再実行させます。ページが更新されたときに解決される `Promise` を返します。
+	 *
+	 * If the argument is given as a `string` or `URL`, it must resolve to the same URL that was passed to `fetch` or `depends` (including query parameters).
+	 * To create a custom identifier, use a string beginning with `[a-z]+:` (e.g. `custom:state`) — this is a valid URL.
+	 *
+	 * The `function` argument can be used define a custom predicate. It receives the full `URL` and causes `load` to rerun if `true` is returned.
+	 * This can be useful if you want to invalidate based on a pattern instead of a exact match.
+	 *
+	 * ```ts
+	 * // Example: Match '/path' regardless of the query parameters
+	 * invalidate((url) => url.pathname === '/path');
+	 * ```
+	 * @param url The invalidated URL
 	 */
-	export function invalidate(dependency?: string | ((href: string) => boolean)): Promise<void>;
+	export function invalidate(url: string | URL | ((url: URL) => boolean)): Promise<void>;
+	/**
+	 * Causes all `load` functions belonging to the currently active page to re-run. Returns a `Promise` that resolves when the page is subsequently updated.
+	 */
+	export function invalidateAll(): Promise<void>;
 	/**
 	 * 指定されたページをプログラム的にプリフェッチします、つまり
 	 *  1. そのページのコードが取得され読み込まれていることを確認し、
@@ -142,17 +223,23 @@ declare module '$app/navigation' {
 	export function prefetchRoutes(routes?: string[]): Promise<void>;
 
 	/**
-	 * リンクをクリックしたり、`goto` を呼び出したり、ブラウザの 戻る/進む を使うなどして新しい URL (内部と外部どちらも含む) にナビゲーションするその直前にトリガーされるナビゲーションインターセプターです。
-	 * 条件付きでナビゲーションを完了させないようにしたり、次の URL を調べたい場合に便利です。
+	 * リンクをクリックしたり、`goto(...)` を呼び出したり、ブラウザの 戻る/進む を使うなどして新しい URL にナビゲーションするその直前にトリガーされるナビゲーションインターセプターです。
+	 * Calling `cancel()` will prevent the navigation from completing.
+	 *
+	 * When navigating to an external URL, `navigation.to` will be `null`.
+	 *
+	 * `beforeNavigate` must be called during a component initialization. It remains active as long as the component is mounted.
 	 */
 	export function beforeNavigate(
-		fn: (navigation: { from: URL; to: URL | null; cancel: () => void }) => void
+		callback: (navigation: Navigation & { cancel: () => void }) => void
 	): void;
 
 	/**
-	 * ページがマウントされたときや、ページコンポーネントがそのままでも Sveltekit がナビゲーションしたときに実行されるライフサイクル関数です。
+	 * A lifecycle function that runs the supplied `callback` when the current component mounts, and also whenever we navigate to a new URL.
+	 *
+	 * `afterNavigate` must be called during a component initialization. It remains active as long as the component is mounted.
 	 */
-	export function afterNavigate(fn: (navigation: { from: URL | null; to: URL }) => void): void;
+	export function afterNavigate(callback: (navigation: Navigation) => void): void;
 }
 
 /**
@@ -194,7 +281,7 @@ declare module '$app/stores' {
 	export const page: Readable<Page>;
 	/**
 	 * 読み取り可能なストア(readable store)です。
-	 * ナビゲーションを開始すると、その値は `{ from: URL, to: URL }` となります。
+	 * When navigating starts, its value is a `Navigation` object with `from`, `to`, `type` and (if `type === 'popstate'`) `delta` properties.
 	 * ナビゲーションが終了すると、その値は `null` に戻ります。
 	 */
 	export const navigating: Readable<Navigation | null>;
@@ -253,7 +340,13 @@ declare module '@sveltejs/kit/hooks' {
 	 * /** @type {import('@sveltejs/kit').Handle} *\/
 	 * async function first({ event, resolve }) {
 	 * 	console.log('first pre-processing');
-	 * 	const result = await resolve(event);
+	 * 	const result = await resolve(event, {
+	 * 		transformPageChunk: ({ html }) => {
+	 * 			// transforms are applied in reverse order
+	 * 			console.log('first transform');
+	 * 			return html;
+	 * 		}
+	 * 	});
 	 * 	console.log('first post-processing');
 	 * 	return result;
 	 * }
@@ -261,7 +354,12 @@ declare module '@sveltejs/kit/hooks' {
 	 * /** @type {import('@sveltejs/kit').Handle} *\/
 	 * async function second({ event, resolve }) {
 	 * 	console.log('second pre-processing');
-	 * 	const result = await resolve(event);
+	 * 	const result = await resolve(event, {
+	 * 		transformPageChunk: ({ html }) => {
+	 * 			console.log('second transform');
+	 * 			return html;
+	 * 		}
+	 * 	});
 	 * 	console.log('second post-processing');
 	 * 	return result;
 	 * }
@@ -274,6 +372,8 @@ declare module '@sveltejs/kit/hooks' {
 	 * ```
 	 * first pre-processing
 	 * second pre-processing
+	 * second transform
+	 * first transform
 	 * second post-processing
 	 * first post-processing
 	 * ```

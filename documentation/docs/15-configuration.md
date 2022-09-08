@@ -18,16 +18,15 @@ const config = {
 		adapter: undefined,
 		alias: {},
 		appDir: '_app',
-		browser: {
-			hydrate: true,
-			router: true
-		},
 		csp: {
 			mode: 'auto',
 			directives: {
 				'default-src': undefined
 				// ...
 			}
+		},
+		csrf: {
+			checkOrigin: true
 		},
 		env: {
 			dir: process.cwd(),
@@ -40,13 +39,10 @@ const config = {
 			params: 'src/params',
 			routes: 'src/routes',
 			serviceWorker: 'src/service-worker',
-			template: 'src/app.html'
+			appTemplate: 'src/app.html',
+			errorTemplate: 'src/error.html'
 		},
 		inlineStyleThreshold: 0,
-		methodOverride: {
-			parameter: '_method',
-			allowed: []
-		},
 		moduleExtensions: ['.js', '.ts'],
 		outDir: '.svelte-kit',
 		paths: {
@@ -56,7 +52,6 @@ const config = {
 		prerender: {
 			concurrency: 1,
 			crawl: true,
-			default: false,
 			enabled: true,
 			entries: ['*'],
 			onError: 'fail',
@@ -127,13 +122,6 @@ const config = {
 
 ビルドされた JS と CSS(およびインポートされたアセット)が提供される `paths.assets` からの相対ディレクトリ(ファイル名にはコンテンツベースのハッシュが含まれており、つまり、無期限にキャッシュすることができます)。先頭または末尾が `/` であってはいけません。
 
-### browser
-
-以下の `boolean` 値のうち、0 個以上を含むオブジェクトです:
-
-- `hydrate` — サーバーでレンダリングされた HTML をクライアントサイドのアプリで [ハイドレート(hydrate)](/docs/page-options#hydrate) するかどうかを指定します。(アプリ全体でこれを `false` に設定することはめったにありません)
-- `router` — クライアントサイドの[ルーター(router)](/docs/page-options#router)をアプリ全体で有効または無効にします。
-
 ### csp
 
 以下の値のうち、0 個以上を含むオブジェクトです:
@@ -171,6 +159,14 @@ export default config;
 
 > ほとんどの [Svelte transitions](https://svelte.jp/tutorial/transition) は、インラインの `<style>` 要素を作成することで動作することにご注意ください。これらをアプリで使用する場合、`style-src` ディレクティブを指定しないようにするか、`unsafe-inline` を追加する必要があります。
 
+### csrf
+
+Protection against [cross-site request forgery](https://owasp.org/www-community/attacks/csrf) attacks:
+
+- `checkOrigin` — if `true`, SvelteKit will check the incoming `origin` header for `POST` form submissions and verify that it matches the server's origin
+
+To allow people to make `POST` form submissions to your app from other origins, you will need to disable this option. Be careful!
+
 ### env
 
 環境変数の設定です:
@@ -195,13 +191,6 @@ export default config;
 CSS を HTML の先頭の `<style>` ブロック内にインライン化するかどうか。このオプションでは、インライン化する CSS ファイルの最大長を数値で指定します。ページに必要な CSS ファイルで、このオプションの値より小さいものはマージされ、`<style>` ブロックにインライン化されます。
 
 > この結果、最初のリクエストが少なくなり、[First Contentful Paint](https://web.dev/first-contentful-paint) スコアを改善することができます。しかし、HTML 出力が大きくなり、ブラウザキャッシュの効果が低下します。慎重に使用してください。
-
-### methodOverride
-
-[HTTP Method Overrides](/docs/routing#endpoints-http-method-overrides) をご参照ください。以下のうち、0 個以上を含むオブジェクトです:
-
-- `parameter` — 使いたいメソッドの値を渡すのに使用するクエリパラメータ名
-- `allowed` - オリジナルのリクエストメソッドを上書きするときに使用することができる HTTP メソッドの配列
 
 ### moduleExtensions
 
@@ -259,7 +248,6 @@ export default config;
 
 - `concurrency` — 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートの CMS からコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます
 - `crawl` — SvelteKit がシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
-- `default` — `true` に設定すると、`export const prerender = false` を含まないページをプリレンダリングします
 - `enabled` — `false` に設定すると、プリレンダリングを完全に無効化できます
 - `entries` — プリレンダリングするページ、またはクロールを開始するページ(`crawl: true` の場合)の配列。`*` 文字列には、全ての動的ではないルート(routes)(すなわち `[parameters]` を含まないページ) が含まれます
 - `onError`

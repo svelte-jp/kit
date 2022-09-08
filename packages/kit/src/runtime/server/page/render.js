@@ -2,7 +2,7 @@ import { devalue } from 'devalue';
 import { readable, writable } from 'svelte/store';
 import * as cookie from 'cookie';
 import { hash } from '../../hash.js';
-import { render_json_payload_script } from '../../../utils/escape.js';
+import { serialize_data } from './serialize_data.js';
 import { s } from '../../../utils/misc.js';
 import { Csp } from './csp.js';
 import { serialize_error } from '../utils.js';
@@ -23,12 +23,12 @@ const updated = {
  *   cookies: import('set-cookie-parser').Cookie[];
  *   options: import('types').SSROptions;
  *   state: import('types').SSRState;
- *   page_config: { hydrate: boolean, router: boolean };
+ *   page_config: { ssr: boolean; csr: boolean };
  *   status: number;
  *   error: HttpError | Error | null;
  *   event: import('types').RequestEvent;
  *   resolve_opts: import('types').RequiredResolveOptions;
- *   validation_errors: Record<string, string> | undefined;
+ *   action_result?: import('types').ActionResult;
  * }} opts
  */
 export async function render_response({
@@ -42,14 +42,14 @@ export async function render_response({
 	error = null,
 	event,
 	resolve_opts,
-	validation_errors
+	action_result
 }) {
 	if (state.prerendering) {
 		if (options.csp.mode === 'nonce') {
 			throw new Error('Cannot use prerendering if config.kit.csp.mode === "nonce"');
 		}
 
-		if (options.template_contains_nonce) {
+		if (options.app_template_contains_nonce) {
 			throw new Error('Cannot use prerendering if page template contains %sveltekit.nonce%');
 		}
 	}
@@ -74,7 +74,12 @@ export async function render_response({
 		error.stack = options.get_stack(error);
 	}
 
-	if (resolve_opts.ssr) {
+	const form_value =
+		action_result?.type === 'success' || action_result?.type === 'invalid'
+			? action_result.data ?? null
+			: null;
+
+	if (page_config.ssr) {
 		/** @type {Record<string, any>} */
 		const props = {
 			stores: {
@@ -82,7 +87,8 @@ export async function render_response({
 				navigating: writable(null),
 				updated
 			},
-			components: await Promise.all(branch.map(({ node }) => node.component()))
+			components: await Promise.all(branch.map(({ node }) => node.component())),
+			form: form_value
 		};
 
 		let data = {};
@@ -102,10 +108,6 @@ export async function render_response({
 			url: event.url,
 			data
 		};
-
-		if (validation_errors) {
-			props.errors = validation_errors;
-		}
 
 		// TODO remove this for 1.0
 		/**
@@ -174,7 +176,7 @@ export async function render_response({
 	/** @param {string} path */
 	const prefixed = (path) => (path.startsWith('/') ? path : `${assets}/${path}`);
 
-	const serialized = { data: '', errors: 'null' };
+	const serialized = { data: '', form: 'null' };
 
 	try {
 		serialized.data = devalue(branch.map(({ server_data }) => server_data));
@@ -188,38 +190,29 @@ export async function render_response({
 		throw error;
 	}
 
-	if (validation_errors) {
-		try {
-			serialized.errors = devalue(validation_errors);
-		} catch (e) {
-			// If we're here, the data could not be serialized with devalue
-			const error = /** @type {any} */ (e);
-			if (error.path) throw new Error(`${error.message} (errors.${error.path})`);
-			throw error;
-		}
+	if (form_value) {
+		// no need to check it can be serialized, we already verified that it's JSON-friendly
+		serialized.form = devalue(form_value);
 	}
 
 	// prettier-ignore
 	const init_app = `
-		import { set_public_env, start } from ${s(prefixed(entry.file))};
-
-		set_public_env(${s(options.public_env)});
+		import { start } from ${s(prefixed(entry.file))};
 
 		start({
-			target: document.querySelector('[data-sveltekit-hydrate="${target}"]').parentNode,
-			paths: ${s(options.paths)},
-			route: ${!!page_config.router},
-			spa: ${!resolve_opts.ssr},
-			trailing_slash: ${s(options.trailing_slash)},
-			hydrate: ${resolve_opts.ssr && page_config.hydrate ? `{
+			env: ${s(options.public_env)},
+			hydrate: ${page_config.ssr ? `{
 				status: ${status},
 				error: ${error && serialize_error(error, e => e.stack)},
 				node_ids: [${branch.map(({ node }) => node.index).join(', ')}],
 				params: ${devalue(event.params)},
 				routeId: ${s(event.routeId)},
 				data: ${serialized.data},
-				errors: ${serialized.errors}
-			}` : 'null'}
+				form: ${serialized.form}
+			}` : 'null'},
+			paths: ${s(options.paths)},
+			target: document.querySelector('[data-sveltekit-hydrate="${target}"]').parentNode,
+			trailing_slash: ${s(options.trailing_slash)}
 		});
 	`;
 
@@ -266,7 +259,7 @@ export async function render_response({
 		head += `\n\t<link href="${path}" ${attributes.join(' ')}>`;
 	}
 
-	if (page_config.router || page_config.hydrate) {
+	if (page_config.csr) {
 		for (const dep of modulepreloads) {
 			const path = prefixed(dep);
 			link_header_preloads.add(`<${encodeURI(path)}>; rel="modulepreload"; nopush`);
@@ -286,26 +279,12 @@ export async function render_response({
 		body += `\n\t\t<script ${attributes.join(' ')}>${init_app}</script>`;
 	}
 
-	if (resolve_opts.ssr && page_config.hydrate) {
-		/** @type {string[]} */
-		const serialized_data = [];
-
-		for (const { url, body, response } of fetched) {
-			serialized_data.push(
-				render_json_payload_script(
-					{ type: 'data', url, body: typeof body === 'string' ? hash(body) : undefined },
-					response
-				)
-			);
-		}
-
-		if (validation_errors) {
-			serialized_data.push(
-				render_json_payload_script({ type: 'validation_errors' }, validation_errors)
-			);
-		}
-
-		body += `\n\t${serialized_data.join('\n\t')}`;
+	if (page_config.ssr && page_config.csr) {
+		body += `\n\t${fetched
+			.map((item) =>
+				serialize_data(item, resolve_opts.filterSerializedResponseHeaders, !!state.prerendering)
+			)
+			.join('\n\t')}`;
 	}
 
 	if (options.service_worker) {
@@ -337,11 +316,12 @@ export async function render_response({
 	// TODO flush chunks as early as we can
 	const html =
 		(await resolve_opts.transformPageChunk({
-			html: options.template({ head, body, assets, nonce: /** @type {string} */ (csp.nonce) }),
+			html: options.app_template({ head, body, assets, nonce: /** @type {string} */ (csp.nonce) }),
 			done: true
 		})) || '';
 
 	const headers = new Headers({
+		'x-sveltekit-page': 'true',
 		'content-type': 'text/html',
 		etag: `"${hash(html)}"`
 	});

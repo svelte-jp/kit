@@ -105,7 +105,8 @@ export function get_default_build_config({ config, input, ssr, outDir }) {
 					format: 'esm',
 					entryFileNames: ssr ? '[name].js' : `${prefix}/[name]-[hash].js`,
 					chunkFileNames: ssr ? 'chunks/[name].js' : `${prefix}/chunks/[name]-[hash].js`,
-					assetFileNames: `${prefix}/assets/[name]-[hash][extname]`
+					assetFileNames: `${prefix}/assets/[name]-[hash][extname]`,
+					hoistTransitiveImports: false
 				},
 				preserveEntrySignatures: 'strict'
 			},
@@ -133,7 +134,8 @@ export function get_default_build_config({ config, input, ssr, outDir }) {
 			rollupOptions: {
 				output: {
 					entryFileNames: `${prefix}/workers/[name]-[hash].js`,
-					chunkFileNames: `${prefix}/workers/chunks/[name]-[hash].js`
+					chunkFileNames: `${prefix}/workers/chunks/[name]-[hash].js`,
+					hoistTransitiveImports: false
 				}
 			}
 		}
@@ -145,7 +147,7 @@ export function get_default_build_config({ config, input, ssr, outDir }) {
  * @returns {string}
  */
 export function assets_base(config) {
-	return config.paths.assets || config.paths.base || './';
+	return config.paths.assets + '/' || config.paths.base + '/' || './';
 }
 
 const method_names = new Set(['GET', 'HEAD', 'PUT', 'POST', 'DELETE', 'PATCH']);

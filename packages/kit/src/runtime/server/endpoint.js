@@ -1,12 +1,14 @@
-import { HttpError, Redirect } from '../control.js';
+import { json } from '../../exports/index.js';
+import { Redirect, ValidationError } from '../control.js';
 import { check_method_names, method_not_allowed } from './utils.js';
 
 /**
  * @param {import('types').RequestEvent} event
  * @param {import('types').SSREndpoint} mod
+ * @param {import('types').SSRState} state
  * @returns {Promise<Response>}
  */
-export async function render_endpoint(event, mod) {
+export async function render_endpoint(event, mod, state) {
 	const method = /** @type {import('types').HttpMethod} */ (event.request.method);
 
 	// TODO: Remove for 1.0
@@ -22,29 +24,43 @@ export async function render_endpoint(event, mod) {
 		return method_not_allowed(mod, method);
 	}
 
+	const prerender = mod.prerender ?? state.prerender_default;
+
+	if (prerender && (mod.POST || mod.PATCH || mod.PUT || mod.DELETE)) {
+		throw new Error('Cannot prerender endpoints that have mutative methods');
+	}
+
+	if (state.prerendering && !prerender) {
+		throw new Error(`${event.routeId} is not prerenderable`);
+	}
+
 	try {
 		const response = await handler(
 			/** @type {import('types').RequestEvent<Record<string, any>>} */ (event)
 		);
 
 		if (!(response instanceof Response)) {
-			return new Response(
-				`Invalid response from route ${event.url.pathname}: handler should return a Response object`,
-				{ status: 500 }
+			throw new Error(
+				`Invalid response from route ${event.url.pathname}: handler should return a Response object`
 			);
+		}
+
+		if (state.prerendering) {
+			response.headers.set('x-sveltekit-routeid', /** @type {string} */ (event.routeId));
+			response.headers.set('x-sveltekit-prerender', String(prerender));
 		}
 
 		return response;
 	} catch (error) {
-		if (error instanceof HttpError) {
-			return new Response(error.message, { status: error.status });
-		} else if (error instanceof Redirect) {
+		if (error instanceof Redirect) {
 			return new Response(undefined, {
 				status: error.status,
-				headers: { Location: error.location }
+				headers: { location: error.location }
 			});
-		} else {
-			throw error;
+		} else if (error instanceof ValidationError) {
+			return json(error.data, { status: error.status });
 		}
+
+		throw error;
 	}
 }

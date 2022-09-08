@@ -2,55 +2,53 @@
 title: Page options
 ---
 
-デフォルトでは、SvelteKitはまずサーバーでコンポーネントをレンダリングし、それをHTMLとしてクライアントに送信します。それからブラウザ上でコンポーネントをサイドレンダリングし、**ハイドレーション(hydration)** と呼ばれるプロセスでそれをインタラクティブにします。そのため、コンポーネントをサーバーとブラウザのどちらでも実行できるようにしておく必要があります。その後で、SvelteKit は後続のナビゲーションを引き継ぐ [**ルーター**](/docs/routing) を初期化します。
+デフォルトでは、SvelteKit はどのコンポーネントも最初はサーバーでレンダリング (または [プリレンダリング](/docs/appendix#prerendering)) し、それを HTML としてクライアントに送信します。その後、ブラウザ上でコンポーネントを再度レンダリングし、**ハイドレーション(hydration)** と呼ばれるプロセスでそれをインタラクティブなものにします。このため、コンポーネントが両方の場所で実行できることを確認する必要があります。SvelteKit はそれから [**router**](/docs/routing) を初期化し、その後のナビゲーションを引き継ぎます。
 
-基本的に、これらは (`svelte.config.js` を介して) アプリ単位で、または (`+page.js` もしくは `+page.server.js` を介して) ページ単位で制御することができます。もし両方とも設定されていてその設定がコンフリクトしている場合、アプリ単位の設定よりページ単位の設定が優先されます。
-
-### router
-
-SvelteKit には [クライアントサイドルーター(client-side router)](/docs/appendix#routing) があり、(ユーザーがリンクをクリックしたり、戻る/進むボタンを操作したときの)ナビゲーションをインターセプトし、リロードによるブラウザのナビゲーション処理をさせることなく、ページコンテンツを更新したりします。
-
-特定の状況においては、アプリ全体では [`browser.router` コンフィグオプション](/docs/configuration#browser)、もしくはページレベルでは `router` の export によって、[クライアントサイドルーティング(client-side routing)](/docs/appendix#routing) を無効にする必要があるかもしれません。
-
-```js
-/// file: +page.js/+page.server.js
-export const router = false;
-```
-
-これによって、ルーターがすでにアクティブかどうかに関わらず、このページからのナビゲーションについてクライアントサイドルーティングが無効になることに注意してください。
-
-### hydrate
-
-通常、SvelteKit はサーバーでレンダリングされたHTMLをインタラクティブなページに [ハイドレート(hydrates)](/docs/appendix#hydration) します。JavaScriptを全く必要としないページ — 多くのブログ記事や 'about' ページがこのカテゴリに入りますが、これらの場合、アプリ全体では [`browser.hydrate` コンフィグオプション](/docs/configuration#browser)、ページレベルでは `hydrate` を export することにより、アプリ起動時のハイドレーションをスキップすることができます:
-
-```js
-/// file: +page.js/+page.server.js
-export const hydrate = false;
-```
-
-> もし `hydrate` と `router` の両方を `false` にした場合、SvelteKit はそのページにJavaScriptを一切追加しません。もし [サーバーサイドレンダリング](/docs/hooks#handle) が `handle` で無効になっている場合、`hydrate` が `true` でないとコンテンツがレンダリングされません。
+これらはそれぞれオプションを [`+page.js`](/docs/routing#page-page-js) や [`+page.server.js`](/docs/routing#page-page-server-js) からエクスポートすることでページごとに、または共有の [`+layout.js`](/docs/routing#layout-layout-js) や [`+layout.server.js`](/docs/routing#layout-layout-server-js) を使用してページグループごとに制御することが可能です。アプリ全体に対してオプションを定義するには、最上位のレイアウト(root layout)からそれをエクスポートします。子レイアウトとページは親レイアウトで設定された値を上書きするため、例えば、プリレンダリングをアプリ全体で有効にし、それから動的にレンダリングする必要があるページではそれを無効にすることができます。
 
 ### prerender
 
-アプリの中のいくつかのページは、ビルド時にシンプルなHTMLとして生成できるかもしれません。それらのページは [_プリレンダリング_](/docs/appendix#prerendering) することができます。
-
-`prerender` アノテーションがあるページは自動的にプリレンダリングされます:
+あなたのアプリの、少なくともいくつかのルートは、ビルド時に生成されるシンプルな HTML ファイルとして表現されることが多いでしょう。これらのルート(routes)を [_プリレンダリング_](/docs/appendix#prerendering) することができます。
 
 ```js
-/// file: +page.js/+page.server.js
+/// file: +page.js/+page.server.js/+server.js
 export const prerender = true;
 ```
 
-あるいは、[`config.kit.prerender.default`](/docs/configuration#prerender) を `true` にした場合、明示的に _プリレンダリング可能ではない_ とマークしているページを除いて全てプリレンダリングされます:
+代わりに、`export const prerender = true` を最上位(root)の `+layout.js` または `+layout.server.js` に設定し、明示的にプリレンダリングしないものとしてマークされたページを除き、全てをプリレンダリングできます:
 
 ```js
-/// file: +page.js/+page.server.js
+/// file: +page.js/+page.server.js/+server.js
 export const prerender = false;
 ```
 
-> もしアプリ全体がプリレンダリングに適しているなら、[`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使用して、静的な web サーバーで扱うのに適した出力ファイルにすることができます。
+`prerender = true` があるルート(routes)は動的な SSR を行うのに使用する manifests から除外されるため、サーバー (または serverless/edge functions) を小さくすることができます。場合によっては、ルート(route)をプリレンダリングしつつ、manifest にも含めたいことがあるでしょう (例えば、`/blog/[slug]` のようなルート(route)があり、最も新しい/人気のあるコンテンツはプリレンダリングしたいがめったにアクセスされないものはサーバーでレンダリングしたい)。こういったケースのために、3つ目のオプションがあります、'auto' です:
 
-プリレンダラーはアプリのルート(root)から始め、プリレンダリング可能なページを見つけるとHTMLを生成します。それぞれのページは、プリレンダリングの候補となる他のページを指す `<a>` 要素を見つけるためにスキャンされます — このため、通常はどのページにアクセスするか指定する必要はありません。もしプリレンダラーによってアクセスされるべきページを指定する必要があれば、[prerender configuration](/docs/configuration#prerender) の `entries` オプションでそれを行えます。
+```js
+/// file: +page.js/+page.server.js/+server.js
+export const prerender = 'auto';
+```
+
+> もしアプリ全体がプリレンダリングに適している場合は、[`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使うことで、任意の静的 Web サーバーで使用するのに適したファイルを出力することができます。
+
+プリレンダラはアプリの最上位(root)から開始され、プリレンダリング可能なページや `+server.js` ルート(routes)を見つけると、そのファイルを生成します。各ページは、プリレンダリングの候補である他のページを指し示す `<a>` 要素を見つけるためにスキャンされます。このため、通常はどのページにアクセスすべきか指定する必要はありません。もしプリレンダラがアクセスするページを指定する必要がある場合は、[prerender configuration](/docs/configuration#prerender) の `entries` オプションでこれを指定することができます。
+
+#### Prerendering server routes
+
+他のページオプションとは違い、`prerender` は `+server.js` ファイルにも適用できます。これらのファイルはレイアウトから影響を受けませんが、そこからデータを読み込むページからデフォルトの値を継承します。例えば、`+page.js` がこの `load` 関数を含む場合…
+
+```js
+/// file: +page.js
+export const prerender = true;
+
+/** @type {import('./$types').PageLoad} */
+export async function load({ fetch }) {
+	const res = await fetch('/my-server-route.json');
+	return await res.json();
+}
+```
+
+…それから `src/routes/my-server-route.json/+server.js` は、自身の `export const prerender = false` を含んでいなければ、プリレンダリング可能であると扱われることになります。
 
 #### プリレンダリングしない場合
 
@@ -68,4 +66,26 @@ export const prerender = false;
 
 このため(他にも理由はありますが)、常に拡張子を付けておくことを推奨します — `src/routes/foo.json/+server.js` と `src/routes/foo/bar.json/+server.js` は、`foo.json` と `foo/bar.json` ファイルが並んで調和して共存できます。
 
-_ページ_ では、`foo` の代わりに `foo/index.html` と書き込むことでこの問題を回避しています。
+ページの場合は、`foo` ではなく `foo/index.html` を書き込むことでこの問題を回避しています。
+
+ルーターがすでにアクティブかどうかにかかわらず、このページからのすべてのナビゲーションでクライアントサイドルーティングが無効になることにご注意ください。
+
+### ssr
+
+通常、SvelteKit ではページを最初にサーバーでレンダリングし、その HTML をクライアントに送信してハイドレーションを行います。もし `ssr` を `false` に設定した場合、代わりに空の 'shell' ページがレンダリングされます。これはページがサーバーでレンダリングできない場合には便利ですが、ほとんどの状況では推奨されません ([appendix をご参照ください](/docs/appendix#ssr))。
+
+```js
+/// file: +page.js
+export const ssr = false;
+```
+
+### csr
+
+通常、SvelteKit はサーバーでレンダリングされた HTML を、クライアントサイドレンダリング(CSR)されたインタラクティブなページに [ハイドレーション](/docs/appendix#hydration) します。JavaScript を全く必要としないページもあります。多くのブログ記事や 'about' ページがこのカテゴリに入ります。このような場合は CSR を無効にすることができます:
+
+```js
+/// file: +page.js
+export const csr = false;
+```
+
+> `ssr` to `csr` の両方が `false` である場合は、何もレンダリングされません。

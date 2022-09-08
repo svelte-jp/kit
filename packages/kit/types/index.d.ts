@@ -12,12 +12,13 @@ import {
 	Prerendered,
 	PrerenderOnErrorValue,
 	RequestOptions,
-	ResponseHeaders,
 	RouteDefinition,
 	TrailingSlash
 } from './private.js';
 import { SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
-import { HttpError, Redirect } from '../src/runtime/control.js';
+import { HttpError, Redirect, ValidationError } from '../src/runtime/control.js';
+
+export { PrerenderOption } from './private.js';
 
 export interface Adapter {
 	name: string;
@@ -34,11 +35,11 @@ export type AwaitedProperties<input extends Record<string, any> | void> = input 
 	? input
 	: unknown;
 
-export type AwaitedErrors<T extends (...args: any) => any> = Awaited<ReturnType<T>> extends {
-	errors?: any;
-}
-	? Awaited<ReturnType<T>>['errors']
-	: undefined;
+export type AwaitedActions<T extends Record<string, (...args: any) => any>> = {
+	[Key in keyof T]: UnpackValidationError<Awaited<ReturnType<T[Key]>>>;
+}[keyof T];
+
+type UnpackValidationError<T> = T extends ValidationError<infer X> ? X : T;
 
 export interface Builder {
 	log: Logger;
@@ -117,18 +118,38 @@ export interface Config {
 	[key: string]: any;
 }
 
+export interface Cookies {
+	/**
+	 * Gets a cookie that was previously set with `cookies.set`, or from the request headers.
+	 */
+	get(name: string, opts?: import('cookie').CookieParseOptions): string | undefined;
+
+	/**
+	 * Sets a cookie. This will add a `set-cookie` header to the response, but also make
+	 * the cookie available via `cookies.get` during the current request.
+	 *
+	 * The `httpOnly` and `secure` options are `true` by default, and must be explicitly
+	 * disabled if you want cookies to be readable by client-side JavaScript and/or transmitted over HTTP
+	 */
+	set(name: string, value: string, opts?: import('cookie').CookieSerializeOptions): void;
+
+	/**
+	 * Deletes a cookie by setting its value to an empty string and setting the expiry date in the past.
+	 */
+	delete(name: string): void;
+}
+
 export interface KitConfig {
 	adapter?: Adapter;
 	alias?: Record<string, string>;
 	appDir?: string;
-	browser?: {
-		hydrate?: boolean;
-		router?: boolean;
-	};
 	csp?: {
 		mode?: 'hash' | 'nonce' | 'auto';
 		directives?: CspDirectives;
 		reportOnly?: CspDirectives;
+	};
+	csrf?: {
+		checkOrigin?: boolean;
 	};
 	env?: {
 		dir?: string;
@@ -142,13 +163,10 @@ export interface KitConfig {
 		params?: string;
 		routes?: string;
 		serviceWorker?: string;
-		template?: string;
+		appTemplate?: string;
+		errorTemplate?: string;
 	};
 	inlineStyleThreshold?: number;
-	methodOverride?: {
-		parameter?: string;
-		allowed?: string[];
-	};
 	outDir?: string;
 	paths?: {
 		assets?: string;
@@ -174,10 +192,6 @@ export interface KitConfig {
 	};
 }
 
-export interface ExternalFetch {
-	(req: Request): Promise<Response>;
-}
-
 export interface Handle {
 	(input: {
 		event: RequestEvent;
@@ -187,6 +201,10 @@ export interface Handle {
 
 export interface HandleError {
 	(input: { error: Error & { frame?: string }; event: RequestEvent }): void;
+}
+
+export interface HandleFetch {
+	(input: { event: RequestEvent; request: Request; fetch: typeof fetch }): MaybePromise<Response>;
 }
 
 /**
@@ -211,15 +229,25 @@ export interface LoadEvent<
 	params: Params;
 	data: Data;
 	routeId: string | null;
-	setHeaders: (headers: ResponseHeaders) => void;
+	setHeaders: (headers: Record<string, string>) => void;
 	url: URL;
 	parent: () => Promise<ParentData>;
 	depends: (...deps: string[]) => void;
 }
 
+export interface NavigationTarget {
+	params: Record<string, string> | null;
+	routeId: string | null;
+	url: URL;
+}
+
+export type NavigationType = 'load' | 'unload' | 'link' | 'goto' | 'popstate';
+
 export interface Navigation {
-	from: URL;
-	to: URL;
+	from: NavigationTarget | null;
+	to: NavigationTarget | null;
+	type: NavigationType;
+	delta?: number;
 }
 
 export interface Page<Params extends Record<string, string> = Record<string, string>> {
@@ -238,13 +266,14 @@ export interface ParamMatcher {
 export interface RequestEvent<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>
 > {
+	cookies: Cookies;
 	getClientAddress: () => string;
 	locals: App.Locals;
 	params: Params;
 	platform: Readonly<App.Platform>;
 	request: Request;
 	routeId: string | null;
-	setHeaders: (headers: ResponseHeaders) => void;
+	setHeaders: (headers: Record<string, string>) => void;
 	url: URL;
 }
 
@@ -260,8 +289,8 @@ export interface RequestHandler<
 }
 
 export interface ResolveOptions {
-	ssr?: boolean;
 	transformPageChunk?: (input: { html: string; done: boolean }) => MaybePromise<string | undefined>;
+	filterSerializedResponseHeaders?: (name: string, value: string) => boolean;
 }
 
 export class Server {
@@ -312,14 +341,28 @@ export interface ServerLoadEvent<
 }
 
 export interface Action<
-	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>
+	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
+	OutputData extends Record<string, any> | void = Record<string, any> | void
 > {
-	(event: RequestEvent<Params>): MaybePromise<
-		| { status?: number; errors: Record<string, any>; location?: never }
-		| { status?: never; errors?: never; location: string }
-		| void
-	>;
+	(event: RequestEvent<Params>): MaybePromise<OutputData>;
 }
+
+export type Actions<
+	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
+	OutputData extends Record<string, any> | void = Record<string, any> | void
+> = Record<string, Action<Params, OutputData>>;
+
+/**
+ * When calling a form action via fetch, the response will be one of these shapes.
+ */
+export type ActionResult<
+	Success extends Record<string, unknown> | undefined = Record<string, any>,
+	Invalid extends Record<string, unknown> | undefined = Record<string, any>
+> =
+	| { type: 'success'; status: number; data?: Success }
+	| { type: 'invalid'; status: number; data?: Invalid }
+	| { type: 'redirect'; status: number; location: string }
+	| { type: 'error'; error: any };
 
 // TODO figure out how to just re-export from '../src/index/index.js' without
 // breaking the site
@@ -343,3 +386,11 @@ export function redirect(status: number, location: string): Redirect;
  * 与えられた data から JSON `Response` オブジェクトを生成します。
  */
 export function json(data: any, init?: ResponseInit): Response;
+
+/**
+ * Generates a `ValidationError` object.
+ */
+export function invalid<T extends Record<string, unknown> | undefined>(
+	status: number,
+	data?: T
+): ValidationError<T>;

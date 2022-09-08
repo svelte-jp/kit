@@ -10,7 +10,7 @@ type OutputDataShape<T> = MaybeWithVoid<
 		Partial<Pick<App.PageData, keyof T & keyof App.PageData>> &
 		Record<string, any>
 >;
-type EnsureParentData<T> = NonNullable<T> extends never ? {} : T;
+type EnsureParentData<T> = T extends null | undefined ? {} : T;
 type PageServerParentData = EnsureParentData<LayoutServerData>;
 type PageParentData = EnsureParentData<LayoutData>;
 type LayoutParams = RouteParams & {};
@@ -20,11 +20,15 @@ export type PageServerLoad<
 	OutputData extends OutputDataShape<PageServerParentData> = OutputDataShape<PageServerParentData>
 > = Kit.ServerLoad<RouteParams, PageServerParentData, OutputData>;
 export type PageServerLoadEvent = Parameters<PageServerLoad>[0];
-export type Errors = null;
+export type ActionData = Kit.AwaitedActions<
+	typeof import('../../../../../../../../+page.server.js').actions
+>;
 export type PageServerData = Kit.AwaitedProperties<
 	Awaited<ReturnType<typeof import('../../../../../../../../+page.server.js').load>>
 >;
 export type PageData = Omit<PageParentData, keyof PageServerData> & PageServerData;
 export type Action = Kit.Action<RouteParams>;
+export type Actions = Kit.Actions<RouteParams>;
 export type LayoutServerData = null;
 export type LayoutData = LayoutParentData;
+export type RequestEvent = Kit.RequestEvent<RouteParams>;

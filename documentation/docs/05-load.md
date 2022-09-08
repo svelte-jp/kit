@@ -18,7 +18,7 @@ export function load(event) {
 
 ### Inputプロパティ
 
-`load` 関数の引数は `LoadEvent` (または、サーバー専用の `load` 関数の場合は `ServerLoadEvent` で、`RequestEvent` から `clientAddress`、`locals`、`platform`、`request` を継承しています)。全てのイベントは以下のプロパティを持ちます:
+`load` 関数の引数は `LoadEvent` (または、サーバー専用の `load` 関数の場合は `ServerLoadEvent` で、`RequestEvent` から `clientAddress`、`cookies`、`locals`、`platform`、`request` を継承しています)。全てのイベントは以下のプロパティを持ちます:
 
 #### data
 
@@ -99,11 +99,13 @@ export function load({ routeId }) {
 
 #### depends
 
-この関数は `load` 関数が1つ以上の URL に _依存(dependency)_ していることを宣言します。その URL は後で [`invalidate()`](/docs/modules#$app-navigation-invalidate) と一緒に使用することで、`load` を再実行させることができます。
+この関数は `load` 関数が1つ以上の URL またはカスタムの識別子(custom identifiers)に _依存(dependency)_ していることを宣言します。その URL は後で [`invalidate()`](/docs/modules#$app-navigation-invalidate) と一緒に使用することで、`load` を再実行させることができます。
 
 `fetch` が `depends` を呼び出すので、これが必要になることはほとんどありません。これが必要になるのは、`fetch` をバイパスするカスタムの API クライアントを使用している場合のみです。
 
 URL はロードされるページに対し、絶対パスか相対パスにすることできますが、[エンコード](https://developer.mozilla.org/ja/docs/Glossary/percent-encoding) されていなければなりません。
+
+カスタムの識別子(custom identifiers)は、[URI の仕様](https://www.rfc-editor.org/rfc/rfc3986.html) に準拠するために、1つ以上の小文字の後にコロンを付ける必要があります。
 
 ```js
 // @filename: ambient.d.ts
@@ -121,7 +123,11 @@ import * as api from '$lib/api';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ depends }) {
-	depends(`${api.base}/foo`, `${api.base}/bar`);
+	depends(
+		`${api.base}/foo`,
+		`${api.base}/bar`,
+		'my-stuff:foo'
+	);
 
 	return {
 		foo: api.client.get('/foo'),
@@ -137,7 +143,7 @@ export async function load({ depends }) {
 - ページリクエストの `cookie` と `authorization` ヘッダーを継承するので、サーバー上でクレデンシャル付きのリクエストを行うことができます
 - サーバー上で、相対パスのリクエストを行うことができます (通常、`fetch` はサーバーのコンテキストで使用する場合にはオリジン付きの URL が必要です)
 - サーバーで動作している場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません
-- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます
+- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](/docs/hooks#handle) で明示的に指定されない限り、シリアライズされないことにご注意ください
 - ハイドレーション中は、レスポンスは HTML から読み込まれ、一貫性が保証され、追加のネットワークリクエストを防ぎます
 
 > Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。
@@ -215,6 +221,7 @@ export async function load({ parent, fetch }) {
 レスポンスにヘッダーを設定する必要がある場合、`setHeaders` メソッドを使用してそれを行うことができます。これは、例えばページをキャッシュさせたい場合に便利です:
 
 ```js
+// @errors: 2322
 /// file: src/routes/blog/+page.js
 /** @type {import('./$types').PageLoad} */
 export async function load({ fetch, setHeaders }) {
@@ -234,25 +241,7 @@ export async function load({ fetch, setHeaders }) {
 
 同じヘッダーを複数回設定すると (`load` 関数が分かれている場合でも) エラーとなります。付与したいヘッダーは一度だけ設定してください。
 
-`set-cookie` は例外で、複数回設定することが可能で、文字列の配列を渡すこともできます:
-
-```js
-/// file: src/routes/+layout.server.js
-/** @type {import('./$types').LayoutLoad} */
-export async function load({ setHeaders }) {
-	setHeaders({
-		'set-cookie': 'a=1; HttpOnly'
-	});
-
-	setHeaders({
-		'set-cookie': 'b=2; HttpOnly'
-	});
-
-	setHeaders({
-		'set-cookie': ['c=3; HttpOnly', 'd=4; HttpOnly']
-	});
-}
-```
+You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](/docs/types#sveltejs-kit-cookies) API in a server-only `load` function instead.
 
 ### Output
 
@@ -332,7 +321,7 @@ _予期せぬ_ エラーがスローされた場合、SvelteKit は [`handleErro
 -import { error } from '@sveltejs/kit';
 +import { error, redirect } from '@sveltejs/kit';
 
-/** @type {import('./$types').LayoutLoad} */
+/** @type {import('./$types').LayoutServerLoad} */
 export function load({ locals }) {
 	if (!locals.user) {
 -		throw error(401, 'not logged in');

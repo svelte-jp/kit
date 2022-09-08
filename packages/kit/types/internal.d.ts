@@ -1,9 +1,7 @@
 import { OutputAsset, OutputChunk } from 'rollup';
 import { SvelteComponent } from 'svelte/internal';
 import {
-	Action,
 	Config,
-	ExternalFetch,
 	ServerLoad,
 	Handle,
 	HandleError,
@@ -14,9 +12,17 @@ import {
 	ResolveOptions,
 	Server,
 	ServerInitOptions,
-	SSRManifest
+	SSRManifest,
+	HandleFetch,
+	Actions
 } from './index.js';
-import { HttpMethod, MaybePromise, RequestOptions, TrailingSlash } from './private.js';
+import {
+	HttpMethod,
+	MaybePromise,
+	PrerenderOption,
+	RequestOptions,
+	TrailingSlash
+} from './private.js';
 
 export interface ServerModule {
 	Server: typeof InternalServer;
@@ -63,8 +69,6 @@ export interface CSRPageNode {
 	component: typeof SvelteComponent;
 	shared: {
 		load?: Load;
-		hydrate?: boolean;
-		router?: boolean;
 	};
 	server: boolean;
 }
@@ -86,14 +90,15 @@ export type CSRRoute = {
 export type GetParams = (match: RegExpExecArray) => Record<string, string>;
 
 export interface Hooks {
-	externalFetch: ExternalFetch;
 	handle: Handle;
 	handleError: HandleError;
+	handleFetch: HandleFetch;
 }
 
 export interface ImportNode {
-	name: string;
-	dynamic: boolean;
+	readonly name: string;
+	readonly dynamic: boolean;
+	readonly children: Generator<ImportNode>;
 }
 
 export class InternalServer extends Server {
@@ -113,11 +118,6 @@ export interface ManifestData {
 	matchers: Record<string, string>;
 }
 
-export interface MethodOverride {
-	parameter: string;
-	allowed: string[];
-}
-
 export interface PageNode {
 	depth: number;
 	component?: string; // TODO supply default component if it's missing (bit of an edge case)
@@ -130,10 +130,6 @@ export interface PageNode {
 	 */
 	child_pages?: PageNode[];
 }
-
-export type PayloadScriptAttributes =
-	| { type: 'data'; url: string; body?: string }
-	| { type: 'validation_errors' };
 
 export interface PrerenderDependency {
 	response: Response;
@@ -266,18 +262,17 @@ export interface SSRNode {
 
 	shared: {
 		load?: Load;
-		hydrate?: boolean;
-		prerender?: boolean;
-		router?: boolean;
+		prerender?: PrerenderOption;
+		ssr?: boolean;
+		csr?: boolean;
 	};
 
 	server: {
 		load?: ServerLoad;
-		prerender?: boolean;
-		POST?: Action;
-		PATCH?: Action;
-		PUT?: Action;
-		DELETE?: Action;
+		prerender?: PrerenderOption;
+		ssr?: boolean;
+		csr?: boolean;
+		actions?: Actions;
 	};
 
 	// store this in dev so we can print serialization errors
@@ -288,27 +283,23 @@ export type SSRNodeLoader = () => Promise<SSRNode>;
 
 export interface SSROptions {
 	csp: ValidatedConfig['kit']['csp'];
+	csrf: {
+		check_origin: boolean;
+	};
 	dev: boolean;
 	get_stack: (error: Error) => string | undefined;
 	handle_error(error: Error & { frame?: string }, event: RequestEvent): void;
 	hooks: Hooks;
-	hydrate: boolean;
 	manifest: SSRManifest;
-	method_override: MethodOverride;
 	paths: {
 		base: string;
 		assets: string;
 	};
-	prerender: {
-		default: boolean;
-		enabled: boolean;
-	};
 	public_env: Record<string, string>;
 	read(file: string): Buffer;
 	root: SSRComponent['default'];
-	router: boolean;
 	service_worker?: string;
-	template({
+	app_template({
 		head,
 		body,
 		assets,
@@ -319,7 +310,8 @@ export interface SSROptions {
 		assets: string;
 		nonce: string;
 	}): string;
-	template_contains_nonce: boolean;
+	app_template_contains_nonce: boolean;
+	error_template({ message, status }: { message: string; status: number }): string;
 	trailing_slash: TrailingSlash;
 }
 
@@ -333,7 +325,9 @@ export interface PageNodeIndexes {
 	leaf: number;
 }
 
-export type SSREndpoint = Partial<Record<HttpMethod, RequestHandler>>;
+export type SSREndpoint = Partial<Record<HttpMethod, RequestHandler>> & {
+	prerender?: PrerenderOption;
+};
 
 export interface SSRRoute {
 	id: string;
@@ -352,6 +346,11 @@ export interface SSRState {
 	initiator?: SSRRoute | SSRErrorPage;
 	platform?: any;
 	prerendering?: PrerenderOptions;
+	/**
+	 * When fetching data from a +server.js endpoint in `load`, the page's
+	 * prerender option is inherited by the endpoint, unless overridden
+	 */
+	prerender_default?: PrerenderOption;
 }
 
 export type StrictBody = string | Uint8Array;

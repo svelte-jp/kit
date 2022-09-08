@@ -7,12 +7,13 @@ import { getRequest, setResponse } from '../../../exports/node/index.js';
 import { installPolyfills } from '../../../exports/node/polyfills.js';
 import { coalesce_to_error } from '../../../utils/error.js';
 import { posixify } from '../../../utils/filesystem.js';
-import { load_template } from '../../../core/config/index.js';
+import { load_error_page, load_template } from '../../../core/config/index.js';
 import { SVELTE_KIT_ASSETS } from '../../../constants.js';
 import * as sync from '../../../core/sync/sync.js';
 import { get_mime_lookup, runtime_base, runtime_prefix } from '../../../core/utils.js';
-import { get_env, prevent_illegal_vite_imports, resolve_entry } from '../utils.js';
+import { prevent_illegal_vite_imports, resolve_entry } from '../utils.js';
 import { compact } from '../../../utils/array.js';
+import { normalizePath } from 'vite';
 
 // Vite doesn't expose this so we just copy the list for now
 // https://github.com/vitejs/vite/blob/3edd1af56e980aef56641a5a51cf2932bb580d41/packages/vite/src/node/plugins/css.ts#L96
@@ -24,10 +25,9 @@ const cwd = process.cwd();
  * @param {import('vite').ViteDevServer} vite
  * @param {import('vite').ResolvedConfig} vite_config
  * @param {import('types').ValidatedConfig} svelte_config
- * @param {Set<string>} illegal_imports
  * @return {Promise<Promise<() => void>>}
  */
-export async function dev(vite, vite_config, svelte_config, illegal_imports) {
+export async function dev(vite, vite_config, svelte_config) {
 	installPolyfills();
 
 	sync.init(svelte_config, vite_config.mode);
@@ -90,7 +90,11 @@ export async function dev(vite, vite_config, svelte_config, illegal_imports) {
 								module_nodes.push(module_node);
 								result.file = url.endsWith('.svelte') ? url : url + '?import'; // TODO what is this for?
 
-								prevent_illegal_vite_imports(module_node, illegal_imports, extensions);
+								prevent_illegal_vite_imports(
+									module_node,
+									normalizePath(svelte_config.kit.files.lib),
+									extensions
+								);
 
 								return module.default;
 							};
@@ -103,7 +107,11 @@ export async function dev(vite, vite_config, svelte_config, illegal_imports) {
 
 							result.shared = module;
 
-							prevent_illegal_vite_imports(module_node, illegal_imports, extensions);
+							prevent_illegal_vite_imports(
+								module_node,
+								normalizePath(svelte_config.kit.files.lib),
+								extensions
+							);
 						}
 
 						if (node.server) {
@@ -269,13 +277,6 @@ export async function dev(vite, vite_config, svelte_config, illegal_imports) {
 		}
 	});
 
-	const { set_private_env } = await vite.ssrLoadModule(`${runtime_base}/env-private.js`);
-	const { set_public_env } = await vite.ssrLoadModule(`${runtime_base}/env-public.js`);
-
-	const env = get_env(svelte_config.kit.env, vite_config.mode);
-	set_private_env(env.private);
-	set_public_env(env.public);
-
 	return () => {
 		const serve_static_middleware = vite.middlewares.stack.find(
 			(middleware) =>
@@ -317,6 +318,14 @@ export async function dev(vite, vite_config, svelte_config, illegal_imports) {
 
 				const handle = user_hooks.handle || (({ event, resolve }) => resolve(event));
 
+				// TODO remove for 1.0
+				// @ts-expect-error
+				if (user_hooks.externalFetch) {
+					throw new Error(
+						'externalFetch has been removed — use handleFetch instead. See https://github.com/sveltejs/kit/pull/6565 for details'
+					);
+				}
+
 				/** @type {import('types').Hooks} */
 				const hooks = {
 					handle,
@@ -331,7 +340,7 @@ export async function dev(vite, vite_config, svelte_config, illegal_imports) {
 								console.error(colors.gray(error.stack));
 							}
 						}),
-					externalFetch: user_hooks.externalFetch || fetch
+					handleFetch: user_hooks.handleFetch || (({ request, fetch }) => fetch(request))
 				};
 
 				if (/** @type {any} */ (hooks).getContext) {
@@ -371,11 +380,15 @@ export async function dev(vite, vite_config, svelte_config, illegal_imports) {
 				}
 
 				const template = load_template(cwd, svelte_config);
+				const error_page = load_error_page(svelte_config);
 
 				const rendered = await respond(
 					request,
 					{
 						csp: svelte_config.kit.csp,
+						csrf: {
+							check_origin: svelte_config.kit.csrf.checkOrigin
+						},
 						dev: true,
 						get_stack: (error) => fix_stack_trace(error),
 						handle_error: (error, event) => {
@@ -401,22 +414,15 @@ export async function dev(vite, vite_config, svelte_config, illegal_imports) {
 							});
 						},
 						hooks,
-						hydrate: svelte_config.kit.browser.hydrate,
 						manifest,
-						method_override: svelte_config.kit.methodOverride,
 						paths: {
 							base: svelte_config.kit.paths.base,
 							assets
 						},
-						prerender: {
-							default: svelte_config.kit.prerender.default,
-							enabled: svelte_config.kit.prerender.enabled
-						},
-						public_env: env.public,
+						public_env: {},
 						read: (file) => fs.readFileSync(path.join(svelte_config.kit.files.assets, file)),
 						root,
-						router: svelte_config.kit.browser.router,
-						template: ({ head, body, assets, nonce }) => {
+						app_template: ({ head, body, assets, nonce }) => {
 							return (
 								template
 									.replace(/%sveltekit\.assets%/g, assets)
@@ -426,7 +432,12 @@ export async function dev(vite, vite_config, svelte_config, illegal_imports) {
 									.replace('%sveltekit.body%', () => body)
 							);
 						},
-						template_contains_nonce: template.includes('%sveltekit.nonce%'),
+						app_template_contains_nonce: template.includes('%sveltekit.nonce%'),
+						error_template: ({ status, message }) => {
+							return error_page
+								.replace(/%sveltekit\.status%/g, String(status))
+								.replace(/%sveltekit\.message%/g, message);
+						},
 						trailing_slash: svelte_config.kit.trailingSlash
 					},
 					{

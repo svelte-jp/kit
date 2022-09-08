@@ -64,13 +64,16 @@ const get_defaults = (prefix = '') => ({
 		amp: undefined,
 		appDir: '_app',
 		browser: {
-			hydrate: true,
-			router: true
+			hydrate: undefined,
+			router: undefined
 		},
 		csp: {
 			mode: 'auto',
 			directives: directive_defaults,
 			reportOnly: directive_defaults
+		},
+		csrf: {
+			checkOrigin: true
 		},
 		endpointExtensions: undefined,
 		env: {
@@ -84,16 +87,15 @@ const get_defaults = (prefix = '') => ({
 			params: join(prefix, 'src/params'),
 			routes: join(prefix, 'src/routes'),
 			serviceWorker: join(prefix, 'src/service-worker'),
-			template: join(prefix, 'src/app.html')
+			appTemplate: join(prefix, 'src/app.html'),
+			errorTemplate: join(prefix, 'src/error.html'),
+			template: undefined
 		},
 		headers: undefined,
 		host: undefined,
 		hydrate: undefined,
 		inlineStyleThreshold: 0,
-		methodOverride: {
-			parameter: '_method',
-			allowed: []
-		},
+		methodOverride: undefined,
 		moduleExtensions: ['.js', '.ts'],
 		outDir: join(prefix, '.svelte-kit'),
 		serviceWorker: {
@@ -107,7 +109,7 @@ const get_defaults = (prefix = '') => ({
 			concurrency: 1,
 			crawl: true,
 			createIndexFiles: undefined,
-			default: false,
+			default: undefined,
 			enabled: true,
 			entries: ['*'],
 			force: undefined,
@@ -247,19 +249,6 @@ test('fails if kit.appDir ends with slash', () => {
 	}, /^config\.kit\.appDir cannot start or end with '\/'. See https:\/\/kit\.svelte\.dev\/docs\/configuration$/);
 });
 
-test('fails if browser.hydrate is false and browser.router is true', () => {
-	assert.throws(() => {
-		validate_config({
-			kit: {
-				browser: {
-					hydrate: false,
-					router: true
-				}
-			}
-		});
-	}, /^config\.kit\.browser\.router cannot be true if config\.kit\.browser\.hydrate is false$/);
-});
-
 test('fails if paths.base is not root-relative', () => {
 	assert.throws(() => {
 		validate_config({
@@ -381,6 +370,9 @@ test('load default config (esm)', async () => {
 
 	const defaults = get_defaults(cwd + '/');
 	defaults.kit.version.name = config.kit.version.name;
+	defaults.kit.files.errorTemplate = fileURLToPath(
+		new URL('./default-error.html', import.meta.url)
+	);
 
 	assert.equal(config, defaults);
 });

@@ -1,4 +1,6 @@
 import { devalue } from 'devalue';
+import { DATA_SUFFIX } from '../../constants.js';
+import { negotiate } from '../../utils/http.js';
 import { HttpError } from '../control.js';
 
 /** @param {any} body */
@@ -134,4 +136,85 @@ export function data_response(data) {
 			}
 		});
 	}
+}
+
+/**
+ * @template {'prerender' | 'ssr' | 'csr'} Option
+ * @template {Option extends 'prerender' ? import('types').PrerenderOption : boolean} Value
+ *
+ * @param {Array<import('types').SSRNode | undefined>} nodes
+ * @param {Option} option
+ *
+ * @returns {Value | undefined}
+ */
+export function get_option(nodes, option) {
+	return nodes.reduce((value, node) => {
+		// TODO remove for 1.0
+		for (const thing of [node?.server, node?.shared]) {
+			if (thing && ('router' in thing || 'hydrate' in thing)) {
+				throw new Error(
+					'`export const hydrate` and `export const router` have been replaced with `export const csr`. See https://github.com/sveltejs/kit/pull/6446'
+				);
+			}
+		}
+
+		return /** @type {any} TypeScript's too dumb to understand this */ (
+			node?.shared?.[option] ?? node?.server?.[option] ?? value
+		);
+	}, /** @type {Value | undefined} */ (undefined));
+}
+
+/**
+ * Return as a response that renders the error.html
+ *
+ * @param {import('types').SSROptions} options
+ * @param {number} status
+ * @param {string} message
+ */
+export function static_error_page(options, status, message) {
+	return new Response(options.error_template({ status, message }), {
+		headers: { 'content-type': 'text/html; charset=utf-8' },
+		status
+	});
+}
+
+/**
+ * @param {import('types').RequestEvent} event
+ * @param {import('types').SSROptions} options
+ * @param {Error} error
+ */
+export function handle_fatal_error(event, options, error) {
+	let status = 500;
+
+	if (error instanceof HttpError) {
+		status = error.status;
+	} else {
+		options.handle_error(error, event);
+	}
+
+	// ideally we'd use sec-fetch-dest instead, but Safari — quelle surprise — doesn't support it
+	const type = negotiate(event.request.headers.get('accept') || 'text/html', [
+		'application/json',
+		'text/html'
+	]);
+
+	if (event.url.pathname.endsWith(DATA_SUFFIX) || type === 'application/json') {
+		return new Response(serialize_error(error, options.get_stack), {
+			status,
+			headers: { 'content-type': 'application/json; charset=utf-8' }
+		});
+	}
+
+	return static_error_page(options, status, error.message);
+}
+
+/**
+ * @param {number} status
+ * @param {string} location
+ */
+export function redirect_response(status, location) {
+	return new Response(undefined, {
+		status,
+		headers: { location }
+	});
 }

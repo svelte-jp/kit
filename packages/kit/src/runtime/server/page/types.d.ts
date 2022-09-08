@@ -1,15 +1,12 @@
-import { ResponseHeaders, SSRNode, CspDirectives } from 'types';
+import { SSRNode, CspDirectives } from 'types';
 import { HttpError } from '../../control.js';
 
 export interface Fetched {
 	url: string;
-	body?: string | null;
-	response: {
-		status: number;
-		statusText: string;
-		headers: ResponseHeaders;
-		body: string;
-	};
+	method: string;
+	request_body?: string | null;
+	response_body: string;
+	response: Response;
 }
 
 export interface FetchState {
