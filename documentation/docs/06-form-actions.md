@@ -4,7 +4,7 @@ title: Form Actions
 
 `+page.server.js` ファイルは _actions_ をエクスポートできます。これによって、`<form>` 要素を使用することでサーバーにデータを `POST` することができます。
 
-`<form>` を使用する場合、クライアントサイドの JavaScript はオプションですが、JavaScript によってフォームのインタラクションを簡単にプログレッシブに強化(_progressively enhance_)することができ、最高のユーザーエクスペリエンスを提供することができます。
+`<form>` を使用する場合、クライアントサイドの JavaScript はオプションですが、JavaScript によって form のインタラクションを簡単にプログレッシブに強化(_progressively enhance_)することができ、最高のユーザーエクスペリエンスを提供することができます。
 
 ### Default actions
 
@@ -31,7 +31,7 @@ export const actions = {
 </form>
 ```
 
-もし誰かがボタンをクリックしたら、ブラウザはフォームデータを `POST` リクエストでサーバーに送信し、デフォルトの action が実行されます。
+もし誰かがボタンをクリックしたら、ブラウザは form のデータを `POST` リクエストでサーバーに送信し、デフォルトの action が実行されます。
 
 > Action は常に `POST` リクエストを使用します。`GET` リクエストには決して副作用があってはならないからです。
 
@@ -75,7 +75,7 @@ export const actions = {
 <form method="POST" action="/login?/register">
 ```
 
-`action` 属性と同じように、button の `formaction` 属性を使用することができ、こうすると親の `<form>` とは別の action に同じフォームデータを `POST` することができます:
+`action` 属性と同じように、button の `formaction` 属性を使用することができ、こうすると親の `<form>` とは別の action に同じ form のデータを `POST` することができます:
 
 ```diff
 /// file: src/routes/login/+page.svelte
@@ -126,7 +126,7 @@ export const actions = {
 </script>
 
 {#if form?.success}
-	<!-- このメッセージは一時的なものです; フォーム送信に対するレスポンスとしてページがレンダリングされたため、存在しています。
+	<!-- このメッセージは一時的なものです; form 送信に対するレスポンスとしてページがレンダリングされたため、存在しています。
 	       ユーザーがリロードすると消えます。 -->
 	<p>Successfully logged in! Welcome back, {data.user.name}</p>
 {/if}
@@ -134,7 +134,7 @@ export const actions = {
 
 #### Validation errors
 
-無効なデータが原因でリクエストが処理できなかった場合、再試行できるようにするために、直前に送信したフォームの値とともに validation error をユーザーに返すことができます。`invalid` 関数は、HTTP ステータスコード (通常、validation error の場合は 400) をデータとともに返します:
+無効なデータが原因でリクエストが処理できなかった場合、再試行できるようにするために、直前に送信した form の値とともに validation error をユーザーに返すことができます。`invalid` 関数は、HTTP ステータスコード (通常、validation error の場合は 400) をデータとともに返します:
 
 ```diff
 // @errors: 2339 2304
@@ -184,7 +184,7 @@ export const actions = {
 </form>
 ```
 
-戻り値は JSON としてシリアライズ可能でなければなりません。その上で、構造は完全にあなた次第です。例えば、もしページに複数のフォームがある場合、返された `form` データがどの `<form>` を参照しているかを `id` プロパティなどで区別することができます。
+戻り値は JSON としてシリアライズ可能でなければなりません。その上で、構造は完全にあなた次第です。例えば、もしページに複数の form がある場合、返された `form` データがどの `<form>` を参照しているかを `id` プロパティなどで区別することができます。
 
 #### Redirects
 
@@ -227,11 +227,11 @@ export const actions = {
 
 ### Progressive enhancement
 
-前のセクションでは [クライアントサイドの JavaScriptなしで動作する](https://kryogenix.org/code/browser/everyonehasjs.html) `/login` action を構築しました — `fetch` は見当たりません。これは素晴らしいことですが、JavaScript が利用可能な場合は、より良いユーザーエクスペリンスを提供するためにフォームのインタラクションをプログレッシブに強化 (progressively enhance) することができます。
+前のセクションでは [クライアントサイドの JavaScriptなしで動作する](https://kryogenix.org/code/browser/everyonehasjs.html) `/login` action を構築しました — `fetch` は見当たりません。これは素晴らしいことですが、JavaScript が利用可能な場合は、より良いユーザーエクスペリンスを提供するために form のインタラクションをプログレッシブに強化 (progressively enhance) することができます。
 
 #### use:enhance
 
-フォームをプログレッシブに強化する最も簡単な方法は、`use:enhance` action を追加することです:
+form をプログレッシブに強化する最も簡単な方法は、`use:enhance` action を追加することです:
 
 ```diff
 /// file: src/routes/login/+page.svelte
@@ -255,7 +255,7 @@ export const actions = {
 - リダイレクトレスポンスの場合は `goto` を呼び出します
 - エラーが発生した場合はもっとも近くにある `+error` 境界をレンダリングします
 
-この挙動をカスタマイズするために、フォームが送信される直前に実行される関数を提供することができます。そして (オプションで) `ActionResult` を引数に取るコールバックを返すことができます。
+この挙動をカスタマイズするために、form が送信される直前に実行される関数を提供することができます。そして (オプションで) `ActionResult` を引数に取るコールバックを返すことができます。
 
 ```svelte
 <form
