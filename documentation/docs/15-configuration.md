@@ -164,11 +164,11 @@ export default config;
 
 ### csrf
 
-Protection against [cross-site request forgery](https://owasp.org/www-community/attacks/csrf) attacks:
+[クロスサイト・リクエスト・フォージェリ(cross-site request forgery)](https://owasp.org/www-community/attacks/csrf) 攻撃に対する防御です:
 
-- `checkOrigin` — if `true`, SvelteKit will check the incoming `origin` header for `POST` form submissions and verify that it matches the server's origin
+- `checkOrigin` — `true` の場合、SvelteKit は `POST` によるフォーム送信を受け取ったとき、受け取った `origin` ヘッダーをチェックし、それがサーバーの origin と一致するか検証します
 
-To allow people to make `POST` form submissions to your app from other origins, you will need to disable this option. Be careful!
+別の origin からあなたのアプリに対して `POST` によるフォーム送信をできるようにするには、このオプションを無効にする必要があります。ご注意ください!
 
 ### env
 

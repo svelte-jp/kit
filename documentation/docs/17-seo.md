@@ -99,14 +99,14 @@ const config = {
 export default config;
 ```
 
-...disabling `csr` in your root `+layout.js`/`+layout.server.js`...
+…最上位(root)の `+layout.js`/`+layout.server.js` の `csr` を無効にします…
 
 ```js
 /// file: src/routes/+layout.server.js
 export const csr = false;
 ```
 
-...and transforming the HTML using `transformPageChunk` along with `transform` imported from `@sveltejs/amp`:
+…そして、`transformPageChunk` と、`@sveltejs/amp` からインポートできる `transform` を使用して、HTML を変換します:
 
 ```js
 import * as amp from '@sveltejs/amp';

@@ -58,7 +58,7 @@ declare namespace App {
 	export interface Platform {}
 
 	/**
-	 * Defines the common shape of expected and unexpected errors. Expected errors are thrown using the `error` function. Unexpected errors are handled by the `handleError` hooks which should return this shape.
+	 * 想定されるエラーと予期せぬエラーの共通の形を定義します。想定されるエラーは `error` 関数を使用してスローされます。予期せぬエラーは `handleError` hooks で処理され、この形を返す必要があります。
 	 */
 	export interface PageError {
 		message: string;
@@ -113,7 +113,7 @@ declare module '$app/forms' {
 		  }) => void);
 
 	/**
-	 * This action enhances a `<form>` element that otherwise would work without JavaScript.
+	 * この action は `<form>` 要素を強化(enhances)します。JavaScriptが無効化されていても `<form>` 要素自体は動作します。
 	 * @param form The form element
 	 * @param options Callbacks for different states of the form lifecycle
 	 */
@@ -140,8 +140,8 @@ declare module '$app/forms' {
 	): { destroy: () => void };
 
 	/**
-	 * This action updates the `form` property of the current page with the given data and updates `$page.status`.
-	 * In case of an error, it redirects to the nearest error page.
+	 * この action は現在のページの `form` プロパティを与えられたデータで更新し、`$page.status` を更新します。
+	 * エラーの場合、もっとも近くにあるエラーページにリダイレクトされます。
 	 */
 	export function applyAction<
 		Success extends Record<string, unknown> | undefined = Record<string, any>,
@@ -187,11 +187,11 @@ declare module '$app/navigation' {
 	/**
 	 * 現在アクティブなページに属している `load` 関数が `fetch` や `depends` を通じて当該の `url` に依存している場合は `load` 関数を再実行させます。ページが更新されたときに解決される `Promise` を返します。
 	 *
-	 * If the argument is given as a `string` or `URL`, it must resolve to the same URL that was passed to `fetch` or `depends` (including query parameters).
-	 * To create a custom identifier, use a string beginning with `[a-z]+:` (e.g. `custom:state`) — this is a valid URL.
+	 * 引数が `string` または `URL` で与えられる場合、`fetch` や `depends` に渡されたものと同じ URL が解決できなければいけません (クエリパラメータも含みます)。
+	 * カスタムの識別子を作るには、`[a-z]+:` から始まる文字列を使用してください (例: `custom:state`) — これは有効な URL です。
 	 *
-	 * The `function` argument can be used define a custom predicate. It receives the full `URL` and causes `load` to rerun if `true` is returned.
-	 * This can be useful if you want to invalidate based on a pattern instead of a exact match.
+	 * `function` 引数はカスタムの predicate を定義するのに使用されます。フルの `URL` を受け取り、`true` が返された場合は `load` を再実行します。
+	 * これは、完全一致ではなくパターンに基づいて invalidate をしたい場合に便利です。
 	 *
 	 * ```ts
 	 * // Example: Match '/path' regardless of the query parameters
@@ -201,7 +201,7 @@ declare module '$app/navigation' {
 	 */
 	export function invalidate(url: string | URL | ((url: URL) => boolean)): Promise<void>;
 	/**
-	 * Causes all `load` functions belonging to the currently active page to re-run. Returns a `Promise` that resolves when the page is subsequently updated.
+	 * 現在アクティブなページに属する全ての `load` 関数を再実行させます。ページが更新されたときに解決される `Promise` を返します。
 	 */
 	export function invalidateAll(): Promise<void>;
 	/**
@@ -230,20 +230,20 @@ declare module '$app/navigation' {
 
 	/**
 	 * リンクをクリックしたり、`goto(...)` を呼び出したり、ブラウザの 戻る/進む を使うなどして新しい URL にナビゲーションするその直前にトリガーされるナビゲーションインターセプターです。
-	 * Calling `cancel()` will prevent the navigation from completing.
+	 * `cancel()` を呼び出すと、ナビゲーションが完了するのを中止します。
 	 *
-	 * When navigating to an external URL, `navigation.to` will be `null`.
+	 * 外部の URL にナビゲーションしている場合、`navigation.to` は `null` になります。
 	 *
-	 * `beforeNavigate` must be called during a component initialization. It remains active as long as the component is mounted.
+	 * `beforeNavigate` はコンポーネントの初期化中に呼び出す必要があります。コンポーネントがマウントされている間、アクティブな状態を維持します。
 	 */
 	export function beforeNavigate(
 		callback: (navigation: Navigation & { cancel: () => void }) => void
 	): void;
 
 	/**
-	 * A lifecycle function that runs the supplied `callback` when the current component mounts, and also whenever we navigate to a new URL.
+	 * 現在のコンポーネントがマウントされるときや、新しい URL に移動するときに、与えられた `callback` を実行するライフサイクル関数です。
 	 *
-	 * `afterNavigate` must be called during a component initialization. It remains active as long as the component is mounted.
+	 * `afterNavigate` はコンポーネントの初期化中に呼び出す必要があります。コンポーネントがマウントされている間、アクティブな状態を維持します。
 	 */
 	export function afterNavigate(callback: (navigation: Navigation) => void): void;
 }
@@ -287,7 +287,7 @@ declare module '$app/stores' {
 	export const page: Readable<Page>;
 	/**
 	 * 読み取り可能なストア(readable store)です。
-	 * When navigating starts, its value is a `Navigation` object with `from`, `to`, `type` and (if `type === 'popstate'`) `delta` properties.
+	 * ナビゲーションが開始すると、その値は `from`、`to`、`type`、(もし `type === 'popstate'` の場合) `delta` プロパティを持つ `Navigation` オブジェクトです。
 	 * ナビゲーションが終了すると、その値は `null` に戻ります。
 	 */
 	export const navigating: Readable<Navigation | null>;

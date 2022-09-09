@@ -54,11 +54,7 @@ afterNavigate(() => {
 <html lang="de">
 ```
 
-<<<<<<< HEAD
 コンテンツが複数の言語で使用可能な場合、開いているページの言語に基づいて `lang` 属性を設定できるようにする必要があります。これは、SvelteKit の [handle hook](/docs/hooks#hooks-server-js-handle) を使用して行うことができます:
-=======
-If your content is available in multiple languages, you should set the `lang` attribute based on the language of the current page. You can do this with SvelteKit's [handle hook](/docs/hooks#hooks-server-js-handle):
->>>>>>> sveltejs/master
 
 ```html
 /// file: src/app.html

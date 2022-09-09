@@ -365,7 +365,7 @@ export type Actions<
 > = Record<string, Action<Params, OutputData>>;
 
 /**
- * When calling a form action via fetch, the response will be one of these shapes.
+ * fetch を通じて form action を呼び出したとき、そのレスポンスはこれらの形となります。
  */
 export type ActionResult<
 	Success extends Record<string, unknown> | undefined = Record<string, any>,
@@ -402,7 +402,7 @@ export function redirect(status: number, location: string): Redirect;
 export function json(data: any, init?: ResponseInit): Response;
 
 /**
- * Generates a `ValidationError` object.
+ * `ValidationError` オブジェクトを生成します。
  */
 export function invalid<T extends Record<string, unknown> | undefined>(
 	status: number,

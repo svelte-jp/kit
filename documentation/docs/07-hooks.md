@@ -2,18 +2,18 @@
 title: Hooks
 ---
 
-'Hooks' are app-wide functions you declare that SvelteKit will call in response to specific events, giving you fine-grained control over the framework's behaviour.
+'Hooks' は、特定のイベントに対して SvelteKit がレスポンスを呼び出すことを宣言するアプリ全体の関数で、これによってフレームワークの動作をきめ細やかに制御できるようになります。
 
-There are two hooks files, both optional:
+hooks ファイルは2つあり、どちらもオプションです:
 
-- `src/hooks.server.js` — your app's server hooks
-- `src/hooks.client.js` — your app's client hooks
+- `src/hooks.server.js` — アプリのサーバーの hooks
+- `src/hooks.client.js` — アプリのクライアントの hooks
 
-> You can configure the location of these files with [`config.kit.files.hooks`](/docs/configuration#files).
+> これらのファイルの場所は [`config.kit.files.hooks`](/docs/configuration#files) で設定できます。
 
 ### Server hooks
 
-The following hooks can be added to `src/hooks.server.js`:
+以下の hooks は `src/hooks.server.js` に追加することができます:
 
 #### handle
 
@@ -90,9 +90,9 @@ export async function handle({ event, resolve }) {
 
 #### handleFetch
 
-This function allows you to modify (or replace) a `fetch` request for an external resource that happens inside a `load` function that runs on the server (or during pre-rendering).
+この関数は、サーバー上で (またはプリレンダリング中に) 実行される `load` 関数の中で発生する、外部リソースに対する `fetch` リクエストを変更 (または置換) することできます。
 
-または、ユーザーがクライアントサイドでそれぞれのページに移動する際に、`load` 関数で `https://api.yourapp.com` のようなパブリックな URL にリクエストを行うかもしれませんが、SSR の場合には (パブリックなインターネットとの間にあるプロキシやロードバランサーをバイパスして) API を直接呼ぶほうが理にかなっているでしょう。
+例えば、ユーザーがクライアントサイドでそれぞれのページに移動する際に、`load` 関数で `https://api.yourapp.com` のようなパブリックな URL にリクエストを行うかもしれませんが、SSR の場合には (パブリックなインターネットとの間にあるプロキシやロードバランサーをバイパスして) API を直接呼ぶほうが理にかなっているでしょう。
 
 ```js
 /** @type {import('@sveltejs/kit').HandleFetch} */
@@ -131,16 +131,16 @@ export async function handleFetch({ event, request, fetch }) {
 
 ### Shared hooks
 
-The following can be added to `src/hooks.server.js` _and_ `src/hooks.client.js`:
+以下は `src/hooks.server.js` _と_ `src/hooks.client.js` のどちらにも追加できます:
 
 #### handleError
 
-If an unexpected error is thrown during loading or rendering, this function will be called with the `error` and the `event`. This allows for two things:
+予期せぬエラーがロード中またはレンダリング中にスローされると、この関数が `error` と `event` を引数にとって呼び出されます。これによって2つのことが可能になります:
 
-- you can log the error
-- you can generate a custom representation of the error that is safe to show to users, omitting sensitive details like messages and stack traces. The returned value, which defaults to `{ message: 'Internal Error' }`, becomes the value of `$page.error`. To make this type-safe, you can customize the expected shape by declaring an `App.PageError` interface (which must include `message: string`, to guarantee sensible fallback behavior).
+- エラーをログに残すことができます
+- エラーからメッセージやスタックトレースなどの機密情報を省略し、ユーザーに見せても安全なカスタムの表現を生成することができます。戻り値は、デフォルトでは `{ message: 'Internal Error' }` で、`$page.error` の値になります。これを型安全にするために、`App.PageError` インターフェースを宣言して、期待される形をカスタマイズすることができます (わかりやすいフォールバックの動作を保証するため、`message: string` を含めなければなりません)。
 
-The following code shows an example of typing the error shape as `{ message: string; code: string }` and returning it accordingly from the `handleError` functions:
+以下のコードは、エラーの形を `{ message: string; code: string }` として型付けし、それを `handleError` 関数から適宜返す例を示しています:
 
 ```ts
 /// file: src/app.d.ts
@@ -192,8 +192,8 @@ export function handleError({ error, event }) {
 }
 ```
 
-> In `src/hooks.client.js`, the type of `handleError` is `HandleClientError` instead of `HandleServerError`, and `event` is a `NavigationEvent` rather than a `RequestEvent`.
+> `src/hooks.client.js` では、`handleError` の型は `HandleServerError` ではなく `HandleClientError` で、`event` は `RequestEvent` ではなく `NavigationEvent` です。 
 
-This function is not called for _expected_ errors (those thrown with the [`error`](/docs/modules#sveltejs-kit-error) function imported from `@sveltejs/kit`).
+この関数は _想定される_ エラー (`@sveltejs/kit` からインポートされる [`error`](/docs/modules#sveltejs-kit-error) 関数でスローされるエラー) の場合は呼び出されません。
 
-During development, if an error occurs because of a syntax error in your Svelte code, the passed in error has a `frame` property appended highlighting the location of the error.
+開発中、Svelte のコードの構文エラーでエラーが発生した場合、渡される error には、エラーの場所のハイライトが付与された `frame` プロパティがあります。

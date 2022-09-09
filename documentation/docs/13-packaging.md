@@ -40,9 +40,9 @@ import Foo from 'your-library/Foo.svelte';
 
 ### Options
 
-`svelte-package` accepts the following options:
+`svelte-package` は以下のオプションを受け付けます:
 
-- `-w`/`--watch` — watch files in `src/lib` for changes and rebuild the package
+- `-w`/`--watch` — `src/lib` の中にあるファイルを監視し、パッケージを再ビルドします
 
 ### Publishing
 
@@ -56,6 +56,6 @@ npm publish ./package
 
 ### 注意事項
 
-相対ファイルのインポートはすべて、Node の ESM アルゴリズムに従って完全に指定する必要があります。つまり、`src/lib/something/index.js` ファイルを `import { something } from './something` のようにインポートすることはできません。代わりに、`import { something } from './something/index.js` というようにインポートする必要があります。TypeScript を使用している場合は、`.ts` ファイルを同じ方法でインポートする必要がありますが、ファイルの末尾は `.ts` ではなく `.js` を使用します (これは我々の管理下ではんはく、TypeScript チームが決定したことです)。`tsconfig.json` または `jsconfig.json` で `"moduleResolution": "NodeNext"` と設定することで、この問題を解決できます。
+相対ファイルのインポートはすべて、Node の ESM アルゴリズムに従って完全に指定する必要があります。つまり、`src/lib/something/index.js` ファイルを `import { something } from './something` のようにインポートすることはできません。代わりに、`import { something } from './something/index.js` というようにインポートする必要があります。TypeScript を使用している場合は、`.ts` ファイルを同じ方法でインポートする必要がありますが、ファイルの末尾は `.ts` ではなく `.js` を使用します (これは我々の管理下ではなく、TypeScript チームが決定したことです)。`tsconfig.json` または `jsconfig.json` で `"moduleResolution": "NodeNext"` と設定することで、この問題を解決できます。
 
 比較的、これは実験的な機能であり、まだ完全に実装されていません。Svelte ファイル(プリプロセス済)と TypeScript ファイル(JavaScriptにトランスパイル済)を除き、全てのファイルはそのままコピーされます。
