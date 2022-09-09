@@ -120,21 +120,21 @@ export interface Config {
 
 export interface Cookies {
 	/**
-	 * Gets a cookie that was previously set with `cookies.set`, or from the request headers.
+	 * 事前に `cookies.set` で設定された cookie や、またはリクエストヘッダーから cookie を取得します。
 	 */
 	get(name: string, opts?: import('cookie').CookieParseOptions): string | undefined;
 
 	/**
-	 * Sets a cookie. This will add a `set-cookie` header to the response, but also make
-	 * the cookie available via `cookies.get` during the current request.
+	 * cookie を設定します。これはレスポンスに `set-cookie` ヘッダーを追加し、
+	 * また、現在のリクエスト中に `cookies.get` を通じてその cookie を利用可能にします。
 	 *
-	 * The `httpOnly` and `secure` options are `true` by default, and must be explicitly
-	 * disabled if you want cookies to be readable by client-side JavaScript and/or transmitted over HTTP
+	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており、
+	 * クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります
 	 */
 	set(name: string, value: string, opts?: import('cookie').CookieSerializeOptions): void;
 
 	/**
-	 * Deletes a cookie by setting its value to an empty string and setting the expiry date in the past.
+	 * 値に空文字列(empty string)を設定したり、有効期限(expiry date)を過去に設定することで、cookie を削除します。
 	 */
 	delete(name: string): void;
 }
