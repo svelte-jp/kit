@@ -8,7 +8,7 @@ SEO で最も重要なのは、高品質なコンテンツを作ること、そ�
 
 #### SSR
 
-近年、検索エンジンはクライアントサイドの JavaScript でレンダリングされたコンテンツのインデックスを改善してきましたが、サーバーサイドレンダリングされたコンテンツのほうがより頻繁に、より確実にインデックスされます。SvelteKit はデフォルトで SSR を採用しています。[`handle`](/docs/hooks#handle) で無効にすることもできますが、適切な理由がない場合はそのままにしておきましょう。
+近年、検索エンジンはクライアントサイドの JavaScript でレンダリングされたコンテンツのインデックスを改善してきましたが、サーバーサイドレンダリングされたコンテンツのほうがより頻繁に、より確実にインデックスされます。SvelteKit はデフォルトで SSR を採用しています。[`handle`](/docs/hooks#hooks-server-js-handle) で無効にすることもできますが、適切な理由がない場合はそのままにしておきましょう。
 
 > SvelteKit のレンダリングは高度な設定が可能です。必要であれば、[動的なレンダリング(dynamic rendering)](https://developers.google.com/search/docs/advanced/javascript/dynamic-rendering) を実装することも可能です。一般的には推奨されません、SSR には SEO 以外のメリットもあるからです。
 

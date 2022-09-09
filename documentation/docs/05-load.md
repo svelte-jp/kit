@@ -143,7 +143,7 @@ export async function load({ depends }) {
 - ページリクエストの `cookie` と `authorization` ヘッダーを継承するので、サーバー上でクレデンシャル付きのリクエストを行うことができます
 - サーバー上で、相対パスのリクエストを行うことができます (通常、`fetch` はサーバーのコンテキストで使用する場合にはオリジン付きの URL が必要です)
 - サーバーで動作している場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません
-- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](/docs/hooks#handle) で明示的に指定されない限り、シリアライズされないことにご注意ください
+- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](/docs/hooks#hooks-server-js-handle) で明示的に指定されない限り、シリアライズされないことにご注意ください
 - ハイドレーション中は、レスポンスは HTML から読み込まれ、一貫性が保証され、追加のネットワークリクエストを防ぎます
 
 > Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。
@@ -241,7 +241,7 @@ export async function load({ fetch, setHeaders }) {
 
 同じヘッダーを複数回設定すると (`load` 関数が分かれている場合でも) エラーとなります。付与したいヘッダーは一度だけ設定してください。
 
-You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](/docs/types#sveltejs-kit-cookies) API in a server-only `load` function instead.
+`setHeaders` では `set-cookie` ヘッダーを追加することはできません。代わりに、サーバー用の `load` 関数で [`cookies`](/docs/types#sveltejs-kit-cookies) API を使用してください。
 
 ### Output
 
@@ -308,7 +308,7 @@ export function load({ locals }) {
 }
 ```
 
-_予期せぬ_ エラーがスローされた場合、SvelteKit は [`handleError`](/docs/hooks#handleerror) を実行し、それを 500 Internal Server Error として扱います。
+_予期せぬ_ エラーがスローされた場合、SvelteKit は [`handleError`](/docs/hooks#hooks-server-js-handleerror) を実行し、それを 500 Internal Error として扱います。
 
 > 開発中は、予期せぬエラーのスタックトレースを `$page.error.stack` として表示します。本番環境では、スタックトレースは非表示となります。
 

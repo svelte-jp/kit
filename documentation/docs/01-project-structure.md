@@ -44,7 +44,7 @@ my-project/
   - `%sveltekit.nonce%` — マニュアルで含めるリンクやスクリプトの [CSP](/docs/configuration#csp) ノンス (使用する場合)
 - `error.html` (optional) 全てが失敗したときにレンダリングされるページです。以下のプレースホルダーを含めることができます:
   - `%sveltekit.status%` — HTTP ステータス
-  - `%sveltekit.message%` — エラーメッセージ
+  - `%sveltekit.error.message%` — エラーメッセージ
 - `hooks.js` (optional) アプリケーションの [hooks](/docs/hooks)
 - `service-worker.js` (optional) [service worker](/docs/service-workers)
 

@@ -23,7 +23,6 @@ SvelteKit では、アプリのルート(routes)間の移動に、(フレーム�
 
 ### data-sveltekit-reload
 
-Occasionally, we need to tell SvelteKit not to handle a link, but allow the browser to handle it. Adding a `data-sveltekit-reload` attribute to a link...
 時には、SvelteKit にリンクを処理させないで、ブラウザに処理をさせる必要があります。`data-sveltekit-reload` 属性をリンクに追加すると…
 
 ```html
@@ -38,7 +37,6 @@ Occasionally, we need to tell SvelteKit not to handle a link, but allow the brow
 
 内部のリンクに移動するとき、SvelteKit はブラウザのデフォルトのナビゲーションの挙動を模倣します: ユーザーがページの左上に来るように、スクロールポジションを 0,0 に変更します (リンクに `#hash` が含まれている場合は、ID が一致する要素までスクロールします)。
 
-In certain cases, you may wish to disable this behaviour. Adding a `data-sveltekit-noscroll` attribute to a link...
 特定のケースでは、この挙動を無効化したいことがあるでしょう。`data-sveltekit-noscroll` 属性をリンクに追加すると…
 
 ```html

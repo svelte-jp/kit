@@ -2,11 +2,20 @@
 title: Hooks
 ---
 
-オプションの `src/hooks.js` (または `src/hooks.ts`、または `src/hooks/index.js`) ファイルはサーバー上で実行される3つの関数 — `handle`、`handleError`、`handleFetch` — をエクスポートできます。全てオプションです。
+'Hooks' are app-wide functions you declare that SvelteKit will call in response to specific events, giving you fine-grained control over the framework's behaviour.
 
-> このファイルの配置場所は [コンフィグ](/docs/configuration) の `config.kit.files.hooks` で変更することができます。
+There are two hooks files, both optional:
 
-### handle
+- `src/hooks.server.js` — your app's server hooks
+- `src/hooks.client.js` — your app's client hooks
+
+> You can configure the location of these files with [`config.kit.files.hooks`](/docs/configuration#files).
+
+### Server hooks
+
+The following hooks can be added to `src/hooks.server.js`:
+
+#### handle
 
 この関数は SvelteKit のサーバーが [リクエスト](/docs/web-standards#fetch-apis-request) を受けるたびに (アプリの実行中であろうと、[プリレンダリング](/docs/page-options#prerender)であろうと) 実行され、[レスポンス](/docs/web-standards#fetch-apis-response) を決定します。リクエストを表す `event` オブジェクトと、ルート(route)をレンダリングしレスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでルート(routes)を実装する場合など)。
 
@@ -79,47 +88,9 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-### handleError
+#### handleFetch
 
-ロード中またはレンダリング中にエラーがスローされた場合、この関数は `error` とそれを引き起こした `event` を渡されて呼び出されます。これにより、エラートラッキングサービスにデータを送ったり、エラーをコンソールにプリントする前にフォーマットをカスタマイズすることができます。
-
-開発中、もし Svelte コードで構文エラーが発生した場合、エラー場所をハイライトする `frame` プロパティが追加されます。
-
-未実装の場合、SvelteKitはデフォルトのフォーマットでエラーをログ出力します。
-
-```js
-/// file: src/hooks.js
-// @filename: ambient.d.ts
-const Sentry: any;
-
-// @filename: index.js
-// ---cut---
-/** @type {import('@sveltejs/kit').HandleError} */
-export function handleError({ error, event }) {
-	// example integration with https://sentry.io/
-	Sentry.captureException(error, { event });
-}
-```
-
-> `handleError` は _予期せぬ_ エラー の場合にのみ呼び出されます。`@sveltejs/kit` からインポートされる [`error`](/docs/modules#sveltejs-kit-error) 関数で作成されたエラーは _想定される_ エラーであるため、これは呼び出されません。
-
-### handleFetch
-
-この関数は、サーバー上で(またはプリレンダリング中に)実行される `load` 関数の中で発生する `fetch` リクエストを変更(または置換)します。
-
-例えば、アプリの前に置かれるプロキシによって追加されるカスタムのヘッダーを含める必要がある場合は:
-
-```js
-// @errors: 2345
-/** @type {import('@sveltejs/kit').HandleFetch} */
-export async function handleFetch({ event, request, fetch }) {
-	const name = 'x-geolocation-city';
-	const value = event.request.headers.get(name);
-	request.headers.set(name, value);
-
-	return fetch(request);
-}
-```
+This function allows you to modify (or replace) a `fetch` request for an external resource that happens inside a `load` function that runs on the server (or during pre-rendering).
 
 または、ユーザーがクライアントサイドでそれぞれのページに移動する際に、`load` 関数で `https://api.yourapp.com` のようなパブリックな URL にリクエストを行うかもしれませんが、SSR の場合には (パブリックなインターネットとの間にあるプロキシやロードバランサーをバイパスして) API を直接呼ぶほうが理にかなっているでしょう。
 
@@ -138,7 +109,7 @@ export async function handleFetch({ request, fetch }) {
 }
 ```
 
-#### Credentials
+**Credentials**
 
 同一オリジン(same-origin)リクエストの場合、SvelteKit の `fetch` 実装は、`credentials` オプションを `"omit"` にしない限り、 `cookie` と `authorization` ヘッダーを転送します。
 
@@ -157,3 +128,72 @@ export async function handleFetch({ event, request, fetch }) {
 	return fetch(request);
 }
 ```
+
+### Shared hooks
+
+The following can be added to `src/hooks.server.js` _and_ `src/hooks.client.js`:
+
+#### handleError
+
+If an unexpected error is thrown during loading or rendering, this function will be called with the `error` and the `event`. This allows for two things:
+
+- you can log the error
+- you can generate a custom representation of the error that is safe to show to users, omitting sensitive details like messages and stack traces. The returned value, which defaults to `{ message: 'Internal Error' }`, becomes the value of `$page.error`. To make this type-safe, you can customize the expected shape by declaring an `App.PageError` interface (which must include `message: string`, to guarantee sensible fallback behavior).
+
+The following code shows an example of typing the error shape as `{ message: string; code: string }` and returning it accordingly from the `handleError` functions:
+
+```ts
+/// file: src/app.d.ts
+declare namespace App {
+	interface PageError {
+		message: string;
+		code: string;
+	}
+}
+```
+
+```js
+/// file: src/hooks.server.js
+// @errors: 2322 2571
+// @filename: ambient.d.ts
+const Sentry: any;
+
+// @filename: index.js
+// ---cut---
+/** @type {import('@sveltejs/kit').HandleServerError} */
+export function handleError({ error, event }) {
+	// example integration with https://sentry.io/
+	Sentry.captureException(error, { event });
+
+	return {
+		message: 'Whoops!',
+		code: error.code ?? 'UNKNOWN'
+	};
+}
+```
+
+```js
+/// file: src/hooks.client.js
+// @errors: 2322 2571
+// @filename: ambient.d.ts
+const Sentry: any;
+
+// @filename: index.js
+// ---cut---
+/** @type {import('@sveltejs/kit').HandleClientError} */
+export function handleError({ error, event }) {
+	// example integration with https://sentry.io/
+	Sentry.captureException(error, { event });
+
+	return {
+		message: 'Whoops!',
+		code: error.code ?? 'UNKNOWN'
+	};
+}
+```
+
+> In `src/hooks.client.js`, the type of `handleError` is `HandleClientError` instead of `HandleServerError`, and `event` is a `NavigationEvent` rather than a `RequestEvent`.
+
+This function is not called for _expected_ errors (those thrown with the [`error`](/docs/modules#sveltejs-kit-error) function imported from `@sveltejs/kit`).
+
+During development, if an error occurs because of a syntax error in your Svelte code, the passed in error has a `frame` property appended highlighting the location of the error.

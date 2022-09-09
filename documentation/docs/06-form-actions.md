@@ -134,7 +134,6 @@ export const actions = {
 
 #### Validation errors
 
-If the request couldn't be processed because of invalid data, you can return validation errors — along with the previously submitted form values — back to the user so that they can try again. The `invalid` function lets you return an HTTP status code (typically 400, in the case of validation errors) along with the data:
 無効なデータが原因でリクエストが処理できなかった場合、再試行できるようにするために、直前に送信したフォームの値とともに validation error をユーザーに返すことができます。`invalid` 関数は、HTTP ステータスコード (通常、validation error の場合は 400) をデータとともに返します:
 
 ```diff
@@ -266,7 +265,7 @@ export const actions = {
 		// `data` はその `FormData` オブジェクトです
 		// `cancel()` は送信(submission)を中止します
 
-		return async (result) => {
+		return async ({ result }) => {
 			// `result` は `ActionResult` オブジェクトです
 		};
 	}}
@@ -294,7 +293,7 @@ export const actions = {
 		// `data` はその `FormData` オブジェクトです
 		// `cancel()` は送信(submission)を中止します
 
-		return async (result) => {
+		return async ({ result }) => {
 			// `result` は `ActionResult` オブジェクトです
 +			if (result.type === 'error') {
 +				await applyAction(result);
