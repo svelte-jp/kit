@@ -120,21 +120,21 @@ export interface Config {
 
 export interface Cookies {
 	/**
-	 * Gets a cookie that was previously set with `cookies.set`, or from the request headers.
+	 * 事前に `cookies.set` で設定された cookie や、またはリクエストヘッダーから cookie を取得します。
 	 */
 	get(name: string, opts?: import('cookie').CookieParseOptions): string | undefined;
 
 	/**
-	 * Sets a cookie. This will add a `set-cookie` header to the response, but also make
-	 * the cookie available via `cookies.get` during the current request.
+	 * cookie を設定します。これはレスポンスに `set-cookie` ヘッダーを追加し、
+	 * また、現在のリクエスト中に `cookies.get` を通じてその cookie を利用可能にします。
 	 *
-	 * The `httpOnly` and `secure` options are `true` by default, and must be explicitly
-	 * disabled if you want cookies to be readable by client-side JavaScript and/or transmitted over HTTP
+	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており、
+	 * クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります
 	 */
 	set(name: string, value: string, opts?: import('cookie').CookieSerializeOptions): void;
 
 	/**
-	 * Deletes a cookie by setting its value to an empty string and setting the expiry date in the past.
+	 * 値に空文字列(empty string)を設定したり、有効期限(expiry date)を過去に設定することで、cookie を削除します。
 	 */
 	delete(name: string): void;
 }
@@ -158,7 +158,10 @@ export interface KitConfig {
 	moduleExtensions?: string[];
 	files?: {
 		assets?: string;
-		hooks?: string;
+		hooks?: {
+			client?: string;
+			server?: string;
+		};
 		lib?: string;
 		params?: string;
 		routes?: string;
@@ -199,8 +202,12 @@ export interface Handle {
 	}): MaybePromise<Response>;
 }
 
-export interface HandleError {
-	(input: { error: Error & { frame?: string }; event: RequestEvent }): void;
+export interface HandleServerError {
+	(input: { error: unknown; event: RequestEvent }): void | App.PageError;
+}
+
+export interface HandleClientError {
+	(input: { error: unknown; event: NavigationEvent }): void | App.PageError;
 }
 
 export interface HandleFetch {
@@ -224,15 +231,20 @@ export interface LoadEvent<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
 	Data extends Record<string, unknown> | null = Record<string, any> | null,
 	ParentData extends Record<string, unknown> = Record<string, any>
-> {
+> extends NavigationEvent<Params> {
 	fetch(info: RequestInfo, init?: RequestInit): Promise<Response>;
-	params: Params;
 	data: Data;
-	routeId: string | null;
 	setHeaders: (headers: Record<string, string>) => void;
-	url: URL;
 	parent: () => Promise<ParentData>;
 	depends: (...deps: string[]) => void;
+}
+
+export interface NavigationEvent<
+	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>
+> {
+	params: Params;
+	routeId: string | null;
+	url: URL;
 }
 
 export interface NavigationTarget {
@@ -255,7 +267,7 @@ export interface Page<Params extends Record<string, string> = Record<string, str
 	params: Params;
 	routeId: string | null;
 	status: number;
-	error: HttpError | Error | null;
+	error: App.PageError | null;
 	data: App.PageData & Record<string, any>;
 }
 
@@ -353,7 +365,7 @@ export type Actions<
 > = Record<string, Action<Params, OutputData>>;
 
 /**
- * When calling a form action via fetch, the response will be one of these shapes.
+ * fetch を通じて form action を呼び出したとき、そのレスポンスはこれらの形となります。
  */
 export type ActionResult<
 	Success extends Record<string, unknown> | undefined = Record<string, any>,
@@ -364,17 +376,19 @@ export type ActionResult<
 	| { type: 'redirect'; status: number; location: string }
 	| { type: 'error'; error: any };
 
-// TODO figure out how to just re-export from '../src/index/index.js' without
-// breaking the site
-
 /**
  * HTTP ステータスコードとオプションのメッセージで `HttpError` オブジェクトを作成します。
  * リクエストの処理中にこのオブジェクトがスローされると、SvelteKit は
  * `handleError` を呼ばずにエラーレスポンス(error response)を返します。
- * @param {number} status
- * @param {string | undefined} [message]
+ * @param status The HTTP status code
+ * @param body An object that conforms to the App.PageError type. If a string is passed, it will be used as the message property.
  */
-export function error(status: number, message?: string | undefined): HttpError;
+export function error(status: number, body: App.PageError): HttpError;
+export function error(
+	status: number,
+	// this overload ensures you can omit the argument or pass in a string if App.PageError is of type { message: string }
+	body?: { message: string } extends App.PageError ? App.PageError | string | undefined : never
+): HttpError;
 
 /**
  * `Redirect` オブジェクトを作成します。リクエストの処理中にスローされると、SvelteKit は
@@ -388,7 +402,7 @@ export function redirect(status: number, location: string): Redirect;
 export function json(data: any, init?: ResponseInit): Response;
 
 /**
- * Generates a `ValidationError` object.
+ * `ValidationError` オブジェクトを生成します。
  */
 export function invalid<T extends Record<string, unknown> | undefined>(
 	status: number,

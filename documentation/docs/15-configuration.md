@@ -34,7 +34,10 @@ const config = {
 		},
 		files: {
 			assets: 'static',
-			hooks: 'src/hooks',
+			hooks: {
+				client: 'src/hooks.client',
+				server: 'src/hooks.server'
+			},
 			lib: 'src/lib',
 			params: 'src/params',
 			routes: 'src/routes',
@@ -161,11 +164,11 @@ export default config;
 
 ### csrf
 
-Protection against [cross-site request forgery](https://owasp.org/www-community/attacks/csrf) attacks:
+[クロスサイト・リクエスト・フォージェリ(cross-site request forgery)](https://owasp.org/www-community/attacks/csrf) 攻撃に対する防御です:
 
-- `checkOrigin` — if `true`, SvelteKit will check the incoming `origin` header for `POST` form submissions and verify that it matches the server's origin
+- `checkOrigin` — `true` の場合、SvelteKit は `POST` による form 送信を受け取ったとき、受け取った `origin` ヘッダーをチェックし、それがサーバーの origin と一致するか検証します
 
-To allow people to make `POST` form submissions to your app from other origins, you will need to disable this option. Be careful!
+別の origin からあなたのアプリに対して `POST` による form 送信をできるようにするには、このオプションを無効にする必要があります。ご注意ください!
 
 ### env
 
@@ -179,7 +182,7 @@ To allow people to make `POST` form submissions to your app from other origins, 
 以下の `string` 値のうち、0 個以上を含むオブジェクトです:
 
 - `assets` — `favicon.ico` or `manifest.json` のような、何も処理する必要もなく、安定した URL を持つべき静的ファイルを配置する場所
-- `hooks` — hooks モジュールのロケーション([Hooks](/docs/hooks) をご参照ください)
+- `hooks` — クライントとサーバーの hooks のロケーション([Hooks](/docs/hooks) をご参照ください)
 - `lib` — コードベース全体から `$lib` でアクセスできる、アプリの内部ライブラリ
 - `params` — [parameter matchers](/docs/routing#advanced-routing-matching) を含むディレクトリ
 - `routes` — アプリの構造を定義するファイル([ルーティング](/docs/routing) をご参照ください)
@@ -296,7 +299,7 @@ URL を解決する際に、末尾のスラッシュ (trailing slashes) を削�
 
 このオプションは [プリレンダリング](/docs/page-options#prerender) にも影響します。もし `trailingSlash` が `always` なら、`/about` のようなルートは `about/index.html` ファイルを生成し、それ以外の場合は `about.html` を生成し、静的な web サーバーの規約に従います。
 
-> 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別の URL として扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](/docs/hooks#handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
+> 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別の URL として扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](/docs/hooks#hooks-server-js-handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
 
 ### version
 

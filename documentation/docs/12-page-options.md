@@ -22,7 +22,7 @@ export const prerender = true;
 export const prerender = false;
 ```
 
-`prerender = true` があるルート(routes)は動的な SSR を行うのに使用する manifests から除外されるため、サーバー (または serverless/edge functions) を小さくすることができます。場合によっては、ルート(route)をプリレンダリングしつつ、manifest にも含めたいことがあるでしょう (例えば、`/blog/[slug]` のようなルート(route)があり、最も新しい/人気のあるコンテンツはプリレンダリングしたいがめったにアクセスされないものはサーバーでレンダリングしたい)。こういったケースのために、3つ目のオプションがあります、'auto' です:
+`prerender = true` があるルート(routes)は動的な SSR を行うのに使用する manifest から除外されるため、サーバー (または serverless/edge functions) を小さくすることができます。場合によっては、ルート(route)をプリレンダリングしつつ、manifest にも含めたいことがあるでしょう (例えば、`/blog/[slug]` のようなルート(route)があり、最も新しい/人気のあるコンテンツはプリレンダリングしたいがめったにアクセスされないものはサーバーでレンダリングしたい、など)。こういったケースのために、3つ目のオプションがあります、'auto' です:
 
 ```js
 /// file: +page.js/+page.server.js/+server.js

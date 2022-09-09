@@ -149,7 +149,7 @@ SvelteKit は、アプリが動作する場所に依存しないように設計�
 
 #### HTML minifier
 
-Sapper はデフォルトで `html-minifier` を含んでいました。SvelteKit はこれを含まないのですが、[hook](/docs/hooks#handle) としてこれを追加することができます:
+Sapper はデフォルトで `html-minifier` を含んでいました。SvelteKit はこれを含まないのですが、[hook](/docs/hooks#hooks-server-js-handle) としてこれを追加することができます:
 
 ```js
 // @filename: ambient.d.ts
