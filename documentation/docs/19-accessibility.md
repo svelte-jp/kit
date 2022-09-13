@@ -54,7 +54,7 @@ afterNavigate(() => {
 <html lang="de">
 ```
 
-コンテンツが複数の言語で使用可能な場合、開いているページの言語に基づいて `lang` 属性を設定できるようにする必要があります。これは、SvelteKit の [handle hook](/docs/hooks#hooks-server-js-handle) を使用して行うことができます:
+コンテンツが複数の言語で使用可能な場合、開いているページの言語に基づいて `lang` 属性を設定できるようにする必要があります。これは、SvelteKit の [handle hook](/docs/hooks#server-hooks-handle) を使用して行うことができます:
 
 ```html
 /// file: src/app.html
@@ -62,7 +62,7 @@ afterNavigate(() => {
 ```
 
 ```js
-/// file: src/hooks.js
+/// file: src/hooks.server.js
 /**
  * @param {import('@sveltejs/kit').RequestEvent} event
  * @returns {string}

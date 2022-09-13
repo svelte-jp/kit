@@ -99,7 +99,7 @@ declare module '$app/forms' {
 		Success extends Record<string, unknown> | undefined = Record<string, any>,
 		Invalid extends Record<string, unknown> | undefined = Record<string, any>
 	> = (input: {
-		action: string;
+		action: URL;
 		data: FormData;
 		form: HTMLFormElement;
 		controller: AbortController;
@@ -108,7 +108,7 @@ declare module '$app/forms' {
 		| void
 		| ((opts: {
 				form: HTMLFormElement;
-				action: string;
+				action: URL;
 				result: ActionResult<Success, Invalid>;
 		  }) => void);
 
@@ -408,10 +408,11 @@ declare module '@sveltejs/kit/node/polyfills' {
  * Node ライクな環境向けの adapter で使用されるユーティリティーです。
  */
 declare module '@sveltejs/kit/node' {
-	export function getRequest(
-		base: string,
-		request: import('http').IncomingMessage
-	): Promise<Request>;
+	export function getRequest(opts: {
+		base: string;
+		request: import('http').IncomingMessage;
+		bodySizeLimit?: number;
+	}): Promise<Request>;
 	export function setResponse(res: import('http').ServerResponse, response: Response): void;
 }
 

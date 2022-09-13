@@ -1,5 +1,5 @@
 ---
-title: SvelteKit はまだ1.0ではないようです。使うべきですか？ Sapperはどうですか？
+title: SvelteKit はまだ1.0ではないようです。使うべきですか？
 ---
 
-SvelteKit は現在のところ、API が確定されるまでの間はベータ版です。Sapper には新機能が追加される予定はなく、開発は全て SvelteKit にフォーカスされています。
+SvelteKit は現在のところ、リリース候補の段階です(release candidate phase)。破壊的な変更は最小限になると考えており、開発はバグの修正にフォーカスされています。

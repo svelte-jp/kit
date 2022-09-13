@@ -51,7 +51,14 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 # READ THIS FIRST!
 
-SvelteKit is still in beta. Expect bugs! Read more [here](https://svelte.dev/blog/sveltekit-beta), and track progress towards 1.0 [here](https://github.com/sveltejs/kit/issues?q=is%3Aopen+is%3Aissue+milestone%3A1.0).
+SvelteKit is in its release candidate phase:
+- :exclamation: expect bugs! 
+- :heavy_check_mark: no more planned breaking changes
+- :heavy_check_mark: countdown to a stable release
+- :x: feature-complete
+- :x: tutorials
+
+Watch [the announcement](https://www.youtube.com/watch?v=A8jkJTWacow&t=29628s) and track [progress towards 1.0](https://github.com/sveltejs/kit/issues?q=is%3Aopen+is%3Aissue+milestone%3A1.0) for more details.
 
 ## Overview
 

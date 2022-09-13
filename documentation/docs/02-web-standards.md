@@ -51,7 +51,11 @@ export function GET(event) {
 
 ### URL APIs
 
+<<<<<<< HEAD
 URL は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) インターフェイスで表現され、`origin` や `pathname` のような便利なプロパティが含まれています (ブラウザでは `hash` なども)。このインターフェイスは、[hooks](/docs/hooks) と [サーバールート(server routes)](/docs/routing#server) では `event.url`、[ページ(pages)](/docs/routing#pages) では [`$page.url`](/docs/modules#$app-stores)、[`beforeNavigate` と `afterNavigate`](/docs/modules#$app-navigation) では `from` と `to`、など、様々な場所で使われています。
+=======
+URLs are represented by the [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL) interface, which includes useful properties like `origin` and `pathname` (and, in the browser, `hash`). This interface shows up in various places — `event.url` in [hooks](/docs/hooks) and [server routes](/docs/routing#server), [`$page.url`](/docs/modules#$app-stores) in [pages](/docs/routing#page), `from` and `to` in [`beforeNavigate` and `afterNavigate`](/docs/modules#$app-navigation) and so on.
+>>>>>>> sveltejs/master
 
 #### URLSearchParams
 
