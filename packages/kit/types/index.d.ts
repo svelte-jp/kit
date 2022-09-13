@@ -292,7 +292,7 @@ export interface RequestEvent<
 /**
  * `(event: RequestEvent) => Response` という関数で、`+server.js` ファイルからエクスポートされます。HTTP verb (`GET`, `PUT`, `PATCH`, etc) に対応しており、それぞれの HTTP メソッドのリクエストを処理します。
  *
- * 1つめのジェネリックな引数(first generic argument)として `Params` を受け取りますが、代わりに [generated types](/docs/types#generated-types) を使うことでこれをスキップすることができます。
+ * 1つめのジェネリックな引数(first generic argument)として `Params` を受け取りますが、代わりに [generated types](https://kit.svelte.jp/docs/types#generated-types) を使うことでこれをスキップすることができます。
  */
 export interface RequestHandler<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>

@@ -1,5 +1,25 @@
 # @sveltejs/kit
 
+## 1.0.0-next.481
+
+### Patch Changes
+
+- [fix] docs links in generated and published types ([#6741](https://github.com/sveltejs/kit/pull/6741))
+
+## 1.0.0-next.480
+
+### Patch Changes
+
+- [breaking] make action passed to enhance function a URL instead of a string ([#6678](https://github.com/sveltejs/kit/pull/6678))
+
+## 1.0.0-next.479
+
+### Patch Changes
+
+- [breaking] request creation cleanup ([#6681](https://github.com/sveltejs/kit/pull/6681))
+
+* [breaking] limit adapter-node request size ([#6684](https://github.com/sveltejs/kit/pull/6684))
+
 ## 1.0.0-next.478
 
 ### Patch Changes

@@ -143,7 +143,7 @@ export async function load({ depends }) {
 - ページリクエストの `cookie` と `authorization` ヘッダーを継承するので、サーバー上でクレデンシャル付きのリクエストを行うことができます
 - サーバー上で、相対パスのリクエストを行うことができます (通常、`fetch` はサーバーのコンテキストで使用する場合にはオリジン付きの URL が必要です)
 - サーバーで動作している場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません
-- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](/docs/hooks#hooks-server-js-handle) で明示的に指定されない限り、シリアライズされないことにご注意ください
+- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](/docs/hooks#server-hooks-handle) で明示的に指定されない限り、シリアライズされないことにご注意ください
 - ハイドレーション中は、レスポンスは HTML から読み込まれ、一貫性が保証され、追加のネットワークリクエストを防ぎます
 
 > Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。
@@ -308,7 +308,7 @@ export function load({ locals }) {
 }
 ```
 
-_予期せぬ_ エラーがスローされた場合、SvelteKit は [`handleError`](/docs/hooks#hooks-server-js-handleerror) を実行し、それを 500 Internal Error として扱います。
+_予期せぬ_ エラーがスローされた場合、SvelteKit は [`handleError`](/docs/hooks#shared-hooks-handleerror) を実行し、それを 500 Internal Error として扱います。
 
 > 開発中は、予期せぬエラーのスタックトレースを `$page.error.stack` として表示します。本番環境では、スタックトレースは非表示となります。
 
@@ -343,7 +343,7 @@ SvelteKit は、ナビゲーション中に `load` 関数の不必要な再実�
 - 参照している `params` プロパティの値が変更された場合
 - 参照している `url` プロパティ (`url.pathname` や `url.search`) の値が変更された場合
 - `await parent()` を呼び出していて、親の `load` 関数が再実行された場合
-- [`fetch`](#fetch) や [`depends`](#depends) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](/docs/modules#$app-navigation-invalidate) で無効 (invalid) であるとマークされた場合
+- [`fetch`](#input-methods-fetch) や [`depends`](#input-methods-depends) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](/docs/modules#$app-navigation-invalidate) で無効 (invalid) であるとマークされた場合
 - [`invalidate()`](/docs/modules#$app-navigation-invalidate) によって全ての有効な `load` 関数が強制的に再実行された場合
 
 `load` 関数の再実行がトリガーされた場合、ページは再マウントされません。その代わり、新しい `data` で更新されます。つまり、コンポーネントの内部状態は保持されるということです。これがお望みでなければ、[`afterNavigate`](/docs/modules#$app-navigation-afternavigate) コールバックの中でリセットすることができますし、コンポーネントを [`{#key ...}`](https://svelte.jp/docs#template-syntax-key) ブロックでくくることもできます。

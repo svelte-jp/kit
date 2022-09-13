@@ -58,7 +58,7 @@ export async function load({ fetch }) {
 
 `src/routes/blog/[slug]/+page.svelte` ルート(route)のような、ページのパラメータを元にデータをロードするページもプリレンダリングができることにご注意ください。
 
-プリレンダリング中に [`url.searchParams`](/docs/load#input-url) にアクセスすることは禁止されています。もし使う必要があるなら、ブラウザの中だけで行うようにしてください (例えば `onMount` の中で)。
+プリレンダリング中に [`url.searchParams`](/docs/load#input-properties-url) にアクセスすることは禁止されています。もし使う必要があるなら、ブラウザの中だけで行うようにしてください (例えば `onMount` の中で)。
 
 #### ルートの衝突(Route conflicts)
 

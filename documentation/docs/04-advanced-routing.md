@@ -47,7 +47,7 @@ src/routes/
 └ +error.svelte
 ```
 
-> `src/routes/a/[...rest]/z/+page.svelte` は `/a/z` (つまり、パラメータがない場合) にマッチしますし、`/a/b/z` や `/a/b/c/z` などにも同様にマッチします。rest パラメータの値が有効であることを、例えば [matcher](#advanced-routing-matching) などを使用して、確実にチェックしてください。
+> `src/routes/a/[...rest]/z/+page.svelte` は `/a/z` (つまり、パラメータがない場合) にマッチしますし、`/a/b/z` や `/a/b/c/z` などにも同様にマッチします。rest パラメータの値が有効であることを、例えば [matcher](#matching) などを使用して、確実にチェックしてください。
 
 ### マッチング(Matching)
 
@@ -88,7 +88,7 @@ SvelteKit は、どのルート(route)に対してリクエストされている
 
 - より詳細・明確(specific)なルート(routes)ほど、より優先度が高い (例えば、動的なパラメータが1つあるルートより、パラメータのないルートのほうがより詳細・明確(specific)である、など)
 - `+server` ファイルは `+page` ファイルより優先度が高い
-- [matchers](#advanced-routing-matching) 付きのパラメータ (`[name=type]`) は matchers なしのパラメータ (`[name]`) よりも優先度が高い
+- [matchers](#matching) 付きのパラメータ (`[name=type]`) は matchers なしのパラメータ (`[name]`) よりも優先度が高い
 - Rest パラメータは最も優先度が低い
 - 優先度が同じ場合はアルファベット順で解決される
 

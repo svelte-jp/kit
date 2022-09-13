@@ -5,7 +5,7 @@ rank: 1
 
 SvelteKit は Sapper の後継であり、その設計の多くの要素を共有しています。
 
-もし、既存の Sapper アプリを SvelteKit に移行する予定がある場合、いくつかの変更が必要になります。移行する際には、[examples](https://kit.svelte.jp/docs#additional-resources-examples) を見ていただくと参考になると思います。
+もし、既存の Sapper アプリを SvelteKit に移行する予定がある場合、いくつかの変更が必要になります。移行する際には、[examples](/docs/additional-resources#examples) を見ていただくと参考になると思います。
 
 ### package.json
 
@@ -40,7 +40,7 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 
 [adapter](/docs/adapters) を追加する必要があります。`sapper build` は [adapter-node](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) とおおよそ同じで、`sapper export` は [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) とおおよそ同じですが、デプロイ先のプラットフォーム向けにデザインされた adapter を使用するのも良いでしょう。
 
-[Vite](https://vitejs.dev) では自動的に処理されないファイルタイプのプラグインを使用している場合は、Vite において同等なことを行う方法を探し、[Vite config](/docs/configuration#vite) に追加する必要があります。
+[Vite](https://vitejs.dev) では自動的に処理されないファイルタイプのプラグインを使用している場合は、Vite において同等なことを行う方法を探し、[Vite config](/docs/project-structure#project-files-vite-config-js) に追加する必要があります。
 
 #### src/client.js
 
@@ -80,7 +80,7 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 | routes/about/index.svelte | routes/about/+page.svelte |
 | routes/about.svelte       | routes/about/+page.svelte |
 
-カスタムのエラーページコンポーネントは `_error.svelte` から `+error.svelte` にリネームしてください。また、どの `_layout.svelte` ファイルも、同様に `+layout.svelte` にリネームしてください。[その他のファイルは無視されます](https://kit.svelte.jp/docs/routing#other-files).
+カスタムのエラーページコンポーネントは `_error.svelte` から `+error.svelte` にリネームしてください。また、どの `_layout.svelte` ファイルも、同様に `+layout.svelte` にリネームしてください。[その他のファイルは無視されます](/docs/routing#other-files).
 
 #### Imports
 
@@ -96,7 +96,7 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 
 この関数は `preload` から [`load`](/docs/load) にリネームされ、その API が変更されました。2 つの引数 — `page` と `session` — の代わりに、両方を 1 つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
 
-`this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。代わりに、[`fetch`](https://kit.svelte.jp/docs/load#input-methods-fetch) を input メソッドから使用できるようになり、[`error`](https://kit.svelte.jp/docs/load#errors) と [`redirect`](https://kit.svelte.jp/docs/load#redirects) の両方がスローされるようになりました。.
+`this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。代わりに、[`fetch`](/docs/load#input-methods-fetch) を input メソッドから使用できるようになり、[`error`](/docs/load#errors) と [`redirect`](/docs/load#redirects) の両方がスローされるようになりました。.
 
 #### Stores
 
@@ -118,7 +118,7 @@ SvelteKit では、それらにアクセスする方法が異なります。`sto
 
 #### ルーティング
 
-ルート(routes) の正規表現はもうサポートされていません。代わりに、[advanced route matching](/docs/routing#advanced-routing-matching) をお使いください。
+ルート(routes) の正規表現はもうサポートされていません。代わりに、[advanced route matching](/docs/advanced-routing#matching) をお使いください。
 
 #### Segments
 
@@ -149,7 +149,7 @@ SvelteKit は、アプリが動作する場所に依存しないように設計�
 
 #### HTML minifier
 
-Sapper はデフォルトで `html-minifier` を含んでいました。SvelteKit はこれを含まないのですが、[hook](/docs/hooks#hooks-server-js-handle) としてこれを追加することができます:
+Sapper はデフォルトで `html-minifier` を含んでいました。SvelteKit はこれを含まないのですが、[hook](/docs/hooks#server-hooks-handle) としてこれを追加することができます:
 
 ```js
 // @filename: ambient.d.ts

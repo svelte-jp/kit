@@ -184,7 +184,7 @@ export default config;
 - `assets` — `favicon.ico` or `manifest.json` のような、何も処理する必要もなく、安定した URL を持つべき静的ファイルを配置する場所
 - `hooks` — クライントとサーバーの hooks のロケーション([Hooks](/docs/hooks) をご参照ください)
 - `lib` — コードベース全体から `$lib` でアクセスできる、アプリの内部ライブラリ
-- `params` — [parameter matchers](/docs/routing#advanced-routing-matching) を含むディレクトリ
+- `params` — [parameter matchers](/docs/advanced-routing#matching) を含むディレクトリ
 - `routes` — アプリの構造を定義するファイル([ルーティング](/docs/routing) をご参照ください)
 - `serviceWorker` — Service Worker のエントリーポイントのロケーション([Service workers](/docs/service-workers) をご参照ください)
 - `template` — HTML レスポンス用テンプレートのロケーション
@@ -299,7 +299,7 @@ URL を解決する際に、末尾のスラッシュ (trailing slashes) を削�
 
 このオプションは [プリレンダリング](/docs/page-options#prerender) にも影響します。もし `trailingSlash` が `always` なら、`/about` のようなルートは `about/index.html` ファイルを生成し、それ以外の場合は `about.html` を生成し、静的な web サーバーの規約に従います。
 
-> 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別の URL として扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](/docs/hooks#hooks-server-js-handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
+> 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別の URL として扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](/docs/hooks#server-hooks-handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
 
 ### version
 
