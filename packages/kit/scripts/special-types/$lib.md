@@ -2,4 +2,4 @@
 
 #### `$lib/server`
 
-A subdirectory of `$lib`. SvelteKit will prevent you from importing any modules in `$lib/server` into public-facing code. See [server-only modules](/docs/server-only-modules).
+`$lib` のサブディレクトリです。SvelteKit は、パブリックに公開されるコードに `$lib/server` のモジュールがインポートされるのを防ぎます。[server-only modules](/docs/server-only-modules) をご参照ください。

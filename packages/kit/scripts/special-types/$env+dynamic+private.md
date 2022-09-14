@@ -1,6 +1,6 @@
 このモジュールは、実行中のプラットフォームで定義された、実行時の環境変数へのアクセスを提供します。例えば、[`adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) を使用している場合 (または [`vite preview`](https://kit.svelte.jp/docs/cli) を実行中の場合)、これは `process.env` と同じです。このモジュールは [`config.kit.env.publicPrefix`](https://kit.svelte.jp/docs/configuration#env) で始まらない変数のみを含んでいます。
 
-このモジュールは一般に公開されるコード(public-facing code)にインポートできません。
+このモジュールはパブリックに公開されるコード(public-facing code)にインポートできません。
 
 ```ts
 import { env } from '$env/dynamic/private';

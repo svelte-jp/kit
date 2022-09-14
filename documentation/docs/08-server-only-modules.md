@@ -2,22 +2,22 @@
 title: Server-only modules
 ---
 
-Like a good friend, SvelteKit keeps your secrets. When writing your backend and frontend in the same repository, it can be easy to accidentally import sensitive data into your front-end code (environment variables containing API keys, for example). SvelteKit provides a way to prevent this entirely: server-only modules.
+良き友人のように、SvelteKit はあなたの秘密を守ります。バックエンドとフロントエンドが同じリポジトリにある場合、機密データをフロントエンドのコードに誤ってインポートしてしまうことが簡単に起こってしまいます (例えば、API キーを持つ環境変数など)。SvelteKit はこれを完全に防ぐ方法を提供します: サーバー専用のモジュール(server-only modules)です
 
 ### Private environment variables
 
-The `$env/static/private` and `$env/dynamic/private` modules, which are covered in the [modules](/docs/modules) section, can only be imported into modules that only run on the server, such as [`hooks.server.js`](/docs/hooks#server-hooks) or [`+page.server.js`](/docs/routing#page-page-server-js).
+[modules](/docs/modules) セクションで説明されている `$env/static/private` モジュールと `$env/dynamic/private` モジュールは、[`hooks.server.js`](/docs/hooks#server-hooks) や [`+page.server.js`](/docs/routing#page-page-server-js) のようなサーバー上でのみ実行されるモジュールにのみインポートすることが可能です。
 
 ### Your modules
 
-You can make your own modules server-only in two ways:
+モジュールをサーバー専用にするには2通りの方法があります:
 
-- adding `.server` to the filename, e.g. `secrets.server.js`
-- placing them in `$lib/server`, e.g. `$lib/server/secrets.js`
+- ファイル名に `.server` を付けます。例: `secrets.server.js`
+- モジュールを `$lib/server` に置きます。例: `$lib/server/secrets.js`
 
 ### How it works
 
-Any time you have public-facing code that imports server-only code (whether directly or indirectly)...
+パブリックに公開されるコード (public-facing code) にサーバー専用のコードを (直接的かまたは間接的かにかかわらず) インポートすると…
 
 ```js
 // @errors: 7005
@@ -40,7 +40,7 @@ export const add = (a, b) => a + b;
 </script>
 ```
 
-...SvelteKit will error:
+…SvelteKit はエラーとなります:
 
 ```
 Cannot import $lib/server/secrets.js into public-facing code:
@@ -49,6 +49,6 @@ Cannot import $lib/server/secrets.js into public-facing code:
 		- $lib/server/secrets.js
 ```
 
-Even though the public-facing code — `src/routes/+page.svelte` — only uses the `add` export and not the secret `atlantisCoordinates` export, the secret code could end up in JavaScript that the browser downloads, and so the import chain is considered unsafe.
+パブリックに公開されるコード `src/routes/+page.svelte` は、`add` を使用しているのみで、シークレットの `atlantisCoordinates` を使用していませんが、ブラウザがダウンロードする JavaScript にシークレットなコードが残ってしまう可能性があり、このインポートチェーンは安全ではないと考えられます。
 
-This feature also works with dynamic imports, even interpolated ones like ``await import(`./${foo}.js`)``, with one small caveat: during development, if there are two or more dynamic imports between the public-facing code and the server-only module, the illegal import will not be detected the first time the code is loaded.
+この機能は動的なインポート(dynamic imports)でも動作し、``await import(`./${foo}.js`)`` のような補完されたインポートに対しても有効ですが、小さい注意点があります。もしパブリックに公開されるコードとサーバー専用のモジュールの間に2つ以上の dynamic imports がある場合、コードが最初にロードされるときに不正なインポートが検出されない可能性があります。
