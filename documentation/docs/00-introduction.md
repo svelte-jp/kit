@@ -4,7 +4,7 @@ title: Introduction
 
 ### 始める前に
 
-> SvelteKitはまだ開発早期段階で、1.0に到達するまでに変更される可能性があります。このドキュメントは作業途中のものです。もし行き詰まったら、[Discord チャットルーム](https://svelte.dev/chat)にどうぞ。
+> SvelteKit は 1.0 に向けたリリース候補段階 (release candidate phase) で、報告された issue に対応しつつ、磨きをかけています。もし行き詰まったら、[Discord チャットルーム](https://svelte.dev/chat)にどうぞ。
 >
 > Sapper からのアップグレードについては [migration guides(移行ガイド)](/docs/migrating) をご覧ください。
 
