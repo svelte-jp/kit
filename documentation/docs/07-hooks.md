@@ -22,7 +22,7 @@ hooks ファイルは2つあり、どちらもオプションです:
 この関数は SvelteKit のサーバーが [リクエスト](/docs/web-standards#fetch-apis-request) を受けるたびに (アプリの実行中であろうと、[プリレンダリング](/docs/page-options#prerender)であろうと) 実行され、[レスポンス](/docs/web-standards#fetch-apis-response) を決定します。リクエストを表す `event` オブジェクトと、ルート(route)をレンダリングしレスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでルート(routes)を実装する場合など)。
 
 ```js
-/// file: src/hooks.js
+/// file: src/hooks.server.js
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	if (event.url.pathname.startsWith('/custom')) {
@@ -39,7 +39,7 @@ export async function handle({ event, resolve }) {
 未実装の場合、デフォルトは `({ event, resolve }) => resolve(event)` となります。カスタムデータをリクエストに追加し、`+server.js` のハンドラーやサーバー専用の `load` 関数に渡すには、以下のように `event.locals` オブジェクトに埋め込んでください。
 
 ```js
-/// file: src/hooks.js
+/// file: src/hooks.server.js
 // @filename: ambient.d.ts
 type User = {
 	name: string;
@@ -51,11 +51,7 @@ declare namespace App {
 	}
 }
 
-const getUserInformation: (cookie: string | undefined) => Promise<User>;
-
-// declare global {
-// 	const getUserInformation: (cookie: string) => Promise<User>;
-// }
+const getUserInformation: (cookie: string | void) => Promise<User>;
 
 // @filename: index.js
 // ---cut---
@@ -78,7 +74,7 @@ export async function handle({ event, resolve }) {
 - `filterSerializedResponseHeaders(name: string, value: string): boolean` — `load` 関数が `fetch` でリソースを読み込むときに、シリアライズされるレスポンスにどのヘッダーを含めるかを決定します。デフォルトでは何も含まれません。
 
 ```js
-/// file: src/hooks.js
+/// file: src/hooks.server.js
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	const response = await resolve(event, {

@@ -128,21 +128,21 @@ export interface Cookies {
 	/**
 	 * 事前に `cookies.set` で設定された cookie や、またはリクエストヘッダーから cookie を取得します。
 	 */
-	get(name: string, opts?: import('cookie').CookieParseOptions): string | undefined;
+	get(name: string, opts?: import('cookie').CookieParseOptions): string | void;
 
 	/**
-	 * cookie を設定します。これはレスポンスに `set-cookie` ヘッダーを追加し、
-	 * また、現在のリクエスト中に `cookies.get` を通じてその cookie を利用可能にします。
+	 * cookie を設定します。これはレスポンスに `set-cookie` ヘッダーを追加し、また、現在のリクエスト中に `cookies.get` を通じてその cookie を利用可能にします。
 	 *
-	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており、
-	 * クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります
+	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。`sameSite` オプションのデフォルトは `lax` です。
+	 *
+	 * デフォルトでは、cookie の `path` は 現在のパス名の 'directory' です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
 	 */
 	set(name: string, value: string, opts?: import('cookie').CookieSerializeOptions): void;
 
 	/**
 	 * 値に空文字列(empty string)を設定したり、有効期限(expiry date)を過去に設定することで、cookie を削除します。
 	 */
-	delete(name: string): void;
+	delete(name: string, opts?: import('cookie').CookieSerializeOptions): void;
 }
 
 export interface KitConfig {
