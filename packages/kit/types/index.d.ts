@@ -133,9 +133,9 @@ export interface Cookies {
 	/**
 	 * cookie を設定します。これはレスポンスに `set-cookie` ヘッダーを追加し、また、現在のリクエスト中に `cookies.get` を通じてその cookie を利用可能にします。
 	 *
-	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。The `sameSite` option defaults to `lax`.
+	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。`sameSite` オプションのデフォルトは `lax` です。
 	 *
-	 * By default, the `path` of a cookie is the 'directory' of the current pathname. In most cases you should explicitly set `path: '/'` to make the cookie available throughout your app.
+	 * デフォルトでは、cookie の `path` は 現在のパス名の 'directory' です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
 	 */
 	set(name: string, value: string, opts?: import('cookie').CookieSerializeOptions): void;
 
