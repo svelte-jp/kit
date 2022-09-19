@@ -25,7 +25,7 @@ export interface Adapter {
 	adapt(builder: Builder): MaybePromise<void>;
 }
 
-export type AwaitedProperties<input extends Record<string, any> | void> = input extends void
+type AwaitedPropertiesUnion<input extends Record<string, any> | void> = input extends void
 	? undefined // needs to be undefined, because void will break intellisense
 	: input extends Record<string, any>
 	? {
@@ -35,9 +35,21 @@ export type AwaitedProperties<input extends Record<string, any> | void> = input 
 	? input
 	: unknown;
 
+export type AwaitedProperties<input extends Record<string, any> | void> =
+	AwaitedPropertiesUnion<input> extends Record<string, any>
+		? OptionalUnion<AwaitedPropertiesUnion<input>>
+		: AwaitedPropertiesUnion<input>;
+
 export type AwaitedActions<T extends Record<string, (...args: any) => any>> = {
-	[Key in keyof T]: UnpackValidationError<Awaited<ReturnType<T[Key]>>>;
+	[Key in keyof T]: OptionalUnion<UnpackValidationError<Awaited<ReturnType<T[Key]>>>>;
 }[keyof T];
+
+// Takes a union type and returns a union type where each type also has all properties
+// of all possible types (typed as undefined), making accessing them more ergonomic
+type OptionalUnion<
+	U extends Record<string, any>, // not unknown, else interfaces don't satisfy this constraint
+	A extends keyof U = U extends U ? keyof U : never
+> = U extends unknown ? { [P in Exclude<A, keyof U>]?: never } & U : never;
 
 // Needs to be here, else ActionData will be resolved to unknown - probably because of "d.ts file imports .js file" in combination with allowJs
 interface ValidationError<T extends Record<string, unknown> | undefined = undefined> {
@@ -128,7 +140,7 @@ export interface Cookies {
 	/**
 	 * 事前に `cookies.set` で設定された cookie や、またはリクエストヘッダーから cookie を取得します。
 	 */
-	get(name: string, opts?: import('cookie').CookieParseOptions): string | void;
+	get(name: string, opts?: import('cookie').CookieParseOptions): string | undefined;
 
 	/**
 	 * cookie を設定します。これはレスポンスに `set-cookie` ヘッダーを追加し、また、現在のリクエスト中に `cookies.get` を通じてその cookie を利用可能にします。
