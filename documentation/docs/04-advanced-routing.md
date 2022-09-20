@@ -22,11 +22,11 @@ title: 高度なルーティング
 }
 ```
 
-> `src/routes/a/[...rest]/z/+page.svelte` will match `/a/z` (i.e. there's no parameter at all) as well as `/a/b/z` and `/a/b/c/z` and so on. Make sure you check that the value of the rest parameter is valid, for example using a [matcher](#matching).
+> `src/routes/a/[...rest]/z/+page.svelte` は `/a/z` にも (つまり、パラメーターが全くない場合にも)、`/a/b/z` や `/a/b/c/z` と同様にマッチします。Rest パラメーターの値が正しいことを、例えば [matcher](#matching) を使用するなどして確認してください。
 
 #### 404 pages
 
-Rest parameters also allow you to render custom 404s. Given these routes...
+Rest パラメーターによってカスタムの 404 をレンダリングすることができます。これらのルート(routes)があるとして…
 
 ```
 src/routes/
@@ -61,7 +61,7 @@ export function load(event) {
 }
 ```
 
-> If you don't handle 404 cases, they will appear in [`handleError`](/docs/hooks#shared-hooks-handleerror)
+> もし 404 のケースをハンドリングしていない場合、[`handleError`](/docs/hooks#shared-hooks-handleerror) によって表示が行われます。
 
 ### マッチング(Matching)
 

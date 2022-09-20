@@ -270,7 +270,7 @@ export function GET({ url }) {
 
 #### Receiving data
 
-By exporting `POST`/`PUT`/`PATCH`/`DELETE` handlers, `+server.js` files can be used to create a complete API:
+`+server.js` ファイルは、`POST`/`PUT`/`PATCH`/`DELETE` ハンドラをエクスポートすることで、完全な API を作成することができます:
 
 ```svelte
 /// file: src/routes/add/+page.svelte
@@ -310,14 +310,14 @@ export async function POST({ request }) {
 }
 ```
 
-> In general, [form actions](/docs/form-actions) are a better way to submit data from the browser to the server.
+> 一般的には、ブラウザからサーバーにデータを送信する方法としては [form actions](/docs/form-actions) のほうがより良い方法です。
 
 #### Content negotiation
 
-`+server.js` files can be placed in the same directory as `+page` files, allowing the same route to be either a page or an API endpoint. To determine which, SvelteKit applies the following rules:
+`+server.js` ファイルは `+page` ファイルと同じディレクトリに置くことができ、これによって同じルート(route)がページにも API エンドポイントにもなるようにすることができます。これがどちらなのか判断するために、SvelteKit は以下のルールを適用します:
 
-- `PUT`/`PATCH`/`DELETE` requests are always handled by `+server.js` since they do not apply to pages
-- `GET`/`POST` requests are treated as page requests if the `accept` header prioritises `text/html` (in other words, it's a browser page request), else they are handled by `+server.js`
+- `PUT`/`PATCH`/`DELETE` リクエストは、ページには適用されないため、常に `+server.js` で処理されます。
+- `GET`/`POST` リクエストは、`accept` ヘッダーが `text/html` を優先している場合 (言い換えると、ブラウザのページリクエストの場合)、ページリクエストとして扱われます。それ以外の場合は `+server.js` で処理されます。
 
 ### $types
 
