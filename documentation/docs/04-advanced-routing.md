@@ -22,7 +22,11 @@ title: 高度なルーティング
 }
 ```
 
-これでカスタムの 404 をレンダリングすることもできます。これらのルート(routes)がある場合…
+> `src/routes/a/[...rest]/z/+page.svelte` will match `/a/z` (i.e. there's no parameter at all) as well as `/a/b/z` and `/a/b/c/z` and so on. Make sure you check that the value of the rest parameter is valid, for example using a [matcher](#matching).
+
+#### 404 pages
+
+Rest parameters also allow you to render custom 404s. Given these routes...
 
 ```
 src/routes/
@@ -47,7 +51,17 @@ src/routes/
 └ +error.svelte
 ```
 
-> `src/routes/a/[...rest]/z/+page.svelte` は `/a/z` (つまり、パラメータがない場合) にマッチしますし、`/a/b/z` や `/a/b/c/z` などにも同様にマッチします。rest パラメータの値が有効であることを、例えば [matcher](#matching) などを使用して、確実にチェックしてください。
+```js
+/// file: src/routes/marx-brothers/[...path]/+page.js
+import { error } from '@sveltejs/kit';
+
+/** @type {import('./$types').PageLoad} */
+export function load(event) {
+	throw error(404, 'Not Found');
+}
+```
+
+> If you don't handle 404 cases, they will appear in [`handleError`](/docs/hooks#shared-hooks-handleerror)
 
 ### マッチング(Matching)
 
