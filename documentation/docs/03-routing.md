@@ -268,6 +268,57 @@ export function GET({ url }) {
 
 便宜上、`@sveltejs/kit` の `error`、`redirect`、`json` メソッドを使用することは可能です (ただし、使用する必要はありません)。`throw error(..)` はプレーンテキストのエラーレスポンスのみを返すことにご注意ください。
 
+#### Receiving data
+
+`+server.js` ファイルは、`POST`/`PUT`/`PATCH`/`DELETE` ハンドラをエクスポートすることで、完全な API を作成することができます:
+
+```svelte
+/// file: src/routes/add/+page.svelte
+<script>
+	let a = 0;
+	let b = 0;
+	let total = 0;
+
+	async function add() {
+		const response = await fetch('/api/add', {
+			method: 'POST',
+			body: JSON.stringify({ a, b }),
+			headers: {
+				'content-type': 'application/json'
+			}
+		});
+
+		total = await response.json();
+	}
+</script>
+
+<input type="number" bind:value={a}> +
+<input type="number" bind:value={b}> =
+{total}
+
+<button on:click={add}>Calculate</button>
+```
+
+```js
+/// file: src/routes/api/add/+server.js
+import { json } from '@sveltejs/kit';
+
+/** @type {import('./$types').RequestHandler} */
+export async function POST({ request }) {
+	const { a, b } = await request.json();
+	return json(a + b);
+}
+```
+
+> 一般的には、ブラウザからサーバーにデータを送信する方法としては [form actions](/docs/form-actions) のほうがより良い方法です。
+
+#### Content negotiation
+
+`+server.js` ファイルは `+page` ファイルと同じディレクトリに置くことができ、これによって同じルート(route)がページにも API エンドポイントにもなるようにすることができます。これがどちらなのか判断するために、SvelteKit は以下のルールを適用します:
+
+- `PUT`/`PATCH`/`DELETE` リクエストは、ページには適用されないため、常に `+server.js` で処理されます。
+- `GET`/`POST` リクエストは、`accept` ヘッダーが `text/html` を優先している場合 (言い換えると、ブラウザのページリクエストの場合)、ページリクエストとして扱われます。それ以外の場合は `+server.js` で処理されます。
+
 ### $types
 
 これまでの例を通してずっと、`$types.d.ts` ファイルからインポートしてきました。これは、TypeScript (または JavaScript を JSDoc の型アノテーションと) 使用している場合に最上位のファイル(root files)を扱う際に型の安全性をもたらすために SvelteKit が隠しディレクトリに作成するファイルです。

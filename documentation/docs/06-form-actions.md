@@ -351,3 +351,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 	<!-- content -->
 </form>
 ```
+
+### Alternatives
+
+サーバーにデータを送信する方法として、プログレッシブな強化(progressively enhance)を行うことができるため Form actions は望ましい方法ですが、[`+server.js`](/docs/routing#server) ファイルを使用して (例えば) JSON API を公開することもできます。

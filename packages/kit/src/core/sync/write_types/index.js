@@ -68,7 +68,7 @@ export async function write_types(config, manifest_data, file) {
 		return;
 	}
 
-	const id = path.posix.relative(config.kit.files.routes, path.dirname(file));
+	const id = posixify(path.relative(config.kit.files.routes, path.dirname(file)));
 
 	const route = manifest_data.routes.find((route) => route.id === id);
 	if (!route) return; // this shouldn't ever happen
@@ -489,7 +489,7 @@ export function tweak_types(content, is_server) {
 			if (node.jsDoc) {
 				// @ts-ignore
 				for (const comment of node.jsDoc) {
-					for (const tag of comment.tags) {
+					for (const tag of comment.tags ?? []) {
 						if (ts.isJSDocTypeTag(tag)) {
 							const is_fn =
 								ts.isFunctionDeclaration(value) ||
