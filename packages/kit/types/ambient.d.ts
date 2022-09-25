@@ -41,6 +41,13 @@
  */
 declare namespace App {
 	/**
+	 * 想定されるエラーと予期せぬエラーの共通の形を定義します。想定されるエラーは `error` 関数を使用してスローされます。予期せぬエラーは `handleError` hooks で処理され、この形を返す必要があります。
+	 */
+	export interface Error {
+		message: string;
+	}
+
+	/**
 	 * `event.locals` を定義する interface です。`event.locals` は [hooks](https://kit.svelte.jp/docs/hooks) (`handle`、`handleError`)、`load` 関数(サーバーのみ)、`+server.js` ファイルからアクセスできます。
 	 */
 	export interface Locals {}
@@ -56,13 +63,6 @@ declare namespace App {
 	 * adapter が `event.platform` で [プラットフォーム固有の情報](https://kit.svelte.jp/docs/adapters#supported-environments-platform-specific-context) を提供する場合、ここでそれを指定することができます。
 	 */
 	export interface Platform {}
-
-	/**
-	 * 想定されるエラーと予期せぬエラーの共通の形を定義します。想定されるエラーは `error` 関数を使用してスローされます。予期せぬエラーは `handleError` hooks で処理され、この形を返す必要があります。
-	 */
-	export interface PageError {
-		message: string;
-	}
 }
 
 /**

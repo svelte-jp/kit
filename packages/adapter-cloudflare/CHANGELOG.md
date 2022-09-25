@@ -1,5 +1,23 @@
 # @sveltejs/adapter-cloudflare
 
+## 1.0.0-next.38
+
+### Patch Changes
+
+- Ensure all excluded paths in `_routes.json` start with / ([#6952](https://github.com/sveltejs/kit/pull/6952))
+
+## 1.0.0-next.37
+
+### Patch Changes
+
+- Support Cloudflare Pages `_routes.json` specification ([#6530](https://github.com/sveltejs/kit/pull/6530))
+
+## 1.0.0-next.36
+
+### Patch Changes
+
+- Include ambient.d.ts files in adapter packages. ([#6917](https://github.com/sveltejs/kit/pull/6917))
+
 ## 1.0.0-next.35
 
 ### Patch Changes

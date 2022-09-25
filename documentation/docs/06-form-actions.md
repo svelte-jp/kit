@@ -352,6 +352,18 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 </form>
 ```
 
+If you have a `+server.js` alongside your `+page.server.js`, `fetch` requests will be routed there by default. To `POST` to an action in `+page.server.js` instead, use the custom `x-sveltekit-action` header:
+
+```diff
+const response = await fetch(this.action, {
+	method: 'POST',
+	body: data,
++	headers: {
++		'x-sveltekit-action': 'true'
++	}
+});
+```
+
 ### Alternatives
 
 サーバーにデータを送信する方法として、プログレッシブな強化(progressively enhance)を行うことができるため Form actions は望ましい方法ですが、[`+server.js`](/docs/routing#server) ファイルを使用して (例えば) JSON API を公開することもできます。

@@ -1639,6 +1639,15 @@ test.describe('Routing', () => {
 		expect(await page.textContent('h1')).toBe('404');
 		expect(await page.textContent('p')).toBe('This is your custom error page saying: "Not Found"');
 	});
+
+	if (process.platform !== 'win32') {
+		test('Respects symlinks', async ({ page, clicknav }) => {
+			await page.goto('/routing');
+			await clicknav('[href="/routing/symlink-from"]');
+
+			expect(await page.textContent('h1')).toBe('symlinked');
+		});
+	}
 });
 
 test.describe('Matchers', () => {
@@ -1807,10 +1816,11 @@ test.describe('Actions', () => {
 		}
 	});
 
-	test('use:enhance', async ({ page, app }) => {
+	test('use:enhance', async ({ page }) => {
 		await page.goto('/actions/enhance');
 
-		expect(await page.textContent('pre')).toBe(JSON.stringify(null));
+		expect(await page.textContent('pre.formdata1')).toBe(JSON.stringify(null));
+		expect(await page.textContent('pre.formdata2')).toBe(JSON.stringify(null));
 
 		await page.type('input[name="username"]', 'foo');
 		await Promise.all([
@@ -1818,7 +1828,8 @@ test.describe('Actions', () => {
 			page.click('button.form1')
 		]);
 
-		await expect(page.locator('pre')).toHaveText(JSON.stringify({ result: 'foo' }));
+		await expect(page.locator('pre.formdata1')).toHaveText(JSON.stringify({ result: 'foo' }));
+		await expect(page.locator('pre.formdata2')).toHaveText(JSON.stringify({ result: 'foo' }));
 	});
 
 	test('use:enhance abort controller', async ({ page, javaScriptEnabled }) => {
@@ -1841,7 +1852,7 @@ test.describe('Actions', () => {
 	test('use:enhance button with formAction', async ({ page, app }) => {
 		await page.goto('/actions/enhance');
 
-		expect(await page.textContent('pre')).toBe(JSON.stringify(null));
+		expect(await page.textContent('pre.formdata1')).toBe(JSON.stringify(null));
 
 		await page.type('input[name="username"]', 'foo');
 		await Promise.all([
@@ -1849,7 +1860,34 @@ test.describe('Actions', () => {
 			page.click('button.form1-register')
 		]);
 
-		await expect(page.locator('pre')).toHaveText(JSON.stringify({ result: 'register: foo' }));
+		await expect(page.locator('pre.formdata1')).toHaveText(
+			JSON.stringify({ result: 'register: foo' })
+		);
+	});
+
+	test('use:enhance button with name', async ({ page, app }) => {
+		await page.goto('/actions/enhance');
+
+		expect(await page.textContent('pre.formdata1')).toBe(JSON.stringify(null));
+
+		await Promise.all([
+			page.waitForRequest((request) => request.url().includes('/actions/enhance')),
+			page.click('button.form1-submitter')
+		]);
+
+		await expect(page.locator('pre.formdata1')).toHaveText(
+			JSON.stringify({ result: 'submitter: foo' })
+		);
+	});
+
+	test('redirect', async ({ page }) => {
+		await page.goto('/actions/redirect');
+
+		page.click('button');
+
+		await Promise.all([page.waitForResponse('/actions/redirect'), page.waitForNavigation()]);
+
+		expect(page.url()).toContain('/actions/enhance');
 	});
 });
 
