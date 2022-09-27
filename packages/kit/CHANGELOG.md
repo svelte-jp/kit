@@ -1,5 +1,129 @@
 # @sveltejs/kit
 
+## 1.0.0-next.504
+
+### Patch Changes
+
+- Add the submitter value with name to formData for use:enhance ([#7012](https://github.com/sveltejs/kit/pull/7012))
+
+## 1.0.0-next.503
+
+### Patch Changes
+
+- Added form property to \$page store ([#6986](https://github.com/sveltejs/kit/pull/6986))
+
+* Throw an error if prerenderable routes are not prerendered ([#6974](https://github.com/sveltejs/kit/pull/6974))
+
+## 1.0.0-next.502
+
+### Patch Changes
+
+- [fix] prevent data types from becoming type `never`, notice moved/deleted files ([#7002](https://github.com/sveltejs/kit/pull/7002))
+
+* Allow ActionData to be undefined ([#6994](https://github.com/sveltejs/kit/pull/6994))
+
+- Respect `config.kit.env.dir` when running `vite preview` ([#7001](https://github.com/sveltejs/kit/pull/7001))
+
+* Only run postinstall script if package.json exists ([#6998](https://github.com/sveltejs/kit/pull/6998))
+
+- Use custom x-sveltekit-action header to route enhanced form submissions to +page.server.js over +server.js ([#6997](https://github.com/sveltejs/kit/pull/6997))
+
+## 1.0.0-next.501
+
+### Patch Changes
+
+- [fix] unwrap promises for load function data on the client ([#6972](https://github.com/sveltejs/kit/pull/6972))
+
+## 1.0.0-next.500
+
+### Patch Changes
+
+- Allow prerendered pages to link to non-prerenderable endpoints ([#6977](https://github.com/sveltejs/kit/pull/6977))
+
+* [fix] handle SPA root data loading error ([#6918](https://github.com/sveltejs/kit/pull/6918))
+
+## 1.0.0-next.499
+
+### Patch Changes
+
+- [breaking] rename App.PageError to App.Error ([#6963](https://github.com/sveltejs/kit/pull/6963))
+
+## 1.0.0-next.498
+
+### Patch Changes
+
+- chdir before attempting postinstall ([#6969](https://github.com/sveltejs/kit/pull/6969))
+
+## 1.0.0-next.497
+
+### Patch Changes
+
+- Add origin header for non-GET and external requests made with server-side fetch ([#6901](https://github.com/sveltejs/kit/pull/6901))
+
+## 1.0.0-next.496
+
+### Patch Changes
+
+- [fix] update page status when applying action ([#6942](https://github.com/sveltejs/kit/pull/6942))
+
+* [fix] apply redirect/error logic for `use:enhance` ([#6828](https://github.com/sveltejs/kit/pull/6828))
+
+## 1.0.0-next.495
+
+### Patch Changes
+
+- Run `svelte-kit sync` in all workspace directories during postinstall ([#6949](https://github.com/sveltejs/kit/pull/6949))
+
+## 1.0.0-next.494
+
+### Patch Changes
+
+- Fix fetch type ([#6955](https://github.com/sveltejs/kit/pull/6955))
+
+* Add csp wasm-unsafe-eval keyword ([#6958](https://github.com/sveltejs/kit/pull/6958))
+
+- Register service worker with relative URL ([#6954](https://github.com/sveltejs/kit/pull/6954))
+
+## 1.0.0-next.493
+
+### Patch Changes
+
+- [fix] allow missing routes folder ([#6944](https://github.com/sveltejs/kit/pull/6944))
+
+* Only forward set-cookie headers for internal fetches ([#6923](https://github.com/sveltejs/kit/pull/6923))
+
+## 1.0.0-next.492
+
+### Patch Changes
+
+- [fix] add missing depends function to ServerLoadEvent type ([#6935](https://github.com/sveltejs/kit/pull/6935))
+
+* Redact error message if `getRequest` fails ([#6936](https://github.com/sveltejs/kit/pull/6936))
+
+- Add cookies.serialize method ([#6925](https://github.com/sveltejs/kit/pull/6925))
+
+* Always apply cookies, not just for matched routes ([#6925](https://github.com/sveltejs/kit/pull/6925))
+
+- [fix] tighten up navigation and invalidation logic ([#6924](https://github.com/sveltejs/kit/pull/6924))
+
+* Respond with 413 if request body is too large ([#6936](https://github.com/sveltejs/kit/pull/6936))
+
+## 1.0.0-next.491
+
+### Patch Changes
+
+- [fix] symlink routes ([#6796](https://github.com/sveltejs/kit/pull/6796))
+
+## 1.0.0-next.490
+
+### Patch Changes
+
+- fix `write_types` on windows using posixify() ([#6913](https://github.com/sveltejs/kit/pull/6913))
+
+* Prevent caching of `__data.js` files ([#6904](https://github.com/sveltejs/kit/pull/6904))
+
+- Make url property getters non-enumerable ([#6909](https://github.com/sveltejs/kit/pull/6909))
+
 ## 1.0.0-next.489
 
 ### Patch Changes

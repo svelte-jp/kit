@@ -760,6 +760,72 @@ test.describe.serial('Invalidation', () => {
 		await page.waitForTimeout(200);
 		expect(await page.textContent('h1')).toBe('a: 4, b: 5');
 	});
+
+	test('multiple invalidations run concurrently', async ({ page, request }) => {
+		await page.goto('/load/invalidation/multiple');
+		expect(await page.textContent('p')).toBe('layout: 0, page: 0');
+
+		await page.click('button.layout');
+		await page.click('button.layout');
+		await page.click('button.page');
+		await page.click('button.page');
+		await page.click('button.layout');
+		await page.click('button.page');
+		await page.click('button.all');
+		await expect(page.locator('p')).toHaveText('layout: 4, page: 4');
+	});
+
+	test('invalidateAll persists through redirects', async ({ page }) => {
+		await page.goto('/load/invalidation/multiple/redirect');
+		await page.click('button.redirect');
+		await expect(page.locator('p.redirect-state')).toHaveText('Redirect state: done');
+	});
+
+	test('+layout(.server).js is re-run when server dep is invalidated', async ({ page }) => {
+		await page.goto('/load/invalidation/depends');
+		const server = await page.textContent('p.server');
+		const shared = await page.textContent('p.shared');
+		expect(server).toBeDefined();
+		expect(shared).toBeDefined();
+
+		await Promise.all([page.click('button.server'), page.waitForLoadState('networkidle')]);
+		await page.waitForTimeout(200);
+		const next_server = await page.textContent('p.server');
+		const next_shared = await page.textContent('p.shared');
+		expect(server).not.toBe(next_server);
+		expect(shared).not.toBe(next_shared);
+	});
+
+	test('+layout.js is re-run when shared dep is invalidated', async ({ page }) => {
+		await page.goto('/load/invalidation/depends');
+		const server = await page.textContent('p.server');
+		const shared = await page.textContent('p.shared');
+		expect(server).toBeDefined();
+		expect(shared).toBeDefined();
+
+		await Promise.all([page.click('button.shared'), page.waitForLoadState('networkidle')]);
+		await page.waitForTimeout(200);
+		const next_server = await page.textContent('p.server');
+		const next_shared = await page.textContent('p.shared');
+		expect(server).toBe(next_server);
+		expect(shared).not.toBe(next_shared);
+	});
+
+	test('Parameter use is tracked even for routes that do not use the parameters', async ({
+		page,
+		clicknav
+	}) => {
+		await page.goto('/load/invalidation/params');
+
+		await clicknav('[href="/load/invalidation/params/1"]');
+		expect(await page.textContent('pre')).toBe('{"a":"1"}');
+
+		await clicknav('[href="/load/invalidation/params/1/x"]');
+		expect(await page.textContent('pre')).toBe('{"a":"1","b":"x"}');
+
+		await page.goBack();
+		expect(await page.textContent('pre')).toBe('{"a":"1"}');
+	});
 });
 
 test.describe('data-sveltekit attributes', () => {
@@ -834,22 +900,25 @@ test.describe('data-sveltekit attributes', () => {
 	});
 });
 
-test('+server.js next to +page.svelte works', async ({ page }) => {
-	await page.goto('/routing/endpoint-next-to-page');
-	expect(await page.textContent('p')).toBe('Hi');
+test.describe('Content negotiation', () => {
+	test('+server.js next to +page.svelte works', async ({ page }) => {
+		await page.goto('/routing/content-negotiation');
+		expect(await page.textContent('p')).toBe('Hi');
 
-	await page.click('button:has-text("GET")');
-	await expect(page.locator('pre')).toHaveText('GET');
+		for (const method of ['GET', 'PUT', 'PATCH', 'POST', 'DELETE']) {
+			await page.click(`button:has-text("${method}")`);
+			await page.waitForFunction(
+				(method) => document.querySelector('pre')?.textContent === method,
+				method
+			);
+		}
+	});
 
-	await page.click('button:has-text("PUT")');
-	await expect(page.locator('pre')).toHaveText('PUT');
+	test('use:enhance uses action, not POST handler', async ({ page }) => {
+		await page.goto('/routing/content-negotiation');
 
-	await page.click('button:has-text("PATCH")');
-	await expect(page.locator('pre')).toHaveText('PATCH');
-
-	await page.click('button:has-text("POST")');
-	await expect(page.locator('pre')).toHaveText('POST');
-
-	await page.click('button:has-text("DELETE")');
-	await expect(page.locator('pre')).toHaveText('DELETE');
+		page.click('button:has-text("Submit")');
+		await page.waitForResponse('/routing/content-negotiation');
+		await expect(page.locator('[data-testid="form-result"]')).toHaveText('form.submitted: true');
+	});
 });

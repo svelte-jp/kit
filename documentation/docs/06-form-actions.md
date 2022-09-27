@@ -92,7 +92,7 @@ export const actions = {
 
 ### action の解剖学
 
-action はそれぞれ `RequestEvent` オブジェクトを受け取って、`request.formData()` でデータを読み込むことができます。リクエスト (例えば、cookie をセットしてユーザーをログインさせるなど) を処理したあと、action は次の更新まで `form` として利用可能なデータで応答することができます。
+action はそれぞれ `RequestEvent` オブジェクトを受け取って、`request.formData()` でデータを読み込むことができます。リクエスト (例えば、cookie をセットしてユーザーをログインさせるなど) を処理したあと、action は次の更新まで、対応するページでは `form` プロパティで、アプリ全体では `$page.form` で利用可能なデータで応答することができます。
 
 ```js
 // @errors: 2339 2304
@@ -249,13 +249,13 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 引数が無い場合、`use:enhance` は、ブラウザネイティブの動作を、フルページリロードを除いてエミュレートします。それは:
 
-- 成功レスポンスの場合は `form` プロパティを更新し、全てのデータを無効化・最新化(invalidate)します
-- 無効なレスポンスの場合は `form` プロパティを更新します
+- 成功レスポンスの場合は `form` プロパティと `$page.form` を更新し、全てのデータを無効化・最新化(invalidate)します
+- 無効なレスポンスの場合は `form` プロパティと `$page.form` を更新します
 - 成功または無効レスポンスの場合は `$page.status` を更新します
 - リダイレクトレスポンスの場合は `goto` を呼び出します
 - エラーが発生した場合はもっとも近くにある `+error` 境界をレンダリングします
 
-> By default the `form` property is only updated for actions that are in a `+page.server.js` alongside the `+page.svelte` because in the native form submission case you would be redirected to the page the action is on
+> デフォルトでは、`form` プロパティと `$page.form` は、`+page.svelte` と同じ並びにある `+page.server.js` に書かれている action によってのみ更新されます。なぜなら、ネイティブのフォーム送信では、action があるページにリダイレクトされるからです。
 
 この挙動をカスタマイズするために、form が送信される直前に実行される関数を提供することができます。そして (オプションで) `ActionResult` を引数に取るコールバックを返すことができます。
 
@@ -307,7 +307,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 `applyAction(result)` の挙動は `result.type` に依存しています:
 
-- `success`, `invalid` — `$page.status` を `result.status` に設定し、`form` を `result.data` で更新します
+- `success`, `invalid` — `$page.status` を `result.status` に設定し、`form` と `$page.form` を `result.data` で更新します
 - `redirect` — `goto(result.location)` を呼び出します
 - `error` — もっとも近くにある `+error` 境界を `result.error` でレンダリングします
 
@@ -350,6 +350,18 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 <form method="POST" on:submit|preventDefault={handleSubmit}>
 	<!-- content -->
 </form>
+```
+
+もし `+page.server.js` と `+server.js` のどちらも存在する場合、デフォルトでは、`fetch` リクエストは `+server.js` のほうにルーティングされます。`+page.server.js` の action に `POST` をするには、カスタムの `x-sveltekit-action` ヘッダーを使用します:
+
+```diff
+const response = await fetch(this.action, {
+	method: 'POST',
+	body: data,
++	headers: {
++		'x-sveltekit-action': 'true'
++	}
+});
 ```
 
 ### Alternatives

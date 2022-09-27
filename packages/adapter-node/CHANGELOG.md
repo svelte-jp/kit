@@ -1,5 +1,29 @@
 # @sveltejs/adapter-node
 
+## 1.0.0-next.96
+
+### Patch Changes
+
+- Disable builtin modules warning ([#7031](https://github.com/sveltejs/kit/pull/7031))
+
+## 1.0.0-next.95
+
+### Patch Changes
+
+- Redact error message if `getRequest` fails ([#6936](https://github.com/sveltejs/kit/pull/6936))
+
+## 1.0.0-next.94
+
+### Patch Changes
+
+- Add missing Rollup dependency ([#6927](https://github.com/sveltejs/kit/pull/6927))
+
+## 1.0.0-next.93
+
+### Patch Changes
+
+- Bundle with rollup instead of esbuild ([#6896](https://github.com/sveltejs/kit/pull/6896))
+
 ## 1.0.0-next.92
 
 ### Patch Changes

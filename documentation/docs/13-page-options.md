@@ -70,6 +70,15 @@ export async function load({ fetch }) {
 
 ルーターがすでにアクティブかどうかにかかわらず、このページからのすべてのナビゲーションでクライアントサイドルーティングが無効になることにご注意ください。
 
+#### Troubleshooting
+
+'The following routes were marked as prerenderable, but were not prerendered' というようなエラーが表示されたら、それは該当のルート (またはページの場合は親レイアウト) に `export const prerender = true` があるにもかかわらず実際にはそのページがプリレンダリングされていないことが原因です。
+
+これらのルート(route)は動的にサーバーレンダリングできないため、該当のルート(route)にアクセスしようとしたときにエラーが発生します。それを解決するには、2つの方法があります:
+
+* SvelteKit が [`config.kit.prerender.entries`](/docs/configuration#prerender) からのリンクを辿ってそのルート(route)を見つけられることを確認してください。リンクを含むページ (例えば `/` ページ) は、_それ自体_ がプリレンダリング可能でなければなりません。そうでないと無視されます。
+* `export const prerender = true` から `export const prerender = 'auto'` に変更してください。`'auto'` になっているルート(route)は動的にサーバーレンダリングすることができます
+
 ### ssr
 
 通常、SvelteKit ではページを最初にサーバーでレンダリングし、その HTML をクライアントに送信してハイドレーションを行います。もし `ssr` を `false` に設定した場合、代わりに空の 'shell' ページがレンダリングされます。これはページがサーバーでレンダリングできない場合には便利ですが、ほとんどの状況では推奨されません ([appendix をご参照ください](/docs/appendix#ssr))。
