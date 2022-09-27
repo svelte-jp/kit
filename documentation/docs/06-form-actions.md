@@ -352,7 +352,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 </form>
 ```
 
-If you have a `+server.js` alongside your `+page.server.js`, `fetch` requests will be routed there by default. To `POST` to an action in `+page.server.js` instead, use the custom `x-sveltekit-action` header:
+もし `+page.server.js` と `+server.js` のどちらも存在する場合、デフォルトでは、`fetch` リクエストは `+server.js` のほうにルーティングされます。`+page.server.js` の action に `POST` をするには、カスタムの `x-sveltekit-action` ヘッダーを使用します:
 
 ```diff
 const response = await fetch(this.action, {

@@ -72,12 +72,12 @@ export async function load({ fetch }) {
 
 #### Troubleshooting
 
-If you encounter an error like 'The following routes were marked as prerenderable, but were not prerendered' it's because the route in question (or a parent layout, if it's a page) has `export const prerender = true` but the page wasn't actually prerendered.
+'The following routes were marked as prerenderable, but were not prerendered' というようなエラーが表示されたら、それは該当のルート (またはページの場合は親レイアウト) に `export const prerender = true` があるにもかかわらず実際にはそのページがプリレンダリングされていないことが原因です。
 
-Since these routes cannot be dynamically server-rendered, this will cause errors when people try to access the route in question. There are two ways to fix it:
+これらのルート(route)は動的にサーバーレンダリングできないため、該当のルート(route)にアクセスしようとしたときにエラーが発生します。それを解決するには、2つの方法があります:
 
-* Ensure that SvelteKit can find the route by following links from [`config.kit.prerender.entries`](/docs/configuration#prerender). The pages containing the links (e.g. your `/` page) must _themselves_ be prerenderable, or they will be ignored
-* Change `export const prerender = true` to `export const prerender = 'auto'`. Routes with `'auto'` can be dynamically server rendered
+* SvelteKit が [`config.kit.prerender.entries`](/docs/configuration#prerender) からのリンクを辿ってそのルート(route)を見つけられることを確認してください。リンクを含むページ (例えば `/` ページ) は、_それ自体_ がプリレンダリング可能でなければなりません。そうでないと無視されます。
+* `export const prerender = true` から `export const prerender = 'auto'` に変更してください。`'auto'` になっているルート(route)は動的にサーバーレンダリングすることができます
 
 ### ssr
 
