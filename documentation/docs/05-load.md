@@ -107,7 +107,7 @@ URL はロードされるページに対し、絶対パスか相対パスにす�
 
 カスタムの識別子(custom identifiers)は、[URI の仕様](https://www.rfc-editor.org/rfc/rfc3986.html) に準拠するために、1つ以上の小文字の後にコロンを付ける必要があります。
 
-The following example shows how to use `depends` to register a dependency on the URLs to a custom API client as well as a custom identifier, which is `invalidate`d after a button click, making the `load` function rerun.
+以下の例では、`depends` を使用して URL の依存関係をカスタムの API クライアントとカスタムの識別子に登録する方法を示しています。これによって、ボタンがクリックされたあとに `invalidate` が呼ばれ、`load`  関数が再実行されます。
 
 ```js
 /// file: src/routes/+page.js
