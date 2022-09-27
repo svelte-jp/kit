@@ -183,7 +183,11 @@ src/routes/
 └ +layout.svelte
 ```
 
-通常、これは最上位のレイアウト(root layout)と `(app)` レイアウトと `item` レイアウトと `[id]` レイアウトを継承します。`@` と、その後ろにセグメント名 (最上位のレイアウト(root layout)の場合は空文字列(empty string)) を追加することで、これらのレイアウトのどれかにリセットすることができます。この例では、`+page@.svelte`、`+page@(app).svelte`、`+page@item.svelte`、`+page@[id].svelte` から選択することができます:
+通常、これは最上位のレイアウト(root layout)と `(app)` レイアウトと `item` レイアウトと `[id]` レイアウトを継承します。`@` と、その後ろにセグメント名 (最上位のレイアウト(root layout)の場合は空文字列(empty string)) を追加することで、これらのレイアウトのどれかにリセットすることができます。この例では、以下のオプションから選択できます:
+- `+page@[id].svelte` - inherits from `src/routes/(app)/item/[id]/+layout.svelte`
+- `+page@item.svelte` - inherits from `src/routes/(app)/item/+layout.svelte`
+- `+page@(app).svelte` - inherits from `src/routes/(app)/+layout.svelte`
+- `+page@.svelte` - inherits from `src/routes/+layout.svelte`
 
 ```diff
 src/routes/
@@ -198,9 +202,25 @@ src/routes/
 └ +layout.svelte
 ```
 
+There is no way to break out of the root layout. You can be sure that it's always present in your app and for example put app-wide UI or behavior in it.
+
 #### +layout@
 
 ページと同じように、同じ方法でレイアウト _自体_ をその親のレイアウトの階層から外すことができます。例えば、`+layout@.svelte` コンポーネントはその全ての子ルート(routes)の階層をリセットします。
+
+```
+src/routes/
+├ (app)/
+│ ├ item/
+│ │ ├ [id]/
+│ │ │ ├ embed/
+│ │ │ │ └ +page.svelte  // uses (app)/item/[id]/+layout.svelte
+│ │ │ └ +layout.svelte  // inherits from (app)/item/+layout@.svelte
+│ │ │ └ +page.svelte    // uses (app)/item/+layout@.svelte
+│ │ └ +layout@.svelte   // inherits from root layout, skipping (app)/+layout.svelte
+│ └ +layout.svelte
+└ +layout.svelte
+```
 
 #### レイアウトグループを使うときは
 

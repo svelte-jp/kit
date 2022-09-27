@@ -107,7 +107,10 @@ URL はロードされるページに対し、絶対パスか相対パスにす�
 
 カスタムの識別子(custom identifiers)は、[URI の仕様](https://www.rfc-editor.org/rfc/rfc3986.html) に準拠するために、1つ以上の小文字の後にコロンを付ける必要があります。
 
+The following example shows how to use `depends` to register a dependency on the URLs to a custom API client as well as a custom identifier, which is `invalidate`d after a button click, making the `load` function rerun.
+
 ```js
+/// file: src/routes/+page.js
 // @filename: ambient.d.ts
 declare module '$lib/api' {
 	interface Data{}
@@ -134,6 +137,24 @@ export async function load({ depends }) {
 		bar: api.client.get('/bar')
 	};
 }
+```
+
+```svelte
+/// file: src/routes/+page.svelte
+<script>
+	import { invalidate } from '$app/navigation';
+
+	/** @type {import('./$types').PageData} */
+	export let data;
+
+	const pageRefresh = async () => {
+		await invalidate('my-stuff:foo');
+	}
+</script>
+
+<p>{data.foo}<p>
+<p>{data.bar}</p>
+<button on:click={pageRefresh}>Refresh my stuff</button>
 ```
 
 #### fetch
@@ -342,7 +363,7 @@ SvelteKit は、ナビゲーション中に `load` 関数の不必要な再実�
 - 参照している `url` プロパティ (`url.pathname` や `url.search`) の値が変更された場合
 - `await parent()` を呼び出していて、親の `load` 関数が再実行された場合
 - [`fetch`](#input-methods-fetch) や [`depends`](#input-methods-depends) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](/docs/modules#$app-navigation-invalidate) で無効 (invalid) であるとマークされた場合
-- [`invalidate()`](/docs/modules#$app-navigation-invalidate) によって全ての有効な `load` 関数が強制的に再実行された場合
+- [`invalidateAll()`](/docs/modules#$app-navigation-invalidateall) によって全ての有効な `load` 関数が強制的に再実行された場合
 
 `load` 関数の再実行がトリガーされた場合、ページは再マウントされません。その代わり、新しい `data` で更新されます。つまり、コンポーネントの内部状態は保持されるということです。これがお望みでなければ、[`afterNavigate`](/docs/modules#$app-navigation-afternavigate) コールバックの中でリセットすることができますし、コンポーネントを [`{#key ...}`](https://svelte.jp/docs#template-syntax-key) ブロックでくくることもできます。
 
