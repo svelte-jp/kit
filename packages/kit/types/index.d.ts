@@ -59,7 +59,11 @@ export interface ValidationError<T extends Record<string, unknown> | undefined =
 	data: T;
 }
 
-type UnpackValidationError<T> = T extends ValidationError<infer X> ? X : T;
+type UnpackValidationError<T> = T extends ValidationError<infer X>
+	? X
+	: T extends void
+	? undefined // needs to be undefined, because void will corrupt union type
+	: T;
 
 export interface Builder {
 	log: Logger;
@@ -147,7 +151,7 @@ export interface Cookies {
 	/**
 	 * cookie を設定します。これはレスポンスに `set-cookie` ヘッダーを追加し、また、現在のリクエスト中に `cookies.get` を通じてその cookie を利用可能にします。
 	 *
-	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。`sameSite` オプションのデフォルトは `lax` です。
+	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており (http://localhost の場合は例外として `secure` は `false` です)、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。`sameSite` オプションのデフォルトは `lax` です。
 	 *
 	 * デフォルトでは、cookie の `path` は 現在のパス名の 'directory' です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
 	 */
@@ -159,11 +163,11 @@ export interface Cookies {
 	delete(name: string, opts?: import('cookie').CookieSerializeOptions): void;
 
 	/**
-	 * Serialize a cookie name-value pair into a Set-Cookie header string.
+	 * cookie の名前と値のペアを Set-Cookie ヘッダー文字列にシリアライズします。
 	 *
-	 * The `httpOnly` and `secure` options are `true` by default, and must be explicitly disabled if you want cookies to be readable by client-side JavaScript and/or transmitted over HTTP. The `sameSite` option defaults to `lax`.
+	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており (http://localhost の場合は例外として `secure` は `false` です)、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。`sameSite` オプションのデフォルトは `lax` です。
 	 *
-	 * By default, the `path` of a cookie is the current pathname. In most cases you should explicitly set `path: '/'` to make the cookie available throughout your app.
+	 * デフォルトでは、cookie の `path` は 現在のパス名です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
 	 *
 	 * @param name the name for the cookie
 	 * @param value value to set the cookie to

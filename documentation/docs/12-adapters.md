@@ -96,7 +96,7 @@ export default function (options) {
 }
 ```
 
-`Adapter` とそのパラメータの型は [types/config.d.ts](https://github.com/sveltejs/kit/blob/master/packages/kit/types/config.d.ts) にあります。
+`Adapter` とそのパラメータの型は [types/index.d.ts](https://github.com/sveltejs/kit/blob/master/packages/kit/types/index.d.ts) にあります。
 
 `adapt` メソッドの中では、adapter がすべきことがたくさんあります:
 

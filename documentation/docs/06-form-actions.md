@@ -249,26 +249,25 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 引数が無い場合、`use:enhance` は、ブラウザネイティブの動作を、フルページリロードを除いてエミュレートします。それは:
 
-- 成功レスポンスの場合は `form` プロパティと `$page.form` を更新し、全てのデータを無効化・最新化(invalidate)します
-- 無効なレスポンスの場合は `form` プロパティと `$page.form` を更新します
-- 成功または無効レスポンスの場合は `$page.status` を更新します
+- action が送信元のページと同じ場所にある場合に限り、成功レスポンスまたは不正なレスポンスに応じて、`form` プロパティと `$page.form` と `$page.status` を更新します。例えば、`<form action="/somewhere/else" ..>` というようなフォームの場合、`form` と `$page` は更新されません。これは、ネイティブのフォーム送信では action があるページにリダイレクトされるからです。
+- 成功レスポンスの場合は `invalidateAll` を使用して全てのデータを無効化・最新化(invalidate)します。
 - リダイレクトレスポンスの場合は `goto` を呼び出します
 - エラーが発生した場合はもっとも近くにある `+error` 境界をレンダリングします
 
-> デフォルトでは、`form` プロパティと `$page.form` は、`+page.svelte` と同じ並びにある `+page.server.js` に書かれている action によってのみ更新されます。なぜなら、ネイティブのフォーム送信では、action があるページにリダイレクトされるからです。
-
-この挙動をカスタマイズするために、form が送信される直前に実行される関数を提供することができます。そして (オプションで) `ActionResult` を引数に取るコールバックを返すことができます。
+この挙動をカスタマイズするために、form が送信される直前に実行される関数を提供することができます。そして (オプションで) `ActionResult` を引数に取るコールバックを返すことができます。もしコールバックを返す場合、上述のデフォルトの動作はトリガーされません。元に戻すには、`update` を呼び出してください。
 
 ```svelte
 <form
 	method="POST"
-	use:enhance={({ form, data, cancel }) => {
+	use:enhance={({ form, data, action, cancel }) => {
 		// `form` は `<form>` 要素です
 		// `data` はその `FormData` オブジェクトです
+		// `action` はフォームが POST される URL です
 		// `cancel()` は送信(submission)を中止します
 
-		return async ({ result }) => {
+		return async ({ result, update }) => {
 			// `result` は `ActionResult` オブジェクトです
+			// `update` は、このコールバックが設定されていない場合に起動されるロジックを起動する関数です
 		};
 	}}
 >
@@ -278,7 +277,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 #### applyAction
 
-独自のコールバックを提供する場合は、最も近くにある `+error` 境界を表示するなど、デフォルトの `use:enhance` の一部を再現する必要があるでしょう。`applyAction` でこれを行うことができます:
+独自のコールバックを提供する場合は、最も近くにある `+error` 境界を表示するなど、デフォルトの `use:enhance` の一部を再現する必要があるでしょう。ほとんどの場合、コールバックに渡された `update` を呼び出すだけで十分です。もっとカスタマイズが必要な場合は、`applyAction` を使用してそれを行うことができます:
 
 ```diff
 <script>
@@ -290,9 +289,10 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 <form
 	method="POST"
-	use:enhance={({ form, data, cancel }) => {
+	use:enhance={({ form, data, action, cancel }) => {
 		// `form` は `<form>` 要素です
 		// `data` はその `FormData` オブジェクトです
+		// `action` はフォームが POST される URL です
 		// `cancel()` は送信(submission)を中止します
 
 		return async ({ result }) => {
@@ -307,7 +307,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 `applyAction(result)` の挙動は `result.type` に依存しています:
 
-- `success`, `invalid` — `$page.status` を `result.status` に設定し、`form` と `$page.form` を `result.data` で更新します
+- `success`, `invalid` — `$page.status` を `result.status` に設定し、`form` と `$page.form` を `result.data` で更新します (`enhance` の `update` とは対照的に、送信元がどこかは関係ありません)
 - `redirect` — `goto(result.location)` を呼び出します
 - `error` — もっとも近くにある `+error` 境界を `result.error` でレンダリングします
 
