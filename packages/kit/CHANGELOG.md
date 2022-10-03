@@ -1,5 +1,33 @@
 # @sveltejs/kit
 
+## 1.0.0-next.507
+
+### Patch Changes
+
+- Allow TypedArray request bodies in `fetch` in `load` ([#7065](https://github.com/sveltejs/kit/pull/7065))
+
+* Use `FormData` polyfill from `undici` rather than `node-fetch` ([#7065](https://github.com/sveltejs/kit/pull/7065))
+
+## 1.0.0-next.506
+
+### Patch Changes
+
+- Default to insecure cookies when serving on http://localhost ([#7090](https://github.com/sveltejs/kit/pull/7090))
+
+* [docs] explain ramifications of base path ([#7095](https://github.com/sveltejs/kit/pull/7095))
+
+- [fix] decode routeIds in headers for prerendering ([#7097](https://github.com/sveltejs/kit/pull/7097))
+
+* [feat] provide `update` to `use:enhance` callback ([#7083](https://github.com/sveltejs/kit/pull/7083))
+
+## 1.0.0-next.505
+
+### Patch Changes
+
+- [fix] handle form action returning nothing; handle page.(server).js without load functions ([#7050](https://github.com/sveltejs/kit/pull/7050))
+
+* [fix] add `RequestEvent` to `$types` when `+layout.server.js` present ([#7063](https://github.com/sveltejs/kit/pull/7063))
+
 ## 1.0.0-next.504
 
 ### Patch Changes
