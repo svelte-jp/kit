@@ -8,6 +8,6 @@ SvelteKit では、`src/service-worker.js` ファイル（または `src/service
 
 > [Service Worker のロケーション](/docs/configuration#files) と [自動登録の無効化](/docs/configuration#serviceworker) についてはプロジェクトの設定で変更することができます。
 
-Service Worker の内部では、[`$service-worker` モジュール](/docs/modules#$service-worker) にアクセスすることができます。
+Service Worker の内部では、[`$service-worker` モジュール](/docs/modules#$service-worker) にアクセスすることができます。If your Vite config specifies `define`, this will be applied to service workers as well as your server/client builds.
 
 Service Worker は（現状はブラウザがまだ import をサポートしていないので）バンドルする必要があり、クライアント側アプリのビルドマニフェストに依存するため、**Service Worker は本番ビルドでのみ機能します。開発モードでは機能しません。**。ローカル環境でテストするには、`vite preview` を使用してください。

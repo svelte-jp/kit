@@ -1,5 +1,33 @@
 # @sveltejs/kit
 
+## 1.0.0-next.511
+
+### Patch Changes
+
+- [perf] render head links before other content ([#7160](https://github.com/sveltejs/kit/pull/7160))
+
+## 1.0.0-next.510
+
+### Patch Changes
+
+- Add `fetch` to `RequestEvent` ([#7113](https://github.com/sveltejs/kit/pull/7113))
+
+## 1.0.0-next.509
+
+### Patch Changes
+
+- Apply define config to service worker ([#7140](https://github.com/sveltejs/kit/pull/7140))
+
+* [chore] Skip removing HTTP/2 pseudo-headers, which is no longer necessary with undici ([#7142](https://github.com/sveltejs/kit/pull/7142))
+
+- bump devalue to version 4 ([#7147](https://github.com/sveltejs/kit/pull/7147))
+
+## 1.0.0-next.508
+
+### Patch Changes
+
+- [chore] Upgrade undici so that we can use its multipart form data parsing instead of node-fetch's ([#7131](https://github.com/sveltejs/kit/pull/7131))
+
 ## 1.0.0-next.507
 
 ### Patch Changes
