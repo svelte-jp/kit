@@ -67,7 +67,7 @@ export function load({ params }) {
 
 この関数は `+page.svelte` とともに実行されます。サーバーサイドレンダリング中はサーバーで実行され、クライアントサイドナビゲーション中はブラウザで実行されます。API の詳細は [`load`](/docs/load) をご参照ください。
 
-`page.js` では、`load` だけでなくページの動作(behaviour)を設定するための値をエクスポートすることができます:
+`+page.js` では、`load` だけでなくページの動作(behaviour)を設定するための値をエクスポートすることができます:
 
 - `export const prerender = true` または `false` または `'auto'`
 - `export const ssr = true` または `false`

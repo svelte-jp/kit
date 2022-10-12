@@ -18,7 +18,7 @@ SvelteKit は、ネットワーク越しにデータを取得するために [`f
 
 #### Request
 
-[`Request`](https://developer.mozilla.org/ja/docs/Web/API/Request) のインスタンスは [hooks](/docs/hooks) や [サーバールート(server routes)](/docs/routing#server) で `event.request` という形でアクセスすることができます。これには `request.json()` や `request.formData()` など、例えばエンドポイントに送られたデータを取得するための便利なメソッドが含まれています。
+[`Request`](https://developer.mozilla.org/ja/docs/Web/API/Request) のインスタンスは [hooks](/docs/hooks) や [サーバールート(server routes)](/docs/routing#server) で `event.request` という形でアクセスすることができます。これには `request.json()` や `request.formData()` など、エンドポイントに送られたデータを取得するための便利なメソッドが含まれています。
 
 #### Response
 
