@@ -65,7 +65,6 @@ afterNavigate(() => {
 /// file: src/hooks.server.js
 /**
  * @param {import('@sveltejs/kit').RequestEvent} event
- * @returns {string}
  */
 function get_lang(event) {
 	return 'en';

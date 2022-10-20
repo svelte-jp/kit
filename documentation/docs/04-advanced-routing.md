@@ -22,11 +22,11 @@ title: 高度なルーティング
 }
 ```
 
-> `src/routes/a/[...rest]/z/+page.svelte` は `/a/z` にも (つまり、パラメーターが全くない場合にも)、`/a/b/z` や `/a/b/c/z` と同様にマッチします。Rest パラメーターの値が正しいことを、例えば [matcher](#matching) を使用するなどして確認してください。
+> `src/routes/a/[...rest]/z/+page.svelte` は `/a/z` にも (つまり、パラメータが全くない場合にも)、`/a/b/z` や `/a/b/c/z` と同様にマッチします。Rest パラメータの値が正しいことを、例えば [matcher](#matching) を使用するなどして確認してください。
 
 #### 404 pages
 
-Rest パラメーターによってカスタムの 404 をレンダリングすることができます。これらのルート(routes)があるとして…
+Rest パラメータによってカスタムの 404 をレンダリングすることができます。これらのルート(routes)があるとして…
 
 ```
 src/routes/
@@ -63,6 +63,12 @@ export function load(event) {
 
 > もし 404 のケースをハンドリングしていない場合、[`handleError`](/docs/hooks#shared-hooks-handleerror) によって表示が行われます。
 
+### Optional parameters
+
+`[lang]/home` というルートに含まれる `lang` というパラメータは必須です。これらのパラメータをオプションにできると、今回の例では `home` と `en/home` のどちらも同じページを指すことができるのでとても便利です。パラメータにもう1つ括弧を付けることでこれができるようになります: `[[lang]]/home`
+
+optional のルートパラメータ(route parameter)は rest パラメータに続けて使用すること (`[...rest]/[[optional]]`) はできません。パラメータは 'greedily' にマッチし、optional のパラメータは使用されないこともあるためです。
+
 ### マッチング(Matching)
 
 `src/routes/archive/[page]` のようなルート(route)は `/archive/3` にマッチしますが、`/archive/potato` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"3"` や `"potato"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](/docs/configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
@@ -92,7 +98,7 @@ export function match(param) {
 
 ```bash
 src/routes/[...catchall]/+page.svelte
-src/routes/[a]/+server.js
+src/routes/[[a]]/foo/+page.svelte
 src/routes/[b]/+page.svelte
 src/routes/foo-[c]/+page.svelte
 src/routes/foo-abc/+page.svelte
@@ -101,9 +107,8 @@ src/routes/foo-abc/+page.svelte
 SvelteKit は、どのルート(route)に対してリクエストされているのかを判断しなければなりません。そのため、以下のルールに従ってこれらをソートします…
 
 - より詳細・明確(specific)なルート(routes)ほど、より優先度が高い (例えば、動的なパラメータが1つあるルートより、パラメータのないルートのほうがより詳細・明確(specific)である、など)
-- `+server` ファイルは `+page` ファイルより優先度が高い
 - [matchers](#matching) 付きのパラメータ (`[name=type]`) は matchers なしのパラメータ (`[name]`) よりも優先度が高い
-- Rest パラメータは最も優先度が低い
+- `[[optional]]` と `[...rest]` パラメータはルート(route)の最後の部分でない限り無視される (最後の部分になっている場合は最も低い優先度として扱われる)。言い換えると、ソートの目的上、`x/[[y]]/z` と `x/z` は同等に扱われる
 - 優先度が同じ場合はアルファベット順で解決される
 
 …この順序で並べると、`/foo-abc` の場合は `src/routes/foo-abc/+page.svelte` を呼び出し、`/foo-def` の場合は `src/routes/foo-[c]/+page.svelte` を呼び出します:
@@ -111,7 +116,7 @@ SvelteKit は、どのルート(route)に対してリクエストされている
 ```bash
 src/routes/foo-abc/+page.svelte
 src/routes/foo-[c]/+page.svelte
-src/routes/[a]/+server.js
+src/routes/[[a]]/foo/+page.svelte
 src/routes/[b]/+page.svelte
 src/routes/[...catchall]/+page.svelte
 ```

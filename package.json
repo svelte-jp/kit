@@ -26,8 +26,8 @@
 	"devDependencies": {
 		"@changesets/cli": "^2.22.0",
 		"@rollup/plugin-commonjs": "^23.0.0",
-		"@rollup/plugin-json": "^4.1.0",
-		"@rollup/plugin-node-resolve": "^14.1.0",
+		"@rollup/plugin-json": "^5.0.0",
+		"@rollup/plugin-node-resolve": "^15.0.0",
 		"@svitejs/changesets-changelog-github-compact": "^0.1.1",
 		"playwright": "^1.25.0",
 		"prettier": "^2.6.2",
@@ -43,7 +43,7 @@
 		"textlint-rule-no-mix-dearu-desumasu": "^4.0.1",
 		"textlint-rule-preset-jtf-style": "^2.3.8"
 	},
-	"packageManager": "pnpm@7.13.3",
+	"packageManager": "pnpm@7.13.5",
 	"engines": {
 		"pnpm": "^7.0.0"
 	},

@@ -6,6 +6,8 @@ title: Page options
 
 これらはそれぞれオプションを [`+page.js`](/docs/routing#page-page-js) や [`+page.server.js`](/docs/routing#page-page-server-js) からエクスポートすることでページごとに、または共有の [`+layout.js`](/docs/routing#layout-layout-js) や [`+layout.server.js`](/docs/routing#layout-layout-server-js) を使用してページグループごとに制御することが可能です。アプリ全体に対してオプションを定義するには、最上位のレイアウト(root layout)からそれをエクスポートします。子レイアウトとページは親レイアウトで設定された値を上書きするため、例えば、プリレンダリングをアプリ全体で有効にし、それから動的にレンダリングする必要があるページではそれを無効にすることができます。
 
+アプリの様々な領域でこれらのオプションをうまく組み合わせることができます。例えば、マーケティングページは高速化を最大限にするためにプリレンダリングし、動的なページは SEO とアクセシビリティのためにサーバーでレンダリングし、管理者用のセクションはクライアントのみでレンダリングするようにして SPA にすることができます。このように、SvelteKit はとても万能で多くの用途にお使いいただけます。
+
 ### prerender
 
 あなたのアプリの、少なくともいくつかのルートは、ビルド時に生成されるシンプルな HTML ファイルとして表現されることが多いでしょう。これらのルート(routes)を [_プリレンダリング_](/docs/appendix#prerendering) することができます。
@@ -72,21 +74,23 @@ export async function load({ fetch }) {
 
 #### Troubleshooting
 
-'The following routes were marked as prerenderable, but were not prerendered' というようなエラーが表示されたら、それは該当のルート (またはページの場合は親レイアウト) に `export const prerender = true` があるにもかかわらず実際にはそのページがプリレンダリングされていないことが原因です。
+'The following routes were marked as prerenderable, but were not prerendered' というようなエラーが表示されたら、それは該当のルート (またはページの場合は親レイアウト) に `export const prerender = true` があるにもかかわらず実際にはそのページがプリレンダリングされていないことが原因です (プリレンダリングクローラーがそのページにアクセスしていないため)。
 
 これらのルート(route)は動的にサーバーレンダリングできないため、該当のルート(route)にアクセスしようとしたときにエラーが発生します。それを解決するには、2つの方法があります:
 
-* SvelteKit が [`config.kit.prerender.entries`](/docs/configuration#prerender) からのリンクを辿ってそのルート(route)を見つけられることを確認してください。リンクを含むページ (例えば `/` ページ) は、_それ自体_ がプリレンダリング可能でなければなりません。そうでないと無視されます。
+* SvelteKit が [`config.kit.prerender.entries`](/docs/configuration#prerender) からのリンクを辿ってそのルート(route)を見つけられることを確認してください。動的なルート(例えば `[parameters]` を持つページ) へのリンクは、他のエントリーポイントをクローリングしても見つからない場合にこのオプションに追加してください。そうしないと、SvelteKit はその parameters が持つべき値がわからないので、プリレンダリングされません。プリレンダリング可能(prerenderable)なページとしてマークされていないページは無視され、そのページから他のページ(prerenderable なものも含む)へのリンクもクローリングされません。
 * `export const prerender = true` から `export const prerender = 'auto'` に変更してください。`'auto'` になっているルート(route)は動的にサーバーレンダリングすることができます
 
 ### ssr
 
-通常、SvelteKit ではページを最初にサーバーでレンダリングし、その HTML をクライアントに送信してハイドレーションを行います。もし `ssr` を `false` に設定した場合、代わりに空の 'shell' ページがレンダリングされます。これはページがサーバーでレンダリングできない場合には便利ですが、ほとんどの状況では推奨されません ([appendix をご参照ください](/docs/appendix#ssr))。
+通常、SvelteKit ではページを最初にサーバーでレンダリングし、その HTML をクライアントに送信してハイドレーションを行います。もし `ssr` を `false` に設定した場合、代わりに空の 'shell' ページがレンダリングされます。これはページがサーバーでレンダリングできない場合には便利 (例えば `document` などのブラウザオンリーな globals を使用するなど) ですが、ほとんどの状況では推奨されません ([appendix をご参照ください](/docs/appendix#ssr))。
 
 ```js
 /// file: +page.js
 export const ssr = false;
 ```
+
+`export const ssr = false` を最上位(root)の `+layout.js` に追加した場合、アプリ全体がクライアントのみでレンダリングされるようになり、それはつまり、本質的にはアプリを SPA にする、ということを意味します。
 
 ### csr
 

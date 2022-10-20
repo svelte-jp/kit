@@ -235,7 +235,7 @@ export function load() {
 
 サーバー上でレイアウトの `load` 関数を実行するためには、それを `+layout.server.js` に移動し、`LayoutLoad` 型を `LayoutServerLoad` に変更します。
 
-Like `+layout.js`, `+layout.server.js` can export [page options](/docs/page-options) — `prerender`, `ssr` and `csr`.
+`+layout.js` と同様に、`+layout.server.js` では [page options](/docs/page-options) — `prerender`、`ssr`、`csr` をエクスポートすることができます。
 
 ### +server
 
