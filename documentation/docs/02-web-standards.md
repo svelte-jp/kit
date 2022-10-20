@@ -47,7 +47,7 @@ export function GET(event) {
 
 ### FormData
 
-When dealing with HTML native form submissions you'll be working with [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) objects.
+HTML のネイティブのフォーム送信を扱う場合は、[`FormData`](https://developer.mozilla.org/ja/docs/Web/API/FormData) オブジェクトを使用します。
 
 ```js
 // @errors: 2461
