@@ -252,7 +252,7 @@ export default config;
 - `concurrency` — 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートの CMS からコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます
 - `crawl` — SvelteKit がシードページからリンクをたどってプリレンダリングするページを見つけるかどうかを決定します
 - `enabled` — `false` に設定すると、プリレンダリングを完全に無効化できます
-- `entries` — プリレンダリングするページ、またはクロールを開始するページ(`crawl: true` の場合)の配列。`*` 文字列には、全ての動的ではないルート(routes)(すなわち `[parameters]` を含まないページ) が含まれます
+- `entries` — プリレンダリングするページ、またはクロールを開始するページ(`crawl: true` の場合)の配列。`*` 文字列には、全ての動的ではないルート(routes)(i.e. pages with no `[parameters]`, because SvelteKit doesn't know what value the parameters should have) が含まれます
 - `onError`
 
   - `'fail'` — (デフォルト) リンクをたどったときにルーティングエラーが発生した場合、ビルドを失敗させます

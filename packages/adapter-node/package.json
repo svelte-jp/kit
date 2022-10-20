@@ -1,6 +1,6 @@
 {
 	"name": "@sveltejs/adapter-node",
-	"version": "1.0.0-next.96",
+	"version": "1.0.0-next.98",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/sveltejs/kit",
@@ -43,8 +43,8 @@
 	},
 	"dependencies": {
 		"@rollup/plugin-commonjs": "^23.0.0",
-		"@rollup/plugin-json": "^4.1.0",
-		"@rollup/plugin-node-resolve": "^14.1.0",
+		"@rollup/plugin-json": "^5.0.0",
+		"@rollup/plugin-node-resolve": "^15.0.0",
 		"rollup": "^2.78.1"
 	}
 }

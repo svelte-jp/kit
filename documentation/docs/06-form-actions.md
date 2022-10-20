@@ -134,7 +134,7 @@ export const actions = {
 
 #### Validation errors
 
-無効なデータが原因でリクエストが処理できなかった場合、再試行できるようにするために、直前に送信した form の値とともに validation error をユーザーに返すことができます。`invalid` 関数は、HTTP ステータスコード (通常、validation error の場合は 400) をデータとともに返します:
+無効なデータが原因でリクエストが処理できなかった場合、再試行できるようにするために、直前に送信した form の値とともに validation error をユーザーに返すことができます。`invalid` 関数は、HTTP ステータスコード (通常、validation error の場合は 400 か 422) をデータとともに返します:
 
 ```diff
 // @errors: 2339 2304
