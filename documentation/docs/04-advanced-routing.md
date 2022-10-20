@@ -108,7 +108,7 @@ SvelteKit は、どのルート(route)に対してリクエストされている
 
 - より詳細・明確(specific)なルート(routes)ほど、より優先度が高い (例えば、動的なパラメータが1つあるルートより、パラメータのないルートのほうがより詳細・明確(specific)である、など)
 - [matchers](#matching) 付きのパラメータ (`[name=type]`) は matchers なしのパラメータ (`[name]`) よりも優先度が高い
-- `[[optional]]` and `[...rest]` parameters are ignored unless they are the final part of the route, in which case they are treated with lowest priority. In other words `x/[[y]]/z` is treated equivalently to `x/z` for the purposes of sorting
+- `[[optional]]` と `[...rest]` パラメータはルート(route)の最後の部分でない限り無視される (最後の部分になっている場合は最も低い優先度として扱われる)。言い換えると、ソートの目的上、`x/[[y]]/z` と `x/z` は同等に扱われる
 - 優先度が同じ場合はアルファベット順で解決される
 
 …この順序で並べると、`/foo-abc` の場合は `src/routes/foo-abc/+page.svelte` を呼び出し、`/foo-def` の場合は `src/routes/foo-[c]/+page.svelte` を呼び出します:
