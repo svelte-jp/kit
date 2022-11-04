@@ -1,4 +1,6 @@
 import fs from 'fs';
+import path from 'path';
+import glob from 'tiny-glob/sync.js';
 import { extract_frontmatter, transform } from '../docs/server/markdown';
 import { render_modules } from '../docs/server/modules';
 import { slugify } from '../docs/server';
@@ -25,8 +27,9 @@ export function content() {
 	for (const category of categories) {
 		const breadcrumbs = category.label ? [category.label] : [];
 
-		for (const file of fs.readdirSync(`../../documentation/${category.slug}`)) {
-			const match = /\d{2}-(.+)\.md/.exec(file);
+		for (const file of glob('**/*.md', { cwd: `../../documentation/${category.slug}` })) {
+			const basename = path.basename(file);
+			const match = /\d{2}-(.+)\.md/.exec(basename);
 			if (!match) continue;
 
 			const slug = match[1];
@@ -53,7 +56,7 @@ export function content() {
 			for (const section of sections) {
 				const lines = section.split('\n');
 				const h3 = lines.shift();
-				const h3link = convert_link(category.label, file, h3);
+				const h3link = convert_link(category.label, `${category.slug}/${file}`, h3);
 				const content = lines.join('\n');
 
 				const subsections = content.trim().split('#### ');
@@ -70,7 +73,7 @@ export function content() {
 				for (const subsection of subsections) {
 					const lines = subsection.split('\n');
 					const h4 = lines.shift();
-					const h4link = convert_link(category.label, file, h4);
+					const h4link = convert_link(category.label, `${category.slug}/${file}`, h4);
 
 					blocks.push({
 						breadcrumbs: [...breadcrumbs, metadata.title, h3, h4],

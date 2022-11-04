@@ -179,9 +179,23 @@ export async function render_response({
 		const match = /\[(\d+)\]\.data\.(.+)/.exec(error.path);
 		if (match) {
 			throw new Error(
-				`Data returned from \`load\` while rendering /${event.routeId} is not serializable: ${error.message} (data.${match[2]})`
+				`Data returned from \`load\` while rendering ${event.routeId} is not serializable: ${error.message} (data.${match[2]})`
 			);
 		}
+
+		const nonPojoError = /pojo/i.exec(error.message);
+
+		if (nonPojoError) {
+			const constructorName = branch.find(({ server_data }) => server_data?.data?.constructor?.name)
+				?.server_data?.data?.constructor?.name;
+
+			throw new Error(
+				`Data returned from \`load\` (while rendering ${event.routeId}) must be a plain object${
+					constructorName ? ` rather than an instance of ${constructorName}` : ''
+				}`
+			);
+		}
+
 		throw error;
 	}
 
@@ -232,7 +246,7 @@ export async function render_response({
 				env: ${s(options.public_env)},
 				hydrate: ${page_config.ssr ? `{
 					status: ${status},
-					error: ${s(error)},
+					error: ${devalue.uneval(error)},
 					node_ids: [${branch.map(({ node }) => node.index).join(', ')}],
 					params: ${devalue.uneval(event.params)},
 					routeId: ${s(event.routeId)},

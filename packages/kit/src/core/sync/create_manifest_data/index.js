@@ -7,6 +7,7 @@ import { parse_route_id } from '../../../utils/routing.js';
 import { sort_routes } from './sort.js';
 
 /**
+ * Generates the manifest data used for the client-side manifest and types generation.
  * @param {{
  *   config: import('types').ValidatedConfig;
  *   fallback?: string;
@@ -121,7 +122,7 @@ function create_routes_and_nodes(cwd, config, fallback) {
 				);
 			}
 
-			const { pattern, names, types } = parse_route_id(id);
+			const { pattern, names, types, optional } = parse_route_id(id);
 
 			/** @type {import('types').RouteData} */
 			const route = {
@@ -132,6 +133,7 @@ function create_routes_and_nodes(cwd, config, fallback) {
 				pattern,
 				names,
 				types,
+				optional,
 
 				layout: null,
 				error: null,
@@ -207,7 +209,7 @@ function create_routes_and_nodes(cwd, config, fallback) {
 			}
 		};
 
-		walk(0, '', '', null);
+		walk(0, '/', '', null);
 
 		if (routes.length === 1) {
 			const root = routes[0];
@@ -223,11 +225,12 @@ function create_routes_and_nodes(cwd, config, fallback) {
 		// If there's no routes directory, we'll just create a single empty route. This ensures the root layout and
 		// error components are included in the manifest, which is needed for subsequent build/dev commands to work
 		routes.push({
-			id: '',
+			id: '/',
 			segment: '',
 			pattern: /^$/,
 			names: [],
 			types: [],
+			optional: [],
 			parent: null,
 			layout: null,
 			error: null,
