@@ -164,7 +164,7 @@ export async function load() {
 
 #### Input
 
-共有される `load` 関数とサーバー専用の `load` 関数はどちらも、リクエストを表すプロパティ (`params`、`routeId`、`url`) と様々な関数 (`depends`、`fetch`、`parent`) にアクセスできます。これらについては、以下のセクションで説明します。
+共有される `load` 関数とサーバー専用の `load` 関数はどちらも、リクエストを表すプロパティ (`params`、`route`、`url`) と様々な関数 (`depends`、`fetch`、`parent`) にアクセスできます。これらについては、以下のセクションで説明します。
 
 サーバー専用の `load` 関数は `ServerLoadEvent` を引数にとって呼び出されます。`ServerLoadEvent` は、`RequestEvent` から `clientAddress`、`cookies`、`locals`、`platform`、`request` を継承しています。
 
@@ -186,7 +186,7 @@ export async function load() {
 
 ### URL data を使用する
 
-多くの場合、`load` 関数は何らかの形で URL に依存します。そのため、`load` 関数では `url`、`routeId`、`params` を提供しています。
+多くの場合、`load` 関数は何らかの形で URL に依存します。そのため、`load` 関数では `url`、`route`、`params` を提供しています。
 
 #### url
 
@@ -194,23 +194,23 @@ export async function load() {
 
 > 環境によっては、サーバーサイドレンダリング時のリクエストヘッダからこれが導出されることもあります。例えば [adapter-node](/docs/adapters#supported-environments-node-js) では、URL を正しく設定するために adapter の設定をする必要があるかもしれません。
 
-#### routeId
+#### route
 
-現在のルート(route)ディレクトリの名前で、`src/routes` との相対です:
+現在のルート(route)ディレクトリの名前を含んでいます。`src/routes` との相対です:
 
 ```js
 /// file: src/routes/a/[b]/[...c]/+page.js
 /** @type {import('./$types').PageLoad} */
-export function load({ routeId }) {
-	console.log(routeId); // '/a/[b]/[...c]'
+export function load({ route }) {
+	console.log(route.id); // '/a/[b]/[...c]'
 }
 ```
 
 #### params
 
-`params` は `url.pathname` と `routeId` から導出されます。
+`params` は `url.pathname` と `route.id` から導出されます。
 
-`routeId` が `/a/[b]/[...c]` で、`url.pathname` が `/a/x/y/z` の場合、`params` オブジェクトはこのようになります:
+`route.id` が `/a/[b]/[...c]` で、`url.pathname` が `/a/x/y/z` の場合、`params` オブジェクトはこのようになります:
 
 ```json
 {

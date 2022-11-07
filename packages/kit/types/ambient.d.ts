@@ -194,11 +194,11 @@ declare module '$app/navigation' {
 			/**
 			 * If `true`, the browser will maintain its scroll position rather than scrolling to the top of the page after navigation
 			 */
-			noscroll?: boolean;
+			noScroll?: boolean;
 			/**
 			 * If `true`, the currently focused element will retain focus after navigation. Otherwise, focus will be reset to the body
 			 */
-			keepfocus?: boolean;
+			keepFocus?: boolean;
 			/**
 			 * The state of the new/updated history entry
 			 */
@@ -257,7 +257,7 @@ declare module '$app/navigation' {
 	 * リンクをクリックしたり、`goto(...)` を呼び出したり、ブラウザの 戻る/進む を使うなどして新しい URL にナビゲーションするその直前にトリガーされるナビゲーションインターセプターです。
 	 * `cancel()` を呼び出すと、ナビゲーションが完了するのを中止します。
 	 *
-	 * 外部の URL にナビゲーションしている場合、`navigation.to` は `null` になります。
+	 * ナビゲーションがクライアントサイドではない場合、`navigation.to.routeId` は `null` になります。
 	 *
 	 * `beforeNavigate` はコンポーネントの初期化中に呼び出す必要があります。コンポーネントがマウントされている間、アクティブな状態を維持します。
 	 */
