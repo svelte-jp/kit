@@ -198,7 +198,7 @@ If we create pages for `/`, `/about` and `/settings`...
 <slot></slot>
 ```
 
-By default, each layout inherits the next layout above it. Sometimes that isn't what you want - in this case, [advanced layouts](/docs/advanced-routing#advanced-layouts) can help you.
+デフォルトでは、各レイアウトはその上にあるレイアウトを継承します。そうしたくない場合は、[advanced layouts](/docs/advanced-routing#advanced-layouts) が役に立つでしょう。
 
 #### +layout.js
 

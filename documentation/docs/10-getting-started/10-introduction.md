@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: イントロダクション
 ---
 
 ### 始める前に

@@ -16,6 +16,12 @@ const docs_project_structure = new Map([
 
 const docs_routing = new Map([['その他のファイル', 'Other files']]);
 
+const docs_load = new Map([
+	['どちらを使用すべきか', 'When to use which'],
+	['URL data を使用する', 'Using URL data'],
+	['fetch リクエストの作成', 'Making fetch requests']
+]);
+
 const docs_form_actions = new Map([['action の解剖学', 'Anatomy of an action']]);
 
 const docs_page_options = new Map([['プリレンダリングしない場合', 'When not to prerender']]);
@@ -104,6 +110,8 @@ export function convert_link(label, file, heading) {
 			// 20-core-concepts
 			case 'docs/20-core-concepts/10-routing.md':
 				return docs_routing.get(heading) || heading;
+			case 'docs/20-core-concepts/20-load.md':
+				return docs_load.get(heading) || heading;
 			case 'docs/20-core-concepts/30-form-actions.md':
 				return docs_form_actions.get(heading) || heading;
 			case 'docs/20-core-concepts/40-page-options.md':

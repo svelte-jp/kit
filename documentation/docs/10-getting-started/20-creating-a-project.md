@@ -1,8 +1,8 @@
 ---
-title: Creating a project
+title: プロジェクトを作成する
 ---
 
-The easiest way to start building a SvelteKit app is to run `npm create`:
+SvelteKit アプリの構築を始めるのに最も簡単な方法は `npm create` を実行することです:
 
 ```bash
 npm create svelte@latest my-app
@@ -11,15 +11,15 @@ npm install
 npm run dev
 ```
 
-The first command will scaffold a new project in the `my-app` directory asking you if you'd like to set up some basic tooling such as TypeScript. See the FAQ for [pointers on setting up additional tooling](/faq#integrations). The subsequent commands will then install its dependencies and start a server on [localhost:5173](http://localhost:5173).
+最初のコマンドでは、TypeScript などの基本的なツールをセットアップするかどうか選択しながら、`my-app` ディレクトリに新しいプロジェクトを生成します。[追加のツールの設定に関するポイント](/faq#integrations) については FAQ をご覧ください。それ以降のコマンドでは、依存関係をインストールし、[localhost:5173](http://localhost:5173) でサーバーを起動します。
 
-There are two basic concepts:
+SvelteKit には2つの基本的なコンセプトがあります:
 
-- Each page of your app is a [Svelte](https://svelte.dev) component
-- You create pages by adding files to the `src/routes` directory of your project. These will be server-rendered so that a user's first visit to your app is as fast as possible, then a client-side app takes over
+- アプリの各ページは [Svelte](https://svelte.jp) コンポーネントです
+- プロジェクトの `src/routes` ディレクトリにファイルを追加することで、ページを作成できます。これらはサーバーでレンダリングされるのでユーザーの最初のアクセスの際に可能な限り速く表示されるようになり、それからクライアントサイドのアプリに引き継がれます
 
-Try editing the files to get a feel for how everything works – you may not need to bother reading the rest of this guide!
+ファイルを編集して、どのように動作するのか確かめてみてください。もしかしたら、もうこれ以降のガイドを読む必要はないかもしれません！
 
-### Editor setup
+### エディタのセットアップ
 
-We recommend using [Visual Studio Code (aka VS Code)](https://code.visualstudio.com/download) with [the Svelte extension](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode), but [support also exists for numerous other editors](https://sveltesociety.dev/tools#editor-support).
+[Visual Studio Code (通称 VS Code)](https://code.visualstudio.com/download) と [Svelte extension](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) のご使用をおすすめしますが、[他にも数多くのエディタをサポートしています](https://sveltesociety.dev/tools#editor-support)。
