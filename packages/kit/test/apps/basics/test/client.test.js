@@ -15,14 +15,33 @@ test.describe('beforeNavigate', () => {
 		await page.waitForLoadState('networkidle');
 
 		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
-		expect(await page.innerHTML('pre')).toBe('true');
+		expect(await page.innerHTML('pre')).toBe('true false link');
+	});
+
+	test('prevents navigation to external', async ({ page, baseURL }) => {
+		await page.goto('/before-navigate/prevent-navigation');
+		await page.click('h1'); // The browsers block attempts to prevent navigation on a frame that's never had a user gesture.
+
+		page.on('dialog', (dialog) => dialog.dismiss());
+
+		page.click('a[href="https://google.de"]'); // do NOT await this, promise only resolves after successful navigation, which never happens
+		await page.waitForTimeout(500);
+		await expect(page.locator('pre')).toHaveText('true true link');
+		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
 	});
 
 	test('prevents navigation triggered by goto', async ({ page, app, baseURL }) => {
 		await page.goto('/before-navigate/prevent-navigation');
 		await app.goto('/before-navigate/a');
 		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
-		expect(await page.innerHTML('pre')).toBe('true');
+		expect(await page.innerHTML('pre')).toBe('true false goto');
+	});
+
+	test('prevents external navigation triggered by goto', async ({ page, app, baseURL }) => {
+		await page.goto('/before-navigate/prevent-navigation');
+		await app.goto('https://google.de');
+		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
+		expect(await page.innerHTML('pre')).toBe('true true goto');
 	});
 
 	test('prevents navigation triggered by back button', async ({ page, app, baseURL }) => {
@@ -31,7 +50,7 @@ test.describe('beforeNavigate', () => {
 		await page.click('h1'); // The browsers block attempts to prevent navigation on a frame that's never had a user gesture.
 
 		await page.goBack();
-		expect(await page.innerHTML('pre')).toBe('true');
+		expect(await page.innerHTML('pre')).toBe('true false popstate');
 		expect(page.url()).toBe(baseURL + '/before-navigate/prevent-navigation');
 	});
 
@@ -47,6 +66,7 @@ test.describe('beforeNavigate', () => {
 
 		await page.close({ runBeforeUnload: true });
 		expect(await type).toBe('beforeunload');
+		expect(await page.innerHTML('pre')).toBe('true true leave');
 	});
 });
 
@@ -464,7 +484,7 @@ test.describe('Load', () => {
 			expect(await page.textContent('h1')).toBe('42');
 
 			expect(warnings).toContain(
-				`Loading http://localhost:${port}/load/window-fetch/data.json using \`window.fetch\`. For best results, use the \`fetch\` that is passed to your \`load\` function: https://kit.svelte.dev/docs/load#input-fetch`
+				`Loading http://localhost:${port}/load/window-fetch/data.json using \`window.fetch\`. For best results, use the \`fetch\` that is passed to your \`load\` function: https://kit.svelte.dev/docs/load#making-fetch-requests`
 			);
 
 			warnings.length = 0;
@@ -473,7 +493,7 @@ test.describe('Load', () => {
 			expect(await page.textContent('h1')).toBe('42');
 
 			expect(warnings).not.toContain(
-				`Loading http://localhost:${port}/load/window-fetch/data.json using \`window.fetch\`. For best results, use the \`fetch\` that is passed to your \`load\` function: https://kit.svelte.dev/docs/load#input-fetch`
+				`Loading http://localhost:${port}/load/window-fetch/data.json using \`window.fetch\`. For best results, use the \`fetch\` that is passed to your \`load\` function: https://kit.svelte.dev/docs/load#making-fetch-requests`
 			);
 		});
 	}
@@ -755,15 +775,27 @@ test.describe.serial('Invalidation', () => {
 		await page.goto('/load/invalidation/forced');
 		expect(await page.textContent('h1')).toBe('a: 0, b: 1');
 
-		await page.click('button');
-		await page.waitForLoadState('networkidle');
-		await page.waitForTimeout(200); // apparently necessary
+		await page.click('button.invalidateall');
+		await page.evaluate(() => window.promise);
 		expect(await page.textContent('h1')).toBe('a: 2, b: 3');
 
-		await page.click('button');
-		await page.waitForLoadState('networkidle');
-		await page.waitForTimeout(200);
+		await page.click('button.invalidateall');
+		await page.evaluate(() => window.promise);
 		expect(await page.textContent('h1')).toBe('a: 4, b: 5');
+	});
+
+	test('server-only load functions are re-run following goto with forced invalidation', async ({
+		page,
+		request
+	}) => {
+		await request.get('/load/invalidation/forced/reset');
+
+		await page.goto('/load/invalidation/forced');
+		expect(await page.textContent('h1')).toBe('a: 0, b: 1');
+
+		await page.click('button.goto');
+		await page.evaluate(() => window.promise);
+		expect(await page.textContent('h1')).toBe('a: 2, b: 3');
 	});
 
 	test('multiple invalidations run concurrently', async ({ page, request }) => {
@@ -830,6 +862,22 @@ test.describe.serial('Invalidation', () => {
 
 		await page.goBack();
 		expect(await page.textContent('pre')).toBe('{"a":"1"}');
+	});
+
+	test('route.id use is tracked for server-only load functions', async ({ page, clicknav }) => {
+		await page.goto('/load/invalidation/route/server/a');
+		expect(await page.textContent('h1')).toBe('route.id: /load/invalidation/route/server/a');
+
+		await clicknav('[href="/load/invalidation/route/server/b"]');
+		expect(await page.textContent('h1')).toBe('route.id: /load/invalidation/route/server/b');
+	});
+
+	test('route.id use is tracked for shared load functions', async ({ page, clicknav }) => {
+		await page.goto('/load/invalidation/route/shared/a');
+		expect(await page.textContent('h1')).toBe('route.id: /load/invalidation/route/shared/a');
+
+		await clicknav('[href="/load/invalidation/route/shared/b"]');
+		expect(await page.textContent('h1')).toBe('route.id: /load/invalidation/route/shared/b');
 	});
 });
 

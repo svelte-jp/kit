@@ -83,7 +83,7 @@ export type CSRPageNodeLoader = () => Promise<CSRPageNode>;
  */
 export type CSRRoute = {
 	id: string;
-	exec: (path: string) => undefined | Record<string, string>;
+	exec(path: string): undefined | Record<string, string>;
 	errors: Array<CSRPageNodeLoader | undefined>;
 	layouts: Array<[boolean, CSRPageNodeLoader] | undefined>;
 	leaf: [boolean, CSRPageNodeLoader];
@@ -169,6 +169,7 @@ export interface RouteData {
 	pattern: RegExp;
 	names: string[];
 	types: string[];
+	optional: boolean[];
 
 	layout: PageNode | null;
 	error: PageNode | null;
@@ -206,12 +207,7 @@ export type ServerData =
 export interface ServerDataNode {
 	type: 'data';
 	data: Record<string, any> | null;
-	uses: {
-		dependencies?: string[];
-		params?: string[];
-		parent?: number | void; // 1 or undefined
-		url?: number | void; // 1 or undefined
-	};
+	uses: Uses;
 }
 
 /**
@@ -260,7 +256,7 @@ export interface SSRNode {
 	/** external CSS files */
 	stylesheets: string[];
 	/** inlined styles */
-	inline_styles?: () => MaybePromise<Record<string, string>>;
+	inline_styles?(): MaybePromise<Record<string, string>>;
 
 	shared: {
 		load?: Load;
@@ -335,6 +331,7 @@ export interface SSRRoute {
 	pattern: RegExp;
 	names: string[];
 	types: string[];
+	optional: boolean[];
 
 	page: PageNodeIndexes | null;
 
@@ -343,7 +340,7 @@ export interface SSRRoute {
 
 export interface SSRState {
 	fallback?: string;
-	getClientAddress: () => string;
+	getClientAddress(): string;
 	initiator?: SSRRoute | SSRErrorPage;
 	platform?: any;
 	prerendering?: PrerenderOptions;
@@ -360,6 +357,7 @@ export interface Uses {
 	dependencies: Set<string>;
 	params: Set<string>;
 	parent: boolean;
+	route: boolean;
 	url: boolean;
 }
 

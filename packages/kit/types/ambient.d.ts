@@ -103,7 +103,7 @@ declare module '$app/forms' {
 		data: FormData;
 		form: HTMLFormElement;
 		controller: AbortController;
-		cancel: () => void;
+		cancel(): void;
 	}) =>
 		| void
 		| ((opts: {
@@ -114,7 +114,7 @@ declare module '$app/forms' {
 				 * Call this to get the default behavior of a form submission response.
 				 * @param options Set `reset: false` if you don't want the `<form>` values to be reset after a successful submission.
 				 */
-				update: (options?: { reset: boolean }) => Promise<void>;
+				update(options?: { reset: boolean }): Promise<void>;
 		  }) => void);
 
 	/**
@@ -144,7 +144,7 @@ declare module '$app/forms' {
 		 * If you provide a custom function with a callback and want to use the default behavior, invoke `update` in your callback.
 		 */
 		submit?: SubmitFunction<Success, Invalid>
-	): { destroy: () => void };
+	): { destroy(): void };
 
 	/**
 	 * この action は現在のページの `form` プロパティを与えられたデータで更新し、`$page.status` を更新します。
@@ -182,14 +182,32 @@ declare module '$app/navigation' {
 	 * SvelteKit が指定された `url` にナビゲーションしたときに解決する Promise を返します(ナビゲーションに失敗した場合は、Promise はリジェクトされます)。
 	 *
 	 * @param url Where to navigate to. Note that if you've set [`config.kit.paths.base`](https://kit.svelte.dev/docs/configuration#paths) and the URL is root-relative, you need to prepend the base path if you want to navigate within the app.
-	 * @param opts.replaceState If `true`, will replace the current `history` entry rather than creating a new one with `pushState`
-	 * @param opts.noscroll If `true`, the browser will maintain its scroll position rather than scrolling to the top of the page after navigation
-	 * @param opts.keepfocus If `true`, the currently focused element will retain focus after navigation. Otherwise, focus will be reset to the body
-	 * @param opts.state The state of the new/updated history entry
+	 * @param opts Options related to the navigation
 	 */
 	export function goto(
 		url: string | URL,
-		opts?: { replaceState?: boolean; noscroll?: boolean; keepfocus?: boolean; state?: any }
+		opts?: {
+			/**
+			 * If `true`, will replace the current `history` entry rather than creating a new one with `pushState`
+			 */
+			replaceState?: boolean;
+			/**
+			 * If `true`, the browser will maintain its scroll position rather than scrolling to the top of the page after navigation
+			 */
+			noScroll?: boolean;
+			/**
+			 * If `true`, the currently focused element will retain focus after navigation. Otherwise, focus will be reset to the body
+			 */
+			keepFocus?: boolean;
+			/**
+			 * The state of the new/updated history entry
+			 */
+			state?: any;
+			/**
+			 * If `true`, all `load` functions of the page will be rerun. See https://kit.svelte.dev/docs/load#invalidation for more info on invalidation.
+			 */
+			invalidateAll?: boolean;
+		}
 	): Promise<void>;
 	/**
 	 * 現在アクティブなページに属している `load` 関数が `fetch` や `depends` を通じて当該の `url` に依存している場合は `load` 関数を再実行させます。ページが更新されたときに解決される `Promise` を返します。
@@ -239,12 +257,12 @@ declare module '$app/navigation' {
 	 * リンクをクリックしたり、`goto(...)` を呼び出したり、ブラウザの 戻る/進む を使うなどして新しい URL にナビゲーションするその直前にトリガーされるナビゲーションインターセプターです。
 	 * `cancel()` を呼び出すと、ナビゲーションが完了するのを中止します。
 	 *
-	 * 外部の URL にナビゲーションしている場合、`navigation.to` は `null` になります。
+	 * ナビゲーションがクライアントサイドではない場合、`navigation.to.routeId` は `null` になります。
 	 *
 	 * `beforeNavigate` はコンポーネントの初期化中に呼び出す必要があります。コンポーネントがマウントされている間、アクティブな状態を維持します。
 	 */
 	export function beforeNavigate(
-		callback: (navigation: Navigation & { cancel: () => void }) => void
+		callback: (navigation: Navigation & { cancel(): void }) => void
 	): void;
 
 	/**
@@ -303,7 +321,7 @@ declare module '$app/stores' {
 	/**
 	 * 読み取り可能なストア(readable store)で、初期値は `false` です。[`version.pollInterval`](https://kit.svelte.jp/docs/configuration#version) が 0 以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` に更新します。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
 	 */
-	export const updated: Readable<boolean> & { check: () => boolean };
+	export const updated: Readable<boolean> & { check(): boolean };
 
 	/**
 	 * 全てのコンテクスチュアルなストア(contextual stores)を返す関数です。サーバー上では、コンポーネントの初期化時に呼び出す必要があります。

@@ -1,5 +1,125 @@
 # @sveltejs/kit
 
+## 1.0.0-next.535
+
+### Patch Changes
+
+- [breaking] call beforeNavigate once with type unload on external navigation, rename type 'load' to 'enter' and type 'unload' to 'leave', add 'willUnload' property ([#6813](https://github.com/sveltejs/kit/pull/6813))
+
+## 1.0.0-next.534
+
+### Patch Changes
+
+- [breaking] more consistent casing for goto options ([#7502](https://github.com/sveltejs/kit/pull/7502))
+
+- [breaking] replace routeId with route.id ([#7450](https://github.com/sveltejs/kit/pull/7450))
+
+- Fix nullish data node reference ([#7503](https://github.com/sveltejs/kit/pull/7503))
+
+## 1.0.0-next.533
+
+### Patch Changes
+
+- [fix] bump required Vite version and address warning ([#7491](https://github.com/sveltejs/kit/pull/7491))
+
+## 1.0.0-next.532
+
+### Patch Changes
+
+- Bump devalue version ([#7466](https://github.com/sveltejs/kit/pull/7466))
+
+## 1.0.0-next.531
+
+### Patch Changes
+
+- [breaking] change `config.kit.prerender.onError` to `handleHttpError`, and check for invalid fragment links ([#7375](https://github.com/sveltejs/kit/pull/7375))
+
+- fix escaping bug in crawler ([#7375](https://github.com/sveltejs/kit/pull/7375))
+
+## 1.0.0-next.530
+
+### Patch Changes
+
+- [fix] fetch erroring on Cloudflare ([#7453](https://github.com/sveltejs/kit/pull/7453))
+
+- Only simulate CORS errors for shared load functions ([#7454](https://github.com/sveltejs/kit/pull/7454))
+
+## 1.0.0-next.529
+
+### Patch Changes
+
+- [fix] better type generation for load functions with different return values ([#7425](https://github.com/sveltejs/kit/pull/7425))
+
+- [fix] correctly strip data suffix at root page ([#7445](https://github.com/sveltejs/kit/pull/7445))
+
+- update dependencies ([#7355](https://github.com/sveltejs/kit/pull/7355))
+
+## 1.0.0-next.528
+
+### Patch Changes
+
+- Restore `req.url` to `req.originalUrl` in dev and preview ([#7343](https://github.com/sveltejs/kit/pull/7343))
+
+## 1.0.0-next.527
+
+### Patch Changes
+
+- [fix] harmonize cookie path and add dev time warnings ([#7416](https://github.com/sveltejs/kit/pull/7416))
+
+* [feat] add invalidateAll option to goto ([#7407](https://github.com/sveltejs/kit/pull/7407))
+
+## 1.0.0-next.526
+
+### Patch Changes
+
+- declare function type with named syntax ([#7396](https://github.com/sveltejs/kit/pull/7396))
+
+* [fix] optional params can be undefined ([#7379](https://github.com/sveltejs/kit/pull/7379))
+
+- [fix] support undici 5.12.0 and pin it ([#7412](https://github.com/sveltejs/kit/pull/7412))
+
+* [chore] upgrade to vite-plugin-svelte 1.1.0 and enable prebundleSvelteLibraries ([#7388](https://github.com/sveltejs/kit/pull/7388))
+
+- Show more descriptive error if data returned from `load` is a non-POJO ([#7386](https://github.com/sveltejs/kit/pull/7386))
+
+## 1.0.0-next.525
+
+### Patch Changes
+
+- Always avoid caching form submission on enhanced forms ([#7350](https://github.com/sveltejs/kit/pull/7350))
+
+## 1.0.0-next.524
+
+### Patch Changes
+
+- [fix] get type gen working again ([#7370](https://github.com/sveltejs/kit/pull/7370))
+
+* [fix] don't run matchers for empty optional params ([#7346](https://github.com/sveltejs/kit/pull/7346))
+
+## 1.0.0-next.523
+
+### Patch Changes
+
+- [fix] split route ids into correct segments ([#7367](https://github.com/sveltejs/kit/pull/7367))
+
+## 1.0.0-next.522
+
+### Patch Changes
+
+- [docs] rewrite load docs ([#7174](https://github.com/sveltejs/kit/pull/7174))
+
+* [breaking] Prefix all route IDs with / ([#7338](https://github.com/sveltejs/kit/pull/7338))
+
+## 1.0.0-next.521
+
+### Patch Changes
+
+- [feat] add reset option to update method of enhance ([#7326](https://github.com/sveltejs/kit/pull/7326))
+
+* [breaking] remove global fetch override when prerendering ([#7318](https://github.com/sveltejs/kit/pull/7318))
+
+- Improve error message when prefetching fails ([#7314](https://github.com/sveltejs/kit/pull/7314))
+
 ## 1.0.0-next.520
 
 ### Patch Changes

@@ -172,6 +172,7 @@ export async function dev(vite, vite_config, svelte_config) {
 							pattern: route.pattern,
 							names: route.names,
 							types: route.types,
+							optional: route.optional,
 							page: route.page,
 							endpoint: endpoint
 								? async () => {
@@ -290,6 +291,8 @@ export async function dev(vite, vite_config, svelte_config) {
 		remove_static_middlewares(vite.middlewares);
 
 		vite.middlewares.use(async (req, res) => {
+			// Vite's base middleware strips out the base path. Restore it
+			req.url = req.originalUrl;
 			try {
 				const base = `${vite.config.server.https ? 'https' : 'http'}://${
 					req.headers[':authority'] || req.headers.host
@@ -436,7 +439,7 @@ export async function dev(vite, vite_config, svelte_config) {
 											'request in handleError has been replaced with event. See https://github.com/sveltejs/kit/pull/3384 for details'
 										);
 									}
-								}) ?? { message: event.routeId != null ? 'Internal Error' : 'Not Found' }
+								}) ?? { message: event.route.id != null ? 'Internal Error' : 'Not Found' }
 							);
 						},
 						hooks,

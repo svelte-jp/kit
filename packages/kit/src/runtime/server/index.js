@@ -5,10 +5,15 @@ import { respond_with_error } from './page/respond_with_error.js';
 import { coalesce_to_error } from '../../utils/error.js';
 import { is_form_content_type } from '../../utils/http.js';
 import { GENERIC_ERROR, handle_fatal_error } from './utils.js';
-import { decode_params, disable_search, normalize_path } from '../../utils/url.js';
+import {
+	decode_params,
+	disable_search,
+	has_data_suffix,
+	normalize_path,
+	strip_data_suffix
+} from '../../utils/url.js';
 import { exec } from '../../utils/routing.js';
 import { render_data } from './data/index.js';
-import { DATA_SUFFIX } from '../../constants.js';
 import { add_cookies_to_headers, get_cookies } from './cookie.js';
 import { HttpError } from '../control.js';
 import { create_fetch } from './fetch.js';
@@ -57,8 +62,8 @@ export async function respond(request, options, state) {
 		decoded = decoded.slice(options.paths.base.length) || '/';
 	}
 
-	const is_data_request = decoded.endsWith(DATA_SUFFIX);
-	if (is_data_request) decoded = decoded.slice(0, -DATA_SUFFIX.length) || '/';
+	const is_data_request = has_data_suffix(decoded);
+	if (is_data_request) decoded = strip_data_suffix(decoded) || '/';
 
 	if (!state.prerendering?.fallback) {
 		const matchers = await options.manifest._.matchers();
@@ -67,7 +72,7 @@ export async function respond(request, options, state) {
 			const match = candidate.pattern.exec(decoded);
 			if (!match) continue;
 
-			const matched = exec(match, candidate.names, candidate.types, matchers);
+			const matched = exec(match, candidate, matchers);
 			if (matched) {
 				route = candidate;
 				params = decode_params(matched);
@@ -96,7 +101,7 @@ export async function respond(request, options, state) {
 	/** @type {Record<string, string>} */
 	const headers = {};
 
-	const { cookies, new_cookies, get_cookie_header } = get_cookies(request, url);
+	const { cookies, new_cookies, get_cookie_header } = get_cookies(request, url, options);
 
 	if (state.prerendering) disable_search(url);
 
@@ -116,7 +121,7 @@ export async function respond(request, options, state) {
 		params,
 		platform: state.platform,
 		request,
-		routeId: route && route.id,
+		route: { id: route?.id ?? null },
 		setHeaders: (new_headers) => {
 			for (const key in new_headers) {
 				const lower = key.toLowerCase();
@@ -173,7 +178,8 @@ export async function respond(request, options, state) {
 		path: removed('path', 'url.pathname'),
 		query: removed('query', 'url.searchParams'),
 		body: body_getter,
-		rawBody: body_getter
+		rawBody: body_getter,
+		routeId: removed('routeId', 'route.id')
 	});
 
 	/** @type {import('types').RequiredResolveOptions} */
@@ -300,8 +306,8 @@ export async function respond(request, options, state) {
 					}
 					add_cookies_to_headers(response.headers, Object.values(new_cookies));
 
-					if (state.prerendering && event.routeId !== null) {
-						response.headers.set('x-sveltekit-routeid', encodeURI(event.routeId));
+					if (state.prerendering && event.route.id !== null) {
+						response.headers.set('x-sveltekit-routeid', encodeURI(event.route.id));
 					}
 
 					return response;

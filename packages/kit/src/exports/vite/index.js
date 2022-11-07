@@ -34,8 +34,10 @@ const enforced_config = {
 			formats: true
 		},
 		manifest: true,
+		modulePreload: {
+			polyfill: true
+		},
 		outDir: true,
-		polyfillModulePreload: true,
 		rollupOptions: {
 			input: true,
 			output: {
@@ -61,7 +63,7 @@ const enforced_config = {
 
 /** @return {import('vite').Plugin[]} */
 export function sveltekit() {
-	return [...svelte(), kit()];
+	return [...svelte({ prebundleSvelteLibraries: true }), kit()];
 }
 
 /**
