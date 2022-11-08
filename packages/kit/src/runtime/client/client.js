@@ -1,5 +1,11 @@
 import { onMount, tick } from 'svelte';
-import { make_trackable, decode_params, normalize_path, add_data_suffix } from '../../utils/url.js';
+import {
+	make_trackable,
+	decode_pathname,
+	decode_params,
+	normalize_path,
+	add_data_suffix
+} from '../../utils/url.js';
 import { find_anchor, get_base_uri, scroll_state } from './utils.js';
 import {
 	lock_fetch,
@@ -83,10 +89,10 @@ export function create_client({ target, base, trailing_slash }) {
 	let load_cache = null;
 
 	const callbacks = {
-		/** @type {Array<(navigation: import('types').Navigation & { cancel: () => void }) => void>} */
+		/** @type {Array<(navigation: import('types').BeforeNavigate) => void>} */
 		before_navigate: [],
 
-		/** @type {Array<(navigation: import('types').Navigation) => void>} */
+		/** @type {Array<(navigation: import('types').AfterNavigate) => void>} */
 		after_navigate: []
 	};
 
@@ -382,7 +388,7 @@ export function create_client({ target, base, trailing_slash }) {
 		});
 		post_update();
 
-		/** @type {import('types').Navigation} */
+		/** @type {import('types').AfterNavigate} */
 		const navigation = {
 			from: null,
 			to: add_url_properties('to', {
@@ -992,7 +998,7 @@ export function create_client({ target, base, trailing_slash }) {
 	function get_navigation_intent(url, invalidating) {
 		if (is_external_url(url)) return;
 
-		const path = decodeURI(url.pathname.slice(base.length) || '/');
+		const path = decode_pathname(url.pathname.slice(base.length) || '/');
 
 		for (const route of routes) {
 			const params = route.exec(path);
@@ -1116,7 +1122,9 @@ export function create_client({ target, base, trailing_slash }) {
 			nav_token,
 			() => {
 				navigating = false;
-				callbacks.after_navigate.forEach((fn) => fn(navigation));
+				callbacks.after_navigate.forEach((fn) =>
+					fn(/** @type {import('types').AfterNavigate} */ (navigation))
+				);
 				stores.navigating.set(null);
 			}
 		);
@@ -1307,7 +1315,7 @@ export function create_client({ target, base, trailing_slash }) {
 				if (!navigating) {
 					// If we're navigating, beforeNavigate was already called. If we end up in here during navigation,
 					// it's due to an external or full-page-reload link, for which we don't want to call the hook again.
-					/** @type {import('types').Navigation & { cancel: () => void }} */
+					/** @type {import('types').BeforeNavigate} */
 					const navigation = {
 						from: add_url_properties('from', {
 							params: current.params,

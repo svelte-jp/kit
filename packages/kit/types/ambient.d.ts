@@ -171,7 +171,7 @@ declare module '$app/forms' {
  * ```
  */
 declare module '$app/navigation' {
-	import { Navigation } from '@sveltejs/kit';
+	import { BeforeNavigate, AfterNavigate } from '@sveltejs/kit';
 
 	/**
 	 * ナビゲーション後のページ更新の時にこれが(例えば `onMount`、`afterNavigate` の中や action で)呼び出された場合、SvelteKit の組み込みのスクロール処理を無効にします。
@@ -261,16 +261,14 @@ declare module '$app/navigation' {
 	 *
 	 * `beforeNavigate` はコンポーネントの初期化中に呼び出す必要があります。コンポーネントがマウントされている間、アクティブな状態を維持します。
 	 */
-	export function beforeNavigate(
-		callback: (navigation: Navigation & { cancel(): void }) => void
-	): void;
+	export function beforeNavigate(callback: (navigation: BeforeNavigate) => void): void;
 
 	/**
 	 * 現在のコンポーネントがマウントされるときや、新しい URL に移動するときに、与えられた `callback` を実行するライフサイクル関数です。
 	 *
 	 * `afterNavigate` はコンポーネントの初期化中に呼び出す必要があります。コンポーネントがマウントされている間、アクティブな状態を維持します。
 	 */
-	export function afterNavigate(callback: (navigation: Navigation) => void): void;
+	export function afterNavigate(callback: (navigation: AfterNavigate) => void): void;
 }
 
 /**
