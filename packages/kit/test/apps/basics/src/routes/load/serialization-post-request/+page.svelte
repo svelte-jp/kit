@@ -3,6 +3,5 @@
 	export let data;
 </script>
 
-Cookie: <span id="cookie-value">
-	{data.encoding}
-</span>
+<h1>a: {data.a}</h1>
+<h2>b: {data.b}</h2>

@@ -83,7 +83,7 @@ export async function load({ fetch }) {
 
 ### ssr
 
-通常、SvelteKit ではページを最初にサーバーでレンダリングし、その HTML をクライアントに送信してハイドレーションを行います。もし `ssr` を `false` に設定した場合、代わりに空の 'shell' ページがレンダリングされます。これはページがサーバーでレンダリングできない場合には便利 (例えば `document` などのブラウザオンリーな globals を使用するなど) ですが、ほとんどの状況では推奨されません ([appendix をご参照ください](/docs/glossary#ssr))。If you put this into your root `+layout.js`, you create an SPA (all pages are client-side rendered only).
+通常、SvelteKit ではページを最初にサーバーでレンダリングし、その HTML をクライアントに送信してハイドレーションを行います。もし `ssr` を `false` に設定した場合、代わりに空の 'shell' ページがレンダリングされます。これはページがサーバーでレンダリングできない場合には便利 (例えば `document` などのブラウザオンリーな globals を使用するなど) ですが、ほとんどの状況では推奨されません ([appendix をご参照ください](/docs/glossary#ssr))。
 
 ```js
 /// file: +page.js
