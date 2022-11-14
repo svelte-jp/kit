@@ -10,4 +10,12 @@ SvelteKit では、`src/service-worker.js` ファイル（または `src/service
 
 Service Worker の内部では、[`$service-worker` モジュール](/docs/modules#$service-worker) にアクセスすることができます。Vite コンフィグで `define` が設定されている場合、server/client のビルドと同様、service worker にもそれが適用されます。
 
-Service Worker は（現状はブラウザがまだ import をサポートしていないので）バンドルする必要があり、クライアント側アプリのビルドマニフェストに依存するため、**Service Worker は本番ビルドでのみ機能します。開発モードでは機能しません。**。ローカル環境でテストするには、`vite preview` を使用してください。
+The service worker is bundled for production, but not during development. For that reason, only browsers that support [modules in service workers](https://web.dev/es-modules-in-sw) will be able to use them at dev time. If you are manually registering your service worker, you will need to pass the `{ type: 'module' }` option in development:
+
+```js
+import { dev } from '$app/environment';
+
+navigator.serviceWorker.register('/service-worker.js', {
+	type: dev ? 'module' : 'classic'
+});
+```

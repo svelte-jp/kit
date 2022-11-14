@@ -86,6 +86,8 @@ export async function handle({ event, resolve }) {
 }
 ```
 
+Note that `resolve(...)` will never throw an error, it will always return a `Promise<Response>` with the appropriate status code. If an error is thrown elsewhere during `handle`, it is treated as fatal, and SvelteKit will respond with a JSON representation of the error or a fallback error page — which can be customised via `src/error.html` — depending on the `Accept` header. You can read more about error handling [here](/docs/errors).
+
 #### handleFetch
 
 この関数は、サーバー上で (またはプリレンダリング中に) 実行される `load` 関数の中で発生する `fetch` リクエストを変更 (または置換) することできます。
@@ -93,6 +95,7 @@ export async function handle({ event, resolve }) {
 例えば、ユーザーがクライアントサイドでそれぞれのページに移動する際に、`load` 関数で `https://api.yourapp.com` のようなパブリックな URL にリクエストを行うかもしれませんが、SSR の場合には (パブリックなインターネットとの間にあるプロキシやロードバランサーをバイパスして) API を直接呼ぶほうが理にかなっているでしょう。
 
 ```js
+/// file: src/hooks.server.js
 /** @type {import('@sveltejs/kit').HandleFetch} */
 export async function handleFetch({ request, fetch }) {
 	if (request.url.startsWith('https://api.yourapp.com/')) {

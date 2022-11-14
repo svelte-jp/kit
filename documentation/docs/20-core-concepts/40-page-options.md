@@ -62,6 +62,8 @@ export async function load({ fetch }) {
 
 プリレンダリング中に [`url.searchParams`](/docs/load#using-url-data-url) にアクセスすることは禁止されています。もし使う必要があるなら、ブラウザの中だけで行うようにしてください (例えば `onMount` の中で)。
 
+Pages with [actions](/docs/form-actions) cannot be prerendered, because a server must be able to handle the action `POST` requests.
+
 #### ルートの衝突(Route conflicts)
 
 プリレンダリングはファイルシステムに書き込むため、ディレクトリとファイルが同じ名前になるエンドポイントを2つ持つことはできません。例えば、`src/routes/foo/+server.js` と `src/routes/foo/bar/+server.js` の場合は、`foo` と `foo/bar` を作成しようとしますが、これは不可能です。

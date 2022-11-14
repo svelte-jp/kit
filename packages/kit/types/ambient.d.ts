@@ -342,6 +342,7 @@ declare module '$app/stores' {
 declare module '$service-worker' {
 	/**
 	 * Viteが生成するファイルを表すURL文字列の配列で、`cache.addAll(build)` を使ってキャッシュするのに適しています。
+	 * During development, this is be an empty array.
 	 */
 	export const build: string[];
 	/**
@@ -350,6 +351,7 @@ declare module '$service-worker' {
 	export const files: string[];
 	/**
 	 * プリレンダリングされたページとエンドポイントに合致するパス名の配列です。
+	 * During development, this is be an empty array.
 	 */
 	export const prerendered: string[];
 	/**
