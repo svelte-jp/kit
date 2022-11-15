@@ -2,17 +2,17 @@
 title: Errors
 ---
 
-Errors are an inevitable fact of software development. SvelteKit handles errors differently depending on where they occur, what kind of errors they are, and the nature of the incoming request.
+ソフトウェア開発において、エラーは避けられないものです。SvelteKit では、エラーが発生した場所、エラーの種類、受信したリクエストの性質に応じて、異なる方法でエラーを処理します。
 
 ### Error objects
 
-SvelteKit distinguishes between expected and unexpected errors, both of which are represented as simple `{ message: string }` objects by default.
+SvelteKit は想定されるエラーと予期せぬエラーを区別します。どちらもデフォルトではシンプルな `{ message: string }` オブジェクトとして表現されます。
 
-You can add additional properties, like a `code` or a tracking `id`, as shown below.
+以下のように、`code` やトラッキング `id` を追加することができます。
 
 ### Expected errors
 
-An _expected_ error is one created with the [`error`](/docs/modules#sveltejs-kit-error) helper imported from `@sveltejs/kit`:
+想定されるエラーとは、`@sveltejs/kit` からインポートされる [`error`](/docs/modules#sveltejs-kit-error) を使用して作成されるものを指します:
 
 ```js
 /// file: src/routes/blog/[slug]/+page.server.js
@@ -40,7 +40,7 @@ export async function load({ params }) {
 }
 ```
 
-This tells SvelteKit to set the response status code to 404 and render an [`+error.svelte`](/docs/routing#error) component, where `$page.error` is the object provided as the second argument to `error(...)`.
+こうすると、SvelteKit はレスポンスのステータスコードを 404 に設定し、[`+error.svelte`](/docs/routing#error) コンポーネントをレンダリングします。`$page.error` は `error(...)` に第二引数として渡されたオブジェクトです。
 
 ```svelte
 /// file: src/routes/+error.svelte
@@ -51,7 +51,7 @@ This tells SvelteKit to set the response status code to 404 and render an [`+err
 <h1>{$page.error.message}</h1>
 ```
 
-You can add extra properties to the error object if needed...
+必要に応じて、エラーオブジェクトにプロパティを追加することができます…
 
 ```diff
 throw error(404, {
@@ -60,7 +60,7 @@ throw error(404, {
 });
 ```
 
-...otherwise, for convenience, you can pass a string as the second argument:
+…追加しない場合は、便宜上、文字列を第二引数に渡すことができます:
 
 ```diff
 -throw error(404, { message: 'Not found' });
@@ -69,15 +69,15 @@ throw error(404, {
 
 ### Unexpected errors
 
-An _unexpected_ error is any other exception that occurs while handling a request. Since these can contain sensitive information, unexpected error messages and stack traces are not exposed to users.
+予期せぬエラーとは、リクエストの処理中に発生するその他の例外のことを指します。これらは機密情報を含むことがあるため、予期せぬエラーのメッセージとスタックトレースはユーザーには公開されません。
 
-By default, unexpected errors are printed to the console (or, in production, your server logs), while the error that is exposed to the user has a generic shape:
+デフォルトでは、予期せぬエラーはコンソール (または、本番環境では、サーバーログ) に出力され、ユーザーに公開されるエラーはこのように汎用的な形式です。
 
 ```json
 { "message": "Internal Error" }
 ```
 
-Unexpected errors will go through the [`handleError`](/docs/hooks#shared-hooks-handleerror) hook, where you can add your own error handling — for example, sending errors to a reporting service, or returning a custom error object. 
+予期せぬエラーは [`handleError`](/docs/hooks#shared-hooks-handleerror) hook を通ります。ここで、独自のエラーハンドリングを追加することができます。例えば、レポーティングサービスにエラーを送ったり、カスタムのエラーオブジェクトを返したりすることができます。
 
 ```js
 /// file: src/hooks.server.js
@@ -101,9 +101,9 @@ export function handleError({ error, event }) {
 
 ### Responses
 
-If an error occurs inside `handle` or inside a [`+server.js`](/docs/routing#server) request handler, SvelteKit will respond with either a fallback error page or a JSON representation of the error object, depending on the request's `Accept` headers.
+もし `handle` の中や [`+server.js`](/docs/routing#server) リクエストハンドラの中でエラーが発生した場合、SvelteKit はリクエストの `Accept` ヘッダー に応じて、フォールバックエラーページか、エラーオブジェクトの JSON 表現をレスポンスとして返します。
 
-You can customise the fallback error page by adding a `src/error.html` file:
+`src/error.html` ファイルを追加することで、フォールバックエラーページをカスタマイズすることができます:
 
 ```html
 <!DOCTYPE html>
@@ -120,15 +120,15 @@ You can customise the fallback error page by adding a `src/error.html` file:
 </html>
 ```
 
-SvelteKit will replace `%sveltekit.status%` and `%sveltekit.error.message%` with their corresponding values.
+SvelteKit が `%sveltekit.status%` と `%sveltekit.error.message%` を、それぞれ対応する値に置き換えます。
 
-If the error instead occurs inside a `load` function while rendering a page, SvelteKit will render the [`+error.svelte`](/docs/routing#error) component nearest to where the error occurred.
+ページのレンダリング中に `load` 関数の中でエラーが発生した場合、SvelteKit はエラーが発生した場所に最も近い [`+error.svelte`](/docs/routing#error) コンポーネントをレンダリングします。
 
-The exception is when the error occurs inside the root `+layout.js` or `+layout.server.js`, since the root layout would ordinarily _contain_ the `+error.svelte` component. In this case, SvelteKit uses the fallback error page.
+例外は、最上位の `+layout.js` や `+layout.server.js` の中でエラーが発生した場合です。通常、最上位のレイアウトには `+error.svelte` コンポーネントが含まれているためです。この場合、SvelteKit はフォールバックエラーページを使用します。
 
 ### Type safety
 
-If you're using TypeScript and need to customize the shape of errors, you can do so by declaring an `App.Error` interface in your app (by convention, in `src/app.d.ts`, though it can live anywhere that TypeScript can 'see'):
+もし TypeScript を使用していてエラーの形式をカスタマイズする必要がある場合、アプリで `App.Error` インターフェイスを宣言することでそれができます (慣習ではこれを `src/app.d.ts` に書きますが、TypeScript が '参照' することができればどこでも構いません):
 
 ```ts
 /// file: src/app.d.ts
@@ -140,4 +140,4 @@ namespace App {
 }
 ```
 
-This interface always includes a `message: string` property.
+このインターフェイスは常に `message: string` プロパティを含んでいます。

@@ -86,7 +86,7 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-Note that `resolve(...)` will never throw an error, it will always return a `Promise<Response>` with the appropriate status code. If an error is thrown elsewhere during `handle`, it is treated as fatal, and SvelteKit will respond with a JSON representation of the error or a fallback error page — which can be customised via `src/error.html` — depending on the `Accept` header. You can read more about error handling [here](/docs/errors).
+`resolve(...)` は決してエラーをスローせず、適切なステータスコードと `Promise<Response>` を返すことにご注意ください。もし `handle` 中に他の場所でエラーがスローされた場合、それは致命的(fatal)なものとして扱われ、SvelteKit は `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズ可能なフォールバックエラーページをレスポンスとして返します。エラーハンドリングの詳細は [こちら](/docs/errors) からお読み頂けます。
 
 #### handleFetch
 
@@ -139,7 +139,7 @@ export async function handleFetch({ event, request, fetch }) {
 予期せぬエラーがロード中またはレンダリング中にスローされると、この関数が `error` と `event` を引数にとって呼び出されます。これによって2つのことが可能になります:
 
 - エラーをログに残すことができます
-- エラーからメッセージやスタックトレースなどの機密情報を省略し、ユーザーに見せても安全なカスタムの表現を生成することができます。戻り値は `$page.error` の値となります。デフォルトでは、404 (`event.route.id` が `null` になっていることで検知できます) の場合は `{ message: 'Not Found' }`、それ以外の場合は `{ message: 'Internal Error' }` となります。これを型安全にするために、`App.Error` インターフェースを宣言して、期待される形をカスタマイズすることができます (わかりやすいフォールバックの動作を保証するため、`message: string` を含めなければなりません)。
+- エラーからメッセージやスタックトレースなどの機密情報を省略し、ユーザーに見せても安全なカスタムの表現を生成することができます。戻り値は `$page.error` の値となります。デフォルトでは、404 (`event.route.id` が `null` になっていることで検知できます) の場合は `{ message: 'Not Found' }`、それ以外の場合は `{ message: 'Internal Error' }` となります。これを型安全にするために、`App.Error` インターフェイスを宣言して、期待される形をカスタマイズすることができます (わかりやすいフォールバックの動作を保証するため、`message: string` を含めなければなりません)。
 
 以下のコードは、エラーの形を `{ message: string; code: string }` として型付けし、それを `handleError` 関数から適宜返す例を示しています:
 

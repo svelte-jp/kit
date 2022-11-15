@@ -62,7 +62,7 @@ export async function load({ fetch }) {
 
 プリレンダリング中に [`url.searchParams`](/docs/load#using-url-data-url) にアクセスすることは禁止されています。もし使う必要があるなら、ブラウザの中だけで行うようにしてください (例えば `onMount` の中で)。
 
-Pages with [actions](/docs/form-actions) cannot be prerendered, because a server must be able to handle the action `POST` requests.
+[action](/docs/form-actions) 付きのページは、サーバーがその action の `POST` リクエストを処理できなければならないため、プリレンダリングできません。
 
 #### ルートの衝突(Route conflicts)
 

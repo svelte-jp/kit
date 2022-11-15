@@ -233,9 +233,9 @@ export const actions = {
 
 ### Loading data
 
-After an action runs, the page will be re-rendered (unless a redirect or an unexpected error occurs), with the action's return value available to the page as the `form` prop. This means that your page's `load` functions will run after the action completes.
+action の実行後、そのページは (リダイレクトや予期せぬエラーが発生しない限り) 再レンダリングされ、action の戻り値が `form` プロパティとしてそのページで使用できるようになります。つまり、ページの `load` 関数は、action が完了したあとに実行されるということです。
 
-Note that `handle` runs before the action is invoked, and does not re-run before the `load` functions. This means that if, for example, you use `handle` to populate `event.locals` based on a cookie, you must update `event.locals` when you set or delete the cookie in an action:
+`handle` は action が呼び出される前に実行され、`load` 関数より前に再実行されることはないことに注意してください。つまり、例えば `handle` を使用して cookie を元に `event.locals` に値を入れる場合、action で cookie を設定したり削除したりするときは `event.locals` を更新しなければなりません:
 
 ```js
 /// file: src/hooks.server.js
