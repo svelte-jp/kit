@@ -1,5 +1,39 @@
 # @sveltejs/kit
 
+## 1.0.0-next.548
+
+### Patch Changes
+
+- Only apply polyfills where necessary ([#7668](https://github.com/sveltejs/kit/pull/7668))
+
+## 1.0.0-next.547
+
+### Patch Changes
+
+- [fix] safely join url segments in manifest ([#7653](https://github.com/sveltejs/kit/pull/7653))
+
+- [breaking] use devalue to (de)serialize action data ([#7494](https://github.com/sveltejs/kit/pull/7494))
+
+- Warn if `%sveltekit.body%` is direct child of `<body>` ([#7652](https://github.com/sveltejs/kit/pull/7652))
+
+## 1.0.0-next.546
+
+### Patch Changes
+
+- fix outdated config error ([#7649](https://github.com/sveltejs/kit/pull/7649))
+
+- [breaking] use hex/unicode escape sequences for encoding special characters in route directory names ([#7644](https://github.com/sveltejs/kit/pull/7644))
+
+- fix `beforeNavigate` description — `routeId` -> `route.id` ([#7643](https://github.com/sveltejs/kit/pull/7643))
+
+## 1.0.0-next.545
+
+### Patch Changes
+
+- [fix] prerendering path and layout fixes ([#7639](https://github.com/sveltejs/kit/pull/7639))
+
+- [fix] add Promise return type to the `enhance` action ([#7629](https://github.com/sveltejs/kit/pull/7629))
+
 ## 1.0.0-next.544
 
 ### Patch Changes

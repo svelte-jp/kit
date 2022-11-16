@@ -42,7 +42,7 @@ my-project/
 - `routes` にはアプリケーションの [ルート(routes)](/docs/routing) を格納します
 - `app.html` はページのテンプレートで、以下のプレースホルダーを含む HTML document です:
   - `%sveltekit.head%` — アプリに必要な `<link>` 要素や `<script>` 要素、`<svelte:head>` コンテンツ 
-  - `%sveltekit.body%` — レンダリングされるページのためのマークアップです。通常、これは直接 `<body>` の中に置かれるのではなく、`<div>` または他の要素の中に置かれます。ブラウザ拡張(browser extensions)が要素を注入するのをハイドレーションプロセスが破壊してしまう、というバグを防ぐためです
+  - `%sveltekit.body%` — レンダリングされるページのためのマークアップです。これを直接 `<body>` の中に置くのではなく、`<div>` または他の要素の中に置く必要があります。ブラウザ拡張(browser extensions)が要素を注入するのをハイドレーションプロセスが破壊してしまう、というバグを防ぐためです。もしこうなっていない場合、SvelteKit は開発中に警告を出します
   - `%sveltekit.assets%` — [`paths.assets`](/docs/configuration#paths) が指定されている場合は [`paths.assets`](/docs/configuration#paths)、指定されていない場合は [`paths.base`](/docs/configuration#paths) への相対パス
   - `%sveltekit.nonce%` — マニュアルで含めるリンクやスクリプトの [CSP](/docs/configuration#csp) nonce (使用する場合)
 - `error.html` (optional) 全てが失敗したときにレンダリングされるページです。以下のプレースホルダーを含めることができます:

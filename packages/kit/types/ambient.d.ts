@@ -95,6 +95,8 @@ declare module '$app/environment' {
 declare module '$app/forms' {
 	import type { ActionResult } from '@sveltejs/kit';
 
+	type MaybePromise<T> = T | Promise<T>;
+
 	export type SubmitFunction<
 		Success extends Record<string, unknown> | undefined = Record<string, any>,
 		Invalid extends Record<string, unknown> | undefined = Record<string, any>
@@ -104,7 +106,7 @@ declare module '$app/forms' {
 		form: HTMLFormElement;
 		controller: AbortController;
 		cancel(): void;
-	}) =>
+	}) => MaybePromise<
 		| void
 		| ((opts: {
 				form: HTMLFormElement;
@@ -115,7 +117,8 @@ declare module '$app/forms' {
 				 * @param options Set `reset: false` if you don't want the `<form>` values to be reset after a successful submission.
 				 */
 				update(options?: { reset: boolean }): Promise<void>;
-		  }) => void);
+		  }) => void)
+	>;
 
 	/**
 	 * この action は `<form>` 要素を強化(enhances)します。JavaScriptが無効化されていても `<form>` 要素自体は動作します。
@@ -154,6 +157,19 @@ declare module '$app/forms' {
 		Success extends Record<string, unknown> | undefined = Record<string, any>,
 		Invalid extends Record<string, unknown> | undefined = Record<string, any>
 	>(result: ActionResult<Success, Invalid>): Promise<void>;
+
+	/**
+	 * Use this function to deserialize the response from a form submission.
+	 * Usage:
+	 * ```
+	 * const res = await fetch('/form?/action', { method: 'POST', body: formData });
+	 * const result = deserialize(await res.text());
+	 * ```
+	 */
+	export function deserialize<
+		Success extends Record<string, unknown> | undefined = Record<string, any>,
+		Invalid extends Record<string, unknown> | undefined = Record<string, any>
+	>(serialized: string): ActionResult<Success, Invalid>;
 }
 
 /**
@@ -257,7 +273,7 @@ declare module '$app/navigation' {
 	 * リンクをクリックしたり、`goto(...)` を呼び出したり、ブラウザの 戻る/進む を使うなどして新しい URL にナビゲーションするその直前にトリガーされるナビゲーションインターセプターです。
 	 * `cancel()` を呼び出すと、ナビゲーションが完了するのを中止します。
 	 *
-	 * ナビゲーションがクライアントサイドではない場合、`navigation.to.routeId` は `null` になります。
+	 * ナビゲーションがクライアントサイドではない場合、`navigation.to.route.id` は `null` になります。
 	 *
 	 * `beforeNavigate` はコンポーネントの初期化中に呼び出す必要があります。コンポーネントがマウントされている間、アクティブな状態を維持します。
 	 */

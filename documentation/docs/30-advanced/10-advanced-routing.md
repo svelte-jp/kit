@@ -123,27 +123,42 @@ src/routes/[...catchall]/+page.svelte
 
 ### エンコード(Encoding)
 
-ディレクトリ名は URI デコードされるので、例えば `%40[username]` のようなディレクトリは `@` で始まる文字にマッチします:
+Some characters can't be used on the filesystem — `/` on Linux and Mac, `\ / : * ? " < > |` on Windows. The `#` and `%` characters have special meaning in URLs, and the `[ ] ( )` characters have special meaning to SvelteKit, so these also can't be used directly as part of your route.
+
+To use these characters in your routes, you can use hexadecimal escape sequences, which have the format `[x+nn]` where `nn` is a hexadecimal character code:
+
+- `\` — `[x+5c]`
+- `/` — `[x+2f]`
+- `:` — `[x+3a]`
+- `*` — `[x+2a]`
+- `?` — `[x+3f]`
+- `"` — `[x+22]`
+- `<` — `[x+3c]`
+- `>` — `[x+3e]`
+- `|` — `[x+7c]`
+- `#` — `[x+23]`
+- `%` — `[x+25]`
+- `[` — `[x+5b]`
+- `]` — `[x+5d]`
+- `(` — `[x+28]`
+- `)` — `[x+29]`
+
+For example, to create a `/smileys/:-)` route, you would create a `src/routes/smileys/[x+3a]-[x+29]/+page.svelte` file.
+
+You can determine the hexadecimal code for a character with JavaScript:
 
 ```js
-// @filename: ambient.d.ts
-declare global {
-	const assert: {
-		equal: (a: any, b: any) => boolean;
-	};
-}
-
-export {};
-
-// @filename: index.js
-// ---cut---
-assert.equal(
-	decodeURIComponent('%40[username]'),
-	'@[username]'
-);
+':'.charCodeAt(0).toString(16); // '3a', hence '[x+3a]'
 ```
 
-`%` 文字を表すには `%25` を使用してください。そうしないと、不正確な結果となります。
+You can also use Unicode escape sequences. Generally you won't need to as you can use the unencoded character directly, but if — for some reason — you can't have a filename with an emoji in it, for example, then you can use the escaped characters. In other words, these are equivalent:
+
+```
+src/routes/[u+d83e][u+dd2a]/+page.svelte
+src/routes/🤪/+page.svelte
+```
+
+The format for a Unicode escape sequence is `[u+nnnn]` where `nnnn` is a valid value between `0000` and `10ffff`. (Unlike JavaScript string escaping, there's no need to use surrogate pairs to represent code points above `ffff`.) To learn more about Unicode encodings, consult [Programming with Unicode](https://unicodebook.readthedocs.io/unicode_encodings.html).
 
 ### Advanced layouts
 
@@ -169,11 +184,15 @@ src/routes/
 
 `+page` を `(group)` の中に直接配置することもできます (例えば、`/` が `(app)` や `(marketing)` のページであるべき場合など)。
 
-次のセクションで示すように、グループの中にあるページとレイアウトは他のディレクトリと同様、レイアウトの階層から外れない限り、その上のレイアウトを継承します。上記の例では、`(app)/+layout.svelte` と `(marketing)/+layout.svelte` はどちらも `+layout.svelte` を継承します。
+#### Breaking out of layouts
+
+The root layout applies to every page of your app — if omitted, it defaults to `<slot />`. If you want some pages to have a different layout hierarchy than the rest, then you can put your entire app inside one or more groups _except_ the routes that should not inherit the common layouts.
+
+In the example above, the `/admin` route does not inherit either the `(app)` or `(marketing)` layouts.
 
 #### +page@
 
-逆に、アプリのルート(routes)によっては、レイアウトの階層から外す必要があるものがあるかもしれません。先程の例の `(app)` グループの中に `/item/[id]/embed` を追加してみましょう:
+Pages can break out of the current layout hierarchy on a route-by-route basis. Suppose we have an `/item/[id]/embed` route inside the `(app)` group from the previous example:
 
 ```diff
 src/routes/
@@ -189,6 +208,7 @@ src/routes/
 ```
 
 通常、これは最上位のレイアウト(root layout)と `(app)` レイアウトと `item` レイアウトと `[id]` レイアウトを継承します。`@` と、その後ろにセグメント名 (最上位のレイアウト(root layout)の場合は空文字列(empty string)) を追加することで、これらのレイアウトのどれかにリセットすることができます。この例では、以下のオプションから選択できます:
+
 - `+page@[id].svelte` -  `src/routes/(app)/item/[id]/+layout.svelte` を継承します
 - `+page@item.svelte` - `src/routes/(app)/item/+layout.svelte` を継承します
 - `+page@(app).svelte` - `src/routes/(app)/+layout.svelte` を継承します
@@ -207,8 +227,6 @@ src/routes/
 └ +layout.svelte
 ```
 
-最上位のレイアウト (root layout) から脱出することはできません。アプリに常に存在するので、例えば、アプリ全体の UI や振る舞いをそこに置くことができます。
-
 #### +layout@
 
 ページと同じように、同じ方法でレイアウト _自体_ をその親のレイアウトの階層から外すことができます。例えば、`+layout@.svelte` コンポーネントはその全ての子ルート(routes)の階層をリセットします。
@@ -220,7 +238,7 @@ src/routes/
 │ │ ├ [id]/
 │ │ │ ├ embed/
 │ │ │ │ └ +page.svelte  // (app)/item/[id]/+layout.svelte を使用します
-│ │ │ └ +layout.svelte  // (app)/item/+layout@.svelte を継承します
+│ │ │ ├ +layout.svelte  // (app)/item/+layout@.svelte を継承します
 │ │ │ └ +page.svelte    // (app)/item/+layout@.svelte を使用します
 │ │ └ +layout@.svelte   // 最上位のレイアウト(root layout)を継承し、(app)/+layout.svelte をスキップします
 │ └ +layout.svelte
