@@ -129,6 +129,10 @@ export async function load({ params }) {
 
 SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラー境界 (error boundary) を探します — もし上記のファイルが存在しない場合は、デフォルトのエラーページをレンダリングする前に `src/routes/blog/+error.svelte` を探しに行き、その次に `src/routes/+error.svelte` を探します。もしそれも失敗した場合は (または、最上位の `+error` の '上に' 位置する最上位の `+layout` の `load` 関数からエラーがスローされた場合)、SvelteKit は静的なフォールバックエラーページをレンダリングします。これは `src/error.html` ファイルを作成することでカスタマイズ可能です。
 
+> エラーが [`handle`](/docs/hooks#server-hooks-handle) の内側や [+server.js](#server) リクエストハンドラ の内側で発生した場合は、`+error.svelte` は使用されません。
+
+エラーハンドリングに関する詳細は [こちら](/docs/errors) からお読み頂けます。
+
 ### +layout
 
 これまで、ページを完全に独立したコンポーネントとして扱ってきました — ナビゲーションを行うと、既存の `+page.svelte` コンポーネントが破棄され、新しいページコンポーネントで置き換えられます。
@@ -156,7 +160,6 @@ SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラ�
 <slot></slot>
 ```
 
-If we create pages for `/`, `/about` and `/settings`...
 `/`、`/about`、`/settings` のためのページを作成する場合…
 
 ```html
@@ -268,7 +271,9 @@ export function GET({ url }) {
 
 `Response` の第一引数には [`ReadableStream`](https://developer.mozilla.org/ja/docs/Web/API/ReadableStream) を指定することができ、大量のデータをストリームしたり、server-sent events を作成したりすることができます (AWS Lambda のような、レスポンスをバッファするプラットフォームにデプロイする場合は除きます)。
 
-便宜上、`@sveltejs/kit` の `error`、`redirect`、`json` メソッドを使用することは可能です (ただし、使用する必要はありません)。`throw error(..)` はプレーンテキストのエラーレスポンスのみを返すことにご注意ください。
+便宜上、`@sveltejs/kit` の `error`、`redirect`、`json` メソッドを使用することは可能です (ただし、使用する必要はありません)。
+
+エラーがスローされる場合 (`throw error(...)` によるスローや、予期せぬエラーがスローされるどちらでも)、レスポンスは `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズすることができるフォールバックエラーページとなります。この場合、[`+error.svelte`](#error) コンポーネントはレンダリングされません。エラーハンドリングに関する詳細は [こちら](/docs/errors) からお読み頂けます。
 
 #### Receiving data
 

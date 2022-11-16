@@ -38,7 +38,7 @@ declare module 'your-library/Foo.svelte';
 import Foo from 'your-library/Foo.svelte';
 ```
 
-> You should avoid using [SvelteKit-specific modules](/docs/modules) like `$app` in your packages unless you intend for them to only be consumable by other SvelteKit projects. E.g. rather than using `import { browser } from '$app/environment'` you could use [`import.meta.env.SSR`](https://vitejs.dev/guide/env-and-mode.html#env-variables) to make the library available to all Vite-based projects or better yet use [Node conditional exports](https://nodejs.org/api/packages.html#conditional-exports) to make it work for all bundlers. You may also wish to pass in things like the current URL or a navigation action as a prop rather than relying directly on `$app/stores`, `$app/navigation`, etc. Writing your app in this more generic fashion will also make it easier to setup tools for testing, UI demos and so on.
+> SvelteKit プロジェクトで利用することだけを意図している場合を除いて、`$app` などの [SvelteKit 固有のモジュール](/docs/modules) をあなたのパッケージで使用するのは避けてください。例えば、`import { browser } from '$app/environment'` を使用するよりも、[`import.meta.env.SSR`](https://vitejs.dev/guide/env-and-mode.html#env-variables) を使用して全ての Vite ベースのプロジェクトで使用できるようにするか、もっと良いのは [Node conditional exports](https://nodejs.org/api/packages.html#conditional-exports) を使用して全てのバンドラーで動作するようにすることです。また、`$app/stores` や `$app/navigation` などに直接依存せずに、現在の URL やナビゲーションアクション(navigation action)などをプロパティとして渡したいケースもあるでしょう。より一般的な方法でアプリを書くことで、テストや UI デモなどのためのツールのセットアップも簡単になります。
 
 ### Options
 

@@ -13,6 +13,13 @@ import { render_modules } from './modules.js';
 import { parse_route_id } from '../../../../../../packages/kit/src/utils/routing.js';
 import ts from 'typescript';
 import MagicString from 'magic-string';
+import { fileURLToPath } from 'url';
+import { createHash } from 'crypto';
+
+const snippet_cache = fileURLToPath(new URL('../../../../.snippets', import.meta.url));
+if (!fs.existsSync(snippet_cache)) {
+	fs.mkdirSync(snippet_cache, { recursive: true });
+}
 
 const languages = {
 	bash: 'bash',
@@ -55,8 +62,6 @@ export async function read_file(file) {
 	const match = /\d{2}-(.+)\.md/.exec(file.split(path.sep).pop());
 	if (!match) return null;
 
-	const slug = match[1];
-
 	const markdown = fs
 		.readFileSync(`${base}/${file}`, 'utf-8')
 		.replace('**TYPES**', () => render_modules('types'))
@@ -69,8 +74,15 @@ export async function read_file(file) {
 	const { content, sections } = parse({
 		body: generate_ts_from_js(body),
 		file,
-		slug,
 		code: (source, language, current) => {
+			const hash = createHash('sha256');
+			hash.update(source + language + current);
+			const digest = hash.digest().toString('base64').replace(/\//g, '-');
+
+			if (fs.existsSync(`${snippet_cache}/${digest}.html`)) {
+				return fs.readFileSync(`${snippet_cache}/${digest}.html`, 'utf-8');
+			}
+
 			/** @type {Record<string, string>} */
 			const options = {};
 
@@ -214,7 +226,7 @@ export async function read_file(file) {
 
 			type_regex.lastIndex = 0;
 
-			return html
+			html = html
 				.replace(type_regex, (match, prefix, name) => {
 					if (options.link === 'false' || name === current) {
 						// we don't want e.g. RequestHandler to link to RequestHandler
@@ -241,6 +253,9 @@ export async function read_file(file) {
 							.join('');
 					}
 				);
+
+			fs.writeFileSync(`${snippet_cache}/${digest}.html`, html);
+			return html;
 		},
 		codespan: (text) => {
 			return (
@@ -267,12 +282,11 @@ export async function read_file(file) {
  * @param {{
  *   body: string;
  *   file: string;
- *   slug: string;
  *   code: (source: string, language: string, current: string) => string;
  *   codespan: (source: string) => string;
  * }} opts
  */
-function parse({ body, file, slug, code, codespan }) {
+function parse({ body, file, code, codespan }) {
 	const headings = [];
 
 	/** @type {import('./types').Section[]} */

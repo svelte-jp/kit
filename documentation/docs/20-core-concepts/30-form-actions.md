@@ -97,6 +97,12 @@ action はそれぞれ `RequestEvent` オブジェクトを受け取って、`re
 ```js
 // @errors: 2339 2304
 /// file: src/routes/login/+page.server.js
+/** @type {import('./$types').PageServerLoad} */
+export async function load({ cookies }) {
+	const user = await db.getUserFromSession(cookies.get('sessionid'));
+	return { user };
+}
+
 /** @type {import('./$types').Actions} */
 export const actions = {
 	login: async ({ cookies, request }) => {
@@ -221,6 +227,70 @@ export const actions = {
 	},
 	register: async (event) => {
 		// TODO register the user
+	}
+};
+```
+
+### Loading data
+
+action の実行後、そのページは (リダイレクトや予期せぬエラーが発生しない限り) 再レンダリングされ、action の戻り値が `form` プロパティとしてそのページで使用できるようになります。つまり、ページの `load` 関数は、action が完了したあとに実行されるということです。
+
+`handle` は action が呼び出される前に実行され、`load` 関数より前に再実行されることはないことに注意してください。つまり、例えば `handle` を使用して cookie を元に `event.locals` に値を入れる場合、action で cookie を設定したり削除したりするときは `event.locals` を更新しなければなりません:
+
+```js
+/// file: src/hooks.server.js
+// @filename: ambient.d.ts
+declare namespace App {
+	interface Locals {
+		user: {
+			name: string;
+		} | null
+	}
+}
+
+// @filename: global.d.ts
+declare global {
+	function getUser(sessionid: string | undefined): {
+		name: string;
+	};
+}
+
+export {};
+
+// @filename: index.js
+// ---cut---
+/** @type {import('@sveltejs/kit').Handle} */
+export async function handle({ event, resolve }) {
+	event.locals.user = await getUser(event.cookies.get('sessionid'));
+	return resolve(event);
+}
+```
+
+```js
+/// file: src/routes/account/+page.server.js
+// @filename: ambient.d.ts
+declare namespace App {
+	interface Locals {
+		user: {
+			name: string;
+		} | null
+	}
+}
+
+// @filename: index.js
+// ---cut---
+/** @type {import('./$types').PageServerLoad} */
+export function load(event) {
+	return {
+		user: event.locals.user
+	};
+}
+
+/** @type {import('./$types').Actions} */
+export const actions = {
+	logout: async (event) => {
+		event.cookies.delete('sessionid');
+		event.locals.user = null;
 	}
 };
 ```

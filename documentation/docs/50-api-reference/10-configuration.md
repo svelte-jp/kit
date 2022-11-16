@@ -257,9 +257,9 @@ export default config;
 - `handleHttpError`
 
   - `'fail'` — (デフォルト) リンクをたどったときにルーティングエラーが発生した場合、ビルドを失敗させます
-  - `'ignore'` - silently ignore the failure and continue
-  - `'warn'` — continue, but print a warning
-  - `(details) => void` — a custom error handler that takes a `details` object with `status`, `path`, `referrer`, `referenceType` and `message` properties. If you `throw` from this function, the build will fail
+  - `'ignore'` - 失敗を無視して継続させます
+  - `'warn'` — 継続しますが、警告(warning)を出力します
+  - `(details) => void` — `status`、`path`、`referrer`、`referenceType`、`message` プロパティを持つ `details` オブジェクトを引数に取るカスタムのエラーハンドラです。この関数から `throw` されると、ビルドが失敗します
   
       ```js
     /** @type {import('@sveltejs/kit').Config} */
@@ -282,10 +282,10 @@ export default config;
 
 - `handleMissingId`
 
-  - `'fail'` — (default) fails the build when a prerendered page links to another prerendered page with a `#` fragment that doesn't correspond to an `id`
-  - `'ignore'` - silently ignore the failure and continue
-  - `'warn'` — continue, but print a warning
-  - `(details) => void` — a custom error handler that takes a `details` object with `path`, `id`, `referrers` and `message` properties. If you `throw` from this function, the build will fail
+  - `'fail'` — (default) プリレンダリングページから他のプリレンダリングページへの、`#` フラグメントを使用しているリンクが、`id` に一致しない場合、ビルドを失敗させます
+  - `'ignore'` - 失敗を無視して継続させます
+  - `'warn'` — 継続しますが、警告(warning)を出力します
+  - `(details) => void` — `path`、`id`、`referrers`、`message` プロパティを持つ `details` オブジェクトを引数に取るカスタムのエラーハンドラです。この関数から `throw` されると、ビルドが失敗します
 
 - `origin` — プリレンダリング時の `url.origin` の値です。レンダリングされたコンテンツに含まれている場合に有用です。
 

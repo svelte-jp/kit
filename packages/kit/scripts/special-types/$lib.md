@@ -2,4 +2,4 @@
 
 #### `$lib/server`
 
-`$lib` のサブディレクトリです。SvelteKit は、パブリックに公開されるコードに `$lib/server` のモジュールがインポートされるのを防ぎます。[server-only modules](/docs/server-only-modules) をご参照ください。
+`$lib` のサブディレクトリです。SvelteKit は、クライアントサイドコードに `$lib/server` のモジュールがインポートされるのを防ぎます。[server-only modules](/docs/server-only-modules) をご参照ください。
