@@ -157,6 +157,8 @@ export default config;
 
 …外部サイトからのスクリプト読み込みを防止します。SvelteKit は、生成されるインラインスタイルとスクリプトに対して、指定されたディレクティブを nonce か hash (`mode` の設定による) で補強します。
 
+script と link 向けに nonce を `app.html` に手動で含めるには、`%sveltekit.nonce%` プレースホルダーをお使いいただけます (例えば `<script nonce="%sveltekit.nonce%">`)。
+
 ページがプリレンダリングされる場合、CSP ヘッダーは `<meta http-equiv>` タグ経由で追加されます (この場合、`frame-ancestors`、`report-uri`、`sandbox` ディレクティブは無視されることにご注意ください)。
 
 > `mode` が `'auto'` の場合、SvelteKit は動的にレンダリングされたページには nonce を、プリレンダリングされたページには hash を使用します。プリレンダリングされたページで nonce を使用するのは安全でないため、禁止されています。

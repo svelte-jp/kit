@@ -123,27 +123,44 @@ src/routes/[...catchall]/+page.svelte
 
 ### エンコード(Encoding)
 
-ディレクトリ名は URI デコードされるので、例えば `%40[username]` のようなディレクトリは `@` で始まる文字にマッチします:
+ファイルシステムでは使用できない文字があります — Linux と Mac では `/`、Windows では `\ / : * ? " < > |` です。URL においては、`#` と `%` には特別な意味がありますし、SvelteKit においては `[ ] ( )` に特別な意味があります。そのため、これらの文字をそのままルート(route)に使用することはできません。
+
+これらの文字をルート(route)に使用するには、16進数のエスケープシーケンスを使います。`[x+nn]` というフォーマットで、`nn` の部分は16進数の文字コードです:
+
+- `\` — `[x+5c]`
+- `/` — `[x+2f]`
+- `:` — `[x+3a]`
+- `*` — `[x+2a]`
+- `?` — `[x+3f]`
+- `"` — `[x+22]`
+- `<` — `[x+3c]`
+- `>` — `[x+3e]`
+- `|` — `[x+7c]`
+- `#` — `[x+23]`
+- `%` — `[x+25]`
+- `[` — `[x+5b]`
+- `]` — `[x+5d]`
+- `(` — `[x+28]`
+- `)` — `[x+29]`
+
+例えば、`/smileys/:-)` というルート(route)を作る場合は、`src/routes/smileys/[x+3a]-[x+29]/+page.svelte` ファイルを作成します。
+
+JavaScript を使って文字の16進数コードを判定することができます:
 
 ```js
-// @filename: ambient.d.ts
-declare global {
-	const assert: {
-		equal: (a: any, b: any) => boolean;
-	};
-}
-
-export {};
-
-// @filename: index.js
-// ---cut---
-assert.equal(
-	decodeURIComponent('%40[username]'),
-	'@[username]'
-);
+':'.charCodeAt(0).toString(16); // '3a', hence '[x+3a]'
 ```
 
-`%` 文字を表すには `%25` を使用してください。そうしないと、不正確な結果となります。
+また、Unicode のエスケープシーケンスを使用することもできます。通常、エンコードされていない文字を直接使用することができるので、こうする必要はありませんが、何らかの理由で、例えばファイル名に絵文字を使用することができない場合、エスケープ文字を使用することができます。言い換えると、以下は同じことをしているということです:
+
+```
+src/routes/[u+d83e][u+dd2a]/+page.svelte
+src/routes/🤪/+page.svelte
+```
+
+Unicode エスケープシーケンスのフォーマットは `[u+nnnn]` で、`nnnn` の部分は `0000` から `10ffff` までの適切な値です。(JavaScript の文字列エスケープとは異なり、`ffff` 以上のコードポイントを表現するためにサロゲートペアを使用する必要はありません。) Unicode エンコーディングについてもっと知りたい方は、[Programming with Unicode](https://unicodebook.readthedocs.io/unicode_encodings.html) を参照してください。
+
+> ディレクトリの先頭に `.` 文字があると、TypeScript で [問題](https://github.com/microsoft/TypeScript/issues/13399) が起きるため、例えば [`.well-known`](https://en.wikipedia.org/wiki/Well-known_URI) のようなルート(route)を作る場合はこれらの文字をエンコードしておくと良いでしょう: `src/routes/[x+2e]well-known/...`
 
 ### Advanced layouts
 
@@ -169,11 +186,15 @@ src/routes/
 
 `+page` を `(group)` の中に直接配置することもできます (例えば、`/` が `(app)` や `(marketing)` のページであるべき場合など)。
 
-次のセクションで示すように、グループの中にあるページとレイアウトは他のディレクトリと同様、レイアウトの階層から外れない限り、その上のレイアウトを継承します。上記の例では、`(app)/+layout.svelte` と `(marketing)/+layout.svelte` はどちらも `+layout.svelte` を継承します。
+#### Breaking out of layouts
+
+最上位のレイアウト(root layout)は、アプリの全てのページに適用されます。省略した場合、デフォルトは `<slot />` です。もし、いくつかのページで他のページとは異なるレイアウト階層を持ちたい場合には、アプリ全体を1つまたは複数のグループにして、共通のレイアウトを継承しないルート(route)を分けることができます。
+
+上記の例で、`/admin` ルート(route)は `(app)` や `(marketing)` のレイアウトを継承しません。
 
 #### +page@
 
-逆に、アプリのルート(routes)によっては、レイアウトの階層から外す必要があるものがあるかもしれません。先程の例の `(app)` グループの中に `/item/[id]/embed` を追加してみましょう:
+ページは、ルート(route)ごとに現在のレイアウト階層から抜け出すことができます。先ほどの例に出てきた `(app)` グループの中に、`/item/[id]/embed` ルート(route)があるとします:
 
 ```diff
 src/routes/
@@ -189,6 +210,7 @@ src/routes/
 ```
 
 通常、これは最上位のレイアウト(root layout)と `(app)` レイアウトと `item` レイアウトと `[id]` レイアウトを継承します。`@` と、その後ろにセグメント名 (最上位のレイアウト(root layout)の場合は空文字列(empty string)) を追加することで、これらのレイアウトのどれかにリセットすることができます。この例では、以下のオプションから選択できます:
+
 - `+page@[id].svelte` -  `src/routes/(app)/item/[id]/+layout.svelte` を継承します
 - `+page@item.svelte` - `src/routes/(app)/item/+layout.svelte` を継承します
 - `+page@(app).svelte` - `src/routes/(app)/+layout.svelte` を継承します
@@ -207,8 +229,6 @@ src/routes/
 └ +layout.svelte
 ```
 
-最上位のレイアウト (root layout) から脱出することはできません。アプリに常に存在するので、例えば、アプリ全体の UI や振る舞いをそこに置くことができます。
-
 #### +layout@
 
 ページと同じように、同じ方法でレイアウト _自体_ をその親のレイアウトの階層から外すことができます。例えば、`+layout@.svelte` コンポーネントはその全ての子ルート(routes)の階層をリセットします。
@@ -220,7 +240,7 @@ src/routes/
 │ │ ├ [id]/
 │ │ │ ├ embed/
 │ │ │ │ └ +page.svelte  // (app)/item/[id]/+layout.svelte を使用します
-│ │ │ └ +layout.svelte  // (app)/item/+layout@.svelte を継承します
+│ │ │ ├ +layout.svelte  // (app)/item/+layout@.svelte を継承します
 │ │ │ └ +page.svelte    // (app)/item/+layout@.svelte を使用します
 │ │ └ +layout@.svelte   // 最上位のレイアウト(root layout)を継承し、(app)/+layout.svelte をスキップします
 │ └ +layout.svelte

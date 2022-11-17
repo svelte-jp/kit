@@ -389,7 +389,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 /// file: src/routes/login/+page.svelte
 <script>
 	import { invalidateAll, goto } from '$app/navigation';
-	import { applyAction } from '$app/forms';
+	import { applyAction, deserialize } from '$app/forms';
 
 	/** @type {import('./$types').ActionData} */
 	export let form;
@@ -406,7 +406,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 		});
 
 		/** @type {import('@sveltejs/kit').ActionResult} */
-		const result = await response.json();
+		const result = deserialize(await response.text());
 
 		if (result.type === 'success') {
 			// re-run all `load` functions, following the successful update
@@ -421,6 +421,8 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 	<!-- content -->
 </form>
 ```
+
+処理を進める前に、`$app/forms` の `deserialize` でレスポンスをデシリアライズする必要があることにご注意ください。`JSON.parse()` では不十分です。なぜなら、例えば `load` 関数のような form action は、`Date` や `BigInt` オブジェクトも戻り値としてサポートしているからです。
 
 もし `+page.server.js` と `+server.js` のどちらも存在する場合、デフォルトでは、`fetch` リクエストは `+server.js` のほうにルーティングされます。`+page.server.js` の action に `POST` をするには、カスタムの `x-sveltekit-action` ヘッダーを使用します:
 

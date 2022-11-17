@@ -1,5 +1,59 @@
 # @sveltejs/kit
 
+## 1.0.0-next.551
+
+### Patch Changes
+
+- Add `Access-Control-Allow-Origin: *` to static assets in dev ([#7688](https://github.com/sveltejs/kit/pull/7688))
+
+- Ignore presence of `keepfocus` and `noscroll` in `goto` options if correctly-cased options are also present ([#7678](https://github.com/sveltejs/kit/pull/7678))
+
+## 1.0.0-next.550
+
+### Patch Changes
+
+- [feat] preload fonts and add preload customization ([#4963](https://github.com/sveltejs/kit/pull/4963))
+
+## 1.0.0-next.549
+
+### Patch Changes
+
+- Always apply Node polyfills ([#7675](https://github.com/sveltejs/kit/pull/7675))
+
+## 1.0.0-next.548
+
+### Patch Changes
+
+- Only apply polyfills where necessary ([#7668](https://github.com/sveltejs/kit/pull/7668))
+
+## 1.0.0-next.547
+
+### Patch Changes
+
+- [fix] safely join url segments in manifest ([#7653](https://github.com/sveltejs/kit/pull/7653))
+
+- [breaking] use devalue to (de)serialize action data ([#7494](https://github.com/sveltejs/kit/pull/7494))
+
+- Warn if `%sveltekit.body%` is direct child of `<body>` ([#7652](https://github.com/sveltejs/kit/pull/7652))
+
+## 1.0.0-next.546
+
+### Patch Changes
+
+- fix outdated config error ([#7649](https://github.com/sveltejs/kit/pull/7649))
+
+- [breaking] use hex/unicode escape sequences for encoding special characters in route directory names ([#7644](https://github.com/sveltejs/kit/pull/7644))
+
+- fix `beforeNavigate` description — `routeId` -> `route.id` ([#7643](https://github.com/sveltejs/kit/pull/7643))
+
+## 1.0.0-next.545
+
+### Patch Changes
+
+- [fix] prerendering path and layout fixes ([#7639](https://github.com/sveltejs/kit/pull/7639))
+
+- [fix] add Promise return type to the `enhance` action ([#7629](https://github.com/sveltejs/kit/pull/7629))
+
 ## 1.0.0-next.544
 
 ### Patch Changes

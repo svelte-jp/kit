@@ -45,6 +45,9 @@ export function find_deps(manifest, entry, add_dynamic_css) {
 	/** @type {Set<string>} */
 	const stylesheets = new Set();
 
+	/** @type {Set<string>} */
+	const fonts = new Set();
+
 	/**
 	 * @param {string} current
 	 * @param {boolean} add_js
@@ -56,6 +59,14 @@ export function find_deps(manifest, entry, add_dynamic_css) {
 		const { chunk } = resolve_symlinks(manifest, current);
 
 		if (add_js) imports.add(chunk.file);
+
+		if (chunk.assets) {
+			for (const asset of chunk.assets) {
+				if (/\.(woff2?|ttf|otf)$/.test(asset)) {
+					fonts.add(asset);
+				}
+			}
+		}
 
 		if (chunk.css) {
 			chunk.css.forEach((file) => stylesheets.add(file));
@@ -77,7 +88,8 @@ export function find_deps(manifest, entry, add_dynamic_css) {
 	return {
 		file: chunk.file,
 		imports: Array.from(imports),
-		stylesheets: Array.from(stylesheets)
+		stylesheets: Array.from(stylesheets),
+		fonts: Array.from(fonts)
 	};
 }
 
@@ -135,7 +147,6 @@ export function get_default_build_config({ config, input, ssr, outDir }) {
 		},
 		define: {
 			__SVELTEKIT_ADAPTER_NAME__: JSON.stringify(config.kit.adapter?.name),
-			__SVELTEKIT_APP_VERSION__: JSON.stringify(config.kit.version.name),
 			__SVELTEKIT_APP_VERSION_FILE__: JSON.stringify(`${config.kit.appDir}/version.json`),
 			__SVELTEKIT_APP_VERSION_POLL_INTERVAL__: JSON.stringify(config.kit.version.pollInterval),
 			__SVELTEKIT_BROWSER__: ssr ? 'false' : 'true',

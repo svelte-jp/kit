@@ -102,12 +102,43 @@ function create_routes_and_nodes(cwd, config, fallback) {
 		 * @param {import('types').RouteData | null} parent
 		 */
 		const walk = (depth, id, segment, parent) => {
-			if (/\]\[/.test(id)) {
+			const unescaped = id.replace(/\[([ux])\+([^\]]+)\]/gi, (match, type, code) => {
+				if (match !== match.toLowerCase()) {
+					throw new Error(`Character escape sequence in ${id} must be lowercase`);
+				}
+
+				if (!/[0-9a-f]+/.test(code)) {
+					throw new Error(`Invalid character escape sequence in ${id}`);
+				}
+
+				if (type === 'x') {
+					if (code.length !== 2) {
+						throw new Error(`Hexadecimal escape sequence in ${id} must be two characters`);
+					}
+
+					return String.fromCharCode(parseInt(code, 16));
+				} else {
+					if (code.length < 4 || code.length > 6) {
+						throw new Error(
+							`Unicode escape sequence in ${id} must be between four and six characters`
+						);
+					}
+
+					return String.fromCharCode(parseInt(code, 16));
+				}
+			});
+
+			if (/\]\[/.test(unescaped)) {
 				throw new Error(`Invalid route ${id} — parameters must be separated`);
 			}
 
 			if (count_occurrences('[', id) !== count_occurrences(']', id)) {
 				throw new Error(`Invalid route ${id} — brackets are unbalanced`);
+			}
+
+			if (/#/.test(segment)) {
+				// Vite will barf on files with # in them
+				throw new Error(`Route ${id} should be renamed to ${id.replace(/#/g, '[x+23]')}`);
 			}
 
 			if (/\[\.\.\.\w+\]\/\[\[/.test(id)) {
@@ -163,6 +194,20 @@ function create_routes_and_nodes(cwd, config, fallback) {
 				if (file.is_dir) continue;
 				if (!file.name.startsWith('+')) continue;
 				if (!valid_extensions.find((ext) => file.name.endsWith(ext))) continue;
+
+				if (file.name.endsWith('.d.ts')) {
+					let name = file.name.slice(0, -5);
+					const ext = valid_extensions.find((ext) => name.endsWith(ext));
+					if (ext) name = name.slice(0, -ext.length);
+
+					const valid =
+						/^\+(?:(page(?:@(.*))?)|(layout(?:@(.*))?)|(error))$/.test(name) ||
+						/^\+(?:(server)|(page(?:(@[a-zA-Z0-9_-]*))?(\.server)?)|(layout(?:(@[a-zA-Z0-9_-]*))?(\.server)?))$/.test(
+							name
+						);
+
+					if (valid) continue;
+				}
 
 				const project_relative = posixify(path.relative(cwd, path.join(dir, file.name)));
 
@@ -468,6 +513,10 @@ function normalize_route_id(id) {
 		id
 			// remove groups
 			.replace(/(?<=^|\/)\(.+?\)(?=$|\/)/g, '')
+
+			.replace(/\[[ux]\+([0-9a-f]+)\]/g, (_, x) =>
+				String.fromCharCode(parseInt(x, 16)).replace(/\//g, '%2f')
+			)
 
 			// replace `[param]` with `<*>`, `[param=x]` with `<x>`, and `[[param]]` with `<?*>`
 			.replace(

@@ -323,16 +323,41 @@ test.describe('Encoded paths', () => {
 		});
 	});
 
-	test('allows %-encoded characters in directory names', async ({ page, clicknav }) => {
-		await page.goto('/encoded');
-		await clicknav('[href="/encoded/$SVLT"]');
-		expect(await page.textContent('h1')).toBe('$SVLT');
-	});
-
-	test('allows %-encoded characters in filenames', async ({ page, clicknav }) => {
+	test('allows non-ASCII character in parameterized route segment', async ({ page, clicknav }) => {
 		await page.goto('/encoded');
 		await clicknav('[href="/encoded/@svelte"]');
 		expect(await page.textContent('h1')).toBe('@svelte');
+	});
+
+	test('allows characters to be represented as escape sequences', async ({ page, clicknav }) => {
+		await page.goto('/encoded/escape-sequences');
+
+		await clicknav('[href="/encoded/escape-sequences/:-)"]');
+		expect(await page.textContent('h1')).toBe(':-)');
+
+		await clicknav('[href="/encoded/escape-sequences/%23"]');
+		expect(await page.textContent('h1')).toBe('#');
+
+		await clicknav('[href="/encoded/escape-sequences/%2F"]');
+		expect(await page.textContent('h1')).toBe('/');
+
+		await clicknav('[href="/encoded/escape-sequences/%3f"]');
+		expect(await page.textContent('h1')).toBe('?');
+
+		await clicknav('[href="/encoded/escape-sequences/%25"]');
+		expect(await page.textContent('h1')).toBe('%');
+
+		await clicknav('[href="/encoded/escape-sequences/<"]');
+		expect(await page.textContent('h1')).toBe('<');
+
+		await clicknav('[href="/encoded/escape-sequences/1<2"]');
+		expect(await page.textContent('h1')).toBe('1<2');
+
+		await clicknav('[href="/encoded/escape-sequences/苗"]');
+		expect(await page.textContent('h1')).toBe('苗');
+
+		await clicknav('[href="/encoded/escape-sequences/🤪"]');
+		expect(await page.textContent('h1')).toBe('🤪');
 	});
 });
 
@@ -1023,6 +1048,13 @@ test.describe('Page options', () => {
 	test('transformPageChunk can change the html output', async ({ page }) => {
 		await page.goto('/transform-page-chunk');
 		expect(await page.getAttribute('meta[name="transform-page"]', 'content')).toBe('Worked!');
+	});
+});
+
+test.describe('$app/environment', () => {
+	test('includes version', async ({ page }) => {
+		await page.goto('/app-environment');
+		expect(await page.textContent('h1')).toBe('TEST_VERSION');
 	});
 });
 
