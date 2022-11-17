@@ -123,9 +123,9 @@ src/routes/[...catchall]/+page.svelte
 
 ### エンコード(Encoding)
 
-Some characters can't be used on the filesystem — `/` on Linux and Mac, `\ / : * ? " < > |` on Windows. The `#` and `%` characters have special meaning in URLs, and the `[ ] ( )` characters have special meaning to SvelteKit, so these also can't be used directly as part of your route.
+ファイルシステムでは使用できない文字があります — Linux と Mac では `/`、Windows では `\ / : * ? " < > |` です。URL においては、`#` と `%` には特別な意味がありますし、SvelteKit においては `[ ] ( )` に特別な意味があります。そのため、これらの文字をそのままルート(route)に使用することはできません。
 
-To use these characters in your routes, you can use hexadecimal escape sequences, which have the format `[x+nn]` where `nn` is a hexadecimal character code:
+これらの文字をルート(route)に使用するには、16進数のエスケープシーケンスを使います。`[x+nn]` というフォーマットで、`nn` の部分は16進数の文字コードです:
 
 - `\` — `[x+5c]`
 - `/` — `[x+2f]`
@@ -143,22 +143,22 @@ To use these characters in your routes, you can use hexadecimal escape sequences
 - `(` — `[x+28]`
 - `)` — `[x+29]`
 
-For example, to create a `/smileys/:-)` route, you would create a `src/routes/smileys/[x+3a]-[x+29]/+page.svelte` file.
+例えば、`/smileys/:-)` というルート(route)を作る場合は、`src/routes/smileys/[x+3a]-[x+29]/+page.svelte` ファイルを作成します。
 
-You can determine the hexadecimal code for a character with JavaScript:
+JavaScript を使って文字の16進数コードを判定することができます:
 
 ```js
 ':'.charCodeAt(0).toString(16); // '3a', hence '[x+3a]'
 ```
 
-You can also use Unicode escape sequences. Generally you won't need to as you can use the unencoded character directly, but if — for some reason — you can't have a filename with an emoji in it, for example, then you can use the escaped characters. In other words, these are equivalent:
+また、Unicode のエスケープシーケンスを使用することもできます。通常、エンコードされていない文字を直接使用することができるので、こうする必要はありませんが、何らかの理由で、例えばファイル名に絵文字を使用することができない場合、エスケープ文字を使用することができます。言い換えると、以下は同じことをしているということです:
 
 ```
 src/routes/[u+d83e][u+dd2a]/+page.svelte
 src/routes/🤪/+page.svelte
 ```
 
-The format for a Unicode escape sequence is `[u+nnnn]` where `nnnn` is a valid value between `0000` and `10ffff`. (Unlike JavaScript string escaping, there's no need to use surrogate pairs to represent code points above `ffff`.) To learn more about Unicode encodings, consult [Programming with Unicode](https://unicodebook.readthedocs.io/unicode_encodings.html).
+Unicode エスケープシーケンスのフォーマットは `[u+nnnn]` で、`nnnn` の部分は `0000` から `10ffff` までの適切な値です。(JavaScript の文字列エスケープとは異なり、`ffff` 以上のコードポイントを表現するためにサロゲートペアを使用する必要はありません。) Unicode エンコーディングについてもっと知りたい方は、[Programming with Unicode](https://unicodebook.readthedocs.io/unicode_encodings.html) を参照してください。
 
 ### Advanced layouts
 
@@ -186,13 +186,13 @@ src/routes/
 
 #### Breaking out of layouts
 
-The root layout applies to every page of your app — if omitted, it defaults to `<slot />`. If you want some pages to have a different layout hierarchy than the rest, then you can put your entire app inside one or more groups _except_ the routes that should not inherit the common layouts.
+最上位のレイアウト(root layout)は、アプリの全てのページに適用されます。省略した場合、デフォルトは `<slot />` です。もし、いくつかのページで他のページとは異なるレイアウト階層を持ちたい場合には、アプリ全体を1つまたは複数のグループにして、共通のレイアウトを継承しないルート(route)を分けることができます。
 
-In the example above, the `/admin` route does not inherit either the `(app)` or `(marketing)` layouts.
+上記の例で、`/admin` ルート(route)は `(app)` や `(marketing)` のレイアウトを継承しません。
 
 #### +page@
 
-Pages can break out of the current layout hierarchy on a route-by-route basis. Suppose we have an `/item/[id]/embed` route inside the `(app)` group from the previous example:
+ページは、ルート(route)ごとに現在のレイアウト階層から抜け出すことができます。先ほどの例に出てきた `(app)` グループの中に、`/item/[id]/embed` ルート(route)があるとします:
 
 ```diff
 src/routes/

@@ -159,8 +159,8 @@ declare module '$app/forms' {
 	>(result: ActionResult<Success, Invalid>): Promise<void>;
 
 	/**
-	 * Use this function to deserialize the response from a form submission.
-	 * Usage:
+	 * フォーム送信からのレスポンスをデシリアライズするためにこの関数を使用してください。
+	 * 使用方法:
 	 * ```
 	 * const res = await fetch('/form?/action', { method: 'POST', body: formData });
 	 * const result = deserialize(await res.text());
