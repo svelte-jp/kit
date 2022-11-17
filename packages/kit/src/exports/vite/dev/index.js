@@ -65,7 +65,8 @@ export async function dev(vite, vite_config, svelte_config) {
 				entry: {
 					file: `/@fs${runtime_prefix}/client/start.js`,
 					imports: [],
-					stylesheets: []
+					stylesheets: [],
+					fonts: []
 				},
 				nodes: manifest_data.nodes.map((node, index) => {
 					return async () => {
@@ -80,6 +81,7 @@ export async function dev(vite, vite_config, svelte_config) {
 						// these are unused in dev, it's easier to include them
 						result.imports = [];
 						result.stylesheets = [];
+						result.fonts = [];
 
 						if (node.component) {
 							result.component = async () => {
@@ -234,7 +236,10 @@ export async function dev(vite, vite_config, svelte_config) {
 		dev: true,
 		etag: true,
 		maxAge: 0,
-		extensions: []
+		extensions: [],
+		setHeaders: (res) => {
+			res.setHeader('access-control-allow-origin', '*');
+		}
 	});
 
 	vite.middlewares.use(async (req, res, next) => {
@@ -265,6 +270,11 @@ export async function dev(vite, vite_config, svelte_config) {
 			res.end(fix_stack_trace(error));
 		}
 	});
+
+	// set `import { version } from '$app/environment'`
+	(await vite.ssrLoadModule(`${runtime_prefix}/env.js`)).set_version(
+		svelte_config.kit.version.name
+	);
 
 	return () => {
 		const serve_static_middleware = vite.middlewares.stack.find(
@@ -470,7 +480,8 @@ export async function dev(vite, vite_config, svelte_config) {
 						service_worker:
 							svelte_config.kit.serviceWorker.register &&
 							!!resolve_entry(svelte_config.kit.files.serviceWorker),
-						trailing_slash: svelte_config.kit.trailingSlash
+						trailing_slash: svelte_config.kit.trailingSlash,
+						version: svelte_config.kit.version.name
 					},
 					{
 						getClientAddress: () => {

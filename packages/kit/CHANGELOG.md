@@ -1,5 +1,25 @@
 # @sveltejs/kit
 
+## 1.0.0-next.551
+
+### Patch Changes
+
+- Add `Access-Control-Allow-Origin: *` to static assets in dev ([#7688](https://github.com/sveltejs/kit/pull/7688))
+
+- Ignore presence of `keepfocus` and `noscroll` in `goto` options if correctly-cased options are also present ([#7678](https://github.com/sveltejs/kit/pull/7678))
+
+## 1.0.0-next.550
+
+### Patch Changes
+
+- [feat] preload fonts and add preload customization ([#4963](https://github.com/sveltejs/kit/pull/4963))
+
+## 1.0.0-next.549
+
+### Patch Changes
+
+- Always apply Node polyfills ([#7675](https://github.com/sveltejs/kit/pull/7675))
+
 ## 1.0.0-next.548
 
 ### Patch Changes

@@ -57,6 +57,7 @@ export interface BuildData {
 			file: string;
 			imports: string[];
 			stylesheets: string[];
+			fonts: string[];
 		};
 		vite_manifest: import('vite').Manifest;
 	};
@@ -255,6 +256,8 @@ export interface SSRNode {
 	imports: string[];
 	/** external CSS files */
 	stylesheets: string[];
+	/** external font files */
+	fonts: string[];
 	/** inlined styles */
 	inline_styles?(): MaybePromise<Record<string, string>>;
 
@@ -310,6 +313,7 @@ export interface SSROptions {
 	app_template_contains_nonce: boolean;
 	error_template({ message, status }: { message: string; status: number }): string;
 	trailing_slash: TrailingSlash;
+	version: string;
 }
 
 export interface SSRErrorPage {

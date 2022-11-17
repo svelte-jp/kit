@@ -27,7 +27,7 @@ const server_template = ({ config, hooks, has_service_worker, runtime, template,
 import root from '__GENERATED__/root.svelte';
 import { respond } from '${runtime}/server/index.js';
 import { set_paths, assets, base } from '${runtime}/paths.js';
-import { set_prerendering } from '${runtime}/env.js';
+import { set_prerendering, set_version } from '${runtime}/env.js';
 import { set_private_env } from '${runtime}/env-private.js';
 import { set_public_env } from '${runtime}/env-public.js';
 
@@ -44,6 +44,7 @@ const error_template = ({ status, message }) => ${s(error_page)
 let read = null;
 
 set_paths(${s(config.kit.paths)});
+set_version(${s(config.kit.version.name)});
 
 let default_protocol = 'https';
 
@@ -86,7 +87,8 @@ export class Server {
 			app_template,
 			app_template_contains_nonce: ${template.includes('%sveltekit.nonce%')},
 			error_template,
-			trailing_slash: ${s(config.kit.trailingSlash)}
+			trailing_slash: ${s(config.kit.trailingSlash)},
+			version: ${s(config.kit.version.name)}
 		};
 	}
 
@@ -283,11 +285,15 @@ export async function build_server(options, client) {
 		/** @type {string[]} */
 		const stylesheets = [];
 
+		/** @type {string[]} */
+		const fonts = [];
+
 		if (node.component) {
 			const entry = find_deps(client.vite_manifest, node.component, true);
 
 			imported.push(...entry.imports);
 			stylesheets.push(...entry.stylesheets);
+			fonts.push(...entry.fonts);
 
 			exports.push(
 				`export const component = async () => (await import('../${
@@ -302,6 +308,7 @@ export async function build_server(options, client) {
 
 			imported.push(...entry.imports);
 			stylesheets.push(...entry.stylesheets);
+			fonts.push(...entry.fonts);
 
 			imports.push(`import * as shared from '../${vite_manifest[node.shared].file}';`);
 			exports.push(`export { shared };`);
@@ -314,7 +321,8 @@ export async function build_server(options, client) {
 
 		exports.push(
 			`export const imports = ${s(imported)};`,
-			`export const stylesheets = ${s(stylesheets)};`
+			`export const stylesheets = ${s(stylesheets)};`,
+			`export const fonts = ${s(fonts)};`
 		);
 
 		/** @type {string[]} */

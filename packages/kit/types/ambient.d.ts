@@ -85,6 +85,11 @@ declare module '$app/environment' {
 	 * プリレンダリング時は `true`、それ以外の場合は `false` です。
 	 */
 	export const prerendering: boolean;
+
+	/**
+	 * The value of `config.kit.version.name`
+	 */
+	export const version: string;
 }
 
 /**
