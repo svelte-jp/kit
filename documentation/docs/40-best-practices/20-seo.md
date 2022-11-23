@@ -18,7 +18,7 @@ SEO で最も重要なのは、高品質なコンテンツを作ること、そ�
 
 #### URLの正規化
 
-SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から、末尾のスラッシュが無いパス名にリダイレクトします ([設定](/docs/configuration#trailingslash) で逆にできます)。URLの重複は、SEOに悪影響を与えます。
+SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から、末尾のスラッシュが無いパス名にリダイレクトします ([設定](/docs/page-options#trailingslash) で逆にできます)。URLの重複は、SEOに悪影響を与えます。
 
 ### Manual setup
 

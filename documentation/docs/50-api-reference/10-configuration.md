@@ -65,7 +65,6 @@ const config = {
 			register: true,
 			files: (filepath) => !/\.DS_Store/.test(filepath)
 		},
-		trailingSlash: 'never',
 		version: {
 			name: Date.now().toString(),
 			pollInterval: 0
@@ -262,7 +261,7 @@ export default config;
   - `'ignore'` - 失敗を無視して継続させます
   - `'warn'` — 継続しますが、警告(warning)を出力します
   - `(details) => void` — `status`、`path`、`referrer`、`referenceType`、`message` プロパティを持つ `details` オブジェクトを引数に取るカスタムのエラーハンドラです。この関数から `throw` されると、ビルドが失敗します
-  
+
       ```js
     /** @type {import('@sveltejs/kit').Config} */
     const config = {
@@ -273,7 +272,7 @@ export default config;
     				if (path === '/not-found' && referrer === '/blog/how-we-built-our-404-page') {
     					return;
     				}
-    				
+
     				// otherwise fail the build
     				throw new Error(message);
     			}
@@ -297,18 +296,6 @@ export default config;
 
 - `register` - `false` を設定した場合、service worker の自動登録を無効にします。
 - `files` - `(filepath: string) => boolean` という型を持つ関数。`true` の場合、与えられたファイルが `$service-worker.files` で利用可能になります。それ以外の場合は除外されます。
-
-### trailingSlash
-
-URL を解決する際に、末尾のスラッシュ (trailing slashes) を削除するか、追加するか、無視するかどうかを指定します (これはページ (pages) にのみ適用され、エンドポイント (endpoints) には適用されないことにご注意ください)。
-
-- `'never'` — `/x/` を `/x` にリダイレクトします
-- `'always'` — `/x` を `/x/` にリダイレクトします
-- `'ignore'` — 末尾のスラッシュを自動で追加したり削除したりしません。`/x` と `/x/` は同等に扱われます
-
-このオプションは [プリレンダリング](/docs/page-options#prerender) にも影響します。もし `trailingSlash` が `always` なら、`/about` のようなルートは `about/index.html` ファイルを生成し、それ以外の場合は `about.html` を生成し、静的な web サーバーの規約に従います。
-
-> 末尾のスラッシュを無視することは推奨されません — 相対パスのセマンティクスが異なるため(`/x` からの `./y` は `/y` となりますが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別の URL として扱われるので SEO に悪影響を及ぼします。もしこのオプションを使用する場合は、[`handle`](/docs/hooks#server-hooks-handle) 関数の中で `request.path` に末尾のスラッシュを条件に応じて追加または削除するロジックを確実に実装してください。
 
 ### version
 

@@ -72,7 +72,7 @@ export async function handle({ event, resolve }) {
 
 - `transformPageChunk(opts: { html: string, done: boolean }): MaybePromise<string | undefined>` — カスタムの変換を HTML に適用します。`done` が true である場合、それは最後のチャンクです。チャンクが整形された HTML であることは保証されませんが (例えば、要素の開始タグは含むが終了タグは含まれない、など)、常に `%sveltekit.head%` やレイアウト(layout)/ページ(page)コンポーネントなどのような理にかなった境界 (sensible boundaries) で分割されます。
 - `filterSerializedResponseHeaders(name: string, value: string): boolean` — `load` 関数が `fetch` でリソースを読み込むときに、シリアライズされるレスポンスにどのヘッダーを含めるかを決定します。デフォルトでは何も含まれません。
-- `preload(input: { type: 'js' | 'css' | 'font' | 'asset', path: string }): boolean` — プリロードのために `<head>` タグに何を追加するか決定します。プリロードによってその対象がより早くダウンロードされるようになるためパフォーマンスが改善しますが、不必要に多くのものをプリロードでダウンロードしてしまうと、core web vitals を悪化させてしまいます。デフォルトでは、`js`、`css`、`font` ファイルがプリロードされます。現時点では `asset` ファイルはプリロードされませんが、フィードバックによっては追加されるかもしれません。
+- `preload(input: { type: 'js' | 'css' | 'font' | 'asset', path: string }): boolean` — `<head>` タグにどのファイルをプリロードの対象として追加するか決定します。このメソッドはビルド時、コードチャンクを構築している際に見つかったファイルごとに呼び出されます。これにより、例えば `+page.svelte` に `import './styles.css` がある場合、そのページに訪れたときにその CSS ファイルへの解決されたパスを以て `preload` が呼び出されるようになります。プリロードによってその対象がより早くダウンロードされるようになるためパフォーマンスが改善しますが、不必要に多くのものをプリロードでダウンロードしてしまうと、core web vitals を悪化させてしまいます。デフォルトでは、`js`、`css` ファイルがプリロードされます。現時点では `asset` ファイルはプリロードされませんが、フィードバックによっては追加されるかもしれません。
 
 ```js
 /// file: src/hooks.server.js
