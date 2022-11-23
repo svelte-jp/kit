@@ -55,14 +55,14 @@ importers:
 
   packages/adapter-cloudflare:
     specifiers:
-      '@cloudflare/workers-types': ^3.18.0
+      '@cloudflare/workers-types': ^4.0.0
       '@types/node': ^16.11.68
       '@types/ws': ^8.5.3
       esbuild: ^0.15.12
       typescript: ^4.8.4
       worktop: 0.8.0-next.14
     dependencies:
-      '@cloudflare/workers-types': 3.18.0
+      '@cloudflare/workers-types': 4.20221111.0
       esbuild: 0.15.12
       worktop: 0.8.0-next.14
     devDependencies:
@@ -73,13 +73,13 @@ importers:
   packages/adapter-cloudflare-workers:
     specifiers:
       '@cloudflare/kv-asset-handler': ^0.2.0
-      '@cloudflare/workers-types': ^3.18.0
+      '@cloudflare/workers-types': ^4.0.0
       '@iarna/toml': ^2.2.5
       '@types/node': ^16.11.68
       esbuild: ^0.15.12
       typescript: ^4.8.4
     dependencies:
-      '@cloudflare/workers-types': 3.18.0
+      '@cloudflare/workers-types': 4.20221111.0
       '@iarna/toml': 2.2.5
       esbuild: 0.15.12
     devDependencies:
@@ -320,7 +320,7 @@ importers:
       '@types/node': 16.18.2
       '@types/sade': 1.7.4
       '@types/set-cookie-parser': 2.4.2
-      marked: 4.1.1
+      marked: 4.2.3
       rollup: 2.79.1
       svelte: 3.52.0
       svelte-preprocess: 4.10.7_besnmoibwkhwtentvwuriss7pa
@@ -652,22 +652,6 @@ importers:
       uvu: 0.5.6
       vite: 3.2.1
 
-  packages/kit/test/prerendering/trailing-slash:
-    specifiers:
-      '@sveltejs/kit': workspace:*
-      svelte: ^3.52.0
-      svelte-check: ^2.9.2
-      typescript: ^4.8.4
-      uvu: ^0.5.6
-      vite: ^3.2.1
-    devDependencies:
-      '@sveltejs/kit': link:../../..
-      svelte: 3.52.0
-      svelte-check: 2.9.2_svelte@3.52.0
-      typescript: 4.8.4
-      uvu: 0.5.6
-      vite: 3.2.1
-
   packages/migrate:
     specifiers:
       '@types/prompts': ^2.4.1
@@ -741,7 +725,7 @@ importers:
       '@types/node': 16.18.2
       flexsearch: 0.7.31
       magic-string: 0.26.7
-      marked: 4.1.1
+      marked: 4.2.3
       prism-svelte: 0.5.0
       prismjs: 1.29.0
       shiki-twoslash: 3.1.0
@@ -1010,8 +994,8 @@ packages:
       mime: 3.0.0
     dev: true
 
-  /@cloudflare/workers-types/3.18.0:
-    resolution: {integrity: sha512-ehKOJVLMeR+tZkYhWEaLYQxl0TaIZu/kE86HF3/RidR8Xv5LuQxpbh+XXAoKVqsaphWLhIgBhgnlN5HGdheXSQ==}
+  /@cloudflare/workers-types/4.20221111.0:
+    resolution: {integrity: sha512-VHaqOBtYnfffxfNOQB4UiZoDT5pk07Y279nZ71w9M6WdAF8EfNp808GlUK0GVf4JZF4Dyu58bytm9gwbTQnhBg==}
     dev: false
 
   /@esbuild/android-arm/0.15.12:
@@ -3610,8 +3594,8 @@ packages:
     resolution: {integrity: sha512-8z4efJYk43E0upd0NbVXwgSTQs6cT3T06etieCMEg7dRbzCbxUCK/GHlX8mhHRDcp+OLlHkPKsvqQTCvsRl2cg==}
     dev: true
 
-  /marked/4.1.1:
-    resolution: {integrity: sha512-0cNMnTcUJPxbA6uWmCmjWz4NJRe/0Xfk2NhXCUHjew9qJzFN20krFnsUe7QynwqOwa5m1fZ4UDg0ycKFVC0ccw==}
+  /marked/4.2.3:
+    resolution: {integrity: sha512-slWRdJkbTZ+PjkyJnE30Uid64eHwbwa1Q25INCAYfZlK4o6ylagBy/Le9eWntqJFoFT93ikUKMv47GZ4gTwHkw==}
     engines: {node: '>= 12'}
     hasBin: true
     dev: true
