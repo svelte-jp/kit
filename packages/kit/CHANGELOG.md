@@ -1,5 +1,27 @@
 # @sveltejs/kit
 
+## 1.0.0-next.559
+
+### Patch Changes
+
+- Roll over non-matching optional parameters instead of 404ing ([#7753](https://github.com/sveltejs/kit/pull/7753))
+
+- [fix] enable Vite's modulePreload.polyfill ([#7770](https://github.com/sveltejs/kit/pull/7770))
+
+## 1.0.0-next.558
+
+### Patch Changes
+
+- [breaking] Disallow error status codes outside 400-599 ([#7767](https://github.com/sveltejs/kit/pull/7767))
+
+- [breaking] Make client-side router ignore links outside %sveltekit.body% ([#7766](https://github.com/sveltejs/kit/pull/7766))
+
+## 1.0.0-next.557
+
+### Patch Changes
+
+- external fetch calls: ensure serialized cookie values are url-encoded [#7736] ([#7736](https://github.com/sveltejs/kit/pull/7736))
+
 ## 1.0.0-next.556
 
 ### Patch Changes
