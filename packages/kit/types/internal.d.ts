@@ -29,11 +29,11 @@ export interface ServerModule {
 	Server: typeof InternalServer;
 
 	override(options: {
+		building: boolean;
 		paths: {
 			base: string;
 			assets: string;
 		};
-		prerendering: boolean;
 		protocol?: 'http' | 'https';
 		read(file: string): Buffer;
 	}): void;
@@ -298,7 +298,7 @@ export interface SSROptions {
 		check_origin: boolean;
 	};
 	dev: boolean;
-	handle_error(error: Error & { frame?: string }, event: RequestEvent): App.Error;
+	handle_error(error: Error & { frame?: string }, event: RequestEvent): MaybePromise<App.Error>;
 	hooks: ServerHooks;
 	manifest: SSRManifest;
 	paths: {

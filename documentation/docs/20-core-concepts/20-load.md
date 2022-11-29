@@ -243,7 +243,7 @@ export async function load({ fetch, params }) {
 
 ### Cookies and headers
 
-サーバー専用の `load` 関数では [`cookies`](/docs/types#sveltejs-kit-cookies) を取得したり設定したりすることができます。
+サーバー専用の `load` 関数では [`cookies`](/docs/types#public-types-cookies) を取得したり設定したりすることができます。
 
 ```js
 /// file: src/routes/+layout.server.js
@@ -544,7 +544,7 @@ export async function load({ fetch, depends }) {
 - `params` のプロパティを参照していて、その値が変更された場合
 - `url` のプロパティを参照していて (例えば `url.pathname` や `url.search`)、その値が変更された場合
 - `await parent()` を呼び出していて、親の `load` 関数が再実行されたとき
-- [`fetch`](#making-fetch-requests) や [`depends`](/docs/types#sveltejs-kit-loadevent) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](/docs/modules#$app-navigation-invalidate) で無効(invalid)であるとマークされた場合
+- [`fetch`](#making-fetch-requests) や [`depends`](/docs/types#public-types-loadevent) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](/docs/modules#$app-navigation-invalidate) で無効(invalid)であるとマークされた場合
 - [`invalidateAll()`](/docs/modules#$app-navigation-invalidateall) によって全ての有効な `load` 関数が強制的に再実行された場合
 
 `load` 関数の再実行は、対応する `+layout.svelte` や `+page.svelte` 内の `data` プロパティが更新されるだけで、コンポーネントは再作成されることはありません。結果として、内部の状態は保持されます。もし、この挙動がお望みでなければ、[`afterNavigate`](/docs/modules#$app-navigation-afternavigate) コールバック内でリセットしたり、コンポーネントを [`{#key ...}`](https://svelte.jp/docs#template-syntax-key) ブロックでラップしたりしてリセットすることができます。

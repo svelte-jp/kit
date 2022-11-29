@@ -81,7 +81,7 @@ throw error(404, {
 
 ```js
 /// file: src/hooks.server.js
-// @errors: 2322 2571
+// @errors: 2322 2571 2339
 // @filename: ambient.d.ts
 const Sentry: any;
 
@@ -94,7 +94,7 @@ export function handleError({ error, event }) {
 
 	return {
 		message: 'Whoops!',
-		code: error.code ?? 'UNKNOWN'
+		code: error?.code ?? 'UNKNOWN'
 	};
 }
 ```
@@ -132,7 +132,7 @@ SvelteKit が `%sveltekit.status%` と `%sveltekit.error.message%` を、それ�
 
 ```ts
 /// file: src/app.d.ts
-namespace App {
+declare namespace App {
 	interface Error {
 		code: string;
 		id: string;

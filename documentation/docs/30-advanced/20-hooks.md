@@ -72,7 +72,7 @@ export async function handle({ event, resolve }) {
 
 - `transformPageChunk(opts: { html: string, done: boolean }): MaybePromise<string | undefined>` — カスタムの変換を HTML に適用します。`done` が true である場合、それは最後のチャンクです。チャンクが整形された HTML であることは保証されませんが (例えば、要素の開始タグは含むが終了タグは含まれない、など)、常に `%sveltekit.head%` やレイアウト(layout)/ページ(page)コンポーネントなどのような理にかなった境界 (sensible boundaries) で分割されます。
 - `filterSerializedResponseHeaders(name: string, value: string): boolean` — `load` 関数が `fetch` でリソースを読み込むときに、シリアライズされるレスポンスにどのヘッダーを含めるかを決定します。デフォルトでは何も含まれません。
-- `preload(input: { type: 'js' | 'css' | 'font' | 'asset', path: string }): boolean` — `<head>` タグにどのファイルをプリロードの対象として追加するか決定します。このメソッドはビルド時、コードチャンクを構築している際に見つかったファイルごとに呼び出されます。これにより、例えば `+page.svelte` に `import './styles.css` がある場合、そのページに訪れたときにその CSS ファイルへの解決されたパスを以て `preload` が呼び出されるようになります。プリロードによってその対象がより早くダウンロードされるようになるためパフォーマンスが改善しますが、不必要に多くのものをプリロードでダウンロードしてしまうと、core web vitals を悪化させてしまいます。デフォルトでは、`js`、`css` ファイルがプリロードされます。現時点では `asset` ファイルはプリロードされませんが、フィードバックによっては追加されるかもしれません。
+- `preload(input: { type: 'js' | 'css' | 'font' | 'asset', path: string }): boolean` — `<head>` タグにどのファイルをプリロードの対象として追加するか決定します。このメソッドはビルド時、コードチャンクを構築している際に見つかったファイルごとに呼び出されます。これにより、例えば `+page.svelte` に `import './styles.css` がある場合、そのページに訪れたときにその CSS ファイルへの解決されたパスを以て `preload` が呼び出されるようになります。これはビルド時の分析によって行われるため、開発モードでは `preload` が呼ばれないことにご注意ください。プリロードによってその対象がより早くダウンロードされるようになるためパフォーマンスが改善しますが、不必要に多くのものをダウンロードしてしまうと、core web vitals を悪化させてしまいます。デフォルトでは、`js`、`css` ファイルがプリロードされます。現時点では `asset` ファイルはプリロードされませんが、フィードバックによっては追加されるかもしれません。
 
 ```js
 /// file: src/hooks.server.js
@@ -157,7 +157,7 @@ declare namespace App {
 
 ```js
 /// file: src/hooks.server.js
-// @errors: 2322 2571
+// @errors: 2322 2571 2339
 // @filename: ambient.d.ts
 const Sentry: any;
 
@@ -170,14 +170,14 @@ export function handleError({ error, event }) {
 
 	return {
 		message: 'Whoops!',
-		code: error.code ?? 'UNKNOWN'
+		code: error?.code ?? 'UNKNOWN'
 	};
 }
 ```
 
 ```js
 /// file: src/hooks.client.js
-// @errors: 2322 2571
+// @errors: 2322 2571 2339
 // @filename: ambient.d.ts
 const Sentry: any;
 
@@ -190,7 +190,7 @@ export function handleError({ error, event }) {
 
 	return {
 		message: 'Whoops!',
-		code: error.code ?? 'UNKNOWN'
+		code: error?.code ?? 'UNKNOWN'
 	};
 }
 ```
@@ -200,3 +200,5 @@ export function handleError({ error, event }) {
 この関数は _想定される_ エラー (`@sveltejs/kit` からインポートされる [`error`](/docs/modules#sveltejs-kit-error) 関数でスローされるエラー) の場合は呼び出されません。
 
 開発中、Svelte のコードの構文エラーでエラーが発生した場合、渡される error には、エラーの場所のハイライトが付与された `frame` プロパティがあります。
+
+> `handleError` 自体が決してエラーをスローしないことを確認してください。
