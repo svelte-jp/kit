@@ -35,7 +35,7 @@ export const prerender = 'auto';
 
 プリレンダラはアプリの最上位(root)から開始され、プリレンダリング可能なページや `+server.js` ルート(routes)を見つけると、そのファイルを生成します。各ページは、プリレンダリングの候補である他のページを指し示す `<a>` 要素を見つけるためにスキャンされます。このため、通常はどのページにアクセスすべきか指定する必要はありません。もしプリレンダラがアクセスするページを指定する必要がある場合は、[prerender configuration](/docs/configuration#prerender) の `entries` オプションでこれを指定することができます。
 
-While prerendering, the value of `building` imported from [`$app/environment`](/docs/modules#$app-environment) will be `true`.
+プリレンダリング中、[`$app/environment`](/docs/modules#$app-environment) からインポートされる `building` の値は `true` になります。
 
 #### Prerendering server routes
 

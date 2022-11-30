@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import glob from 'tiny-glob/sync.js';
 import { fileURLToPath } from 'url';
-import { convert_link } from '../sites/kit.svelte.dev/src/lib/docs/server/convertlink.js';
+import { convert_link } from '../src/lib/docs/server/convertlink.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

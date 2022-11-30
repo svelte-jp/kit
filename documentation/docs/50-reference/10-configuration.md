@@ -2,7 +2,7 @@
 title: Configuration
 ---
 
-Your project's configuration lives in a `svelte.config.js` file at the root of your project. As well as SvelteKit, this config object is used by other tooling that integrates with Svelte such as editor extensions.
+プロジェクトの設定は、プロジェクトの root にある `svelte.config.js` ファイルに保存されています。SvelteKit だけでなく、エディタ拡張(editor extensions)など Svelte とインテグレーションする他のツールでもこれが使用されます。
 
 ```js
 /// file: svelte.config.js
@@ -20,6 +20,6 @@ export default config;
 
 > TYPES: @sveltejs/kit#Config
 
-The `kit` property configures SvelteKit, and can have the following properties:
+`kit` プロパティは SvelteKit を設定し、以下のプロパティを持つことができます:
 
 > EXPANDED_TYPES: @sveltejs/kit#KitConfig

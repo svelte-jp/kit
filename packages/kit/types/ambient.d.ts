@@ -71,7 +71,7 @@ declare module '$app/environment' {
 	export const browser: boolean;
 
 	/**
-	 * SvelteKit analyses your app during the `build` step by running it. During this process, `building` is `true`. This also applies during prerendering.
+	 * SvelteKit はビルド時にアプリを実行し、アプリを解析します。このプロセス中は、`building` は `true` です。これはプリレンダリング中にも適用されます。
 	 */
 	export const building: boolean;
 
@@ -81,7 +81,7 @@ declare module '$app/environment' {
 	export const dev: boolean;
 
 	/**
-	 * The value of `config.kit.version.name`.
+	 * `config.kit.version.name` の値です。
 	 */
 	export const version: string;
 }

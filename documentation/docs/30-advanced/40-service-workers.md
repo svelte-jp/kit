@@ -4,9 +4,9 @@ title: Service workers
 
 Service Worker は、アプリ内部でネットワークリクエストを処理するプロキシサーバーとして機能します。これによりアプリをオフラインで動作させることが可能になります。もしオフラインサポートが不要な場合（または構築するアプリの種類によって現実的に実装できない場合）でも、ビルドした JS と CSS を事前にキャッシュしてナビゲーションを高速化するために Service Worker を使用する価値はあります。
 
-In SvelteKit, if you have a `src/service-worker.js` file (or `src/service-worker.ts`, `src/service-worker/index.js`, etc) it will be bundled and automatically registered. You can change the [location of your service worker](/docs/configuration#files) if you need to.
+SvelteKit では、`src/service-worker.js` ファイル (または `src/service-worker.ts` や `src/service-worker/index.js` など) がある場合、バンドルされ、自動的に登録されます。必要に応じて、[service worker の ロケーション](/docs/configuration#files) を変更することができます。 
 
-You can [disable automatic registration](/docs/configuration#serviceworker) if you need to register the service worker with your own logic or use another solution. The default registration looks something like this:
+service worker を独自のロジックで登録する必要がある場合や、その他のソリューションを使う場合は、[自動登録を無効化](/docs/configuration#serviceworker) することができます。デフォルトの登録方法は次のようなものです:
 
 ```js
 if ('serviceWorker' in navigator) {
@@ -16,9 +16,9 @@ if ('serviceWorker' in navigator) {
 }
 ```
 
-Inside the service worker you have access to the [`$service-worker` module](/docs/modules#$service-worker), which provides you with the paths to all static assets, build files and prerendered pages. You're also provided with an app version string which you can use for creating a unique cache name. If your Vite config specifies `define` (used for global variable replacements), this will be applied to service workers as well as your server/client builds.
+service worker の内部では、[`$service-worker` モジュール](/docs/modules#$service-worker) にアクセスでき、これによって全ての静的なアセット、ビルドファイル、プリレンダリングページへのパスが提供されます。また、アプリのバージョン文字列の提供され、一意なキャッシュ名を作成するのに使用することができます。Vite の設定に `define` (グローバル変数の置換に使用) を指定している場合、それはサーバー/クライアントのビルドだけでなく、service worker にも適用されます。
 
-The following example caches the built app and any files in `static` eagerly, and caches all other requests as they happen. This would make each page work offline once visited.
+次の例では、ビルドされたアプリと `static` にあるファイルをすぐに(eagerly)キャッシュし、その他全てのリクエストはそれらの発生時にキャッシュします。これにより、各ページは一度アクセスするとオフラインで動作するようになります。
 
 ```js
 // @ts-nocheck Official TS Service Worker typings are still a work in progress.
@@ -85,7 +85,7 @@ self.addEventListener('fetch', (event) => {
 });
 ```
 
-> Be careful when caching! In some cases, stale data might be worse than data that's unavailable while offline. Since browsers will empty caches if they get too full, you should also be careful about caching large assets like video files.
+> キャッシュにはご注意ください！ 場合によっては、オフラインでは利用できないデータよりも古くなったデータのほうが悪いことがあります。ブラウザはキャッシュが一杯になると空にするため、ビデオファイルのような大きなアセットをキャッシュする場合にもご注意ください。
 
 service worker はプロダクション向けにはバンドルされますが、開発中はバンドルされません。そのため、[modules in service workers](https://web.dev/es-modules-in-sw) をサポートするブラウザのみ、開発時にもそれを使用することができます。service worker を手動で登録する場合、開発時に `{ type: 'module' }` オプションを渡す必要があります:
 
@@ -97,6 +97,6 @@ navigator.serviceWorker.register('/service-worker.js', {
 });
 ```
 
-> `build` and `prerendered` are empty arrays during development
+> `build` と `prerendered` は開発中は空配列です
 
-SvelteKit's service worker implementation is deliberately low-level. If you need a more full-flegded but also more opinionated solution, we recommend looking at solutions like [Vite PWA plugin](https://vite-pwa-org.netlify.app/frameworks/sveltekit.html), which uses [Workbox](https://web.dev/learn/pwa/workbox). For more general information on service workers, we recommend [the MDN web docs](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers).
+SvelteKit の service worker 実装は意図的に低レベル(low-level)です。より本格的な、よりこだわりが強い(opinionated)ソリューションが必要な場合は、[Vite PWA plugin](https://vite-pwa-org.netlify.app/frameworks/sveltekit.html) のようなソリューションをご覧になることをおすすめしております、こちらは [Workbox](https://web.dev/learn/pwa/workbox) を使用しています。service worker に関する一般的な情報をもっとお探しであれば、[MDN web docs](https://developer.mozilla.org/ja/docs/Web/API/Service_Worker_API/Using_Service_Workers) をおすすめします。
