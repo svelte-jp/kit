@@ -442,9 +442,9 @@ const response = await fetch(this.action, {
 
 ### GET vs POST
 
-As we've seen, to invoke a form action you must use `method="POST"`.
+これまで見てきたように、フォームアクションを使うには、`method="POST"` を使用する必要があります。
 
-Some forms don't need to `POST` data to the server — search inputs, for example. For these you can use `method="GET"` (or, equivalently, no `method` at all), and SvelteKit will treat them like `<a>` elements, using the client-side router instead of a full page navigation:
+サーバーにデータを `POST` する必要がないフォームもあるでしょう — 例えば検索入力(search inputs)です。これに対応するには `method="GET"` (または、`method` を全く書かないのも同等です) を使うことができ、そして SvelteKit はそれを `<a>` 要素のように扱い、フルページナビゲーションの代わりにクライアントサイドルーターを使用します。:
 
 ```html
 <form action="/search">
@@ -452,4 +452,4 @@ Some forms don't need to `POST` data to the server — search inputs, for exampl
 </form>
 ```
 
-As with `<a>` elements, you can set the [`data-sveltekit-reload`](/docs/link-options#data-sveltekit-reload) and [`data-sveltekit-noscroll`](/docs/link-options#data-sveltekit-noscroll) attributes on the `<form>` to control the router's behaviour.
+`<a>` 要素と同じように、[`data-sveltekit-reload`](/docs/link-options#data-sveltekit-reload) 属性と [`data-sveltekit-noscroll`](/docs/link-options#data-sveltekit-noscroll) 属性を `<form>` に設定することができ、ルーターの挙動をコントロールすることができます。
