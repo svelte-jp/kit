@@ -6,20 +6,53 @@ SvelteKit では、アプリのルート(routes)間の移動に、(フレーム�
 
 `data-sveltekit-*` 属性でリンクの挙動をカスタマイズすることができます。これらは `<a>` 自身やその親要素に適用することができます。
 
-### data-sveltekit-prefetch
+### data-sveltekit-preload-data
 
-コードのインポートとページのデータの取得を先取りするためには、`data-sveltekit-prefetch` 属性を使用します。これによって、ナビゲーションをトリガーする `click` イベントを待つのではなく、ユーザーがリンクをホバーしたり(デスクトップの場合)、タッチしたり(モバイルの場合)するとすぐにすべての読み込みを開始します。通常、これによって数百ミリ秒稼ぐことができ、この差は遅延を感じるインターフェイスときびきび動くインターフェイスの違いとなります。
+ユーザーがリンクをクリックしたことをブラウザが検知するより前に、(デスクトップでは) マウスがリンクをホバーしたことや、`touchstart` や `mousedown` がトリガーされることを検知することができます。どちらの場合も、`click` イベントが発生することを経験に基づいて推測することができます。
 
-この挙動を全体に適用するには、この属性を親要素 (または `src/app.html` の `<body>`) に追加してください:
+SvelteKit はこの情報を使ってインポートするコードやそのページのデータの取得をいち早く開始することができ、数百ミリ秒を稼ぐことができます。これが、ユーザーインターフェースが遅延していると感じるか、それともきびきび動いていると感じるかの差になります。
+
+この動作は `data-sveltekit-preload-data` 属性によってコントロールすることができ、2つの値のうちどちらかを設定することができます:
+
+- `"hover"` は、マウスがリンクの上にきたときにプリロードを開始します。モバイルでは、`touchstart` でプリロードが開始されます
+- `"tap"` は、`touchstart` や `mousedown` イベントが検知されるとすぐにプリロードが開始されます
+
+デフォルトのプロジェクテンプレートには、`src/app.html` の `<body>` 要素に `data-sveltekit-preload-data="hover"` が適用されており、デフォルトで全てのリンクがホバー時にプリロードされます:
 
 ```html
-/// file: src/routes/+layout.svelte
-<main data-sveltekit-prefetch>
-	<slot />
-</main>
+<body data-sveltekit-preload-data="hover">
+	<div style="display: contents">%sveltekit.body%</div>
+</body>
 ```
 
-> また、プログラムで `$app/navigation` の `prefetch` を呼び出すこともできます。 
+時には、ユーザーがリンクをホバーしたときに `load` を呼ぶのは望ましくないことがあるでしょう。誤検出の可能性もありますし (必ずしもホバーに続いてクリックが発生するわけではない)、データの更新が非常に早い場合はデータが古くなってしまうこともあります。
+
+これらの場合には、値に `"tap"` を指定します。こうすると SvelteKit は、ユーザーがリンクをタップまたはクリックしたときのみ、`load` を呼び出すようになります:
+
+```html
+<a data-sveltekit-preload-data="tap" href="/stonks">
+	Get current stonk values
+</a>
+```
+
+> プログラムで `$app/navigation` の `preloadData` を実行することもできます。
+
+ユーザーがデータ使用量の削減を選択している場合、つまり [`navigator.connection.saveData`](https://developer.mozilla.org/ja/docs/Web/API/NetworkInformation/saveData) が `true` になっている場合は、データは決してプリロードされません。
+
+### data-sveltekit-preload-code
+
+リンク先の _データ_ をプリロードしたくない場所であっても、_コード_ をプリロードするのは有益なこともあります。`data-sveltekit-preload-code` 属性は `data-sveltekit-preload-data` と同様に動作しますが、4つの値から選択できる点が異なります。'先行度'('eagerness') の降順で並べると:
+
+- `"eager"` は、すぐにリンクをプリロードします
+- `"viewport"` は、リンクがビューポートに入るとすぐにプリロードします
+- `"hover"` - コードだけがプリロードされることを除き、上記(`data-sveltekit-preload-data` の `"hover"`)と同じです
+- `"tap"` - コードだけがプリロードされることを除き、上記(`data-sveltekit-preload-data` の `"tap"`)と同じです
+
+`viewport` と `eager` は、ナビゲーション直後の DOM に存在するリンクにのみ適用されることにご注意ください。リンクが後から追加された場合 (例えば `{#if ...}` ブロックの中)、`hover` や `tap` によってトリガーされるまでプリロードされません。DOM の変更を積極的に観察することによって生じてしまうパフォーマンス劣化を避けるためです。
+
+> コードのプリロードはデータのプリロードの前提条件であるため、この属性は、存在するどの `data-sveltekit-preload-data` 属性よりも先行度が高い値(more eager value)を指定した場合にのみ、効果を発揮します。
+
+`data-sveltekit-preload-data` と同様、ユーザーがデータ使用量の削減を選択している場合、この属性も無視されます。
 
 ### data-sveltekit-reload
 
@@ -50,14 +83,14 @@ SvelteKit では、アプリのルート(routes)間の移動に、(フレーム�
 これらのオプションが有効になっている要素の中でこれらのオプションを無効にするには、`"off"` 値を使用します:
 
 ```html
-<div data-sveltekit-prefetch>
-	<!-- これらのリンクはプリフェッチされます -->
+<div data-sveltekit-preload-data>
+	<!-- these links will be preloaded -->
 	<a href="/a">a</a>
 	<a href="/b">b</a>
 	<a href="/c">c</a>
 
-	<div data-sveltekit-prefetch="off">
-		<!-- これらのリンクはプリフェッチされません -->
+	<div data-sveltekit-preload-data="off">
+		<!-- these links will NOT be preloaded -->
 		<a href="/d">d</a>
 		<a href="/e">e</a>
 		<a href="/f">f</a>

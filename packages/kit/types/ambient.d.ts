@@ -5,10 +5,9 @@
  * /// <reference types="@sveltejs/kit" />
  *
  * declare namespace App {
+ * 	interface Error {}
  * 	interface Locals {}
- *
  * 	interface PageData {}
- *
  * 	interface Platform {}
  * }
  * ```
@@ -65,11 +64,6 @@ declare namespace App {
 	export interface Platform {}
 }
 
-/**
- * ```ts
- * import { browser, dev, prerendering } from '$app/environment';
- * ```
- */
 declare module '$app/environment' {
 	/**
 	 * アプリがブラウザで動作している場合 `true` です。
@@ -77,32 +71,30 @@ declare module '$app/environment' {
 	export const browser: boolean;
 
 	/**
-	 * 開発サーバーが動作しているかどうか。`NODE_ENV` や `MODE` に対応しているか保証されません。
+	 * SvelteKit はビルド時にアプリを実行し、アプリを解析します。このプロセス中は、`building` は `true` です。これはプリレンダリング中にも適用されます。
+	 */
+	export const building: boolean;
+
+	/**
+	 * 開発サーバーが動作しているかどうか。`NODE_ENV` や `MODE` に対応しているかどうかは保証されません。
 	 */
 	export const dev: boolean;
 
 	/**
-	 * プリレンダリング時は `true`、それ以外の場合は `false` です。
-	 */
-	export const prerendering: boolean;
-
-	/**
-	 * The value of `config.kit.version.name`
+	 * `config.kit.version.name` の値です。
 	 */
 	export const version: string;
 }
 
-/**
- * ```ts
- * import { enhance, applyAction } from '$app/forms';
- * ```
- */
 declare module '$app/forms' {
 	import type { ActionResult } from '@sveltejs/kit';
 
 	type MaybePromise<T> = T | Promise<T>;
 
-	export type SubmitFunction<
+	// this is duplicated in @sveltejs/kit because create-svelte tests fail
+	// if we use the imported version. See https://github.com/sveltejs/kit/pull/7003#issuecomment-1330921789
+	// for why this happens (it's likely a bug in TypeScript, but one that is so rare that it's unlikely to be fixed)
+	type SubmitFunction<
 		Success extends Record<string, unknown> | undefined = Record<string, any>,
 		Invalid extends Record<string, unknown> | undefined = Record<string, any>
 	> = (input: {
@@ -166,9 +158,10 @@ declare module '$app/forms' {
 	/**
 	 * フォーム送信からのレスポンスをデシリアライズするためにこの関数を使用してください。
 	 * 使用方法:
-	 * ```
-	 * const res = await fetch('/form?/action', { method: 'POST', body: formData });
-	 * const result = deserialize(await res.text());
+	 *
+	 * ```js
+	 * const response = await fetch('/form?/action', { method: 'POST', body: formData });
+	 * const result = deserialize(await response.text());
 	 * ```
 	 */
 	export function deserialize<
@@ -177,20 +170,6 @@ declare module '$app/forms' {
 	>(serialized: string): ActionResult<Success, Invalid>;
 }
 
-/**
- * ```ts
- * import {
- * 	afterNavigate,
- * 	beforeNavigate,
- * 	disableScrollHandling,
- * 	goto,
- * 	invalidate,
- * 	invalidateAll,
- * 	prefetch,
- * 	prefetchRoutes
- * } from '$app/navigation';
- * ```
- */
 declare module '$app/navigation' {
 	import { BeforeNavigate, AfterNavigate } from '@sveltejs/kit';
 
@@ -251,28 +230,27 @@ declare module '$app/navigation' {
 	 */
 	export function invalidateAll(): Promise<void>;
 	/**
-	 * 指定されたページをプログラム的にプリフェッチします、つまり
+	 * 指定されたページをプログラム的にプリロードします、つまり
 	 *  1. そのページのコードが取得され読み込まれていることを確認し、
 	 *  2. そのページの load 関数を適切なオプションで呼び出します。
 	 *
-	 * `data-sveltekit-prefetch` が使用された `<a>` 要素をユーザーがタップまたはマウスオーバーしたときに SvelteKit がトリガーする動作と同じです。
+	 * `data-sveltekit-preload-data` が使用された `<a>` 要素をユーザーがタップまたはマウスオーバーしたときに SvelteKit がトリガーする動作と同じです。
 	 * 次のナビゲーション先が `href` である場合、load から返される値が使われるので、ナビゲーションを瞬時に行うことができます。
-	 * プリフェッチが完了したときに解決される Promise を返します。
+	 * プリロードが完了したときに解決される Promise を返します。
 	 *
-	 * @param href Page to prefetch
+	 * @param href Page to preload
 	 */
-	export function prefetch(href: string): Promise<void>;
+	export function preloadData(href: string): Promise<void>;
 	/**
-	 * まだ取得されていないルート(routes)のコードをプログラム的にプリフェッチします。
+	 * まだ取得されていないルート(routes)のコードをプログラム的にインポートします。
 	 * 通常、後続のナビゲーションを高速にするためにこれを呼び出します。
 	 *
-	 * 引数を指定しない場合は全てのルート(routes)を取得します。指定する場合は、ルート(routes)にマッチするパス名、例えば
-	 * `/about` (`src/routes/about.svelte` にマッチ) や `/blog/*` (`src/routes/blog/[slug].svelte` にマッチ) のように指定することができます。
+	 * You can specify routes by any matching pathname such as `/about` (to match `src/routes/about.svelte`) or `/blog/*` (to match `src/routes/blog/[slug].svelte`).
 	 *
-	 * prefetch 関数とは異なり、この関数はそれぞれのページの load を呼び出しません。
-	 * ルート(routes)のプリフェッチが完了したときに解決される Promise を返します。
+	 * `preloadData` とは異なり、この関数は `load` 関数を呼び出しません。
+	 * モジュールのインポートが完了したときに解決される Promise を返します。
 	 */
-	export function prefetchRoutes(routes?: string[]): Promise<void>;
+	export function preloadCode(...urls: string[]): Promise<void>;
 
 	/**
 	 * リンクをクリックしたり、`goto(...)` を呼び出したり、ブラウザの 戻る/進む を使うなどして新しい URL にナビゲーションするその直前にトリガーされるナビゲーションインターセプターです。
@@ -292,11 +270,6 @@ declare module '$app/navigation' {
 	export function afterNavigate(callback: (navigation: AfterNavigate) => void): void;
 }
 
-/**
- * ```ts
- * import { base, assets } from '$app/paths';
- * ```
- */
 declare module '$app/paths' {
 	/**
 	 * [`config.kit.paths.base`](https://kit.svelte.jp/docs/configuration#paths) にマッチする文字列です。
@@ -313,10 +286,6 @@ declare module '$app/paths' {
 }
 
 /**
- * ```ts
- * import { getStores, navigating, page, updated } from '$app/stores';
- * ```
- *
  * サーバー上のストア(Store)は _コンテクスチュアル(contextual)_ で、ルート(root)コンポーネントの [context](https://svelte.jp/tutorial/context-api) に追加されます。つまり、`page` はリクエストごとにユニークであり、同じサーバーで同時に処理される複数のリクエスト感で共有されません。
  *
  * そのため、ストアを使用するためには、コンポーネントの初期化の際にそのストアをサブスクライブする必要があります (コンポーネント内で `$page` という形でストアの値を参照する場合、自動的にそうなります)。
@@ -354,10 +323,6 @@ declare module '$app/stores' {
 }
 
 /**
- * ```ts
- * import { build, files, prerendered, version } from '$service-worker';
- * ```
- *
  * このモジュールは [service workers](https://kit.svelte.jp/docs/service-workers) でのみ使用できます。
  */
 declare module '$service-worker' {
@@ -388,10 +353,9 @@ declare module '@sveltejs/kit/hooks' {
 	 * 複数の `handle` の呼び出しを middleware ライクな方法でシーケンス化するヘルパー関数です。
 	 *
 	 * ```js
-	 * /// file: src/hooks.js
+	 * /// file: src/hooks.server.js
 	 * import { sequence } from '@sveltejs/kit/hooks';
 	 *
-	 * /** @type {import('@sveltejs/kit').Handle} *\/
 	 * async function first({ event, resolve }) {
 	 * 	console.log('first pre-processing');
 	 * 	const result = await resolve(event, {
@@ -405,7 +369,6 @@ declare module '@sveltejs/kit/hooks' {
 	 * 	return result;
 	 * }
 	 *
-	 * /** @type {import('@sveltejs/kit').Handle} *\/
 	 * async function second({ event, resolve }) {
 	 * 	console.log('second pre-processing');
 	 * 	const result = await resolve(event, {

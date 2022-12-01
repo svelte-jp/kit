@@ -39,7 +39,7 @@
 				サーバーレンダリングアプリのSEOとプログレッシブエンハンスメント、SPAの洗練されたナビゲーションを全て備えています
 			</p>
 
-			<a data-sveltekit-prefetch href="/docs" class="cta">ドキュメントを読む</a>
+			<a data-sveltekit-preload-data href="/docs" class="cta">ドキュメントを読む</a>
 		</div>
 
 		<div slot="three">
@@ -48,7 +48,7 @@
 				高度なルーティング、サーバーサイドレンダリング、コード分割、オフラインサポートなどをすぐにお使いいただけます。
 			</p>
 
-			<a data-sveltekit-prefetch href="/docs" class="cta">ドキュメントを読む</a>
+			<a data-sveltekit-preload-data href="/docs" class="cta">ドキュメントを読む</a>
 		</div>
 
 		<div class="description" slot="what">
@@ -74,7 +74,7 @@ cd my-app
 npm install
 npm run dev -- --open</code
 				></pre>
-			<a data-sveltekit-prefetch href="/docs" class="cta">get started</a>
+			<a data-sveltekit-preload-data href="/docs" class="cta">get started</a>
 		</div>
 	</Blurb>
 </div>

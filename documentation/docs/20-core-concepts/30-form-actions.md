@@ -439,3 +439,17 @@ const response = await fetch(this.action, {
 ### Alternatives
 
 サーバーにデータを送信する方法として、プログレッシブな強化(progressively enhance)を行うことができるため Form actions は望ましい方法ですが、[`+server.js`](/docs/routing#server) ファイルを使用して (例えば) JSON API を公開することもできます。
+
+### GET vs POST
+
+これまで見てきたように、フォームアクションを使うには、`method="POST"` を使用する必要があります。
+
+サーバーにデータを `POST` する必要がないフォームもあるでしょう — 例えば検索入力(search inputs)です。これに対応するには `method="GET"` (または、`method` を全く書かないのも同等です) を使うことができ、そして SvelteKit はそれを `<a>` 要素のように扱い、フルページナビゲーションの代わりにクライアントサイドルーターを使用します。:
+
+```html
+<form action="/search">
+	<input name="q">
+</form>
+```
+
+`<a>` 要素と同じように、[`data-sveltekit-reload`](/docs/link-options#data-sveltekit-reload) 属性と [`data-sveltekit-noscroll`](/docs/link-options#data-sveltekit-noscroll) 属性を `<form>` に設定することができ、ルーターの挙動をコントロールすることができます。

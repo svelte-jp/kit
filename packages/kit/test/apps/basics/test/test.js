@@ -1164,7 +1164,7 @@ test.describe('$app/stores', () => {
 		expect(await page.textContent('#nav-status')).toBe('not currently navigating');
 
 		if (javaScriptEnabled) {
-			await app.prefetchRoutes(['/store/navigating/b']);
+			await app.preloadCode('/store/navigating/b');
 
 			const res = await Promise.all([
 				page.click('a[href="/store/navigating/b"]'),
@@ -1336,6 +1336,32 @@ test.describe('Redirects', () => {
 		if (javaScriptEnabled) {
 			expect(await page.textContent('h1')).toBe('Hazaa!');
 		}
+	});
+
+	test('redirect response in handle hook', async ({ baseURL, clicknav, page }) => {
+		await page.goto('/redirect');
+
+		await clicknav('[href="/redirect/in-handle?response"]');
+
+		await page.waitForURL('/redirect/c');
+		expect(await page.textContent('h1')).toBe('c');
+		expect(page.url()).toBe(`${baseURL}/redirect/c`);
+
+		await page.goBack();
+		expect(page.url()).toBe(`${baseURL}/redirect`);
+	});
+
+	test('throw redirect in handle hook', async ({ baseURL, clicknav, page }) => {
+		await page.goto('/redirect');
+
+		await clicknav('[href="/redirect/in-handle?throw"]');
+
+		await page.waitForURL('/redirect/c');
+		expect(await page.textContent('h1')).toBe('c');
+		expect(page.url()).toBe(`${baseURL}/redirect/c`);
+
+		await page.goBack();
+		expect(page.url()).toBe(`${baseURL}/redirect`);
 	});
 });
 

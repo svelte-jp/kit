@@ -84,7 +84,7 @@ Sapper アプリでよくあるパターンとして、内部ライブラリを 
 
 #### Imports
 
-`@sapper/app` からインポートしていた `goto`、`prefetch`、`prefetchRoutes` は [`$app/navigation`](/docs/modules#$app-navigation) からのインポートに置き換えてください。
+`@sapper/app` からインポートしていた `goto`、`prefetch`、`prefetchRoutes` は、[`$app/navigation`](/docs/modules#$app-navigation) からインポートする `goto`、`preloadData`、`preloadCode` にそれぞれ置き換えてください。
 
 `@sapper/app` からインポートしていた `stores` については置き換える必要があります — 以下の [Stores](/docs/migrating#pages-and-layouts-stores)) をご覧ください。
 
@@ -132,8 +132,8 @@ Sapper では、相対 URL は、現在のページに対してではなく、ba
 
 #### &lt;a&gt; attributes
 
-- `sapper:prefetch` is now `data-sveltekit-prefetch`
-- `sapper:noscroll` is now `data-sveltekit-noscroll`
+- `sapper:prefetch` は `data-sveltekit-preload-data` になりました
+- `sapper:noscroll` は `data-sveltekit-noscroll` になりました
 
 ### Endpoints
 

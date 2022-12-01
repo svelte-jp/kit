@@ -8,8 +8,8 @@ import 'prismjs/components/prism-typescript.js';
 import 'prism-svelte';
 import { convert_link } from './convertlink.js';
 import { escape, extract_frontmatter, transform } from './markdown.js';
-import { modules } from '../../../../../../packages/kit/docs/types.js';
-import { render_modules } from './modules.js';
+import { modules } from './type-info.js';
+import { render, replace_placeholders } from './render.js';
 import { parse_route_id } from '../../../../../../packages/kit/src/utils/routing.js';
 import ts from 'typescript';
 import MagicString from 'magic-string';
@@ -46,8 +46,12 @@ const type_regex = new RegExp(
 
 const type_links = new Map();
 
+const slugs = {
+	'@sveltejs/kit': 'public-types'
+};
+
 modules.forEach((module) => {
-	const slug = slugify(module.name);
+	const slug = slugs[module.name] || slugify(module.name);
 
 	module.types.forEach((type) => {
 		const link = `/docs/types#${slug}-${slugify(type.name)}`;
@@ -59,13 +63,10 @@ modules.forEach((module) => {
  * @param {string} file
  */
 export async function read_file(file) {
-	const match = /\d{2}-(.+)\.md/.exec(file.split(path.sep).pop());
+	const match = /\d{2}-(.+)\.md/.exec(path.basename(file));
 	if (!match) return null;
 
-	const markdown = fs
-		.readFileSync(`${base}/${file}`, 'utf-8')
-		.replace('**TYPES**', () => render_modules('types'))
-		.replace('**EXPORTS**', () => render_modules('exports'));
+	const markdown = replace_placeholders(fs.readFileSync(`${base}/${file}`, 'utf-8'));
 
 	const highlighter = await createShikiHighlighter({ theme: 'css-variables' });
 
@@ -114,10 +115,12 @@ export async function read_file(file) {
 				version_class = ' js-version';
 			}
 
-			if (language === 'js' || language === 'ts') {
+			if (language === 'dts') {
+				html = renderCodeToHTML(source, 'ts', { twoslash: false }, {}, highlighter);
+			} else if (language === 'js' || language === 'ts') {
 				try {
 					const injected = [];
-					if (source.includes('$app/')) {
+					if (source.includes('$app/') || source.includes('@sveltejs/kit/')) {
 						injected.push(
 							`// @filename: ambient-kit.d.ts`,
 							`/// <reference types="@sveltejs/kit" />`
@@ -220,7 +223,7 @@ export async function read_file(file) {
 				html = `<pre class='language-${plang}'><code>${highlighted}</code></pre>`;
 			}
 
-			html = `<div class="code-block${version_class}">${
+			html = `<div class="code-block${version_class} ${options.style ?? ''}">${
 				options.file ? `<h5>${options.file}</h5>` : ''
 			}${html}</div>`;
 
@@ -252,7 +255,8 @@ export async function read_file(file) {
 							})
 							.join('');
 					}
-				);
+				)
+				.replace(/\/\*…\*\//g, '…');
 
 			fs.writeFileSync(`${snippet_cache}/${digest}.html`, html);
 			return html;
@@ -341,7 +345,7 @@ function parse({ body, file, code, codespan }) {
 					slug
 				});
 			} else {
-				throw new Error(`Unexpected <h${level}> in ${file}`);
+				// throw new Error(`Unexpected <h${level}> in ${file}`);
 			}
 
 			return `<h${level} id="${slug}">${html}<a href="#${slug}" class="anchor"><span class="visually-hidden">permalink</span></a></h${level}>`;

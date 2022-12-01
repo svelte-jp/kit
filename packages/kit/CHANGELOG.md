@@ -1,5 +1,87 @@
 # @sveltejs/kit
 
+## 1.0.0-next.570
+
+### Patch Changes
+
+- Remove prepublishOnly script ([#7893](https://github.com/sveltejs/kit/pull/7893))
+
+## 1.0.0-next.569
+
+### Patch Changes
+
+- Ignore elements that are no longer in the document ([#7881](https://github.com/sveltejs/kit/pull/7881))
+
+- [breaking] Use client-side routing for `<form method="GET">` ([#7828](https://github.com/sveltejs/kit/pull/7828))
+
+## 1.0.0-next.568
+
+### Patch Changes
+
+- [fix] add migration hint for renamed methods ([#7874](https://github.com/sveltejs/kit/pull/7874))
+
+## 1.0.0-next.567
+
+### Patch Changes
+
+- Co-locate synthetic types with other Kit types ([#7864](https://github.com/sveltejs/kit/pull/7864))
+
+## 1.0.0-next.566
+
+### Patch Changes
+
+- Add more type documentation ([#7003](https://github.com/sveltejs/kit/pull/7003))
+
+- [breaking] move SubmitFunction into @sveltejs/kit ([#7003](https://github.com/sveltejs/kit/pull/7003))
+
+## 1.0.0-next.565
+
+### Patch Changes
+
+- [breaking] Replace `data-sveltekit-prefetch` with `-preload-code` and `-preload-data` ([#7776](https://github.com/sveltejs/kit/pull/7776))
+
+- [breaking] Rename `prefetch` to `preloadData` and `prefetchRoutes` to `preloadCode` ([#7776](https://github.com/sveltejs/kit/pull/7776))
+
+## 1.0.0-next.564
+
+### Patch Changes
+
+- [chore] upgrade undici ([#7830](https://github.com/sveltejs/kit/pull/7830))
+
+- Make `$page.url` resilient against mutations ([#7827](https://github.com/sveltejs/kit/pull/7827))
+
+## 1.0.0-next.563
+
+### Patch Changes
+
+- [feat] allow handleError to return a promise ([#7780](https://github.com/sveltejs/kit/pull/7780))
+
+- [breaking] remove `format` option from `generateManifest(...)` ([#7820](https://github.com/sveltejs/kit/pull/7820))
+
+## 1.0.0-next.562
+
+### Patch Changes
+
+- [fix] handle redirects in handle hook while processing data request ([#7797](https://github.com/sveltejs/kit/pull/7797))
+
+- Make touchstart listener passive ([#7818](https://github.com/sveltejs/kit/pull/7818))
+
+- [breaking] remove `getStaticDirectory()` from builder API ([#7809](https://github.com/sveltejs/kit/pull/7809))
+
+- Make console.warn wrapper named rather than anonymous ([#7811](https://github.com/sveltejs/kit/pull/7811))
+
+## 1.0.0-next.561
+
+### Patch Changes
+
+- Upgrade vite-plugin-svelte to ^1.3.1 ([#7760](https://github.com/sveltejs/kit/pull/7760))
+
+## 1.0.0-next.560
+
+### Patch Changes
+
+- [breaking] Rename `prerendering` to `building`, remove `config.kit.prerender.enabled` ([#7762](https://github.com/sveltejs/kit/pull/7762))
+
 ## 1.0.0-next.559
 
 ### Patch Changes
