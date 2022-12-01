@@ -74,6 +74,7 @@ export async function read_file(file) {
 
 	const { content, sections } = parse({
 		body: generate_ts_from_js(body),
+		file,
 		code: (source, language, current) => {
 			const hash = createHash('sha256');
 			hash.update(source + language + current);
@@ -284,11 +285,12 @@ export async function read_file(file) {
 /**
  * @param {{
  *   body: string;
+ *   file: string;
  *   code: (source: string, language: string, current: string) => string;
  *   codespan: (source: string) => string;
  * }} opts
  */
-function parse({ body, code, codespan }) {
+function parse({ body, file, code, codespan }) {
 	const headings = [];
 
 	/** @type {import('./types').Section[]} */
