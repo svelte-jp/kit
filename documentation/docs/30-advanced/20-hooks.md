@@ -13,11 +13,11 @@ hooks ファイルは2つあり、どちらもオプションです:
 
 > これらのファイルの場所は [`config.kit.files.hooks`](/docs/configuration#files) で設定できます。
 
-### Server hooks
+## Server hooks
 
 以下の hooks は `src/hooks.server.js` に追加することができます:
 
-#### handle
+### handle
 
 この関数は SvelteKit のサーバーが [リクエスト](/docs/web-standards#fetch-apis-request) を受けるたびに (アプリの実行中であろうと、[プリレンダリング](/docs/page-options#prerender)であろうと) 実行され、[レスポンス](/docs/web-standards#fetch-apis-response) を決定します。リクエストを表す `event` オブジェクトと、ルート(route)をレンダリングしレスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでルート(routes)を実装する場合など)。
 
@@ -90,7 +90,7 @@ export async function handle({ event, resolve }) {
 
 `resolve(...)` は決してエラーをスローせず、適切なステータスコードと `Promise<Response>` を返すことにご注意ください。もし `handle` 中に他の場所でエラーがスローされた場合、それは致命的(fatal)なものとして扱われ、SvelteKit は `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズ可能なフォールバックエラーページをレスポンスとして返します。エラーハンドリングの詳細は [こちら](/docs/errors) からお読み頂けます。
 
-#### handleFetch
+### handleFetch
 
 この関数は、サーバー上で (またはプリレンダリング中に) 実行される `load` 関数の中で発生する `fetch` リクエストを変更 (または置換) することできます。
 
@@ -132,11 +132,11 @@ export async function handleFetch({ event, request, fetch }) {
 }
 ```
 
-### Shared hooks
+## Shared hooks
 
 以下は `src/hooks.server.js` _と_ `src/hooks.client.js` のどちらにも追加できます:
 
-#### handleError
+### handleError
 
 予期せぬエラーがロード中またはレンダリング中にスローされると、この関数が `error` と `event` を引数にとって呼び出されます。これによって2つのことが可能になります:
 

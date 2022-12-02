@@ -8,7 +8,7 @@ title: Web standards
 
 具体的には、以下のことが楽にできるでしょう:
 
-### Fetch APIs
+## Fetch APIs
 
 SvelteKit は、ネットワーク越しにデータを取得するために [`fetch`](https://developer.mozilla.org/ja/docs/Web/API/fetch) を使用します。ブラウザだけでなく、[hooks](/docs/hooks) や [サーバールート(server routes)](/docs/routing#server) の中でも使用することができます。
 
@@ -16,15 +16,15 @@ SvelteKit は、ネットワーク越しにデータを取得するために [`f
 
 `fetch` 自体の他に、[Fetch API](https://developer.mozilla.org/ja/docs/Web/API/Fetch_API) には以下のインターフェイスが含まれています:
 
-#### Request
+### Request
 
 [`Request`](https://developer.mozilla.org/ja/docs/Web/API/Request) のインスタンスは [hooks](/docs/hooks) や [サーバールート(server routes)](/docs/routing#server) で `event.request` という形でアクセスすることができます。これには `request.json()` や `request.formData()` など、エンドポイントに送られたデータを取得するための便利なメソッドが含まれています。
 
-#### Response
+### Response
 
 [`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) のインスタンスは `await fetch(...)` と `+server.js` ファイル内のハンドラーから返されます。本質的には、SvelteKit アプリは `Request` を `Response` に変換するマシンです。
 
-#### Headers
+### Headers
 
 [`Headers`](https://developer.mozilla.org/ja/docs/Web/API/Headers) インターフェイスでは、SvelteKit が受信した `request.headers` を読むことと、送信する `response.headers` をセットすることができます:
 
@@ -45,7 +45,7 @@ export function GET(event) {
 }
 ```
 
-### FormData
+## FormData
 
 HTML のネイティブのフォーム送信を扱う場合は、[`FormData`](https://developer.mozilla.org/ja/docs/Web/API/FormData) オブジェクトを使用します。
 
@@ -68,15 +68,15 @@ export async function POST(event) {
 }
 ```
 
-### Stream APIs
+## Stream APIs
 
 ほとんどの場合、エンドポイント(endpoints) は 上記の `userAgent` の例のように、完全なデータを返します。たまに、1度ではメモリに収まらない大きすぎるレスポンスを返したり、チャンクで配信したりしなければならないことがあります。このような場合のために、プラットフォームは [streams](https://developer.mozilla.org/ja/docs/Web/API/Streams_API) — [ReadableStream](https://developer.mozilla.org/ja/docs/Web/API/ReadableStream)、[WritableStream](https://developer.mozilla.org/ja/docs/Web/API/WritableStream)、[TransformStream](https://developer.mozilla.org/ja/docs/Web/API/TransformStream) を提供しています。
 
-### URL APIs
+## URL APIs
 
 URL は [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) インターフェイスで表現され、`origin` や `pathname` のような便利なプロパティが含まれています (ブラウザでは `hash` なども)。このインターフェイスは、[hooks](/docs/hooks) と [サーバールート(server routes)](/docs/routing#server) では `event.url`、[ページ(pages)](/docs/routing#page) では [`$page.url`](/docs/modules#$app-stores)、[`beforeNavigate` と `afterNavigate`](/docs/modules#$app-navigation) では `from` と `to`、など、様々な場所で使われています。
 
-#### URLSearchParams
+### URLSearchParams
 
 URL が存在する場所であれば、[`URLSearchParams`](https://developer.mozilla.org/ja/docs/Web/API/URLSearchParams) のインスタンスである `url.searchParams` を使用してクエリパラメータにアクセスできます:
 
@@ -93,7 +93,7 @@ export {};
 const foo = url.searchParams.get('foo');
 ```
 
-### Web Crypto
+## Web Crypto
 
 [Web Crypto API](https://developer.mozilla.org/ja/docs/Web/API/Web_Crypto_API) を、グローバルの `crypto` 経由で使用することができます。内部では [Content Security Policy](/docs/configuration#csp) ヘッダーで使用されていますが、例えば UUID を生成するのにもお使い頂けます。
 

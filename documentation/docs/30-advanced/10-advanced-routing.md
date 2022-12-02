@@ -2,7 +2,7 @@
 title: 高度なルーティング
 ---
 
-### Restパラメータ
+## Restパラメータ
 
 ルートセグメント(route segments)の数がわからない場合は、rest 構文を使用することができます。例えば GitHub のファイルビューアのようなものを実装する場合は…
 
@@ -24,7 +24,7 @@ title: 高度なルーティング
 
 > `src/routes/a/[...rest]/z/+page.svelte` は `/a/z` にも (つまり、パラメータが全くない場合にも)、`/a/b/z` や `/a/b/c/z` と同様にマッチします。Rest パラメータの値が正しいことを、例えば [matcher](#matching) を使用するなどして確認してください。
 
-#### 404 pages
+### 404 pages
 
 Rest パラメータによってカスタムの 404 をレンダリングすることができます。これらのルート(routes)があるとして…
 
@@ -63,13 +63,13 @@ export function load(event) {
 
 > もし 404 のケースをハンドリングしていない場合、[`handleError`](/docs/hooks#shared-hooks-handleerror) によって表示が行われます。
 
-### Optional parameters
+## Optional parameters
 
 `[lang]/home` というルートに含まれる `lang` というパラメータは必須です。これらのパラメータをオプションにできると、今回の例では `home` と `en/home` のどちらも同じページを指すことができるのでとても便利です。パラメータにもう1つ括弧を付けることでこれができるようになります: `[[lang]]/home`
 
 optional のルートパラメータ(route parameter)は rest パラメータに続けて使用すること (`[...rest]/[[optional]]`) はできません。パラメータは 'greedily' にマッチし、optional のパラメータは使用されないこともあるためです。
 
-### マッチング(Matching)
+## マッチング(Matching)
 
 `src/routes/archive/[page]` のようなルート(route)は `/archive/3` にマッチしますが、`/archive/potato` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"3"` や `"potato"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](/docs/configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
 
@@ -92,7 +92,7 @@ export function match(param) {
 
 > Matcher は サーバーとブラウザの両方で動作します。
 
-### ソート(Sorting)
+## ソート(Sorting)
 
 あるパスに対し、マッチするルート(routes)は複数でも構いません。例えば、これらのルート(routes)はどれも `/foo-abc` にマッチします:
 
@@ -121,7 +121,7 @@ src/routes/[b]/+page.svelte
 src/routes/[...catchall]/+page.svelte
 ```
 
-### エンコード(Encoding)
+## エンコード(Encoding)
 
 ファイルシステムでは使用できない文字があります — Linux と Mac では `/`、Windows では `\ / : * ? " < > |` です。URL においては、`#` と `%` には特別な意味がありますし、SvelteKit においては `[ ] ( )` に特別な意味があります。そのため、これらの文字をそのままルート(route)に使用することはできません。
 
@@ -162,11 +162,11 @@ Unicode エスケープシーケンスのフォーマットは `[u+nnnn]` で、
 
 > ディレクトリの先頭に `.` 文字があると、TypeScript で [問題](https://github.com/microsoft/TypeScript/issues/13399) が起きるため、例えば [`.well-known`](https://en.wikipedia.org/wiki/Well-known_URI) のようなルート(route)を作る場合はこれらの文字をエンコードしておくと良いでしょう: `src/routes/[x+2e]well-known/...`
 
-### Advanced layouts
+## Advanced layouts
 
 デフォルトでは、 _レイアウトの階層_ が _ルート(route)の階層_ に反映されます。場合によっては、そうしたくないこともあるかもしれません。
 
-#### (group)
+### (group)
 
 'アプリ' のルート(routes)としてのレイアウト (例えば `/dashboard` や `/item`) が1つあり、'マーケティング' のルート(routes)としての別のレイアウト (`/blog` や `/testimonials`) があるかもしれません。これらのルート(routes)を、ディレクトリの名前を括弧でくくることでグループ化することができます。通常のディレクトリとは異なり、`(app)` や `(marketing)` はそれらの中のルート(routes)の URL パス名には影響しません:
 
@@ -186,13 +186,13 @@ src/routes/
 
 `+page` を `(group)` の中に直接配置することもできます (例えば、`/` が `(app)` や `(marketing)` のページであるべき場合など)。
 
-#### Breaking out of layouts
+### Breaking out of layouts
 
 最上位のレイアウト(root layout)は、アプリの全てのページに適用されます。省略した場合、デフォルトは `<slot />` です。もし、いくつかのページで他のページとは異なるレイアウト階層を持ちたい場合には、アプリ全体を1つまたは複数のグループにして、共通のレイアウトを継承しないルート(route)を分けることができます。
 
 上記の例で、`/admin` ルート(route)は `(app)` や `(marketing)` のレイアウトを継承しません。
 
-#### +page@
+### +page@
 
 ページは、ルート(route)ごとに現在のレイアウト階層から抜け出すことができます。先ほどの例に出てきた `(app)` グループの中に、`/item/[id]/embed` ルート(route)があるとします:
 
@@ -229,7 +229,7 @@ src/routes/
 └ +layout.svelte
 ```
 
-#### +layout@
+### +layout@
 
 ページと同じように、同じ方法でレイアウト _自体_ をその親のレイアウトの階層から外すことができます。例えば、`+layout@.svelte` コンポーネントはその全ての子ルート(routes)の階層をリセットします。
 
@@ -247,7 +247,7 @@ src/routes/
 └ +layout.svelte
 ```
 
-#### レイアウトグループを使うときは
+### レイアウトグループを使うときは
 
 全てのユースケースがレイアウトのグループ化に適しているわけではありませんし、無理に使用する必要もありません。あなたのユースケースが複雑な `(group)` のネストになってしまうかもしれませんし、たった1つの例外ケースのために `(group)` を導入したくないかもしれません。コンポジション (再利用可能な `load` 関数や Svelte コンポーネント) や if 文など、他の手段を使用してやりたいことを実現するのは全く問題ありません。以下の例では、最上位のレイアウト(root layout)に戻し、他のレイアウトでも使用できるコンポーネントや関数を再利用したレイアウトを示しています:
 

@@ -8,7 +8,7 @@ title: Page options
 
 アプリの様々な領域でこれらのオプションをうまく組み合わせることができます。例えば、マーケティングページは高速化を最大限にするためにプリレンダリングし、動的なページは SEO とアクセシビリティのためにサーバーでレンダリングし、管理者用のセクションはクライアントのみでレンダリングするようにして SPA にすることができます。このように、SvelteKit はとても万能で多くの用途にお使いいただけます。
 
-### prerender
+## prerender
 
 あなたのアプリの、少なくともいくつかのルートは、ビルド時に生成されるシンプルな HTML ファイルとして表現されることが多いでしょう。これらのルート(routes)を [_プリレンダリング_](/docs/glossary#prerendering) することができます。
 
@@ -37,7 +37,7 @@ export const prerender = 'auto';
 
 プリレンダリング中、[`$app/environment`](/docs/modules#$app-environment) からインポートされる `building` の値は `true` になります。
 
-#### Prerendering server routes
+### Prerendering server routes
 
 他のページオプションとは違い、`prerender` は `+server.js` ファイルにも適用できます。これらのファイルはレイアウトから影響を受けませんが、そこからデータを読み込むページからデフォルトの値を継承します。例えば、`+page.js` がこの `load` 関数を含む場合…
 
@@ -54,7 +54,7 @@ export async function load({ fetch }) {
 
 …それから `src/routes/my-server-route.json/+server.js` は、自身の `export const prerender = false` を含んでいなければ、プリレンダリング可能であると扱われることになります。
 
-#### プリレンダリングしない場合
+### プリレンダリングしない場合
 
 基本的なルールは次の通りです: ページがプリレンダリング可能であると言うためには、そのページを直接表示する2人のユーザーが、サーバーから同じコンテンツを取得できなけれなりません。
 
@@ -66,7 +66,7 @@ export async function load({ fetch }) {
 
 [action](/docs/form-actions) 付きのページは、サーバーがその action の `POST` リクエストを処理できなければならないため、プリレンダリングできません。
 
-#### ルートの衝突(Route conflicts)
+### ルートの衝突(Route conflicts)
 
 プリレンダリングはファイルシステムに書き込むため、ディレクトリとファイルが同じ名前になるエンドポイントを2つ持つことはできません。例えば、`src/routes/foo/+server.js` と `src/routes/foo/bar/+server.js` の場合は、`foo` と `foo/bar` を作成しようとしますが、これは不可能です。
 
@@ -76,7 +76,7 @@ export async function load({ fetch }) {
 
 ルーターがすでにアクティブかどうかにかかわらず、このページからのすべてのナビゲーションでクライアントサイドルーティングが無効になることにご注意ください。
 
-#### Troubleshooting
+### Troubleshooting
 
 'The following routes were marked as prerenderable, but were not prerendered' というようなエラーが表示されたら、それは該当のルート (またはページの場合は親レイアウト) に `export const prerender = true` があるにもかかわらず実際にはそのページがプリレンダリングされていないことが原因です (プリレンダリングクローラーがそのページにアクセスしていないため)。
 
@@ -85,7 +85,7 @@ export async function load({ fetch }) {
 * SvelteKit が [`config.kit.prerender.entries`](/docs/configuration#prerender) からのリンクを辿ってそのルート(route)を見つけられることを確認してください。動的なルート(例えば `[parameters]` を持つページ) へのリンクは、他のエントリーポイントをクローリングしても見つからない場合にこのオプションに追加してください。そうしないと、SvelteKit はその parameters が持つべき値がわからないので、プリレンダリングされません。プリレンダリング可能(prerenderable)なページとしてマークされていないページは無視され、そのページから他のページ(プリレンダリング可能なものも含む)へのリンクもクローリングされません。
 * `export const prerender = true` から `export const prerender = 'auto'` に変更してください。`'auto'` になっているルート(route)は動的にサーバーレンダリングすることができます
 
-### ssr
+## ssr
 
 通常、SvelteKit ではページを最初にサーバーでレンダリングし、その HTML をクライアントに送信してハイドレーションを行います。もし `ssr` を `false` に設定した場合、代わりに空の 'shell' ページがレンダリングされます。これはページがサーバーでレンダリングできない場合には便利 (例えば `document` などのブラウザオンリーな globals を使用するなど) ですが、ほとんどの状況では推奨されません ([appendix をご参照ください](/docs/glossary#ssr))。
 
@@ -96,7 +96,7 @@ export const ssr = false;
 
 `export const ssr = false` を最上位(root)の `+layout.js` に追加した場合、アプリ全体がクライアントのみでレンダリングされるようになり、それはつまり、本質的にはアプリを SPA にする、ということを意味します。
 
-### csr
+## csr
 
 通常、SvelteKit はサーバーでレンダリングされた HTML を、クライアントサイドレンダリング(CSR)されたインタラクティブなページに [ハイドレーション](/docs/glossary#hydration) します。JavaScript を全く必要としないページもあります。多くのブログ記事や 'about' ページがこのカテゴリに入ります。このような場合は CSR を無効にすることができます:
 
@@ -107,7 +107,7 @@ export const csr = false;
 
 > `ssr` to `csr` の両方が `false` である場合は、何もレンダリングされません！
 
-### trailingSlash
+## trailingSlash
 
 デフォルトでは、SvelteKit は URL から末尾のスラッシュ(trailing slash)を取り除きます。`/about/` にアクセスすると、`/about` へのリダイレクトをレスポンスとして受け取ることになります。この動作は、`trailingSlash` オプションで変更することができます。指定できる値は `'never'` (デフォルト)、`'always'`、`'ignore'` です。
 

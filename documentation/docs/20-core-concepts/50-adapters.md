@@ -8,7 +8,7 @@ SvelteKit アプリをデプロイする前に、それをデプロイ先の環�
 
 > 新しい環境のサポートを追加することに関しては、[adapter-auto の README](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) をご参照ください。
 
-### サポートされている環境
+## サポートされている環境
 
 SvelteKit は、公式にサポートされている adapter を多数提供しています。
 
@@ -18,7 +18,7 @@ SvelteKit は、公式にサポートされている adapter を多数提供し�
 - [Netlify](https://netlify.com) — [`adapter-netlify`](https://github.com/sveltejs/kit/tree/master/packages/adapter-netlify)
 - [Vercel](https://vercel.com) — [`adapter-vercel`](https://github.com/sveltejs/kit/tree/master/packages/adapter-vercel)
 
-#### Node.js
+### Node.js
 
 シンプルな Node サーバーを作成するには、[`@sveltejs/adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) パッケージをインストールし、`svelte.config.js` を更新します:
 
@@ -42,7 +42,7 @@ export default {
 };
 ```
 
-#### 静的サイト(Static sites)
+### 静的サイト(Static sites)
 
 ほとんどの adapter は、サイト内の [プリレンダリング可能な](/docs/page-options#prerender) ページについて、静的な HTML を生成します。アプリ全体がプリレンダリング可能な場合は、[`@sveltejs/adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使用して _全ての_ ページ について静的な HTML を生成することができます。完全に静的なサイトは、[GitHub Pages](https://pages.github.com/) のような静的ホストなど、さまざまなプラットフォームでホストすることができます。
 
@@ -56,11 +56,11 @@ export default {
 
 > SvelteKit をデプロイする環境に対して [`trailingSlash`](/docs/page-options#trailingslash) が適切に設定されているかよく確かめてください。`/a` に対するリクエストを受け取っても `/a.html` をレンダリングしない環境の場合、`/a.html` の代わりに `/a/index.html` を生成するために `trailingSlash: 'always'` を設定する必要があります。
 
-#### プラットフォーム固有の情報
+### プラットフォーム固有の情報
 
 adapter によっては、リクエストに関する追加情報にアクセスすることができます。例えば、Cloudflare Workers の場合は KV namespaces などを含む `env` オブジェクトにアクセスできます。これは [hooks](/docs/hooks) や [サーバールート(server routes)](/docs/routing#server) で使用される `RequestEvent` に、`platform` プロパティとして渡されます — 詳しくは、各 adapter のドキュメントをご参照ください。
 
-### コミュニティが提供する adapter
+## コミュニティが提供する adapter
 
 加えて、他のプラットフォーム向けに、[コミュニティによって提供されている adapter](https://sveltesociety.dev/components#adapters) もございます。パッケージマネージャーで該当の adapter をインストールした後、`svelte.config.js` を更新してください:
 
@@ -70,7 +70,7 @@ adapter によっては、リクエストに関する追加情報にアクセス
 +import adapter from 'svelte-adapter-[x]';
 ```
 
-### custom adapter を作成する
+## custom adapter を作成する
 
 似ているプラットフォーム向けの [adapter のソースを探し](https://github.com/sveltejs/kit/tree/master/packages)、それをコピーするところから始めることを推奨します。
 

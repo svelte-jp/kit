@@ -20,6 +20,6 @@ SvelteKit には2つの基本的なコンセプトがあります:
 
 ファイルを編集して、どのように動作するのか確かめてみてください。もしかしたら、もうこれ以降のガイドを読む必要はないかもしれません！
 
-### エディタのセットアップ
+## エディタのセットアップ
 
 [Visual Studio Code (通称 VS Code)](https://code.visualstudio.com/download) と [Svelte extension](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) のご使用をおすすめしますが、[他にも数多くのエディタをサポートしています](https://sveltesociety.dev/tools#editor-support)。
