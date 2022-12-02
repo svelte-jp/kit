@@ -228,12 +228,12 @@ export interface Cookies {
 
 export interface KitConfig {
 	/**
-	 * Your [adapter](https://kit.svelte.dev/docs/adapters) is run when executing `vite build`. It determines how the output is converted for different platforms.
+	 * [adapter](https://kit.svelte.jp/docs/adapters) は、`vite build` の実行中に実行されます。これによってどのプラットフォーム向けにアウトプットを変換するか決定します。
 	 * @default undefined
 	 */
 	adapter?: Adapter;
 	/**
-	 * An object containing zero or more aliases used to replace values in `import` statements. These aliases are automatically passed to Vite and TypeScript.
+	 * `import` 文の値を置き換えるのに使用されるエイリアスを0個以上含むオブジェクトです。これらのエイリアスは自動的に Vite と TypeScript に渡されます。
 	 *
 	 * ```js
 	 * /// file: svelte.config.js
@@ -256,19 +256,19 @@ export interface KitConfig {
 	 * };
 	 * ```
 	 *
-	 * > The built-in `$lib` alias is controlled by `config.kit.files.lib` as it is used for packaging.
+	 * > ビルトインの `$lib` エイリアスはパッケージングに使用されるため、`config.kit.files.lib` でコントロールされます。
 	 *
-	 * > You will need to run `npm run dev` to have SvelteKit automatically generate the required alias configuration in `jsconfig.json` or `tsconfig.json`.
+	 * > `jsconfig.json` や `tsconfig.json` に必要なエイリアス設定を、SvelteKit に自動的に生成させるためには、`npm run dev` を実行する必要があります。
 	 * @default {}
 	 */
 	alias?: Record<string, string>;
 	/**
-	 * The directory relative to `paths.assets` where the built JS and CSS (and imported assets) are served from. (The filenames therein contain content-based hashes, meaning they can be cached indefinitely). Must not start or end with `/`.
+	 * ビルドされた JS と CSS (とインポートされたアセット) が提供されるディレクトリで、`paths.assets` との相対です。(ファイル名にはそれ自体にコンテンツベースのハッシュが含まれるため、無期限にキャッシュすることができます)。先頭と末尾を `/` にすることはできません。
 	 * @default "_app"
 	 */
 	appDir?: string;
 	/**
-	 * [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) configuration. CSP helps to protect your users against cross-site scripting (XSS) attacks, by limiting the places resources can be loaded from. For example, a configuration like this...
+	 * [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) の設定です。CSP は、読み込むことができるリソースを、そのリソースの場所(ドメインなど)で制限することによって、クロスサイトスクリプティング(XSS)攻撃からユーザーを守るのに役立ちます。例えば、このような設定の場合…
 	 *
 	 * ```js
 	 * /// file: svelte.config.js
@@ -289,164 +289,164 @@ export interface KitConfig {
 	 * export default config;
 	 * ```
 	 *
-	 * ...would prevent scripts loading from external sites. SvelteKit will augment the specified directives with nonces or hashes (depending on `mode`) for any inline styles and scripts it generates.
+	 * …外部サイトのスクリプトの読み込みを防ぐことができます。SvelteKit は、生成されるインラインスタイルとスクリプトに対し、指定したディレクティブを nonce または hash (`mode` の設定による) で補強します。
 	 *
-	 * To add a nonce for scripts and links manually included in `src/app.html`, you may use the placeholder `%sveltekit.nonce%` (for example `<script nonce="%sveltekit.nonce%">`).
+	 * `src/app.html` の script や link に nonce を追加するには、`%sveltekit.nonce%` プレースホルダーをお使いください (例えば `<script nonce="%sveltekit.nonce%">`)。
 	 *
-	 * When pages are prerendered, the CSP header is added via a `<meta http-equiv>` tag (note that in this case, `frame-ancestors`, `report-uri` and `sandbox` directives will be ignored).
+	 * ページがプリレンダリングされる場合、CSP ヘッダーは `<meta http-equiv>` タグで追加されます (この場合、`frame-ancestors`、`report-uri`、`sandbox` ディレクティブは無視されることにご注意ください)。
 	 *
-	 * > When `mode` is `'auto'`, SvelteKit will use nonces for dynamically rendered pages and hashes for prerendered pages. Using nonces with prerendered pages is insecure and therefore forbidden.
+	 * > `mode` が `'auto'` の場合、SvelteKit は動的にレンダリングされるページには nonce を使用し、プリレンダリングされたページには hash を使用します。プリレンダリングされたページに nonce を使用するのは安全ではないため、禁止されています。
 	 *
-	 * > Note that most [Svelte transitions](https://svelte.dev/tutorial/transition) work by creating an inline `<style>` element. If you use these in your app, you must either leave the `style-src` directive unspecified or add `unsafe-inline`.
+	 * > 多くの [Svelte transitions](https://svelte.jp/tutorial/transition) はインラインの `<style>` 要素を作成することで動作することにご注意ください。アプリでこれらを使用する場合は、`style-src` ディレクティブを指定しないようにするか、`unsafe-inline` を追加する必要があります。
 	 */
 	csp?: {
 		/**
-		 * Whether to use hashes or nonces to restrict `<script>` and `<style>` elements. `'auto'` will use hashes for prerendered pages, and nonces for dynamically rendered pages.
+		 * `<script>` と `<style>` 要素の制限に hash と nonce のどちらを使用するか。`'auto'` の場合、プリレンダリングされたページには hash を、動的にレンダリングされるページには nonce が使用されます。
 		 */
 		mode?: 'hash' | 'nonce' | 'auto';
 		/**
-		 * Directives that will be added to `Content-Security-Policy` headers.
+		 * `Content-Security-Policy` ヘッダーに追加されるディレクティブです。
 		 */
 		directives?: CspDirectives;
 		/**
-		 * Directives that will be added to `Content-Security-Policy-Report-Only` headers.
+		 * `Content-Security-Policy-Report-Only` ヘッダーに追加されるディレクティブです。
 		 */
 		reportOnly?: CspDirectives;
 	};
 	/**
-	 * Protection against [cross-site request forgery](https://owasp.org/www-community/attacks/csrf) attacks.
+	 * [cross-site request forgery](https://owasp.org/www-community/attacks/csrf) 攻撃からの防御の設定です。
 	 */
 	csrf?: {
 		/**
-		 * Whether to check the incoming `origin` header for `POST` form submissions and verify that it matches the server's origin.
+		 * `POST` フォーム送信時、受信した `origin` ヘッダーをチェックしてサーバーのオリジン(origin)と一致するか検証することを行うかどうか。
 		 *
-		 * To allow people to make `POST` form submissions to your app from other origins, you will need to disable this option. Be careful!
+		 * 別のオリジンにあるあなたのアプリに対して `POST` フォーム送信をできるようにするには、このオプションを無効にする必要があります。ご注意を!
 		 * @default true
 		 */
 		checkOrigin?: boolean;
 	};
 	/**
-	 * Environment variable configuration
+	 * 環境変数設定
 	 */
 	env?: {
 		/**
-		 * The directory to search for `.env` files.
+		 * `.env` ファイルを探すディレクトリです。
 		 * @default "."
 		 */
 		dir?: string;
 		/**
-		 * A prefix that signals that an environment variable is safe to expose to client-side code. See [`$env/static/public`](/docs/modules#$env-static-public) and [`$env/dynamic/public`](/docs/modules#$env-dynamic-public). Note that Vite's [`envPrefix`](https://vitejs.dev/config/shared-options.html#envprefix) must be set separately if you are using Vite's environment variable handling - though use of that feature should generally be unnecessary.
+		 * クライアントサイドコードに公開されても安全な環境変数に付与される接頭辞です。[`$env/static/public`](/docs/modules#$env-static-public) と [`$env/dynamic/public`](/docs/modules#$env-dynamic-public) をご覧ください。Vite の環境変数ハンドリングを使用する場合は、別途 Vite の [`envPrefix`](https://vitejs.dev/config/shared-options.html#envprefix) を設定する必要があることにご注意ください - ただし、通常この機能を使う必要はありません。
 		 * @default "PUBLIC_"
 		 */
 		publicPrefix?: string;
 	};
 	/**
-	 * Where to find various files within your project.
+	 * プロジェクト内の各種ファイルの場所。
 	 */
 	files?: {
 		/**
-		 * a place to put static files that should have stable URLs and undergo no processing, such as `favicon.ico` or `manifest.json`
+		 * `favicon.ico` や `manifest.json` のように、不変の URL を持つ、何も処理されない静的なファイルを置く場所です
 		 * @default "static"
 		 */
 		assets?: string;
 		hooks?: {
 			/**
-			 * The location of your client [hooks](https://kit.svelte.dev/docs/hooks).
+			 * クライアントの [hooks](https://kit.svelte.jp/docs/hooks) のロケーションです。
 			 * @default "src/hooks.client"
 			 */
 			client?: string;
 			/**
-			 * The location of your server [hooks](https://kit.svelte.dev/docs/hooks).
+			 * サーバーの [hooks](https://kit.svelte.jp/docs/hooks) のロケーションです。
 			 * @default "src/hooks.server"
 			 */
 			server?: string;
 		};
 		/**
-		 * your app's internal library, accessible throughout the codebase as `$lib`
+		 * コードベース全体から `$lib` としてアクセスできる、アプリの内部ライブラリ
 		 * @default "src/lib"
 		 */
 		lib?: string;
 		/**
-		 * a directory containing [parameter matchers](https://kit.svelte.dev/docs/advanced-routing#matching)
+		 * [parameter matchers](https://kit.svelte.jp/docs/advanced-routing#matching) を置くディレクトリ
 		 * @default "src/params"
 		 */
 		params?: string;
 		/**
-		 * the files that define the structure of your app (see [Routing](https://kit.svelte.dev/docs/routing))
+		 * アプリの構造を定義するファイル ([Routing](https://kit.svelte.jp/docs/routing) をご覧ください)
 		 * @default "src/routes"
 		 */
 		routes?: string;
 		/**
-		 * the location of your service worker's entry point (see [Service workers](https://kit.svelte.dev/docs/service-workers))
+		 * service worker のエントリーポイントのロケーション ([Service workers](https://kit.svelte.jp/docs/service-workers) をご覧ください)
 		 * @default "src/service-worker"
 		 */
 		serviceWorker?: string;
 		/**
-		 * the location of the template for HTML responses
+		 * HTML レスポンスのテンプレートのロケーション
 		 * @default "src/app.html"
 		 */
 		appTemplate?: string;
 		/**
-		 * the location of the template for fallback error responses
+		 * フォールバックエラーレスポンスのテンプレートのロケーション
 		 * @default "src/error.html"
 		 */
 		errorTemplate?: string;
 	};
 	/**
-	 * Inline CSS inside a `<style>` block at the head of the HTML. This option is a number that specifies the maximum length of a CSS file to be inlined. All CSS files needed for the page and smaller than this value are merged and inlined in a `<style>` block.
+	 * HTML の head の `<style>` ブロックの中のインライン CSS です。このオプションには、インライン化される CSS ファイルの最大長を数値で指定します。ページに必要な CSS ファイルで、この数値より小さいものは全てマージされ、`<style>` ブロックにインライン化されます。
 	 *
-	 * > This results in fewer initial requests and can improve your [First Contentful Paint](https://web.dev/first-contentful-paint) score. However, it generates larger HTML output and reduces the effectiveness of browser caches. Use it advisedly.
+	 * > これによって初期リクエストが減り、[First Contentful Paint](https://web.dev/first-contentful-paint) スコアを改善することができます。しかし、より大きな HTML が生成され、ブラウザのキャッシュの有効性を低下させます。慎重にお使いください。
 	 * @default 0
 	 */
 	inlineStyleThreshold?: number;
 	/**
-	 * An array of file extensions that SvelteKit will treat as modules. Files with extensions that match neither `config.extensions` nor `config.kit.moduleExtensions` will be ignored by the router.
+	 * SvelteKit がモジュールとして扱うファイルの拡張子の配列です。`config.extensions` と `config.kit.moduleExtensions` のいずれにもマッチしない拡張子のファイルは、ルーターから無視されます。
 	 * @default [".js", ".ts"]
 	 */
 	moduleExtensions?: string[];
 	/**
-	 * The directory that SvelteKit writes files to during `dev` and `build`. You should exclude this directory from version control.
+	 * SvelteKit が `dev` や `build` 中にファイルを書き込むディレクトリです。このディレクトリはバージョンコントロールから除外すると良いでしょう。
 	 * @default ".svelte-kit"
 	 */
 	outDir?: string;
 	paths?: {
 		/**
-		 * An absolute path that your app's files are served from. This is useful if your files are served from a storage bucket of some kind.
+		 * アプリのファイルが提供される絶対パス(absolute path)です。これは、何らかのストレージバケットからファイルを提供する場合に有用です。
 		 * @default ""
 		 */
 		assets?: string;
 		/**
-		 * A root-relative path that must start, but not end with `/` (e.g. `/base-path`), unless it is the empty string. This specifies where your app is served from and allows the app to live on a non-root path. Note that you need to prepend all your root-relative links with the base value or they will point to the root of your domain, not your `base` (this is how the browser works). You can use [`base` from `$app/paths`](/docs/modules#$app-paths-base) for that: `<a href="{base}/your-page">Link</a>`. If you find yourself writing this often, it may make sense to extract this into a reusable component.
+		 * ルート相対なパス(root-relative path)です。空文字(empty string)以外を指定する場合、先頭は `/` を付ける必要があり、末尾には `/` を付けてはいけません (例: `/base-path`)。アプリがどこから提供されるかを指定することで、アプリをルートではないパス(non-root path)で動作させることができます。ルート相対(root-relative)なリンクには、先頭に base の値を追加しなければなりません。そうしないとリンクが `base` ではなくドメインのルート(root)を指してしまいます(これはブラウザの動作によるものです)。これを行うには、[`base` from `$app/paths`](/docs/modules#$app-paths-base) をインポートして `<a href="{base}/your-page">Link</a>` のようにします。もし、これを頻繁に書くようであれば、再利用可能なコンポーネントに抽出するのも良いでしょう。
 		 * @default ""
 		 */
 		base?: string;
 	};
 	/**
-	 * See [Prerendering](https://kit.svelte.dev/docs/page-options#prerender).
+	 * [プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender) をご覧ください。
 	 */
 	prerender?: {
 		/**
-		 * How many pages can be prerendered simultaneously. JS is single-threaded, but in cases where prerendering performance is network-bound (for example loading content from a remote CMS) this can speed things up by processing other tasks while waiting on the network response.
+		 * 同時にいくつのページをプリレンダリングできるか。JS はシングルスレッドですが、プリレンダリングのパフォーマンスがネットワークに縛られている場合(例えば、リモートの CMS からコンテンツをロードしている場合)、ネットワークの応答を待っている間に他のタスクを処理することで高速化することができます。
 		 * @default 1
 		 */
 		concurrency?: number;
 		/**
-		 * Whether SvelteKit should find pages to prerender by following links from `entries`.
+		 * SvelteKit が `entries` からリンクをたどってプリレダリングするページを探すかどうか。
 		 * @default true
 		 */
 		crawl?: boolean;
 		/**
-		 * An array of pages to prerender, or start crawling from (if `crawl: true`). The `*` string includes all non-dynamic routes (i.e. pages with no `[parameters]`, because SvelteKit doesn't know what value the parameters should have).
+		 * プリレンダリングするページ、または (`crawl: true` の場合は) クローリングを開始するページの配列。`*` 文字列は、全ての動的でないルート(route) (つまり、`[parameters]` がないページです。なぜなら、SvelteKit は その parameters がどんな値を持つかわからないからです) が含まれます。
 		 * @default ["*"]
 		 */
 		entries?: Array<'*' | `/${string}`>;
 		/**
-		 * How to respond to HTTP errors encountered while prerendering the app.
+		 * アプリのプリレンダリング中に発生した HTTP エラーに対する応答方法。
 		 *
-		 * - `'fail'` — fail the build
-		 * - `'ignore'` - silently ignore the failure and continue
-		 * - `'warn'` — continue, but print a warning
-		 * - `(details) => void` — a custom error handler that takes a `details` object with `status`, `path`, `referrer`, `referenceType` and `message` properties. If you `throw` from this function, the build will fail
+		 * - `'fail'` — ビルドを失敗させます
+		 * - `'ignore'` - 失敗(failure)を無視して継続させます
+		 * - `'warn'` — 継続しますが、警告(warning)をプリントします
+		 * - `(details) => void` — `status`、`path`、`referrer`、`referenceType`、`message` プロパティを持つ `details` オブジェクトを引数に取るカスタムのエラーハンドラです。この関数から `throw` されると、ビルドが失敗します
 		 *
 		 * ```js
 		 * /// type: import('@sveltejs/kit').Config
@@ -472,47 +472,47 @@ export interface KitConfig {
 		 */
 		handleHttpError?: PrerenderHttpErrorHandlerValue;
 		/**
-		 * How to respond to hash links from one prerendered page to another that don't correspond to an `id` on the destination page
+		 * あるプリレンダリングページから別のプリレンダリングページへのハッシュリンクが、リンク先ページの `id` に対応していない場合の応答方法
 		 *
-		 * - `'fail'` — fail the build
-		 * - `'ignore'` - silently ignore the failure and continue
-		 * - `'warn'` — continue, but print a warning
-		 * - `(details) => void` — a custom error handler that takes a `details` object with `path`, `id`, `referrers` and `message` properties. If you `throw` from this function, the build will fail
+		 * - `'fail'` — ビルドを失敗させます
+		 * - `'ignore'` - 失敗(failure)を無視して継続させます
+		 * - `'warn'` — 継続しますが、警告(warning)をプリントします
+		 * - `(details) => void` — `path`、`id`、`referrers`、`message` プロパティを持つ `details` オブジェクトを引数に取るカスタムのエラーハンドラです。この関数から `throw` されると、ビルドが失敗します
 		 *
 		 * @default "fail"
 		 */
 		handleMissingId?: PrerenderMissingIdHandlerValue;
 		/**
-		 * The value of `url.origin` during prerendering; useful if it is included in rendered content.
+		 * `origin` — プリレンダリング時の `url.origin` の値です。レンダリングされたコンテンツに含まれていると有用な場合があります。
 		 * @default "http://sveltekit-prerender"
 		 */
 		origin?: string;
 	};
 	serviceWorker?: {
 		/**
-		 * Whether to automatically register the service worker, if it exists.
+		 * service worker が存在する場合、自動的に登録するかどうか。
 		 * @default true
 		 */
 		register?: boolean;
 		/**
-		 * Determine which files in your `static` directory will be available in `$service-worker.files`.
+		 * `static` ディレクトリにあるどのファイルを `$service-worker.files` で利用可能にするかを決定します。
 		 * @default (filename) => !/\.DS_Store/.test(filename)
 		 */
 		files?(filepath: string): boolean;
 	};
 	/**
-	 * Client-side navigation can be buggy if you deploy a new version of your app while people are using it. If the code for the new page is already loaded, it may have stale content; if it isn't, the app's route manifest may point to a JavaScript file that no longer exists. SvelteKit solves this problem by falling back to traditional full-page navigation if it detects that a new version has been deployed, using the `name` specified here (which defaults to a timestamp of the build).
+	 * アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、そこに古いコンテンツがある可能性があります。そうでなくとも、アプリのルートマニフェスト(route manifest)が、もう存在しない JavaScript ファイルを指している可能性があります。SvelteKit は、ここで指定された `name` (デフォルトではビルドのタイムスタンプ) を使用して新しいバージョンがデプロイされたことを検知し、従来のフルページナビゲーションにフォールバックすることにより、この問題を解決しています。
 	 *
-	 * If you set `pollInterval` to a non-zero value, SvelteKit will poll for new versions in the background and set the value of the [`updated`](/docs/modules#$app-stores-updated) store to `true` when it detects one.
+	 * `pollInterval` を 0 以外の値に設定した場合、SvelteKit はバックグラウンドで新しいバージョンをポーリングし、それを検知すると [`updated`](/docs/modules#$app-stores-updated) ストアの値を `true` にします。
 	 */
 	version?: {
 		/**
-		 * The current app version string.
+		 * アプリの現在のバージョンの文字列です。
 		 * @default Date.now().toString()
 		 */
 		name?: string;
 		/**
-		 * The interval in milliseconds to poll for version changes. If this is `0`, no polling occurs.
+		 * バージョンの変更をポーリングするインターバル(ミリ秒)です。これが `0` の場合、ポーリングは発生しません。
 		 * @default 0
 		 */
 		pollInterval?: number;
