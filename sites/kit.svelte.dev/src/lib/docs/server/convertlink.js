@@ -85,18 +85,16 @@ const faq = new Map([
 		'`document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？',
 		'How do I use a client-side only library that depends on `document` or `window`?'
 	],
-	['Yarn を使用するにはどうすれば良いですか？', 'How do I use with Yarn?'],
 	['Yarn 2 で動作しますか？', 'Does it work with Yarn 2?'],
 	['Yarn 3 を使用するにはどうすれば良いですか？', 'How do I use with Yarn 3?']
 ]);
 
 /**
- * @param {string | undefined} label
  * @param {string} file
  * @param {string} heading
  */
-export function convert_link(label, file, heading) {
-	if (label) {
+export function convert_link(file, heading) {
+	if (file.startsWith('faq')) {
 		return faq.get(heading) || heading;
 	} else {
 		switch (file) {

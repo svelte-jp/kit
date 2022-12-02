@@ -25,7 +25,7 @@ for (const doc of doc_filenames) {
 
 	for (let headline of headlines) {
 		const original_headline = headline[0].slice(3).trim();
-		let hash = slugify(convert_link(undefined, `docs/${doc}`, original_headline));
+		let hash = slugify(convert_link(`docs/${doc}`, original_headline));
 		if (content.charAt(headline.index - 1) === '#') {
 			hash = last_headline + '-' + hash;
 		} else {

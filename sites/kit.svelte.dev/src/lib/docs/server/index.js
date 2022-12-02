@@ -75,7 +75,6 @@ export async function read_file(file) {
 	const { content, sections } = parse({
 		file,
 		body: generate_ts_from_js(body),
-		file,
 		code: (source, language, current) => {
 			const hash = createHash('sha256');
 			hash.update(source + language + current);
@@ -323,7 +322,7 @@ function parse({ file, body, code, codespan }) {
 
 			current = title;
 
-			const original_title = convert_link(headings[0], file, html)
+			const original_title = convert_link(file, html)
 				.replace(/<\/?code>/g, '')
 				.replace(/&quot;/g, '"')
 				.replace(/&lt;/g, '<')
