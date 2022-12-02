@@ -73,6 +73,7 @@ export async function read_file(file) {
 	const { metadata, body } = extract_frontmatter(markdown);
 
 	const { content, sections } = parse({
+		file,
 		body: generate_ts_from_js(body),
 		file,
 		code: (source, language, current) => {
@@ -109,10 +110,10 @@ export async function read_file(file) {
 			let version_class = '';
 			if (language === 'generated-ts' || language === 'generated-svelte') {
 				language = language.replace('generated-', '');
-				version_class = ' ts-version';
+				version_class = 'ts-version';
 			} else if (language === 'original-js' || language === 'original-svelte') {
 				language = language.replace('original-', '');
-				version_class = ' js-version';
+				version_class = 'js-version';
 			}
 
 			if (language === 'dts') {
@@ -223,9 +224,13 @@ export async function read_file(file) {
 				html = `<pre class='language-${plang}'><code>${highlighted}</code></pre>`;
 			}
 
-			html = `<div class="code-block${version_class} ${options.style ?? ''}">${
-				options.file ? `<h5>${options.file}</h5>` : ''
-			}${html}</div>`;
+			if (options.file) {
+				html = html.replace('<pre', `<pre data-file="${options.file}"`);
+			}
+
+			if (version_class) {
+				html = html.replace(/class=('|")/, `class=$1${version_class} `);
+			}
 
 			type_regex.lastIndex = 0;
 
@@ -284,13 +289,13 @@ export async function read_file(file) {
 
 /**
  * @param {{
- *   body: string;
  *   file: string;
+ *   body: string;
  *   code: (source: string, language: string, current: string) => string;
  *   codespan: (source: string) => string;
  * }} opts
  */
-function parse({ body, file, code, codespan }) {
+function parse({ file, body, code, codespan }) {
 	const headings = [];
 
 	/** @type {import('./types').Section[]} */
@@ -331,7 +336,7 @@ function parse({ body, file, code, codespan }) {
 
 			const slug = headings.filter(Boolean).join('-');
 
-			if (level === 3) {
+			if (level === 2) {
 				section = {
 					title,
 					slug,
@@ -339,16 +344,16 @@ function parse({ body, file, code, codespan }) {
 				};
 
 				sections.push(section);
-			} else if (level === 4) {
-				section.sections.push({
+			} else if (level === 3) {
+				(section?.sections ?? sections).push({
 					title,
 					slug
 				});
 			} else {
-				// throw new Error(`Unexpected <h${level}> in ${file}`);
+				throw new Error(`Unexpected <h${level}> in ${file}`);
 			}
 
-			return `<h${level} id="${slug}">${html}<a href="#${slug}" class="anchor"><span class="visually-hidden">permalink</span></a></h${level}>`;
+			return `<h${level} id="${slug}">${html}<a href="#${slug}" class="permalink"><span class="visually-hidden">permalink</span></a></h${level}>`;
 		},
 		code: (source, language) => code(source, language, current),
 		codespan

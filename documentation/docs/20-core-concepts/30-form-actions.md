@@ -6,7 +6,7 @@ title: Form actions
 
 `<form>` を使用する場合、クライアントサイドの JavaScript はオプションですが、JavaScript によって form のインタラクションを簡単にプログレッシブに強化(_progressively enhance_)することができ、最高のユーザーエクスペリエンスを提供することができます。
 
-### Default actions
+## Default actions
 
 最もシンプルなケースでは、ページは `default` の action を宣言します:
 
@@ -44,7 +44,7 @@ export const actions = {
 </form>
 ```
 
-### Named actions
+## Named actions
 
 単一の `default` の action の代わりに、名前付きの action (named action) を必要なだけ持つことができます:
 
@@ -90,7 +90,7 @@ export const actions = {
 
 > 名前付き action (named action) の隣にデフォルトの action を置くことはできません。なぜなら リダイレクト無しで名前付き action (named action) に POST をすると、クエリパラメータが URL に保持され、それ以降デフォルトの POST をしようとしても以前 POST した名前付き action (named action) を通ってしまうからです。
 
-### action の解剖学
+## action の解剖学
 
 action はそれぞれ `RequestEvent` オブジェクトを受け取って、`request.formData()` でデータを読み込むことができます。リクエスト (例えば、cookie をセットしてユーザーをログインさせるなど) を処理したあと、action は次の更新まで、対応するページでは `form` プロパティで、アプリ全体では `$page.form` で利用可能なデータで応答することができます。
 
@@ -138,7 +138,7 @@ export const actions = {
 {/if}
 ```
 
-#### Validation errors
+### Validation errors
 
 無効なデータが原因でリクエストが処理できなかった場合、再試行できるようにするために、直前に送信した form の値とともに validation error をユーザーに返すことができます。`invalid` 関数は、HTTP ステータスコード (通常、validation error の場合は 400 か 422) をデータとともに返します。ステータスコードは `$page.status` から使用することができ、data は `form` から使用することができます:
 
@@ -192,7 +192,7 @@ export const actions = {
 
 戻り値は JSON としてシリアライズ可能でなければなりません。その上で、構造は完全にあなた次第です。例えば、もしページに複数の form がある場合、返された `form` データがどの `<form>` を参照しているかを `id` プロパティなどで区別することができます。
 
-#### Redirects
+### Redirects
 
 redirect (と error) は [`load`](/docs/load#redirects) のそれと同じように機能します:
 
@@ -231,7 +231,7 @@ export const actions = {
 };
 ```
 
-### Loading data
+## Loading data
 
 action の実行後、そのページは (リダイレクトや予期せぬエラーが発生しない限り) 再レンダリングされ、action の戻り値が `form` プロパティとしてそのページで使用できるようになります。つまり、ページの `load` 関数は、action が完了したあとに実行されるということです。
 
@@ -295,11 +295,11 @@ export const actions = {
 };
 ```
 
-### Progressive enhancement
+## Progressive enhancement
 
 前のセクションでは [クライアントサイドの JavaScriptなしで動作する](https://kryogenix.org/code/browser/everyonehasjs.html) `/login` action を構築しました — `fetch` は見当たりません。これは素晴らしいことですが、JavaScript が利用可能な場合は、より良いユーザーエクスペリンスを提供するために form のインタラクションをプログレッシブに強化 (progressively enhance) することができます。
 
-#### use:enhance
+### use:enhance
 
 form をプログレッシブに強化する最も簡単な方法は、`use:enhance` action を追加することです:
 
@@ -345,7 +345,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 これらの関数を、ロード中の UI (loading UI) を表示したり隠したりすることなどに使用できます。
 
-#### applyAction
+### applyAction
 
 独自のコールバックを提供する場合は、最も近くにある `+error` 境界を表示するなど、デフォルトの `use:enhance` の一部を再現する必要があるでしょう。ほとんどの場合、コールバックに渡された `update` を呼び出すだけで十分です。もっとカスタマイズが必要な場合は、`applyAction` を使用してそれを行うことができます:
 
@@ -381,7 +381,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 - `redirect` — `goto(result.location)` を呼び出します
 - `error` — もっとも近くにある `+error` 境界を `result.error` でレンダリングします
 
-#### Custom event listener
+### Custom event listener
 
 `use:enhance` ではなく、`<form>` の通常のイベントリスナーを使うことで、ご自身でプログレッシブ・エンハンスメント(progressive enhancement)を実装することもできます:
 
@@ -436,11 +436,11 @@ const response = await fetch(this.action, {
 });
 ```
 
-### Alternatives
+## Alternatives
 
 サーバーにデータを送信する方法として、プログレッシブな強化(progressively enhance)を行うことができるため Form actions は望ましい方法ですが、[`+server.js`](/docs/routing#server) ファイルを使用して (例えば) JSON API を公開することもできます。
 
-### GET vs POST
+## GET vs POST
 
 これまで見てきたように、フォームアクションを使うには、`method="POST"` を使用する必要があります。
 

@@ -4,13 +4,13 @@ title: Errors
 
 ソフトウェア開発において、エラーは避けられないものです。SvelteKit では、エラーが発生した場所、エラーの種類、受信したリクエストの性質に応じて、異なる方法でエラーを処理します。
 
-### Error objects
+## Error objects
 
 SvelteKit は想定されるエラーと予期せぬエラーを区別します。どちらもデフォルトではシンプルな `{ message: string }` オブジェクトとして表現されます。
 
 以下のように、`code` やトラッキング `id` を追加することができます。
 
-### Expected errors
+## Expected errors
 
 想定されるエラーとは、`@sveltejs/kit` からインポートされる [`error`](/docs/modules#sveltejs-kit-error) を使用して作成されるものを指します:
 
@@ -67,7 +67,7 @@ throw error(404, {
 +throw error(404, 'Not found');
 ```
 
-### Unexpected errors
+## Unexpected errors
 
 予期せぬエラーとは、リクエストの処理中に発生するその他の例外のことを指します。これらは機密情報を含むことがあるため、予期せぬエラーのメッセージとスタックトレースはユーザーには公開されません。
 
@@ -99,7 +99,7 @@ export function handleError({ error, event }) {
 }
 ```
 
-### Responses
+## Responses
 
 もし `handle` の中や [`+server.js`](/docs/routing#server) リクエストハンドラの中でエラーが発生した場合、SvelteKit はリクエストの `Accept` ヘッダー に応じて、フォールバックエラーページか、エラーオブジェクトの JSON 表現をレスポンスとして返します。
 
@@ -126,7 +126,7 @@ SvelteKit が `%sveltekit.status%` と `%sveltekit.error.message%` を、それ�
 
 例外は、最上位の `+layout.js` や `+layout.server.js` の中でエラーが発生した場合です。通常、最上位のレイアウトには `+error.svelte` コンポーネントが含まれているためです。この場合、SvelteKit はフォールバックエラーページを使用します。
 
-### Type safety
+## Type safety
 
 もし TypeScript を使用していてエラーの形式をカスタマイズする必要がある場合、アプリで `App.Error` インターフェイスを宣言することでそれができます (慣習ではこれを `src/app.d.ts` に書きますが、TypeScript が '参照' することができればどこでも構いません):
 

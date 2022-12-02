@@ -10,6 +10,6 @@ SvelteKit プロジェクトは [Vite](https://ja.vitejs.dev) を使用してい
 
 しかしながら SvelteKit には、プロジェクト初期化のための CLI も含まれています:
 
-### svelte-kit sync
+## svelte-kit sync
 
 `svelte-kit sync` は、型や `tsconfig.json` などのプロジェクト用に生成されるファイルを作成します。プロジェクトを作成すると、`prepare` script としてリストアップされ、npm ライフサイクルの一部として自動的に実行されるので、通常はこのコマンドを実行する必要はないはずです。

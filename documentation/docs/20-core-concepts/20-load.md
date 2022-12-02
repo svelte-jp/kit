@@ -4,7 +4,7 @@ title: Loading data
 
 [`+page.svelte`](/docs/routing#page-page-svelte) コンポーネント (と [`+layout.svelte`](/docs/routing#layout-layout-svelte) コンポーネント) をレンダリングする前に、データを取得する必要があるケースが多いでしょう。`load` 関数を定義することでこれができるようになります。
 
-### Page data
+## Page data
 
 `+page.svelte` ファイルは、`load` 関数をエクスポートする `+page.js` (または `+page.ts`) という兄弟ファイルを持つことができ、`load` 関数の戻り値は page で `data` プロパティを介して使用することができます。
 
@@ -59,7 +59,7 @@ export async function load({ params }) {
 
 型が `PageLoad` から `PageServerLoad` に変わっていることにご注意ください。サーバー専用の `load` 関数では追加の引数にアクセスすることができます。どのような場合に `+page.js` を使用し、どのような場合に `+page.server.js` を使用するのかを理解するには、[Shared vs server](/docs/load#shared-vs-server) を参照してください。
 
-### Layout data
+## Layout data
 
 `+layout.svelte` ファイルでも、`+layout.js` や `+layout.server.js` を通じてデータを読み込むことができます。
 
@@ -134,7 +134,7 @@ export async function load() {
 
 > 複数の `load` 関数が同じキーを持つデータを返した場合、最後に返したものが'勝ちます'。レイアウトの `load` が `{ a: 1, b: 2 }` を返し、ページの `load` が `{ b: 3, c: 4 }` を返すと、結果は `{ a: 1, b: 3, c: 4 }` となります。
 
-### $page.data
+## $page.data
 
 `+page.svelte` コンポーネントとその上の各 `+layout.svelte` コンポーネントは、自身のデータとその親の全てのデータにアクセスすることができます。
 
@@ -153,7 +153,7 @@ export async function load() {
 
 `$page.data` の型情報は `App.PageData` から提供されます。
 
-### Shared vs server
+## Shared vs server
 
 これまで見てきたように、`load` 関数には2つの種類があります:
 
@@ -162,7 +162,7 @@ export async function load() {
 
 概念上は同じものですが、気をつけなければならない重要な違いがあります。
 
-#### Input
+### Input
 
 共有される `load` 関数とサーバー専用の `load` 関数はどちらも、リクエストを表すプロパティ (`params`、`route`、`url`) と様々な関数 (`depends`、`fetch`、`parent`) にアクセスできます。これらについては、以下のセクションで説明します。
 
@@ -170,13 +170,13 @@ export async function load() {
 
 共有される `load` 関数は、`LoadEvent` を引数にとって呼び出されます。`LoadEvent` は `data` プロパティを持っています。もし `+page.js` と `+page.server.js` (または `+layout.js` と `+layout.server.js`) の両方に `load` 関数がある場合、サーバー専用の `load` 関数の戻り値が、共有される `load` 関数の引数の `data` プロパティとなります。
 
-#### Output
+### Output
 
 共有される `load` 関数は、任意の値(カスタムクラスやコンポーネントコンストラクタなどを含む)を含むオブジェクトを返すことができます。
 
 サーバー専用の `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ、つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照などを返さなければなりません。
 
-#### どちらを使用すべきか
+### どちらを使用すべきか
 
 サーバー専用の `load` 関数は、データベースやファイルシステムからデータを直接アクセスする必要がある場合や、プライベートな環境変数を使用する必要がある場合に有用です。
 
@@ -184,17 +184,17 @@ export async function load() {
 
 まれに、両方を同時に使用する必要がある場合もあります。例えば、サーバーからのデータで初期化されたカスタムクラスのインスタンスを返す必要がある場合です。
 
-### URL data を使用する
+## URL data を使用する
 
 多くの場合、`load` 関数は何らかの形で URL に依存します。そのため、`load` 関数では `url`、`route`、`params` を提供しています。
 
-#### url
+### url
 
 [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、`searchParams` ([`URLSearchParams`](https://developer.mozilla.org/ja/docs/Web/API/URLSearchParams) オブジェクトとしてパースされたクエリ文字列を含む) を含んでいます。`url.hash` はサーバーで利用できないため、`load` 中にアクセスすることはできません。
 
 > 環境によっては、サーバーサイドレンダリング時のリクエストヘッダからこれが導出されることもあります。例えば [adapter-node](/docs/adapters#supported-environments-node-js) では、URL を正しく設定するために adapter の設定をする必要があるかもしれません。
 
-#### route
+### route
 
 現在のルート(route)ディレクトリの名前を含んでいます。`src/routes` との相対です:
 
@@ -206,7 +206,7 @@ export function load({ route }) {
 }
 ```
 
-#### params
+### params
 
 `params` は `url.pathname` と `route.id` から導出されます。
 
@@ -219,7 +219,7 @@ export function load({ route }) {
 }
 ```
 
-### fetch リクエストの作成
+## fetch リクエストの作成
 
 外部の API や `+server.js` ハンドラからデータを取得するには、提供されている `fetch` 関数を使用します。これは [ネイティブの `fetch` web API](https://developer.mozilla.org/ja/docs/Web/API/fetch) と同じように動作しますが、いくつか追加の機能があります:
 
@@ -241,7 +241,7 @@ export async function load({ fetch, params }) {
 
 > Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。
 
-### Cookies and headers
+## Cookies and headers
 
 サーバー専用の `load` 関数では [`cookies`](/docs/types#public-types-cookies) を取得したり設定したりすることができます。
 
@@ -291,7 +291,7 @@ export async function load({ fetch, setHeaders }) {
 
 同じヘッダーを複数回設定することは (たとえ別々の `load` 関数であっても) エラーとなります。指定したヘッダーを設定できるのは一度だけです。`set-cookie` ヘッダーは、`setHeaders` では追加できません。代わりに、`cookies.set(name, value, options)` を使用してください。
 
-### Using parent data
+## Using parent data
 
 `load` 関数が親の `load` 関数からのデータにアクセスできたら便利なことがあるでしょう。`await parent()` でこれを行うことができます:
 
@@ -354,7 +354,7 @@ export async function load({ params, parent }) {
 }
 ```
 
-### Errors
+## Errors
 
 `load` 中にエラーがスローされた場合、最も近くにある [`+error.svelte`](/docs/routing#error) がレンダリングされます。想定されるエラーには、`@sveltejs/kit` からインポートできる `error` ヘルパーを使用して HTTP ステータスコードとオプションのメッセージを指定できます:
 
@@ -388,7 +388,7 @@ export function load({ locals }) {
 
 予期せぬエラーがスローされた場合、SvelteKit は [`handleError`](/docs/hooks#shared-hooks-handleerror) を呼び出し、それを 500 Internal Error として処理します。
 
-### Redirects
+## Redirects
 
 ユーザーをリダイレクトさせるには、`@sveltejs/kit` からインポートできる `redirect` ヘルパーを使用して、ステータスコード `3xx` と一緒にリダイレクト先の location を指定します。
 
@@ -415,7 +415,7 @@ export function load({ locals }) {
 }
 ```
 
-### Promise unwrapping
+## Promise unwrapping
 
 トップレベルの promise は await されるので、ウォータフォールを作ることなく、複数の promise を簡単に返すことができます:
 
@@ -444,11 +444,11 @@ export function load() {
 </script>
 ```
 
-### Parallel loading
+## Parallel loading
 
 ページをレンダリング (またはページにナビゲーション) するとき、SvelteKit はすべての `load` 関数を同時に実行し、リクエストのウォーターフォールを回避します。クライアントサイドナビゲーションのときは、複数のサーバー専用 `load` 関数の呼び出し結果が単一のレスポンスにグループ化されます。すべての `load` 関数が返されると、ページがレンダリングされます。
 
-### Invalidation
+## Invalidation
 
 SvelteKit は それぞれの `load` 関数の依存関係を追跡し、ナビゲーションの際に不必要に再実行されるのを回避します。
 
@@ -496,7 +496,7 @@ export async function load() {
 
 `await parent()` を呼び出している `load` 関数は、親の `load` 関数が再実行された場合に再実行されます。
 
-#### Manual invalidation
+### Manual invalidation
 
 現在のページに適用される `load` 関数は、[`invalidate(url)`](/docs/modules#$app-navigation-invalidate) を使用することで再実行させることもできます。これは `url` に依存しているすべての `load` 関数を再実行させるものです。[`invalidateAll()`](/docs/modules#$app-navigation-invalidateall) は、すべての `load` 関数を再実行させます。
 
@@ -549,6 +549,6 @@ export async function load({ fetch, depends }) {
 
 `load` 関数の再実行は、対応する `+layout.svelte` や `+page.svelte` 内の `data` プロパティが更新されるだけで、コンポーネントは再作成されることはありません。結果として、内部の状態は保持されます。もし、この挙動がお望みでなければ、[`afterNavigate`](/docs/modules#$app-navigation-afternavigate) コールバック内でリセットしたり、コンポーネントを [`{#key ...}`](https://svelte.jp/docs#template-syntax-key) ブロックでラップしたりしてリセットすることができます。
 
-### 状態の共有(Shared state)
+## 状態の共有(Shared state)
 
 多くのサーバー環境では、アプリの単一のインスタンスが複数のユーザーにサービスを提供することになります。そのため、リクエストごと(per-request)、ユーザーごと(per-user)の状態を `load` 関数の外側の共有変数に保存してはいけません。代わりに、`event.locals` に保存するようにしてください。

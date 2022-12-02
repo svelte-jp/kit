@@ -12,9 +12,9 @@ SvelteKit の中心は、 _ファイルシステムベースのルーター_ で
 
 ルート(route)のディレクトリはそれぞれ1つ以上の _ルートファイル(route files)_ を格納します。ルートファイル(route files)には `+` という接頭辞が付いているので、それで見分けることができます。
 
-### +page
+## +page
 
-#### +page.svelte
+### +page.svelte
 
 `+page.svelte` コンポーネントはアプリのページを定義します。デフォルトでは、ページは最初のリクエストではサーバー ([SSR](/docs/glossary#ssr)) でレンダリングされ、その後のナビゲーションではブラウザ ([CSR](/docs/glossary#csr-and-spa)) でレンダリングされます。
 
@@ -44,7 +44,7 @@ SvelteKit の中心は、 _ファイルシステムベースのルーター_ で
 
 > SvelteKit では、ルート(routes)間のナビゲーションに、フレームワーク固有の `<Link>` コンポーネントではなく、`<a>` 要素を使用します。
 
-#### +page.js
+### +page.js
 
 ページではたびたび、レンダリングの前になんらかのデータを読み込む必要があります。これに対応するため、`load` 関数をエクスポートする `+page.js` (または、TypeScript をお使いの場合は `+page.ts`) モジュールを追加しています:
 
@@ -75,7 +75,7 @@ export function load({ params }) {
 
 これらに関するより詳しい情報は [page options](/docs/page-options) をご覧ください。
 
-#### +page.server.js
+### +page.server.js
 
 `load` 関数をサーバー上でのみ実行できるようにしたい場合 — 例えば、データベースからデータを取得したり、API キーのようなプライベートな[環境変数](/docs/modules#$env-static-private)にアクセスしたりする必要がある場合 — `+page.js` を `+page.server.js` にリネームし、`PageLoad` 型を `PageServerLoad` に変更します。
 
@@ -114,7 +114,7 @@ export async function load({ params }) {
 
 また、`+page.server.js` ファイルは _actions_ をエクスポートできます。`load` がサーバーからデータを読み取る場合、`actions` は `<form>` 要素を使用してサーバーにデータを書き込むことができます。これらの使い方を学ぶには、[form actions](/docs/form-actions) セクションをご参照ください。
 
-### +error
+## +error
 
 `load` 中にエラーが発生した場合、SvelteKit はデフォルトのエラーページをレンダリングします。`+error.svelte` を追加することで、ルート(route) ごとにエラーページをカスタマイズすることができます:
 
@@ -133,13 +133,13 @@ SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラ�
 
 エラーハンドリングに関する詳細は [こちら](/docs/errors) からお読み頂けます。
 
-### +layout
+## +layout
 
 これまで、ページを完全に独立したコンポーネントとして扱ってきました — ナビゲーションを行うと、既存の `+page.svelte` コンポーネントが破棄され、新しいページコンポーネントで置き換えられます。
 
 しかし多くのアプリでは、トップレベルのナビゲーションやフッターのように _全ての_ ページで表示されるべき要素があります。全ての `+page.svelte` にそれらを繰り返し配置する代わりに、_レイアウト(layouts)_ に配置することができます。
 
-#### +layout.svelte
+### +layout.svelte
 
 全てのページに適用するレイアウトを作成するには、`src/routes/+layout.svelte` というファイルを作成します。デフォルトのレイアウト (あなたが作成していない場合に SvelteKit が使用するもの) は以下のようなものです…
 
@@ -203,7 +203,7 @@ SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラ�
 
 デフォルトでは、各レイアウトはその上にあるレイアウトを継承します。そうしたくない場合は、[advanced layouts](/docs/advanced-routing#advanced-layouts) が役に立つでしょう。
 
-#### +layout.js
+### +layout.js
 
 `+page.svelte` が `+page.js` からデータを読み込むように、`+layout.svelte` コンポーネントは `+layout.js` の [`load`](/docs/load) 関数からデータを取得することができます。
 
@@ -236,13 +236,13 @@ export function load() {
 
 > しばしば、ページ間をナビゲーションしているときにレイアウトデータが変更されないことがあります。SvelteKit は必要に応じてインテリジェントに [`load`](/docs/load) 関数を再実行します。
 
-#### +layout.server.js
+### +layout.server.js
 
 サーバー上でレイアウトの `load` 関数を実行するためには、それを `+layout.server.js` に移動し、`LayoutLoad` 型を `LayoutServerLoad` に変更します。
 
 `+layout.js` と同様に、`+layout.server.js` では [page options](/docs/page-options) — `prerender`、`ssr`、`csr` をエクスポートすることができます。
 
-### +server
+## +server
 
 ページと同様に、`+server.js` ファイル (よく 'API ルート(API route)' または 'エンドポイント(endpoint)' とも呼ばれる) でルート(routes) を定義でき、これによってレスポンスを完全にコントロールすることができます。`+server.js` ファイル (または `+server.ts`) は `GET`、`POST`、`PATCH`、`PUT`、`DELETE` などの HTTP verbs に対応する関数をエクスポートします。これは `RequestEvent` を引数に取り、[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) オブジェクトを返します。
 
@@ -275,7 +275,7 @@ export function GET({ url }) {
 
 エラーがスローされる場合 (`throw error(...)` によるスローや、予期せぬエラーがスローされるどちらでも)、レスポンスは `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズすることができるフォールバックエラーページとなります。この場合、[`+error.svelte`](#error) コンポーネントはレンダリングされません。エラーハンドリングに関する詳細は [こちら](/docs/errors) からお読み頂けます。
 
-#### Receiving data
+### Receiving data
 
 `+server.js` ファイルは、`POST`/`PUT`/`PATCH`/`DELETE` ハンドラをエクスポートすることで、完全な API を作成することができます:
 
@@ -319,14 +319,14 @@ export async function POST({ request }) {
 
 > 一般的には、ブラウザからサーバーにデータを送信する方法としては [form actions](/docs/form-actions) のほうがより良い方法です。
 
-#### Content negotiation
+### Content negotiation
 
 `+server.js` ファイルは `+page` ファイルと同じディレクトリに置くことができ、これによって同じルート(route)がページにも API エンドポイントにもなるようにすることができます。これがどちらなのか判断するために、SvelteKit は以下のルールを適用します:
 
 - `PUT`/`PATCH`/`DELETE` リクエストは、ページには適用されないため、常に `+server.js` で処理されます。
 - `GET`/`POST` リクエストは、`accept` ヘッダーが `text/html` を優先している場合 (言い換えると、ブラウザのページリクエストの場合)、ページリクエストとして扱われます。それ以外の場合は `+server.js` で処理されます。
 
-### $types
+## $types
 
 これまでの例を通してずっと、`$types.d.ts` ファイルからインポートしてきました。これは、TypeScript (または JavaScript を JSDoc の型アノテーションと) 使用している場合に最上位のファイル(root files)を扱う際に型の安全性をもたらすために SvelteKit が隠しディレクトリに作成するファイルです。
 
@@ -342,7 +342,7 @@ export async function POST({ request }) {
 
 `load` 関数に `PageLoad`、`PageServerLoad`、`LayoutLoad`、`LayoutServerLoad` (それぞれ `+page.js`、`+page.server.js`、`+layout.js`、`+layout.server.js`) というアノテーションを付けると、`params` と戻り値が正しく型付けされることが保証されるでしょう。
 
-### その他のファイル
+## その他のファイル
 
 ルート(route)ディレクトリ内のその他のファイルは SvelteKit から無視されます。つまり、コンポーネントやユーティリティモジュールを、それらを必要とするルート(routes)に配置することができます。
 

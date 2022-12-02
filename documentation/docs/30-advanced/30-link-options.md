@@ -6,7 +6,7 @@ SvelteKit では、アプリのルート(routes)間の移動に、(フレーム�
 
 `data-sveltekit-*` 属性でリンクの挙動をカスタマイズすることができます。これらは `<a>` 自身やその親要素に適用することができます。
 
-### data-sveltekit-preload-data
+## data-sveltekit-preload-data
 
 ユーザーがリンクをクリックしたことをブラウザが検知するより前に、(デスクトップでは) マウスがリンクをホバーしたことや、`touchstart` や `mousedown` がトリガーされることを検知することができます。どちらの場合も、`click` イベントが発生することを経験に基づいて推測することができます。
 
@@ -39,7 +39,7 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 
 ユーザーがデータ使用量の削減を選択している場合、つまり [`navigator.connection.saveData`](https://developer.mozilla.org/ja/docs/Web/API/NetworkInformation/saveData) が `true` になっている場合は、データは決してプリロードされません。
 
-### data-sveltekit-preload-code
+## data-sveltekit-preload-code
 
 リンク先の _データ_ をプリロードしたくない場所であっても、_コード_ をプリロードするのは有益なこともあります。`data-sveltekit-preload-code` 属性は `data-sveltekit-preload-data` と同様に動作しますが、4つの値から選択できる点が異なります。'先行度'('eagerness') の降順で並べると:
 
@@ -54,7 +54,7 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 
 `data-sveltekit-preload-data` と同様、ユーザーがデータ使用量の削減を選択している場合、この属性も無視されます。
 
-### data-sveltekit-reload
+## data-sveltekit-reload
 
 時には、SvelteKit にリンクを処理させないで、ブラウザに処理をさせる必要があります。`data-sveltekit-reload` 属性をリンクに追加すると…
 
@@ -66,7 +66,7 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 
 `rel="external"` 属性があるリンクも同様に扱われます。加えて、[プリレンダリング中](/docs/page-options#prerender) は無視されます。
 
-### data-sveltekit-noscroll
+## data-sveltekit-noscroll
 
 内部のリンクに移動するとき、SvelteKit はブラウザのデフォルトのナビゲーションの挙動を模倣します: ユーザーがページの左上に来るように、スクロールポジションを 0,0 に変更します (リンクに `#hash` が含まれている場合は、ID が一致する要素までスクロールします)。
 
@@ -78,7 +78,7 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 
 …リンクがクリックされたあとのスクロールを中止します。
 
-### Disabling options
+## Disabling options
 
 これらのオプションが有効になっている要素の中でこれらのオプションを無効にするには、`"off"` 値を使用します:
 

@@ -40,13 +40,13 @@ import Foo from 'your-library/Foo.svelte';
 
 > SvelteKit プロジェクトで利用することだけを意図している場合を除いて、`$app` などの [SvelteKit 固有のモジュール](/docs/modules) をあなたのパッケージで使用するのは避けてください。例えば、`import { browser } from '$app/environment'` を使用するよりも、[`import.meta.env.SSR`](https://vitejs.dev/guide/env-and-mode.html#env-variables) を使用して全ての Vite ベースのプロジェクトで使用できるようにするか、もっと良いのは [Node conditional exports](https://nodejs.org/api/packages.html#conditional-exports) を使用して全てのバンドラーで動作するようにすることです。また、`$app/stores` や `$app/navigation` などに直接依存せずに、現在の URL やナビゲーションアクション(navigation action)などをプロパティとして渡したいケースもあるでしょう。より一般的な方法でアプリを書くことで、テストや UI デモなどのためのツールのセットアップも簡単になります。
 
-### Options
+## Options
 
 `svelte-package` は以下のオプションを受け付けます:
 
 - `-w`/`--watch` — `src/lib` の中にあるファイルを監視し、パッケージを再ビルドします
 
-### Publishing
+## Publishing
 
 生成されたパッケージをパブリッシュするには:
 
@@ -56,7 +56,7 @@ npm publish ./package
 
 上記の `./package` は生成されるディレクトリ名を参照しています。カスタムで [`package.dir`](/docs/configuration) を設定している場合は、適宜変更してください。
 
-### 注意事項
+## 注意事項
 
 相対ファイルのインポートはすべて、Node の ESM アルゴリズムに従って完全に指定する必要があります。つまり、`src/lib/something/index.js` ファイルを `import { something } from './something` のようにインポートすることはできません。代わりに、`import { something } from './something/index.js` というようにインポートする必要があります。TypeScript を使用している場合は、`.ts` ファイルを同じ方法でインポートする必要がありますが、ファイルの末尾は `.ts` ではなく `.js` を使用します (これは我々の管理下ではなく、TypeScript チームが決定したことです)。`tsconfig.json` または `jsconfig.json` で `"moduleResolution": "NodeNext"` と設定することで、この問題を解決できます。
 

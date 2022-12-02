@@ -2,13 +2,13 @@
 title: イントロダクション
 ---
 
-### 始める前に
+## 始める前に
 
 > SvelteKit は 1.0 に向けたリリース候補段階 (release candidate phase) で、報告された issue に対応しつつ、磨きをかけています。もし行き詰まったら、[Discord チャットルーム](https://svelte.dev/chat)にどうぞ。
 >
 > Sapper からのアップグレードについては [migration guides(移行ガイド)](/docs/migrating) をご覧ください。
 
-### SvelteKitとは
+## SvelteKitとは
 
 SvelteKitはとてもハイパフォーマンスなWebアプリを構築するためのフレームワークです。
 

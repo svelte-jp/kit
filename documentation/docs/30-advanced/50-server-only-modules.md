@@ -4,18 +4,18 @@ title: Server-only modules
 
 良き友人のように、SvelteKit はあなたの秘密を守ります。バックエンドとフロントエンドが同じリポジトリにある場合、機密データをフロントエンドのコードに誤ってインポートしてしまうことが簡単に起こってしまいます (例えば、API キーを持つ環境変数など)。SvelteKit はこれを完全に防ぐ方法を提供します: サーバー専用のモジュール(server-only modules)です
 
-### Private environment variables
+## Private environment variables
 
 [modules](/docs/modules) セクションで説明されている `$env/static/private` モジュールと `$env/dynamic/private` モジュールは、[`hooks.server.js`](/docs/hooks#server-hooks) や [`+page.server.js`](/docs/routing#page-page-server-js) のようなサーバー上でのみ実行されるモジュールにのみインポートすることが可能です。
 
-### Your modules
+## Your modules
 
 モジュールをサーバー専用にするには2通りの方法があります:
 
 - ファイル名に `.server` を付けます。例: `secrets.server.js`
 - モジュールを `$lib/server` に置きます。例: `$lib/server/secrets.js`
 
-### How it works
+## How it works
 
 パブリックに公開されるコード (public-facing code) にサーバー専用のコードを (直接的かまたは間接的かにかかわらず) インポートすると…
 

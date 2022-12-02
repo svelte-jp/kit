@@ -106,13 +106,11 @@ onMount(() => {
 });
 ```
 
-### Yarn を使用するにはどうすれば良いですか？
-
-#### Yarn 2 で動作しますか？
+### Yarn 2 で動作しますか？
 
 多少は。Plug'n'Play 機能、通称 'pnp' は動きません (Node のモジュール解決アルゴリズムから逸脱しており、SvelteKitが[数多くのライブラリ](https://blog.sindresorhus.com/get-ready-for-esm-aa53530b3f77)とともに使用している[ネイティブの JavaScript モジュールではまだ動作しません](https://github.com/yarnpkg/berry/issues/638))。[`.yarnrc.yml`](https://yarnpkg.com/configuration/yarnrc#nodeLinker) で `nodeLinker: 'node-modules'` を使用して pnp を無効にできますが、おそらく npm や [pnpm](https://pnpm.io/) を使用するほうが簡単でしょう。同じように高速で効率的ですが、互換性に頭を悩ませることはありません。
 
-#### Yarn 3 を使用するにはどうすれば良いですか？
+### Yarn 3 を使用するにはどうすれば良いですか？
 
 現時点の、最新の Yarn (version 3) の ESM サポート は [experimental](https://github.com/yarnpkg/berry/pull/2161) であるようです。
 

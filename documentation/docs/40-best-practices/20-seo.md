@@ -4,31 +4,31 @@ title: SEO
 
 SEO で最も重要なのは、高品質なコンテンツを作ること、そしてそれが web 上で広くリンクされることです。しかし、ランクが高いサイトを構築するためにいくつか技術的に考慮すべきこともあります。
 
-### Out of the box
+## Out of the box
 
-#### SSR
+### SSR
 
 近年、検索エンジンはクライアントサイドの JavaScript でレンダリングされたコンテンツのインデックスを改善してきましたが、サーバーサイドレンダリングされたコンテンツのほうがより頻繁に、より確実にインデックスされます。SvelteKit はデフォルトで SSR を採用しています。[`handle`](/docs/hooks#server-hooks-handle) で無効にすることもできますが、適切な理由がない場合はそのままにしておきましょう。
 
 > SvelteKit のレンダリングは高度な設定が可能です。必要であれば、[動的なレンダリング(dynamic rendering)](https://developers.google.com/search/docs/advanced/javascript/dynamic-rendering) を実装することも可能です。一般的には推奨されません、SSR には SEO 以外のメリットもあるからです。
 
-#### パフォーマンス
+### パフォーマンス
 
 [Core Web Vitals](https://web.dev/vitals/#core-web-vitals) のような指標は検索エンジンのランクに影響を与えます。Svelte と SvelteKit はオーバーヘッドが最小限であるため、ハイパフォーマンスなサイトを簡単に構築できです。Google の [PageSpeed Insights](https://pagespeed.web.dev/) や [Lighthouse](https://developers.google.com/web/tools/lighthouse) で、ご自身のサイトをテストすることができます。
 
-#### URLの正規化
+### URLの正規化
 
 SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から、末尾のスラッシュが無いパス名にリダイレクトします ([設定](/docs/page-options#trailingslash) で逆にできます)。URLの重複は、SEOに悪影響を与えます。
 
-### Manual setup
+## Manual setup
 
-#### &lt;title&gt; と &lt;meta&gt;
+### &lt;title&gt; と &lt;meta&gt;
 
 全てのページで、よく練られたユニークな `<title>` と `<meta name="description">` を [`<svelte:head>`](https://svelte.jp/docs#template-syntax-svelte-head) の内側に置くべきです。説明的な title と description の書き方に関するガイダンスと、検索エンジンにとってわかりやすいコンテンツを作るためのその他の方法については、Google の [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) のドキュメントで見つけることができます。
 
 > A common pattern is to return SEO-related `data` from page [`load`](/docs/load) functions, then use it (as [`$page.data`](/docs/modules#$app-stores)) in a `<svelte:head>` in your root [layout](/docs/routing#layout).
 
-#### 構造化データ
+### 構造化データ
 
 [構造化データ](https://developers.google.com/search/docs/advanced/structured-data/intro-structured-data) は、検索エンジンがページのコンテンツを理解するのに役立ちます。[`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess) と一緒に構造化データを使用している場合は、明示的に `ld+json` データを保持する必要があります (これは [将来変更される可能性があります](https://github.com/sveltejs/svelte-preprocess/issues/305)):
 
@@ -52,7 +52,7 @@ const config = {
 export default config;
 ```
 
-#### サイトマップ
+### サイトマップ
 
 [サイトマップ](https://developers.google.com/search/docs/advanced/sitemaps/build-sitemap) は、検索エンジンがサイト内のページの優先順位付けをするのに役立ちます、特にコンテンツの量が多い場合は。エンドポイントを使用してサイトマップを動的に作成できます:
 
@@ -81,7 +81,7 @@ export async function GET() {
 }
 ```
 
-#### AMP
+### AMP
 
 現代の web 開発における不幸な現実として、サイトの [Accelerated Mobile Pages (AMP)](https://amp.dev/) バージョンを作らなければならないときがある、というのがあります。SvelteKit では、[`inlineStyleThreshold`](/docs/configuration#inlinestylethreshold) オプションを設定することでこれを実現することができます…
 
