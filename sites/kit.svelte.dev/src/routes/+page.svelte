@@ -1,106 +1,62 @@
 <script>
-	import { Blurb } from '@sveltejs/site-kit';
-	import Hero from './Hero.svelte';
-	import Logotype from './svelte-kit-logotype.svg';
-	import Machine from './svelte-kit-machine.webp?w=1440;800;600;480&format=avif;webp;png&picture';
+	import Features from './home/Features.svelte';
+	import Hero from './home/Hero.svelte';
+	import Showcase from './home/Showcase.svelte';
+	import Try from './home/Try.svelte';
+	import Deployment from './home/Deployment.svelte';
+	import Svelte from './home/Svelte.svelte';
+	import Intro from './home/Intro.svelte';
+	import './home/common.css';
 </script>
 
 <svelte:head>
-	<title>SvelteKit • Svelteアプリを最速で構築する方法</title>
+	<title>SvelteKit • 効率的で無駄のない、研ぎ澄まされた Web 開発</title>
 
 	<meta name="twitter:title" content="SvelteKit" />
-	<meta name="twitter:description" content="Svelteアプリを最速で構築する方法" />
-	<meta name="description" content="SvelteKitはオフィシャルなSvelteアプリケーションフレームワーク" />
+	<meta name="twitter:description" content="効率的で無駄のない、研ぎ澄まされた Web 開発" />
+	<meta name="description" content="SvelteKit はオフィシャルな Svelte アプリケーションフレームワーク" />
 </svelte:head>
 
-<h1 class="visually-hidden">SvelteKit</h1>
-<Hero
-	title="SvelteKit"
-	logotype={Logotype}
-	tagline="Svelteアプリを最速で構築する方法"
-	background={Machine}
-	alt="SvelteKit illustration"
-/>
+<div class="home">
+	<h1 class="visually-hidden">SvelteKit</h1>
 
-<div class="blurb-shifter">
-	<Blurb>
-		<div slot="one">
-			<h2>Powered by Svelte</h2>
-			<p>
-				SvelteKitはSvelteを利用したアプリケーションフレームワークです - 大きいアプリを小さいフットプリントで構築できます
-			</p>
+	<Hero />
+	<Intro />
+	<Try />
+	<Svelte />
+	<Features />
+	<Deployment />
+	<Showcase />
 
-			<a href="https://svelte.jp" class="cta">Svelteを学ぶ</a>
-		</div>
-
-		<div slot="two">
-			<h2>Best of both worlds</h2>
-			<p>
-				サーバーレンダリングアプリのSEOとプログレッシブエンハンスメント、SPAの洗練されたナビゲーションを全て備えています
-			</p>
-
-			<a data-sveltekit-preload-data href="/docs" class="cta">ドキュメントを読む</a>
-		</div>
-
-		<div slot="three">
-			<h2>Build fast</h2>
-			<p>
-				高度なルーティング、サーバーサイドレンダリング、コード分割、オフラインサポートなどをすぐにお使いいただけます。
-			</p>
-
-			<a data-sveltekit-preload-data href="/docs" class="cta">ドキュメントを読む</a>
-		</div>
-
-		<div class="description" slot="what">
-			<p>
-				SvelteKitはあらゆる規模のWebアプリケーションを構築できるフレームワークです。
-				素晴らしい開発体験と柔軟なファイルシステムベースのルーティングを備えています。
-			</p>
-
-			<p>
-				シングルページアプリとは異なり、SvelteKitはSEO・プログレッシブエンハンスメント・初期ロードを犠牲にしません。
-				また、トラディショナルなサーバーレンダリングアプリとは異なり、ナビゲーションは瞬時に行われます。
-			</p>
-
-			<p>
-				<a href="https://node.new/sveltekit">StackBlitz で試す</a> か、ローカルにプロジェクトを作成してください。
-			</p>
-		</div>
-
-		<div slot="how">
-			<pre><code
-					>npm create <span class="orange-highlight">svelte</span>@latest my-app
-cd my-app
-npm install
-npm run dev -- --open</code
-				></pre>
-			<a data-sveltekit-preload-data href="/docs" class="cta">get started</a>
-		</div>
-	</Blurb>
+	<footer>
+		<p>
+			SvelteKit は <a target="_blank" rel="noreferrer" href="https://github.com/sveltejs/kit"
+				>フリーのオープンソースソフトウェア</a
+			> で、MIT ライセンスでリリースされています。
+		</p>
+	</footer>
 </div>
 
 <style>
-	:global(.hero-container:dir(rtl)) {
-		max-width: 116rem;
+	footer {
+		padding: 1em var(--sk-page-padding-side);
+		text-align: center;
+		background: var(--sk-back-2);
 	}
 
-	pre {
-		height: 100%;
-		display: flex;
-		flex-direction: column;
+	footer p {
+		max-width: 20em;
+		margin: 0 auto;
 	}
 
-	.orange-highlight {
-		color: var(--sk-theme-1);
+	footer p a {
+		color: inherit;
+		text-decoration: underline;
 	}
 
-	.blurb-shifter {
-		margin-top: calc(-10rem + var(--sk-page-padding-side));
-	}
-
-	@media (min-width: 900px) {
-		.blurb-shifter {
-			margin-top: -12em;
+	@media (min-width: 680px) {
+		footer p {
+			max-width: none;
 		}
 	}
 </style>

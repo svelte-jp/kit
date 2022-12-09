@@ -326,6 +326,11 @@ export interface KitConfig {
 		checkOrigin?: boolean;
 	};
 	/**
+	 * アプリが別の大規模なアプリに埋め込まれているかどうか。もし `true` の場合、SvelteKit はナビゲーションなどに関係するイベントリスナーを、`window` の代わりに `%sveltekit.body%` の親に追加し、`params` を `location.pathname` から導くのではなく、サーバーから取得して渡します。
+	 * @default false
+	 */
+	embedded?: boolean;
+	/**
 	 * 環境変数設定
 	 */
 	env?: {
@@ -900,9 +905,14 @@ export interface RequestEvent<
 	 */
 	setHeaders(headers: Record<string, string>): void;
 	/**
-	 * The URL of the current page or endpoint
+	 * The URL of the current page or endpoint.
 	 */
 	url: URL;
+	/**
+	 * `true` if the request comes from the client asking for `+page/layout.server.js` data. The `url` property will be stripped of the internal information
+	 * related to the data request in this case. Use this property instead if the distinction is important to you.
+	 */
+	isDataRequest: boolean;
 }
 
 /**
