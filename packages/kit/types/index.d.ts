@@ -326,6 +326,11 @@ export interface KitConfig {
 		checkOrigin?: boolean;
 	};
 	/**
+	 * Whether or not the app is embedded inside a larger app. If `true`, SvelteKit will add its event listeners related to navigation etc on the parent of `%sveltekit.body%` instead of `window`, and will pass `params` from the server rather than inferring them from `location.pathname`.
+	 * @default false
+	 */
+	embedded?: boolean;
+	/**
 	 * 環境変数設定
 	 */
 	env?: {
@@ -900,9 +905,14 @@ export interface RequestEvent<
 	 */
 	setHeaders(headers: Record<string, string>): void;
 	/**
-	 * The URL of the current page or endpoint
+	 * The URL of the current page or endpoint.
 	 */
 	url: URL;
+	/**
+	 * `true` if the request comes from the client asking for `+page/layout.server.js` data. The `url` property will be stripped of the internal information
+	 * related to the data request in this case. Use this property instead if the distinction is important to you.
+	 */
+	isDataRequest: boolean;
 }
 
 /**

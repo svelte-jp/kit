@@ -59,9 +59,25 @@ const enforced_config = {
 	root: true
 };
 
-/** @return {import('vite').Plugin[]} */
-export function sveltekit() {
-	return [...svelte(), kit()];
+/** @return {Promise<import('vite').Plugin[]>} */
+export async function sveltekit() {
+	const svelte_config = await load_config();
+
+	/** @type {import('@sveltejs/vite-plugin-svelte').Options} */
+	const vite_plugin_svelte_options = {
+		configFile: false,
+		extensions: svelte_config.extensions,
+		preprocess: svelte_config.preprocess,
+		onwarn: svelte_config.onwarn,
+		compilerOptions: {
+			// @ts-expect-error SvelteKit requires hydratable true by default
+			hydratable: true,
+			...svelte_config.compilerOptions
+		},
+		...svelte_config.vitePlugin
+	};
+
+	return [...svelte(vite_plugin_svelte_options), ...kit({ svelte_config })];
 }
 
 /**
@@ -74,12 +90,10 @@ export function sveltekit() {
  * - https://rollupjs.org/guide/en/#build-hooks
  * - https://rollupjs.org/guide/en/#output-generation-hooks
  *
- * @return {import('vite').Plugin}
+ * @param {{ svelte_config: import('types').ValidatedConfig }} options
+ * @return {import('vite').Plugin[]}
  */
-function kit() {
-	/** @type {import('types').ValidatedConfig} */
-	let svelte_config;
-
+function kit({ svelte_config }) {
 	/** @type {import('vite').ResolvedConfig} */
 	let vite_config;
 
@@ -183,8 +197,9 @@ function kit() {
 	// TODO remove this for 1.0
 	check_vite_version();
 
-	return {
-		name: 'vite-plugin-svelte-kit',
+	/** @type {import('vite').Plugin} */
+	const plugin_build = {
+		name: 'vite-plugin-sveltekit-build',
 
 		/**
 		 * Build the SvelteKit-provided Vite config to be merged with the user's vite.config.js file.
@@ -192,7 +207,6 @@ function kit() {
 		 */
 		async config(config, config_env) {
 			vite_config_env = config_env;
-			svelte_config = await load_config();
 
 			env = get_env(svelte_config.kit.env, vite_config_env.mode);
 
@@ -248,7 +262,8 @@ function kit() {
 				define: {
 					__SVELTEKIT_APP_VERSION_POLL_INTERVAL__: '0',
 					__SVELTEKIT_BROWSER__: config_env.ssrBuild ? 'false' : 'true',
-					__SVELTEKIT_DEV__: 'true'
+					__SVELTEKIT_DEV__: 'true',
+					__SVELTEKIT_EMBEDDED__: svelte_config.kit.embedded ? 'true' : 'false'
 				},
 				publicDir: svelte_config.kit.files.assets,
 				resolve: {
@@ -274,7 +289,13 @@ function kit() {
 					external: ['@sveltejs/kit']
 				},
 				optimizeDeps: {
-					exclude: ['@sveltejs/kit']
+					exclude: [
+						'@sveltejs/kit',
+						// exclude kit features so that libraries using them work even when they are prebundled
+						// this does not affect app code, just handling of imported libraries that use $app or $env
+						'$app',
+						'$env'
+					]
 				}
 			};
 
@@ -533,7 +554,12 @@ function kit() {
 				fs.unlinkSync(`${paths.output_dir}/client/${vite_config.build.manifest}`);
 				fs.unlinkSync(`${paths.output_dir}/server/${vite_config.build.manifest}`);
 			}
-		},
+		}
+	};
+
+	/** @type {import('vite').Plugin} */
+	const plugin_middleware = {
+		name: 'vite-plugin-sveltekit-middleware',
 
 		/**
 		 * Adds the SvelteKit middleware to do SSR in dev mode.
@@ -551,6 +577,8 @@ function kit() {
 			return preview(vite, vite_config, svelte_config);
 		}
 	};
+
+	return [plugin_build, plugin_middleware];
 }
 
 function check_vite_version() {

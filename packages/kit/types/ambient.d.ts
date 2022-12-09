@@ -433,5 +433,5 @@ declare module '@sveltejs/kit/vite' {
 	/**
 	 * SvelteKit Vite プラグインを返します。
 	 */
-	export function sveltekit(): Plugin[];
+	export function sveltekit(): Promise<Plugin[]>;
 }

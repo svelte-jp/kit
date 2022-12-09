@@ -5,6 +5,7 @@
 	"private": true,
 	"scripts": {
 		"test": "turbo run test --filter=./packages/*",
+		"test:vite-ecosystem-ci": "pnpm test --dir packages/kit",
 		"check": "turbo run check",
 		"lint": "turbo run lint",
 		"format": "turbo run format",
@@ -27,7 +28,7 @@
 		"@rollup/plugin-commonjs": "^23.0.3",
 		"@rollup/plugin-json": "^5.0.2",
 		"@rollup/plugin-node-resolve": "^15.0.1",
-		"@svitejs/changesets-changelog-github-compact": "^0.1.1",
+		"@svitejs/changesets-changelog-github-compact": "^1.0.0",
 		"playwright": "^1.28.1",
 		"prettier": "^2.8.0",
 		"rollup": "^2.79.1",
@@ -42,7 +43,7 @@
 		"textlint-rule-no-mix-dearu-desumasu": "^4.0.1",
 		"textlint-rule-preset-jtf-style": "^2.3.8"
 	},
-	"packageManager": "pnpm@7.17.1",
+	"packageManager": "pnpm@7.18.1",
 	"engines": {
 		"pnpm": "^7.0.0"
 	},
