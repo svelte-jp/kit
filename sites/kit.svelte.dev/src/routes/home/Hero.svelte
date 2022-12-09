@@ -7,8 +7,8 @@
 	<div class="hero-contents">
 		<div class="hero-text">
 			<img alt="SvelteKit logotype" width="400" height="50" class="logotype" src={logotype} />
-			<div class="tagline">web development, streamlined</div>
-			<a class="cta" href="/docs/introduction">read the docs</a>
+			<div class="tagline">効率的で無駄のない、研ぎ澄まされた Web 開発</div>
+			<a class="cta" href="/docs/introduction">ドキュメントを読む</a>
 		</div>
 
 		<picture class="hero-image" sizes="(min-width: 480px) 800px, (min-width: 1024px) 480px, 600px">

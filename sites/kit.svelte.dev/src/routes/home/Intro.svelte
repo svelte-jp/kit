@@ -5,28 +5,27 @@
 <Section --background="var(--sk-back-1)">
 	<div class="grid" style="--columns: 3">
 		<div>
-			<h2>fast</h2>
+			<h2>高速</h2>
 			<p>
-				Powered by <a target="_blank" rel="noreferrer" href="https://svelte.dev">Svelte</a> and
-				<a target="_blank" rel="noreferrer" href="https://vitejs.dev">Vite</a>, speed is baked into
-				every crevice: fast setup, fast dev, fast builds, fast page loads, fast navigation. Did we
-				mention it's fast?
+				<a target="_blank" rel="noreferrer" href="https://svelte.jp">Svelte</a> と 
+				<a target="_blank" rel="noreferrer" href="https://vitejs.dev">Vite</a> を使用しており、
+				あらゆる部分にその速さが組み込まれています: 高速なセットアップ、高速な開発、高速なビルド、高速なページロード、高速なナビゲーション。
 			</p>
 		</div>
 
 		<div>
-			<h2>fun</h2>
+			<h2>楽しい</h2>
 			<p>
-				No more wasted days figuring out bundler configuration, routing, SSR, CSP, TypeScript,
-				deployment settings and all the other boring stuff. Code with joy.
+				もうこれ以上、バンドラーのコンフィグやルーティング、SSR、CSP、TypeScript、デプロイの設定、その他全ての退屈な作業に時間を費やすことはありません。
+				コーディングに喜びを。
 			</p>
 		</div>
 
 		<div>
-			<h2>flexible</h2>
+			<h2>柔軟</h2>
 			<p>
-				SPA? MPA? SSR? SSG? Check. SvelteKit gives you the tools to succeed whatever it is you're
-				building. And it runs wherever JavaScript does.
+				SPA? MPA? SSR? SSG? 全て対応しています。SvelteKit は、構築しようとしているものが何であれ、それを実現するためのツールを提供します。
+				そして、それは JavaScript が動作するところならどこでも動作します。
 			</p>
 		</div>
 	</div>

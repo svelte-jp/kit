@@ -14,15 +14,15 @@
 
 <Section --background="var(--background-1)">
 	<div class="grid" style="--columns: 3">
-		<h2>deploy anywhere</h2>
+		<h2>デプロイ先を選ばない</h2>
 		<div class="blurb">
 			<p>
-				Export static HTML files. Run your own Node server. Deploy code to the edge of the world. If
-				a platform runs JavaScript, it runs SvelteKit — in some cases with <strong
-					>zero configuration</strong
-				>.
+				静的な HTML ファイルを出力する。Node サーバーで実行する。世界中のエッジにコードをデプロイする。
+				JavaScript が実行できるプラットフォームなら、SvelteKit を実行することができます。いくつかのケースでは <strong
+					>設定不要</strong
+				> です。
 			</p>
-			<p>Want to try deploying somewhere else? Swap out your adapter with a single line of code.</p>
+			<p>他の場所にデプロイしたい? たった1行のコードで adapter を交換できます。</p>
 		</div>
 	</div>
 
@@ -103,7 +103,7 @@
 				<img src={azure} alt="Azure logo" />
 				<span>Azure</span>
 			</a>
-			<a target="_blank" rel="noreferrer" href="https://kit.svelte.dev/docs/adapters">
+			<a target="_blank" rel="noreferrer" href="https://kit.svelte.jp/docs/adapters">
 				<img src={plus} alt="Plus sign" />
 				<span>More...</span>
 			</a>
@@ -114,9 +114,9 @@
 				src="/edge.svg"
 				width="1000"
 				height="1000"
-				alt="Dynamically rendered map of the world, centered on the user's location"
+				alt="動的にレンダリングされた世界地図、ユーザーのロケーションが中心になっています"
 			/>
-			<span> rendered on the edge, just for you </span>
+			<span> あなた向けに、エッジでレンダリングされています </span>
 		</div>
 	</div>
 </Section>

@@ -5,8 +5,8 @@
 
 <Section --background="var(--background-1)">
 	<p class="definition">
-		<em>/ˈsvɛlt/</em> <span class="adjective">adjective</span>
-		<span class="description">attractively thin, graceful and stylish</span>
+		<em>/ˈsvɛlt/</em> <span class="adjective">形容詞</span>
+		<span class="description">魅力的でスリム、洗練されていてスタイリッシュ</span>
 	</p>
 
 	<div class="grid" style="--columns: 3">
@@ -19,42 +19,42 @@
 					rel="noreferrer"
 					href="https://www.offerzen.com/community/svelte-origins-documentary"
 				>
-					Watch the full Svelte Origins documentary
+					Svelte Origins ドキュメンタリーをフルで視聴する
 				</a>
 			</p>
 		</div>
 
 		<div>
 			<p>
-				SvelteKit is built on Svelte, a UI framework that uses a compiler to let you write
-				breathtakingly concise components that do minimal work in the browser, using languages you
-				already know — HTML, CSS and JavaScript. <strong style="color: var(--sk-theme-2)"
-					>It's a love letter to web development.</strong
+				SvelteKit は Svelte 上に構築されています。Svelte はコンパイラを使用する UI フレームワークで、息を呑むほど簡潔にコンポーネントを書くことができ、
+				ブラウザで最小限の動作となるようにしてくれます。
+				開発者は既知の言語(HTML、CSS、JavaScript)を使うことができます。 <strong style="color: var(--sk-theme-2)"
+					>これは、web 開発へのラブレターです。</strong
 				>
 			</p>
 
 			<p>
-				But don't take our word for it. Developers consistently rank Svelte as the framework they're
+				私たちが主張しているだけだと思わないでください。Svelte は、開発者が
 				<a
 					target="_blank"
 					rel="noreferrer"
 					href="https://insights.stackoverflow.com/survey/2021#section-most-loved-dreaded-and-wanted-web-frameworks"
 				>
-					most
+					最も
 				</a>
 				<a
 					target="_blank"
 					rel="noreferrer"
 					href="https://tsh.io/state-of-frontend/#which-of-the-following-frameworks-would-you-like-to-learn-in-the-future"
 				>
-					excited
+					使用
 				</a>
 				<a
 					target="_blank"
 					rel="noreferrer"
 					href="https://2021.stateofjs.com/en-US/libraries/front-end-frameworks/"
 				>
-					about
+					したいと
 				</a>
 
 				<a
@@ -62,8 +62,8 @@
 					rel="noreferrer"
 					href="https://twitter.com/Rich_Harris/status/1589675637195042817"
 				>
-					using</a
-				>.
+					考えている</a
+				>フレームワークとして、常に上位にランクしています。
 			</p>
 		</div>
 	</div>

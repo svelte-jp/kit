@@ -24,7 +24,7 @@
 				/>
 			</svg>
 
-			see for yourself
+			自分で試す場合
 		</h2>
 		<div class="try">
 			<div class="terminal">
@@ -46,9 +46,9 @@
 		</div>
 	</div>
 	<p class="create-an-app">
-		...or
-		<a target="_blank" rel="noreferrer" href="https://sveltekit.new"> create an app </a>
-		on StackBlitz.
+		...または、StackBlitz で
+		<a target="_blank" rel="noreferrer" href="https://sveltekit.new"> アプリを作成 </a>
+		してみてください。
 	</p>
 </Section>
 
