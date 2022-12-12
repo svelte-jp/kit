@@ -29,7 +29,9 @@ SvelteKit では、ページ間のナビゲーションではページのリロ�
 
 旧来のサーバーレンダリングアプリケーションでは、ナビゲーションでフォーカスがページのトップにリセットされます。これによって、キーボードやスクリーンリーダーを使用して web をブラウジングする方が、ページの先頭からやり取りできるようになります。
 
-クライアントサイドルーティング中にこの動作をシミュレートするために、SvelteKit は各ナビゲーション後に `<body>` 要素にフォーカスします。この動作をカスタマイズしたい場合は、`afterNavigate` hook を使用してカスタムのフォーカスマネジメントロジックを実装することができます:
+To simulate this behavior during client-side routing, SvelteKit focuses the `<body>` element after each navigation and [enhanced form submission](https://kit.svelte.dev/docs/form-actions#progressive-enhancement). There is one exception - if an element with the [`autofocus`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus) attribute is present, SvelteKit will focus that element instead. Make sure to [consider the implications for assistive technology](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus#accessibility_considerations) when using that attribute.
+
+If you want to customize SvelteKit's focus management, you can use the `afterNavigate` hook:
 
 ```js
 /// <reference types="@sveltejs/kit" />

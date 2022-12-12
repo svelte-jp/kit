@@ -1,3 +1,4 @@
+import { DEV } from 'esm-env';
 import { onMount, tick } from 'svelte';
 import {
 	make_trackable,
@@ -383,7 +384,7 @@ export function create_client({ target, base }) {
 
 	/** @param {import('./types').NavigationFinished} result */
 	function initialize(result) {
-		if (__SVELTEKIT_DEV__ && document.querySelector('vite-error-overlay')) return;
+		if (DEV && document.querySelector('vite-error-overlay')) return;
 
 		current = result.state;
 
@@ -560,7 +561,7 @@ export function create_client({ target, base }) {
 
 		const node = await loader();
 
-		if (__SVELTEKIT_DEV__) {
+		if (DEV) {
 			validate_common_exports(node.shared);
 		}
 
@@ -592,6 +593,7 @@ export function create_client({ target, base }) {
 					uses.url = true;
 				}),
 				async fetch(resource, init) {
+					/** @type {URL | string} */
 					let requested;
 
 					if (resource instanceof Request) {
@@ -674,10 +676,23 @@ export function create_client({ target, base }) {
 				}
 			});
 
-			if (import.meta.env.DEV) {
+			if (DEV) {
 				try {
 					lock_fetch();
 					data = (await node.shared.load.call(null, load_input)) ?? null;
+					if (data != null && Object.getPrototypeOf(data) !== Object.prototype) {
+						throw new Error(
+							`a load function related to route '${route.id}' returned ${
+								typeof data !== 'object'
+									? `a ${typeof data}`
+									: data instanceof Response
+									? 'a Response object'
+									: Array.isArray(data)
+									? 'an array'
+									: 'a non-plain object'
+							}, but must return a plain object at the top level (i.e. \`return {...}\`)`
+						);
+					}
 				} finally {
 					unlock_fetch();
 				}
@@ -1299,7 +1314,7 @@ export function create_client({ target, base }) {
 		},
 
 		disable_scroll_handling: () => {
-			if (import.meta.env.DEV && started && !updating) {
+			if (DEV && started && !updating) {
 				throw new Error('Can only disable scroll handling during navigation');
 			}
 
@@ -1372,7 +1387,7 @@ export function create_client({ target, base }) {
 						url,
 						params: current.params,
 						branch: branch.slice(0, error_load.idx).concat(error_load.node),
-						status: 500, // TODO might not be 500?
+						status: result.status ?? 500,
 						error: result.error,
 						route
 					});
@@ -1720,7 +1735,7 @@ export function create_client({ target, base }) {
 async function load_data(url, invalid) {
 	const data_url = new URL(url);
 	data_url.pathname = add_data_suffix(url.pathname);
-	if (__SVELTEKIT_DEV__ && url.searchParams.has('x-sveltekit-invalidated')) {
+	if (DEV && url.searchParams.has('x-sveltekit-invalidated')) {
 		throw new Error('Cannot used reserved query parameter "x-sveltekit-invalidated"');
 	}
 	data_url.searchParams.append(
@@ -1813,7 +1828,7 @@ function add_url_properties(type, target) {
 }
 
 function pre_update() {
-	if (__SVELTEKIT_DEV__) {
+	if (DEV) {
 		return () => {
 			check_for_removed_attributes();
 		};
@@ -1852,7 +1867,7 @@ function reset_focus() {
 	}
 }
 
-if (__SVELTEKIT_DEV__) {
+if (DEV) {
 	// Nasty hack to silence harmless warnings the user can do nothing about
 	const console_warn = console.warn;
 	console.warn = function warn(...args) {

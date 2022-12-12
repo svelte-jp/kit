@@ -271,7 +271,7 @@ export async function load({ cookies }) {
 サーバー専用の `load` 関数と共有される `load` 関数はどちらも `setHeaders` 関数にアクセスでき、サーバー上で実行している場合、 レスポンスにヘッダーを設定できます。(ブラウザで実行している場合、`setHeaders` には何の効果もありません。) これは、ページをキャッシュさせる場合に便利です、例えば:
 
 ```js
-// @errors: 2322
+// @errors: 2322 1360
 /// file: src/routes/products/+page.js
 /** @type {import('./$types').PageLoad} */
 export async function load({ fetch, setHeaders }) {

@@ -1,5 +1,49 @@
 # @sveltejs/kit
 
+## 1.0.0-next.582
+
+### Patch Changes
+
+- [fix] improve split between Vite plugins ([#8055](https://github.com/sveltejs/kit/pull/8055))
+
+- [fix] set Vite base URL ([#8046](https://github.com/sveltejs/kit/pull/8046))
+
+- add declaration for vitePreprocess reexport ([#8053](https://github.com/sveltejs/kit/pull/8053))
+
+## 1.0.0-next.581
+
+### Patch Changes
+
+- [feat] vitePreprocess ([#8036](https://github.com/sveltejs/kit/pull/8036))
+
+## 1.0.0-next.580
+
+### Patch Changes
+
+- [breaking] throw an error on invalid load response ([#8003](https://github.com/sveltejs/kit/pull/8003))
+
+- [fix] allow SvelteKit to be used without bundling ([#7950](https://github.com/sveltejs/kit/pull/7950))
+
+## 1.0.0-next.579
+
+### Patch Changes
+
+- [breaking] update svelte peerDependency to ^3.54.0 ([#7543](https://github.com/sveltejs/kit/pull/7543))
+
+- update esbuild to ^0.16.3 ([#7543](https://github.com/sveltejs/kit/pull/7543))
+
+- [breaking] upgrade to Vite 4 ([#7543](https://github.com/sveltejs/kit/pull/7543))
+
+## 1.0.0-next.578
+
+### Patch Changes
+
+- [fix] respect fetch cache option ([#8024](https://github.com/sveltejs/kit/pull/8024))
+
+- [breaking] rename invalid() to fail() and ValidationError to ActionFailure ([#8012](https://github.com/sveltejs/kit/pull/8012))
+
+- [breaking] replace automatic fallback generation with `builder.generateFallback(fallback)` ([#8013](https://github.com/sveltejs/kit/pull/8013))
+
 ## 1.0.0-next.577
 
 ### Patch Changes
