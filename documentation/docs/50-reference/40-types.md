@@ -20,7 +20,7 @@ The following are referenced by the public types documented above, but cannot be
 
 ```js
 /// file: src/routes/[foo]/[bar]/[baz]/+page.server.js
-// @errors: 2355 2322
+// @errors: 2355 2322 1360
 /** @type {import('@sveltejs/kit').RequestHandler<{
  *   foo: string;
  *   bar: string;

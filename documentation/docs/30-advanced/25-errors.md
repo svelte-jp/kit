@@ -81,7 +81,7 @@ throw error(404, {
 
 ```js
 /// file: src/hooks.server.js
-// @errors: 2322 2571 2339
+// @errors: 2322 1360 2571 2339
 // @filename: ambient.d.ts
 const Sentry: any;
 

@@ -25,8 +25,14 @@ export const actions = {
 ```svelte
 /// file: src/routes/login/+page.svelte
 <form method="POST">
-	<input name="email" type="email">
-	<input name="password" type="password">
+	<label>
+		Email
+		<input name="email" type="email">
+	</label>
+	<label>
+		Password
+		<input name="password" type="password">
+	</label>
 	<button>Log in</button>
 </form>
 ```
@@ -81,8 +87,14 @@ export const actions = {
 /// file: src/routes/login/+page.svelte
 -<form method="POST">
 +<form method="POST" action="?/login">
-	<input name="email" type="email">
-	<input name="password" type="password">
+	<label>
+		Email
+		<input name="email" type="email">
+	</label>
+	<label>
+		Password
+		<input name="password" type="password">
+	</label>
 	<button>Log in</button>
 +	<button formaction="?/register">Register</button>
 </form>
@@ -140,12 +152,12 @@ export const actions = {
 
 ### Validation errors
 
-無効なデータが原因でリクエストが処理できなかった場合、再試行できるようにするために、直前に送信した form の値とともに validation error をユーザーに返すことができます。`invalid` 関数は、HTTP ステータスコード (通常、validation error の場合は 400 か 422) をデータとともに返します。ステータスコードは `$page.status` から使用することができ、data は `form` から使用することができます:
+無効なデータが原因でリクエストが処理できなかった場合、再試行できるようにするために、直前に送信した form の値とともに validation error をユーザーに返すことができます。`fail` 関数は、HTTP ステータスコード (通常、validation error の場合は 400 か 422) をデータとともに返します。ステータスコードは `$page.status` から使用することができ、data は `form` から使用することができます:
 
 ```diff
 // @errors: 2339 2304
 /// file: src/routes/login/+page.server.js
-+import { invalid } from '@sveltejs/kit';
++import { fail } from '@sveltejs/kit';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
@@ -155,13 +167,13 @@ export const actions = {
 		const password = data.get('password');
 
 +		if (!email) {
-+			return invalid(400, { email, missing: true });
++			return fail(400, { email, missing: true });
 +		}
 
 		const user = await db.getUser(email);
 
 +		if (!user || user.password !== hash(password)) {
-+			return invalid(400, { email, incorrect: true });
++			return fail(400, { email, incorrect: true });
 +		}
 
 		cookies.set('sessionid', await db.createSession(user));
@@ -179,12 +191,17 @@ export const actions = {
 ```diff
 /// file: src/routes/login/+page.svelte
 <form method="POST" action="?/login">
--	<input name="email" type="email">
 +	{#if form?.missing}<p class="error">The email field is required</p>{/if}
 +	{#if form?.incorrect}<p class="error">Invalid credentials!</p>{/if}
-+	<input name="email" type="email" value={form?.email ?? ''}>
-
-	<input name="password" type="password">
+	<label>
+		Email
+-		<input name="email" type="email">
++		<input name="email" type="email" value={form?.email ?? ''}>
+	</label>
+	<label>
+		Password
+		<input name="password" type="password">
+	</label>
 	<button>Log in</button>
 	<button formaction="?/register">Register</button>
 </form>
@@ -199,7 +216,7 @@ redirect (と error) は [`load`](/docs/load#redirects) のそれと同じよう
 ```diff
 // @errors: 2339 2304
 /// file: src/routes/login/+page.server.js
-+import { invalid, redirect } from '@sveltejs/kit';
++import { fail, redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
@@ -210,11 +227,11 @@ export const actions = {
 
 		const user = await db.getUser(email);
 		if (!user) {
-			return invalid(400, { email, missing: true });
+			return fail(400, { email, missing: true });
 		}
 
 		if (user.password !== hash(password)) {
-			return invalid(400, { email, incorrect: true });
+			return fail(400, { email, incorrect: true });
 		}
 
 		cookies.set('sessionid', await db.createSession(user));
@@ -323,6 +340,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 - 成功レスポンスの場合は、`<form>` 要素をリセットして `invalidateAll` で全てのデータを無効化・最新化(invalidate)します。
 - リダイレクトレスポンスの場合は `goto` を呼び出します
 - エラーが発生した場合はもっとも近くにある `+error` 境界をレンダリングします
+- 適切な要素に [フォーカスをリセット](/docs/accessibility#focus-management) します
 
 この挙動をカスタマイズするために、form が送信される直前に実行される `SubmitFunction` 関数を提供することができます。そして (オプションで) `ActionResult` を引数に取るコールバックを返すことができます。もしコールバックを返す場合、上述のデフォルトの動作はトリガーされません。元に戻すには、`update` を呼び出してください。
 
@@ -377,9 +395,11 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 `applyAction(result)` の挙動は `result.type` に依存しています:
 
-- `success`, `invalid` — `$page.status` を `result.status` に設定し、`form` と `$page.form` を `result.data` で更新します (`enhance` の `update` とは対照的に、送信元がどこかは関係ありません)
+- `success`, `failure` — `$page.status` を `result.status` に設定し、`form` と `$page.form` を `result.data` で更新します (`enhance` の `update` とは対照的に、送信元がどこかは関係ありません)
 - `redirect` — `goto(result.location)` を呼び出します
 - `error` — もっとも近くにある `+error` 境界を `result.error` でレンダリングします
+
+いずれの場合でも、[フォーカスはリセットされます](/docs/accessibility#focus-management)。
 
 ### Custom event listener
 
@@ -448,7 +468,10 @@ const response = await fetch(this.action, {
 
 ```html
 <form action="/search">
-	<input name="q">
+	<label>
+		Search
+		<input name="q">
+	</label>
 </form>
 ```
 

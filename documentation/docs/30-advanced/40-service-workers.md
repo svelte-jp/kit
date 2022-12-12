@@ -21,7 +21,7 @@ service worker の内部では、[`$service-worker` モジュール](/docs/modul
 次の例では、ビルドされたアプリと `static` にあるファイルをすぐに(eagerly)キャッシュし、その他全てのリクエストはそれらの発生時にキャッシュします。これにより、各ページは一度アクセスするとオフラインで動作するようになります。
 
 ```js
-// @ts-nocheck Official TS Service Worker typings are still a work in progress.
+// @errors: 2339
 import { build, files, version } from '$service-worker';
 
 // Create a unique cache name for this deployment

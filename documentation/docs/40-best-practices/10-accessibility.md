@@ -25,11 +25,13 @@ SvelteKit では、ページ間のナビゲーションではページのリロ�
 
 これにより、スクリーンリーダーやその他の支援技術が、ナビゲーション後に新しいページを識別することができるようになります。説明的なタイトルを提供することは、[SEO](/docs/seo#manual-setup-title-and-meta) にとっても重要なことです。
 
-## Focus management
+## フォーカス管理(Focus management)
 
 旧来のサーバーレンダリングアプリケーションでは、ナビゲーションでフォーカスがページのトップにリセットされます。これによって、キーボードやスクリーンリーダーを使用して web をブラウジングする方が、ページの先頭からやり取りできるようになります。
 
-クライアントサイドルーティング中にこの動作をシミュレートするために、SvelteKit は各ナビゲーション後に `<body>` 要素にフォーカスします。この動作をカスタマイズしたい場合は、`afterNavigate` hook を使用してカスタムのフォーカスマネジメントロジックを実装することができます:
+クライアントサイドルーティング中にこの挙動をシミュレートするために、SvelteKit は各ナビゲーションや [強化されたフォーム送信(enhanced form submission)](https://kit.svelte.jp/docs/form-actions#progressive-enhancement) の後、`<body>` 要素にフォーカスを合わせます。1つ例外があります - [`autofocus`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus) 属性が付いている要素が存在する場合、SvelteKit はその要素にフォーカスを合わせます。この属性を使用するときは、[支援技術(assistive technology)に対する影響を必ず考慮](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus#accessibility_considerations)してください。
+
+SvelteKit のフォーカス管理をカスタマイズしたい場合は、`afterNavigate` hook を使います:
 
 ```js
 /// <reference types="@sveltejs/kit" />

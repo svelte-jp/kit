@@ -3,6 +3,7 @@ import colors from 'kleur';
 import path from 'path';
 import sirv from 'sirv';
 import { URL } from 'url';
+import { isCSSRequest } from 'vite';
 import { getRequest, setResponse } from '../../../exports/node/index.js';
 import { installPolyfills } from '../../../exports/node/polyfills.js';
 import { coalesce_to_error } from '../../../utils/error.js';
@@ -10,12 +11,9 @@ import { posixify, resolve_entry, to_fs } from '../../../utils/filesystem.js';
 import { load_error_page, load_template } from '../../../core/config/index.js';
 import { SVELTE_KIT_ASSETS } from '../../../constants.js';
 import * as sync from '../../../core/sync/sync.js';
-import { get_mime_lookup, runtime_base, runtime_prefix } from '../../../core/utils.js';
+import { get_mime_lookup, runtime_prefix } from '../../../core/utils.js';
 import { compact } from '../../../utils/array.js';
-
-// Vite doesn't expose this so we just copy the list for now
-// https://github.com/vitejs/vite/blob/3edd1af56e980aef56641a5a51cf2932bb580d41/packages/vite/src/node/plugins/css.ts#L96
-const style_pattern = /\.(css|less|sass|scss|styl|stylus|pcss|postcss)$/;
+import { not_found } from '../utils.js';
 
 const cwd = process.cwd();
 
@@ -27,12 +25,6 @@ const cwd = process.cwd();
  */
 export async function dev(vite, vite_config, svelte_config) {
 	installPolyfills();
-
-	// @ts-expect-error
-	globalThis.__SVELTEKIT_BROWSER__ = false;
-
-	// @ts-expect-error
-	globalThis.__SVELTEKIT_DEV__ = true;
 
 	sync.init(svelte_config, vite_config.mode);
 
@@ -131,7 +123,7 @@ export async function dev(vite, vite_config, svelte_config) {
 								const query = parsed.searchParams;
 
 								if (
-									style_pattern.test(dep.file) ||
+									isCSSRequest(dep.file) ||
 									(query.has('svelte') && query.get('type') === 'style')
 								) {
 									try {
@@ -229,13 +221,16 @@ export async function dev(vite, vite_config, svelte_config) {
 		}, 100);
 	};
 
+	// flag to skip watchers if server is already restarting
+	let restarting = false;
+
 	// Debounce add/unlink events because in case of folder deletion or moves
 	// they fire in rapid succession, causing needless invocations.
 	watch('add', () => debounce(update_manifest));
 	watch('unlink', () => debounce(update_manifest));
 	watch('change', (file) => {
 		// Don't run for a single file if the whole manifest is about to get updated
-		if (timeout) return;
+		if (timeout || restarting) return;
 
 		sync.update(svelte_config, manifest_data, file);
 	});
@@ -246,11 +241,22 @@ export async function dev(vite, vite_config, svelte_config) {
 	// send the vite client a full-reload event without path being set
 	if (appTemplate !== 'index.html') {
 		vite.watcher.on('change', (file) => {
-			if (file === appTemplate) {
+			if (file === appTemplate && !restarting) {
 				vite.ws.send({ type: 'full-reload' });
 			}
 		});
 	}
+
+	// changing the svelte config requires restarting the dev server
+	// the config is only read on start and passed on to vite-plugin-svelte
+	// which needs up-to-date values to operate correctly
+	vite.watcher.on('change', (file) => {
+		if (path.basename(file) === 'svelte.config.js') {
+			console.log(`svelte config changed, restarting vite dev-server. changed file: ${file}`);
+			restarting = true;
+			vite.restart();
+		}
+	});
 
 	const assets = svelte_config.kit.paths.assets ? SVELTE_KIT_ASSETS : svelte_config.kit.paths.base;
 	const asset_server = sirv(svelte_config.kit.files.assets, {
@@ -292,11 +298,6 @@ export async function dev(vite, vite_config, svelte_config) {
 		}
 	});
 
-	// set `import { version } from '$app/environment'`
-	(await vite.ssrLoadModule(`${runtime_prefix}/env.js`)).set_version(
-		svelte_config.kit.version.name
-	);
-
 	return () => {
 		const serve_static_middleware = vite.middlewares.stack.find(
 			(middleware) =>
@@ -327,10 +328,7 @@ export async function dev(vite, vite_config, svelte_config) {
 				}
 
 				if (!decoded.startsWith(svelte_config.kit.paths.base)) {
-					return not_found(
-						res,
-						`Not found (did you mean ${svelte_config.kit.paths.base + req.url}?)`
-					);
+					return not_found(req, res, svelte_config.kit.paths.base);
 				}
 
 				if (decoded === svelte_config.kit.paths.base + '/service-worker.js') {
@@ -418,13 +416,6 @@ export async function dev(vite, vite_config, svelte_config) {
 				const { default: root } = await vite.ssrLoadModule(
 					`/${posixify(path.relative(cwd, `${svelte_config.kit.outDir}/generated/root.svelte`))}`
 				);
-
-				const paths = await vite.ssrLoadModule(`${runtime_base}/paths.js`);
-
-				paths.set_paths({
-					base: svelte_config.kit.paths.base,
-					assets
-				});
 
 				let request;
 
@@ -531,21 +522,11 @@ export async function dev(vite, vite_config, svelte_config) {
 	};
 }
 
-/** @param {import('http').ServerResponse} res */
-function not_found(res, message = 'Not found') {
-	res.statusCode = 404;
-	res.end(message);
-}
-
 /**
  * @param {import('connect').Server} server
  */
 function remove_static_middlewares(server) {
-	// We don't use viteServePublicMiddleware because of the following issues:
-	// https://github.com/vitejs/vite/issues/9260
-	// https://github.com/vitejs/vite/issues/9236
-	// https://github.com/vitejs/vite/issues/9234
-	const static_middlewares = ['viteServePublicMiddleware', 'viteServeStaticMiddleware'];
+	const static_middlewares = ['viteServeStaticMiddleware'];
 	for (let i = server.stack.length - 1; i > 0; i--) {
 		// @ts-expect-error using internals
 		if (static_middlewares.includes(server.stack[i].handle.name)) {

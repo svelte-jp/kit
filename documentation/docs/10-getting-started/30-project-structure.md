@@ -53,13 +53,15 @@ my-project/
 
 TypeScript を使用している場合、`.js` の代わりに `.ts` ファイルを使用することができます。
 
+プロジェクトのセットアップ時に [Vitest](https://vitest.dev) を追加した場合、ユニットテストは `.test.js` (または `.test.ts`) という拡張子で `src` ディレクトリに置かれます。
+
 ### static
 
 `robots.txt` や `favicon.png` など、そのままサーブされる静的なアセットをここに含めます。
 
 ### tests
 
-`npm create svelte@latest` の実行時、プロジェクトにテストを追加することを選択した場合、このディレクトリに格納されます。
+プロジェクトのセットアップ時、ブラウザテストのために [Playwright](https://playwright.dev/) を追加した場合、そのテストはこのディレクトリに置かれます。
 
 ### package.json
 

@@ -112,9 +112,9 @@
 		<div class="globe">
 			<img
 				src="/edge.svg"
-				width="1000"
-				height="1000"
-				alt="動的にレンダリングされた世界地図、ユーザーのロケーションが中心になっています"
+				width="100%"
+				height="100%"
+				alt="動的にレンダリングされた世界地図で、ユーザーのロケーションが中心になっています"
 			/>
 			<span> あなた向けに、エッジでレンダリングされています </span>
 		</div>
@@ -176,7 +176,7 @@
 		flex-direction: column-reverse;
 	}
 
-	.platforms div span {
+	.platforms a span {
 		font-size: var(--sk-text-xs);
 		color: var(--sk-text-3);
 		text-align: center;
