@@ -340,7 +340,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 - 成功レスポンスの場合は、`<form>` 要素をリセットして `invalidateAll` で全てのデータを無効化・最新化(invalidate)します。
 - リダイレクトレスポンスの場合は `goto` を呼び出します
 - エラーが発生した場合はもっとも近くにある `+error` 境界をレンダリングします
-- [reset focus](/docs/accessibility#focus-management) to the appropriate element
+- 適切な要素に [フォーカスをリセット](/docs/accessibility#focus-management) します
 
 この挙動をカスタマイズするために、form が送信される直前に実行される `SubmitFunction` 関数を提供することができます。そして (オプションで) `ActionResult` を引数に取るコールバックを返すことができます。もしコールバックを返す場合、上述のデフォルトの動作はトリガーされません。元に戻すには、`update` を呼び出してください。
 
@@ -399,7 +399,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 - `redirect` — `goto(result.location)` を呼び出します
 - `error` — もっとも近くにある `+error` 境界を `result.error` でレンダリングします
 
-In all cases, [focus will be reset](/docs/accessibility#focus-management).
+いずれの場合でも、[フォーカスはリセットされます](/docs/accessibility#focus-management)。
 
 ### Custom event listener
 

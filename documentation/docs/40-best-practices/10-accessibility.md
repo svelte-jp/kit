@@ -25,13 +25,13 @@ SvelteKit では、ページ間のナビゲーションではページのリロ�
 
 これにより、スクリーンリーダーやその他の支援技術が、ナビゲーション後に新しいページを識別することができるようになります。説明的なタイトルを提供することは、[SEO](/docs/seo#manual-setup-title-and-meta) にとっても重要なことです。
 
-## Focus management
+## フォーカス管理(Focus management)
 
 旧来のサーバーレンダリングアプリケーションでは、ナビゲーションでフォーカスがページのトップにリセットされます。これによって、キーボードやスクリーンリーダーを使用して web をブラウジングする方が、ページの先頭からやり取りできるようになります。
 
-To simulate this behavior during client-side routing, SvelteKit focuses the `<body>` element after each navigation and [enhanced form submission](https://kit.svelte.dev/docs/form-actions#progressive-enhancement). There is one exception - if an element with the [`autofocus`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus) attribute is present, SvelteKit will focus that element instead. Make sure to [consider the implications for assistive technology](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus#accessibility_considerations) when using that attribute.
+クライアントサイドルーティング中にこの挙動をシミュレートするために、SvelteKit は各ナビゲーションや [強化されたフォーム送信(enhanced form submission)](https://kit.svelte.jp/docs/form-actions#progressive-enhancement) の後、`<body>` 要素にフォーカスを合わせます。1つ例外があります - [`autofocus`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus) 属性が付いている要素が存在する場合、SvelteKit はその要素にフォーカスを合わせます。この属性を使用するときは、[支援技術(assistive technology)に対する影響を必ず考慮](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus#accessibility_considerations)してください。
 
-If you want to customize SvelteKit's focus management, you can use the `afterNavigate` hook:
+SvelteKit のフォーカス管理をカスタマイズしたい場合は、`afterNavigate` hook を使います:
 
 ```js
 /// <reference types="@sveltejs/kit" />

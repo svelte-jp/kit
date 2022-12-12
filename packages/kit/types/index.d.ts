@@ -1091,7 +1091,7 @@ export function error(
 ): HttpError;
 
 /**
- * [`error`](https://kit.svelte.jp/docs/modules#sveltejs-kit-error) 関数に返されるオブジェクトです
+ * [`error`](https://kit.svelte.jp/docs/modules#sveltejs-kit-error) 関数が返すオブジェクトです
  */
 export interface HttpError {
 	/** The [HTTP status code](https://httpstatusdogs.com), in the range 400-599 */
@@ -1110,7 +1110,7 @@ export function redirect(
 ): Redirect;
 
 /**
- * [`redirect`](https://kit.svelte.jp/docs/modules#sveltejs-kit-redirect) 関数に返されるオブジェクトです
+ * [`redirect`](https://kit.svelte.jp/docs/modules#sveltejs-kit-redirect) 関数が返すオブジェクトです
  */
 export interface Redirect {
 	/** The [HTTP status code](https://httpstatusdogs.com), in the range 300-308. */
@@ -1127,7 +1127,7 @@ export interface Redirect {
 export function json(data: any, init?: ResponseInit): Response;
 
 /**
- * Create an `ActionFailure` object.
+ * `ActionFailure` オブジェクトを作成します。
  */
 export function fail<T extends Record<string, unknown> | undefined>(
 	status: number,
@@ -1135,7 +1135,7 @@ export function fail<T extends Record<string, unknown> | undefined>(
 ): ActionFailure<T>;
 
 /**
- * The object returned by the [`fail`](https://kit.svelte.dev/docs/modules#sveltejs-kit-fail) function
+ * [`fail`](https://kit.svelte.jp/docs/modules#sveltejs-kit-fail) 関数が返すオブジェクトです
  */
 export interface ActionFailure<T extends Record<string, unknown> | undefined = undefined>
 	extends UniqueInterface {

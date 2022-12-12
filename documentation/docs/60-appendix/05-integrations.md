@@ -8,7 +8,7 @@ title: Integrations
 
 ### `vitePreprocess`
 
-`vite-plugin-svelte` offers a [`vitePreprocess`](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/preprocess.md) feature which utilizes Vite for preprocessing. It is capable of handling the language flavors Vite handles: TypeScript, PostCSS, SCSS, Less, Stylus, and SugarSS. For convenience, it is re-exported from the `@sveltejs/kit/vite` package. If you set your project up with TypeScript it will be included by default:
+`vite-plugin-svelte` には [`vitePreprocess`](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/preprocess.md) という機能があり、Vite をプリプロセスに用いることができます。これによって Vite が扱える言語フレーバー (TypeScript、PostCSS、SCSS、Less、Stylus、SugarSS) の処理が可能になります。便宜上、これは `@sveltejs/kit/vite` パッケージから再エクスポートされています。プロジェクトに TypeScript を設定すると、これがデフォルトで含まれるようになります:
 
 ```js
 // svelte.config.js
@@ -21,9 +21,9 @@ export default {
 
 ### `svelte-preprocess`
 
-`svelte-preprocess` has some additional functionality not found in `vitePreprocess` such as support for Pug, Babel, and global styles. However, `vitePreprocess` may be faster and require less configuration, so it is used by default. Note that CoffeeScript is [not supported](https://github.com/sveltejs/kit/issues/2920#issuecomment-996469815) by SvelteKit.
+`svelte-preprocess` は、Pug、Babel、global styles のサポートなど、`vitePreprocess` には無い機能があります。しかし、`vitePreprocess` はより速く、設定が少ないため、デフォルトでは `vitePreprocess` が使用されます。SvelteKit は CoffeeScript を [サポートしていない](https://github.com/sveltejs/kit/issues/2920#issuecomment-996469815) ことにご注意ください。
 
-You will need to install `svelte-preprocess` with `npm install --save-dev svelte-preprocess` and [add it to your `svelte.config.js`](https://github.com/sveltejs/svelte-preprocess/blob/main/docs/usage.md#with-svelte-config). After that, you will often need to [install the corresponding library](https://github.com/sveltejs/svelte-preprocess/blob/main/docs/getting-started.md) such as `npm install -D sass` or `npm install -D less`.
+`svelte-preprocess` をインストールするには `npm install --save-dev svelte-preprocess` を実行し、ご自身で [`svelte.config.js` に追加する](https://github.com/sveltejs/svelte-preprocess/blob/main/docs/usage.md#with-svelte-config) 必要があります。その後、`npm install -D sass` や `npm install -D less` など、[対応するライブラリのインストール](https://github.com/sveltejs/svelte-preprocess/blob/main/docs/getting-started.md) が必要になることが多いようです。
 
 ## Adders
 
