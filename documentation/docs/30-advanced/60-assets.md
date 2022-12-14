@@ -16,18 +16,7 @@ title: アセットハンドリング
 
 マークアップから直接アセットを参照したければ、[svelte-preprocess-import-assets](https://github.com/bluwy/svelte-preprocess-import-assets) などのプリプロセッサをお使い頂けます。
 
-CSS 関数の `url()` でインクルードされたアセットの場合は、[`experimental.useVitePreprocess`](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/config.md#usevitepreprocess) オプションが役立つでしょう:
-
-```js
-// svelte.config.js
-export default {
-	vitePlugin: {
-		experimental: {
-			useVitePreprocess: true
-		}
-	}
-};
-```
+CSS 関数の `url()` でインクルードされたアセットの場合は、[`vitePreprocess`](https://kit.svelte.jp/docs/integrations#preprocessors-vitepreprocess) が役立つでしょう。
 
 ## 変換(Transforming)
 

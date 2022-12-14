@@ -36,7 +36,7 @@ export async function handle({ event, resolve }) {
 
 > 静的アセット(プリレンダリング済みのページを含む)に対するリクエストは SvelteKit では処理されません。
 
-未実装の場合、デフォルトは `({ event, resolve }) => resolve(event)` となります。カスタムデータをリクエストに追加し、`+server.js` のハンドラーやサーバー専用の `load` 関数に渡すには、以下のように `event.locals` オブジェクトに埋め込んでください。
+未実装の場合、デフォルトは `({ event, resolve }) => resolve(event)` となります。カスタムデータをリクエストに追加し、`+server.js` のハンドラーやサーバー(server) `load` 関数に渡すには、以下のように `event.locals` オブジェクトに埋め込んでください。
 
 ```js
 /// file: src/hooks.server.js
@@ -144,41 +144,44 @@ export async function handleFetch({ event, request, fetch }) {
 - エラーをログに残すことができます
 - エラーからメッセージやスタックトレースなどの機密情報を省略し、ユーザーに見せても安全なカスタムの表現を生成することができます。戻り値は `$page.error` の値となります。デフォルトでは、404 (`event.route.id` が `null` になっていることで検知できます) の場合は `{ message: 'Not Found' }`、それ以外の場合は `{ message: 'Internal Error' }` となります。これを型安全にするために、`App.Error` インターフェイスを宣言して、期待される形をカスタマイズすることができます (わかりやすいフォールバックの動作を保証するため、`message: string` を含めなければなりません)。
 
-以下のコードは、エラーの形を `{ message: string; code: string }` として型付けし、それを `handleError` 関数から適宜返す例を示しています:
+以下のコードは、エラーの形を `{ message: string; errorId: string }` として型付けし、それを `handleError` 関数から適宜返す例を示しています:
 
 ```ts
 /// file: src/app.d.ts
 declare namespace App {
 	interface Error {
 		message: string;
-		code: string;
+		errorId: string;
 	}
 }
 ```
 
 ```js
 /// file: src/hooks.server.js
-// @errors: 2322 1360 2571 2339
+// @errors: 2322
 // @filename: ambient.d.ts
 const Sentry: any;
 
 // @filename: index.js
 // ---cut---
+import crypto from 'crypto';
+
 /** @type {import('@sveltejs/kit').HandleServerError} */
 export function handleError({ error, event }) {
+	const errorId = crypto.randomUUID();
 	// example integration with https://sentry.io/
-	Sentry.captureException(error, { event });
+	Sentry.captureException(error, { event, errorId });
 
 	return {
 		message: 'Whoops!',
-		code: error?.code ?? 'UNKNOWN'
+		errorId
 	};
 }
 ```
 
 ```js
 /// file: src/hooks.client.js
-// @errors: 2322 1360 2571 2339
+// @errors: 2322
 // @filename: ambient.d.ts
 const Sentry: any;
 
@@ -186,12 +189,13 @@ const Sentry: any;
 // ---cut---
 /** @type {import('@sveltejs/kit').HandleClientError} */
 export function handleError({ error, event }) {
+	const errorId = crypto.randomUUID();
 	// example integration with https://sentry.io/
-	Sentry.captureException(error, { event });
+	Sentry.captureException(error, { event, errorId });
 
 	return {
 		message: 'Whoops!',
-		code: error?.code ?? 'UNKNOWN'
+		errorId
 	};
 }
 ```
