@@ -66,7 +66,12 @@ export async function load({ fetch }) {
 
 [action](/docs/form-actions) 付きのページは、サーバーがその action の `POST` リクエストを処理できなければならないため、プリレンダリングできません。
 
+### Prerender and ssr
+
+If you set the [ssr option](#ssr) to `false`, each request will result in the same empty HTML shell. Since this would result in unnecessary work, SvelteKit defaults to prerendering any pages it finds where `prerender` is not explicitly set to `false`.
+
 ### ルートの衝突(Route conflicts)
+=======
 
 プリレンダリングはファイルシステムに書き込むため、ディレクトリとファイルが同じ名前になるエンドポイントを2つ持つことはできません。例えば、`src/routes/foo/+server.js` と `src/routes/foo/bar/+server.js` の場合は、`foo` と `foo/bar` を作成しようとしますが、これは不可能です。
 
