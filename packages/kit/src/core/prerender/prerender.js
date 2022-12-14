@@ -22,11 +22,12 @@ const [, , client_out_dir, manifest_path, results_path, verbose, env] = process.
 prerender();
 
 /**
- * @template T
+ * @template {{message: string}} T
+ * @template {Omit<T, 'message'>} K
  * @param {import('types').Logger} log
  * @param {'fail' | 'warn' | 'ignore' | ((details: T) => void)} input
- * @param {(details: T) => string} format
- * @returns {(details: T) => void}
+ * @param {(details: K) => string} format
+ * @returns {(details: K) => void}
  */
 function normalise_error_handler(log, input, format) {
 	switch (input) {
@@ -41,6 +42,7 @@ function normalise_error_handler(log, input, format) {
 		case 'ignore':
 			return () => {};
 		default:
+			// @ts-expect-error TS thinks T might be of a different kind, but it's not
 			return (details) => input({ ...details, message: format(details) });
 	}
 }
@@ -390,16 +392,24 @@ export async function prerender() {
 			for (const layout of layouts) {
 				if (layout) {
 					validate_common_exports(layout.server, route.id);
-					validate_common_exports(layout.shared, route.id);
+					validate_common_exports(layout.universal, route.id);
 				}
 			}
 
 			if (page) {
 				validate_page_server_exports(page.server, route.id);
-				validate_common_exports(page.shared, route.id);
+				validate_common_exports(page.universal, route.id);
 			}
 
-			const prerender = get_option(nodes, 'prerender') ?? false;
+			const should_prerender = get_option(nodes, 'prerender');
+			const prerender =
+				should_prerender === true ||
+				// Try prerendering if ssr is false and no server needed. Set it to 'auto' so that
+				// the route is not removed from the manifest, there could be a server load function.
+				// People can opt out of this behavior by explicitly setting prerender to false
+				(should_prerender !== false && get_option(nodes, 'ssr') === false && !page?.server?.actions
+					? 'auto'
+					: false);
 
 			prerender_map.set(route.id, prerender);
 		}

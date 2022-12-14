@@ -57,7 +57,7 @@ export async function load({ params }) {
 }
 ```
 
-型が `PageLoad` から `PageServerLoad` に変わっていることにご注意ください。サーバー専用の `load` 関数では追加の引数にアクセスすることができます。どのような場合に `+page.js` を使用し、どのような場合に `+page.server.js` を使用するのかを理解するには、[Shared vs server](/docs/load#shared-vs-server) を参照してください。
+型が `PageLoad` から `PageServerLoad` に変わっていることにご注意ください。サーバー(server) `load` 関数では追加の引数にアクセスすることができます。どのような場合に `+page.js` を使用し、どのような場合に `+page.server.js` を使用するのかを理解するには、[Universal vs server](/docs/load#universal-vs-server) を参照してください。
 
 ## Layout data
 
@@ -153,34 +153,34 @@ export async function load() {
 
 `$page.data` の型情報は `App.PageData` から提供されます。
 
-## Shared vs server
+## Universal vs server
 
 これまで見てきたように、`load` 関数には2つの種類があります:
 
-* `+page.js` ファイルと `+layout.js` ファイルがエクスポートする `load` 関数は、サーバーとブラウザで共有(shared)されます
-* `+page.server.js` ファイルと `+layout.server.js` ファイルがエクスポートする `load` 関数は、サーバー専用です
+* `+page.js` ファイルと `+layout.js` ファイルは、サーバーとブラウザの両方で実行されるユニバーサル(universal) `load` 関数をエクスポートします
+* `+page.server.js` ファイルと `+layout.server.js` ファイルは、サーバーサイドでのみ実行されるサーバー(server) `load` 関数をエクスポートします
 
 概念上は同じものですが、気をつけなければならない重要な違いがあります。
 
 ### Input
 
-共有される `load` 関数とサーバー専用の `load` 関数はどちらも、リクエストを表すプロパティ (`params`、`route`、`url`) と様々な関数 (`depends`、`fetch`、`parent`) にアクセスできます。これらについては、以下のセクションで説明します。
+ユニバーサル(universal) `load` 関数とサーバー(server) `load` 関数はどちらも、リクエストを表すプロパティ (`params`、`route`、`url`) と様々な関数 (`depends`、`fetch`、`parent`) にアクセスできます。これらについては、以下のセクションで説明します。
 
-サーバー専用の `load` 関数は `ServerLoadEvent` を引数にとって呼び出されます。`ServerLoadEvent` は、`RequestEvent` から `clientAddress`、`cookies`、`locals`、`platform`、`request` を継承しています。
+サーバー(server) `load` 関数は `ServerLoadEvent` を引数にとって呼び出されます。`ServerLoadEvent` は、`RequestEvent` から `clientAddress`、`cookies`、`locals`、`platform`、`request` を継承しています。
 
-共有される `load` 関数は、`LoadEvent` を引数にとって呼び出されます。`LoadEvent` は `data` プロパティを持っています。もし `+page.js` と `+page.server.js` (または `+layout.js` と `+layout.server.js`) の両方に `load` 関数がある場合、サーバー専用の `load` 関数の戻り値が、共有される `load` 関数の引数の `data` プロパティとなります。
+ユニバーサル(universal) `load` 関数は、`LoadEvent` を引数にとって呼び出されます。`LoadEvent` は `data` プロパティを持っています。もし `+page.js` と `+page.server.js` (または `+layout.js` と `+layout.server.js`) の両方に `load` 関数がある場合、サーバー(server) `load` 関数の戻り値が、ユニバーサル(universal) `load` 関数の引数の `data` プロパティとなります。
 
 ### Output
 
-共有される `load` 関数は、任意の値(カスタムクラスやコンポーネントコンストラクタなどを含む)を含むオブジェクトを返すことができます。
+ユニバーサル(universal) `load` 関数は、任意の値(カスタムクラスやコンポーネントコンストラクタなどを含む)を含むオブジェクトを返すことができます。
 
-サーバー専用の `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ、つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照などを返さなければなりません。
+サーバー(server) `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ、つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照などを返さなければなりません。
 
 ### どちらを使用すべきか
 
-サーバー専用の `load` 関数は、データベースやファイルシステムからデータを直接アクセスする必要がある場合や、プライベートな環境変数を使用する必要がある場合に有用です。
+サーバー(server) `load` 関数は、データベースやファイルシステムからデータを直接アクセスする必要がある場合や、プライベートな環境変数を使用する必要がある場合に有用です。
 
-共有される `load` 関数は、外部の API から データを `fetch` (取得) する必要があり、プライベートなクレデンシャルが必要ない場合に便利です。なぜなら、SvelteKit はあなたのサーバーを経由せずに、その API から直接データを取得することができるからです。また、Svelte コンポーネントコンストラクタのような、シリアライズできないものを返す必要がある場合にも便利です。
+ユニバーサル(universal) `load` 関数は、外部の API から データを `fetch` (取得) する必要があり、プライベートなクレデンシャルが必要ない場合に便利です。なぜなら、SvelteKit はあなたのサーバーを経由せずに、その API から直接データを取得することができるからです。また、Svelte コンポーネントコンストラクタのような、シリアライズできないものを返す必要がある場合にも便利です。
 
 まれに、両方を同時に使用する必要がある場合もあります。例えば、サーバーからのデータで初期化されたカスタムクラスのインスタンスを返す必要がある場合です。
 
@@ -243,7 +243,7 @@ export async function load({ fetch, params }) {
 
 ## Cookies and headers
 
-サーバー専用の `load` 関数では [`cookies`](/docs/types#public-types-cookies) を取得したり設定したりすることができます。
+サーバー(server) `load` 関数では [`cookies`](/docs/types#public-types-cookies) を取得したり設定したりすることができます。
 
 ```js
 /// file: src/routes/+layout.server.js
@@ -268,7 +268,7 @@ export async function load({ cookies }) {
 
 > cookie を設定するときは、`path` プロパティにご注意ください。デフォルトでは、cookie の `path` は現在のパス名です。例えば、`admin/user` ページで cookie を設定した場合、デフォルトではその cookie は `admin` ページ配下でのみ使用することができます。多くの場合、`path` を `'/'` に設定して、アプリ全体で cookie を使用できるようにしたいでしょう。
 
-サーバー専用の `load` 関数と共有される `load` 関数はどちらも `setHeaders` 関数にアクセスでき、サーバー上で実行している場合、 レスポンスにヘッダーを設定できます。(ブラウザで実行している場合、`setHeaders` には何の効果もありません。) これは、ページをキャッシュさせる場合に便利です、例えば:
+サーバー(server) `load` 関数とユニバーサル(universal) `load` 関数はどちらも `setHeaders` 関数にアクセスでき、サーバー上で実行している場合、 レスポンスにヘッダーを設定できます。(ブラウザで実行している場合、`setHeaders` には何の効果もありません。) これは、ページをキャッシュさせる場合に便利です、例えば:
 
 ```js
 // @errors: 2322 1360
@@ -446,7 +446,7 @@ export function load() {
 
 ## Parallel loading
 
-ページをレンダリング (またはページにナビゲーション) するとき、SvelteKit はすべての `load` 関数を同時に実行し、リクエストのウォーターフォールを回避します。クライアントサイドナビゲーションのときは、複数のサーバー専用 `load` 関数の呼び出し結果が単一のレスポンスにグループ化されます。すべての `load` 関数が返されると、ページがレンダリングされます。
+ページをレンダリング (またはページにナビゲーション) するとき、SvelteKit はすべての `load` 関数を同時に実行し、リクエストのウォーターフォールを回避します。クライアントサイドナビゲーションのときは、複数のサーバー(server) `load` 関数の呼び出し結果が単一のレスポンスにグループ化されます。すべての `load` 関数が返されると、ページがレンダリングされます。
 
 ## Invalidation
 

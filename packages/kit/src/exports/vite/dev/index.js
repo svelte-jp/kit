@@ -36,6 +36,9 @@ export async function dev(vite, vite_config, svelte_config) {
 	/** @type {import('types').SSRManifest} */
 	let manifest;
 
+	/** @type {Error | null} */
+	let manifest_error = null;
+
 	/** @param {string} id */
 	async function resolve(id) {
 		const url = id.startsWith('..') ? `/@fs${path.posix.resolve(id)}` : `/${id}`;
@@ -49,7 +52,28 @@ export async function dev(vite, vite_config, svelte_config) {
 	}
 
 	async function update_manifest() {
-		({ manifest_data } = await sync.create(svelte_config));
+		try {
+			({ manifest_data } = await sync.create(svelte_config));
+
+			if (manifest_error) {
+				manifest_error = null;
+				vite.ws.send({ type: 'full-reload' });
+			}
+		} catch (error) {
+			manifest_error = /** @type {Error} */ (error);
+
+			console.error(colors.bold().red('Invalid routes'));
+			console.error(error);
+			vite.ws.send({
+				type: 'error',
+				err: {
+					message: manifest_error.message ?? 'Invalid routes',
+					stack: ''
+				}
+			});
+
+			return;
+		}
 
 		manifest = {
 			appDir: svelte_config.kit.appDir,
@@ -91,13 +115,13 @@ export async function dev(vite, vite_config, svelte_config) {
 							};
 						}
 
-						if (node.shared) {
-							const { module, module_node } = await resolve(node.shared);
+						if (node.universal) {
+							const { module, module_node } = await resolve(node.universal);
 
 							module_nodes.push(module_node);
 
-							result.shared = module;
-							result.shared_id = node.shared;
+							result.universal = module;
+							result.universal_id = node.universal;
 						}
 
 						if (node.server) {
@@ -432,6 +456,27 @@ export async function dev(vite, vite_config, svelte_config) {
 				const template = load_template(cwd, svelte_config);
 				const error_page = load_error_page(svelte_config);
 
+				/** @param {{ status: number; message: string }} opts */
+				const error_template = ({ status, message }) => {
+					return error_page
+						.replace(/%sveltekit\.status%/g, String(status))
+						.replace(/%sveltekit\.error\.message%/g, message);
+				};
+
+				if (manifest_error) {
+					console.error(colors.bold().red('Invalid routes'));
+					console.error(manifest_error);
+
+					res.writeHead(500, {
+						'Content-Type': 'text/html; charset=utf-8'
+					});
+					res.end(
+						error_template({ status: 500, message: manifest_error.message ?? 'Invalid routes' })
+					);
+
+					return;
+				}
+
 				const rendered = await respond(
 					request,
 					{
@@ -486,11 +531,7 @@ export async function dev(vite, vite_config, svelte_config) {
 							);
 						},
 						app_template_contains_nonce: template.includes('%sveltekit.nonce%'),
-						error_template: ({ status, message }) => {
-							return error_page
-								.replace(/%sveltekit\.status%/g, String(status))
-								.replace(/%sveltekit\.error\.message%/g, message);
-						},
+						error_template,
 						service_worker:
 							svelte_config.kit.serviceWorker.register &&
 							!!resolve_entry(svelte_config.kit.files.serviceWorker),
