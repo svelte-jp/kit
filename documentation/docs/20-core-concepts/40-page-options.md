@@ -68,10 +68,9 @@ export async function load({ fetch }) {
 
 ### Prerender and ssr
 
-If you set the [ssr option](#ssr) to `false`, each request will result in the same empty HTML shell. Since this would result in unnecessary work, SvelteKit defaults to prerendering any pages it finds where `prerender` is not explicitly set to `false`.
+[ssr option](#ssr) を `false` に設定すると、各リクエストは同じ空の HTML shell になってしまいます。これは不必要な作業となるため、SvelteKit は `prerender` が明示的に `false` に設定されていないページを見つけた場合、デフォルトでプリレンダリングを行います。
 
 ### ルートの衝突(Route conflicts)
-=======
 
 プリレンダリングはファイルシステムに書き込むため、ディレクトリとファイルが同じ名前になるエンドポイントを2つ持つことはできません。例えば、`src/routes/foo/+server.js` と `src/routes/foo/bar/+server.js` の場合は、`foo` と `foo/bar` を作成しようとしますが、これは不可能です。
 
