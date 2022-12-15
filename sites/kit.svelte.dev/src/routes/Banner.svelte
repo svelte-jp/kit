@@ -15,10 +15,10 @@
 
 <header class="banner" class:visible>
 	<p>
-		<a href="https://svelte.dev/blog/announcing-sveltekit-1.0">
-			<strong>SvelteKit 1.0 is here!</strong>
-			<span class="small">Learn more</span>
-			<span class="large">Read the blog post to learn more</span>
+		<a href="https://svelte.jp/blog/announcing-sveltekit-1.0">
+			<strong>SvelteKit が 1.0 に到達！</strong>
+			<span class="small">もっと詳しく</span>
+			<span class="large">もっと詳しく知るにはこちらのブログ記事をお読みください</span>
 		</a>
 	</p>
 </header>
