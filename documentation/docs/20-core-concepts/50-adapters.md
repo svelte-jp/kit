@@ -112,5 +112,3 @@ export default function (options) {
 - 対象プラットフォームの正しい場所にユーザーの静的ファイルや生成した JS/CSS ファイルを設置する
 
 可能であれば、adapter の出力は `build/` ディレクトリに、中間出力は `.svelte-kit/[adapter-name]` に置くことを推奨します。
-
-> adapter API はバージョン 1.0 のリリース前に変更される可能性があります。

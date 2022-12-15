@@ -15,8 +15,10 @@
 
 <header class="banner" class:visible>
 	<p>
-		<a href="https://www.youtube.com/watch?v=N4BRVkQVoMc">
-			<strong>Dec 14:</strong> a Svelte Radio live special 👀
+		<a href="https://svelte.jp/blog/announcing-sveltekit-1.0">
+			<strong>SvelteKit が 1.0 に到達！</strong>
+			<span class="small">もっと詳しく</span>
+			<span class="large">もっと詳しく知るにはこちらのブログ記事をお読みください</span>
 		</a>
 	</p>
 </header>
@@ -43,6 +45,20 @@
 
 	.banner a {
 		color: inherit;
+	}
+
+	.large {
+		display: none;
+	}
+
+	@media (min-width: 440px) {
+		.small {
+			display: none;
+		}
+
+		.large {
+			display: initial;
+		}
 	}
 
 	@media (max-width: 800px) {
