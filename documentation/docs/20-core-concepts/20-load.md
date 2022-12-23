@@ -421,7 +421,7 @@ export function load({ locals }) {
 トップレベルの promise は await されるので、ウォータフォールを作ることなく、複数の promise を簡単に返すことができます:
 
 ```js
-/// file: src/routes/+page.server.js
+/// file: src/routes/+page.js
 /** @type {import('./$types').PageServerLoad} */
 export function load() {
 	return {

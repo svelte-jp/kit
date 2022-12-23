@@ -25,8 +25,8 @@
 	"homepage": "https://github.com/sveltejs/kit#readme",
 	"devDependencies": {
 		"@changesets/cli": "^2.25.2",
-		"@rollup/plugin-commonjs": "^23.0.3",
-		"@rollup/plugin-json": "^5.0.2",
+		"@rollup/plugin-commonjs": "^24.0.0",
+		"@rollup/plugin-json": "^6.0.0",
 		"@rollup/plugin-node-resolve": "^15.0.1",
 		"@svitejs/changesets-changelog-github-compact": "^1.0.0",
 		"playwright": "^1.28.1",
@@ -43,7 +43,7 @@
 		"textlint-rule-no-mix-dearu-desumasu": "^4.0.1",
 		"textlint-rule-preset-jtf-style": "^2.3.8"
 	},
-	"packageManager": "pnpm@7.18.2",
+	"packageManager": "pnpm@7.19.0",
 	"engines": {
 		"pnpm": "^7.0.0"
 	},
