@@ -32,10 +32,10 @@
 		"playwright": "^1.28.1",
 		"prettier": "^2.8.0",
 		"rollup": "^3.7.0",
-		"svelte": "^3.54.0",
+		"svelte": "^3.55.0",
 		"tiny-glob": "^0.2.9",
 		"turbo": "^1.6.3",
-		"typescript": "^4.9.3",
+		"typescript": "^4.9.4",
 		"all-contributors-cli": "^6.20.0",
 		"shelljs": "^0.8.3",
 		"textlint": "^11.9.0",
@@ -43,7 +43,7 @@
 		"textlint-rule-no-mix-dearu-desumasu": "^4.0.1",
 		"textlint-rule-preset-jtf-style": "^2.3.8"
 	},
-	"packageManager": "pnpm@7.19.0",
+	"packageManager": "pnpm@7.21.0",
 	"engines": {
 		"pnpm": "^7.0.0"
 	},
