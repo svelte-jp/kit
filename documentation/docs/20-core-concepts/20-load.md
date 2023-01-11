@@ -34,7 +34,7 @@ export function load({ params }) {
 
 生成される `$types` モジュールのおかげで、完全な型安全性を確保できます。
 
-`+page.js` ファイルの `load` 関数はサーバーでもブラウザでも実行されます。`load` 関数を _常に_ サーバーで実行させたければ (例えばプライベートな環境変数を使用していたり、データベースにアクセスする場合など)、代わりに `+page.server.js` に `load` 関数を置くとよいでしょう。
+`+page.js` ファイルの `load` 関数はサーバーでもブラウザでも実行されます。`load` 関数を*常に*サーバーで実行させたければ (例えばプライベートな環境変数を使用していたり、データベースにアクセスする場合など)、代わりに `+page.server.js` に `load` 関数を置くとよいでしょう。
 
 例えばブログ記事の `load` 関数をより現実的なものにするとしたら、以下のように、サーバー上でのみ実行され、データベースからデータを取得する、というものになるでしょう。
 
@@ -90,9 +90,8 @@ export async function load() {
 </script>
 
 <main>
-	<slot>
-		<!-- +page.svelte is rendered here -->
-	</slot>
+	<!-- +page.svelte is rendered in this <slot> -->
+	<slot />
 </main>
 
 <aside>
@@ -422,7 +421,7 @@ export function load({ locals }) {
 
 ```js
 /// file: src/routes/+page.js
-/** @type {import('./$types').PageServerLoad} */
+/** @type {import('./$types').PageLoad} */
 export function load() {
 	return {
 		a: Promise.resolve('a'),
@@ -522,7 +521,7 @@ export async function load({ fetch, depends }) {
 ```svelte
 /// file: src/routes/random-number/+page.svelte
 <script>
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate, invalidateAll } from '$app/navigation';
 
 	/** @type {import('./$types').PageData} */
 	export let data;

@@ -8,7 +8,7 @@ title: Errors
 
 SvelteKit は想定されるエラーと予期せぬエラーを区別します。どちらもデフォルトではシンプルな `{ message: string }` オブジェクトとして表現されます。
 
-以下のように、`code` やトラッキング `id` を追加することができます。
+以下の例のように、`code` やトラッキング `id` を追加することができます。(TypeScript を使用する場合、[Type safety](/docs/errors#type-safety) で説明したように `Error` 型を再定義する必要があります)
 
 ## Expected errors
 
@@ -83,10 +83,17 @@ throw error(404, {
 /// file: src/hooks.server.js
 // @errors: 2322 1360 2571 2339
 // @filename: ambient.d.ts
-const Sentry: any;
+declare module '@sentry/node' {
+	export const init: (opts: any) => void;
+	export const captureException: (error: any, opts: any) => void;
+}
 
 // @filename: index.js
 // ---cut---
+import * as Sentry from '@sentry/node';
+
+Sentry.init({/*...*/})
+
 /** @type {import('@sveltejs/kit').HandleServerError} */
 export function handleError({ error, event }) {
 	// example integration with https://sentry.io/
@@ -98,6 +105,8 @@ export function handleError({ error, event }) {
 	};
 }
 ```
+
+> `handleError` では*絶対に* error をスローしないでください
 
 ## Responses
 

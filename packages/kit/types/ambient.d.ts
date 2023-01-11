@@ -320,7 +320,7 @@ declare module '$app/stores' {
 	/**
 	 * 読み取り可能なストア(readable store)で、初期値は `false` です。[`version.pollInterval`](https://kit.svelte.jp/docs/configuration#version) が 0 以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` に更新します。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
 	 */
-	export const updated: Readable<boolean> & { check(): boolean };
+	export const updated: Readable<boolean> & { check(): Promise<boolean> };
 
 	/**
 	 * 全てのコンテクスチュアルなストア(contextual stores)を返す関数です。サーバー上では、コンポーネントの初期化時に呼び出す必要があります。

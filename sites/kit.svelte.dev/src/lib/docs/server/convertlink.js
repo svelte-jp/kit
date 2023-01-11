@@ -2,7 +2,9 @@
 
 const docs_introduction = new Map([
 	['始める前に', 'Before we begin'],
-	['SvelteKitとは', 'What is SvelteKit?']
+	['SvelteKitとは', 'What is SvelteKit?'],
+	['Svelteとは', 'What is Svelte?'],
+	['SvelteKit は Svelte 上で何を提供するのか', 'What does SvelteKit provide on top of Svelte?']
 ]);
 
 const docs_creating_a_project = new Map([['エディタのセットアップ', 'Editor setup']]);
@@ -80,11 +82,19 @@ const docs_glossary = new Map([
 
 const faq = new Map([
 	['データベースのセットアップはどう行えばよいですか？', 'How do I setup a database?'],
-	['ミドルウェア(middleware)を使うにはどうすればよいですか？', 'How do I use middleware?'],
 	[
-		'`document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？',
-		'How do I use a client-side only library that depends on `document` or `window`?'
+		'package.json の詳細をアプリケーションに含めるにはどうすればよいですか？',
+		'How do I include details from package.json in my application?'
 	],
+	[
+		('`document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？',
+		'How do I use a client-side only library that depends on `document` or `window`?')
+	],
+	[
+		'別のバックエンド API サーバーを使用するにはどうすれば良いですか？',
+		'How do I use a different backend API server?'
+	],
+	['ミドルウェア(middleware)を使うにはどうすればよいですか？', 'How do I use middleware?'],
 	['Yarn 2 で動作しますか？', 'Does it work with Yarn 2?'],
 	['Yarn 3 を使用するにはどうすれば良いですか？', 'How do I use with Yarn 3?']
 ]);

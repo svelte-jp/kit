@@ -66,7 +66,7 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-[`sequence` ヘルパー関数](/docs/modules#sveltejs-kit-hooks)を使用すると、複数の `handle` 関数呼び出しを追加することができます。
+[`sequence` ヘルパー関数](/docs/modules#sveltejs-kit-hooks)を使用すると、複数の `handle` 関数を定義することができます。
 
 `resolve` はオプションの第2引数をサポートしており、レスポンスのレンダリング方法をより詳細にコントロールすることができます。そのパラメータは、以下のフィールドを持つオブジェクトです:
 
@@ -92,14 +92,14 @@ export async function handle({ event, resolve }) {
 
 ### handleFetch
 
-この関数は、サーバー上で (またはプリレンダリング中に) 実行される `load` 関数の中で発生する `fetch` リクエストを変更 (または置換) することできます。
+この関数は、サーバー上で (またはプリレンダリング中に) 実行される `load` 関数や `action` 関数の中で発生する `fetch` リクエストを変更 (または置換) することできます。
 
 例えば、ユーザーがクライアントサイドでそれぞれのページに移動する際に、`load` 関数で `https://api.yourapp.com` のようなパブリックな URL にリクエストを行うかもしれませんが、SSR の場合には (パブリックなインターネットとの間にあるプロキシやロードバランサーをバイパスして) API を直接呼ぶほうが理にかなっているでしょう。
 
 ```js
 /// file: src/hooks.server.js
 /** @type {import('@sveltejs/kit').HandleFetch} */
-export async function handleFetch({ request, fetch }) {
+export function handleFetch({ request, fetch }) {
 	if (request.url.startsWith('https://api.yourapp.com/')) {
 		// clone the original request, but change the URL
 		request = new Request(
@@ -124,7 +124,7 @@ export async function handleFetch({ request, fetch }) {
 /// file: src/hooks.server.js
 // @errors: 2345
 /** @type {import('@sveltejs/kit').HandleFetch} */
-export async function handleFetch({ event, request, fetch }) {
+export function handleFetch({ event, request, fetch }) {
 	if (request.url.startsWith('https://api.my-domain.com/')) {
 		request.headers.set('cookie', event.request.headers.get('cookie'));
 	}
@@ -160,11 +160,17 @@ declare namespace App {
 /// file: src/hooks.server.js
 // @errors: 2322
 // @filename: ambient.d.ts
-const Sentry: any;
+declare module '@sentry/node' {
+	export const init: (opts: any) => void;
+	export const captureException: (error: any, opts: any) => void;
+}
 
 // @filename: index.js
 // ---cut---
+import * as Sentry from '@sentry/node';
 import crypto from 'crypto';
+
+Sentry.init({/*...*/})
 
 /** @type {import('@sveltejs/kit').HandleServerError} */
 export function handleError({ error, event }) {
@@ -183,10 +189,17 @@ export function handleError({ error, event }) {
 /// file: src/hooks.client.js
 // @errors: 2322
 // @filename: ambient.d.ts
-const Sentry: any;
+declare module '@sentry/svelte' {
+	export const init: (opts: any) => void;
+	export const captureException: (error: any, opts: any) => void;
+}
 
 // @filename: index.js
 // ---cut---
+import * as Sentry from '@sentry/svelte';
+
+Sentry.init({/*...*/})
+
 /** @type {import('@sveltejs/kit').HandleClientError} */
 export function handleError({ error, event }) {
 	const errorId = crypto.randomUUID();

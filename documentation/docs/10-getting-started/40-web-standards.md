@@ -12,7 +12,7 @@ title: Web standards
 
 SvelteKit は、ネットワーク越しにデータを取得するために [`fetch`](https://developer.mozilla.org/ja/docs/Web/API/fetch) を使用します。ブラウザだけでなく、[hooks](/docs/hooks) や [サーバールート(server routes)](/docs/routing#server) の中でも使用することができます。
 
-> [`load`](/docs/load) 関数の中では特別なバージョンの `fetch` を使用することができ、サーバーサイドレンダリング中に、HTTP をコールすることなく、クレデンシャルを保持したまま、直接エンドポイント(endpoints)を呼び出すことができます。(`load` の外側のサーバーサイドコードでクレデンシャル付きの fetch を行う場合は、明示的に `cookie` や `authorization` ヘッダーなどを渡さなければなりません。) また、通常のサーバーサイドの `fetch` では絶対パスの URL が必要となりますが、特別なバージョンの `fetch` では相対パスのリクエストが可能です。
+> [`load`](/docs/load) 関数、[server hooks](/docs/hooks#server-hooks)、[API routes](/docs/routing#server) の中では特別なバージョンの `fetch` を使用することができ、サーバーサイドレンダリング中に、HTTP をコールすることなく、クレデンシャルを保持したまま、直接エンドポイント(endpoints)を呼び出すことができます。(`load` の外側のサーバーサイドコードでクレデンシャル付きの fetch を行う場合は、明示的に `cookie` や `authorization` ヘッダーなどを渡さなければなりません。) また、通常のサーバーサイドの `fetch` では絶対パスの URL が必要となりますが、特別なバージョンの `fetch` では相対パスのリクエストが可能です。
 
 `fetch` 自体の他に、[Fetch API](https://developer.mozilla.org/ja/docs/Web/API/Fetch_API) には以下のインターフェイスが含まれています:
 
