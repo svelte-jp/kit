@@ -90,6 +90,8 @@ export function match(param) {
 
 もしパス名がマッチしない場合、SvelteKit は (後述のソート順の指定に従って) 他のルートでマッチするか試行し、どれにもマッチしない場合は最終的に 404 を返します。
 
+`params` ディレクトリにある各モジュールは matcher に対応しています。ただし、matcher のユニットテストに使用される `*.test.js` と `*.spec.js` ファイルは例外です。
+
 > Matcher は サーバーとブラウザの両方で動作します。
 
 ## ソート(Sorting)
@@ -98,7 +100,7 @@ export function match(param) {
 
 ```bash
 src/routes/[...catchall]/+page.svelte
-src/routes/[[a]]/foo/+page.svelte
+src/routes/[[a=x]]/+page.svelte
 src/routes/[b]/+page.svelte
 src/routes/foo-[c]/+page.svelte
 src/routes/foo-abc/+page.svelte
@@ -116,7 +118,7 @@ SvelteKit は、どのルート(route)に対してリクエストされている
 ```bash
 src/routes/foo-abc/+page.svelte
 src/routes/foo-[c]/+page.svelte
-src/routes/[[a]]/foo/+page.svelte
+src/routes/[[a=x]]/+page.svelte
 src/routes/[b]/+page.svelte
 src/routes/[...catchall]/+page.svelte
 ```

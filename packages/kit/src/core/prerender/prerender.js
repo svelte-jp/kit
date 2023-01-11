@@ -1,8 +1,9 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { pathToFileURL, URL } from 'url';
-import { mkdirp, posixify, walk } from '../../utils/filesystem.js';
 import { installPolyfills } from '../../exports/node/polyfills.js';
+import { mkdirp, posixify, walk } from '../../utils/filesystem.js';
+import { should_polyfill } from '../../utils/platform.js';
 import { is_root_relative, resolve } from '../../utils/url.js';
 import { queue } from './queue.js';
 import { crawl } from './crawl.js';
@@ -89,7 +90,9 @@ export async function prerender() {
 		verbose: verbose === 'true'
 	});
 
-	installPolyfills();
+	if (should_polyfill) {
+		installPolyfills();
+	}
 
 	const server_root = join(config.outDir, 'output');
 
@@ -99,10 +102,20 @@ export async function prerender() {
 	/** @type {import('types').SSRManifest} */
 	const manifest = (await import(pathToFileURL(manifest_path).href)).manifest;
 
+	/** @type {Map<string, string>} */
+	const saved = new Map();
+
 	override({
 		building: true,
 		paths: config.paths,
-		read: (file) => readFileSync(join(config.files.assets, file))
+		read: (file) => {
+			// stuff we just wrote
+			const filepath = saved.get(file);
+			if (filepath) return readFileSync(filepath);
+
+			// stuff in `static`
+			return readFileSync(join(config.files.assets, file));
+		}
 	});
 
 	const server = new Server(manifest);
@@ -219,6 +232,7 @@ export async function prerender() {
 			}
 
 			const body = result.body ?? new Uint8Array(await result.response.arrayBuffer());
+
 			save(
 				'dependencies',
 				result.response,
@@ -348,6 +362,9 @@ export async function prerender() {
 		} else if (response_type !== OK) {
 			handle_http_error({ status: response.status, path: decoded, referrer, referenceType });
 		}
+
+		manifest.assets.add(file);
+		saved.set(file, dest);
 	}
 
 	for (const route of manifest._.routes) {

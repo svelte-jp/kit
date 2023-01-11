@@ -8,39 +8,6 @@ title: SvelteKit で X を使うにはどうすればよいですか？
 
 データベースに問い合わせを行うコードを [サーバールート(server route)](/docs/routing#server) に置いてください。.svelte ファイルの中でデータベースに問い合わせを行わないでください。コネクションをすぐにセットアップし、シングルトンとしてアプリ全体からクライアントにアクセスできるように `db.js` のようなものを作ることができます。`hooks.js` で1回セットアップするコードを実行し、データベースヘルパーを必要とするすべてのエンドポイントにインポートできます。
 
-### ミドルウェア(middleware)を使うにはどうすればよいですか？
-
-`adapter-node` は、プロダクションモードで使用するためのミドルウェアを自分のサーバで構築します。開発モードでは、Vite プラグインを使用して Vite にミドルウェア(middleware) を追加することができます。例えば:
-
-```js
-// @filename: ambient.d.ts
-declare module '@sveltejs/kit/vite'; // TODO this feels unnecessary, why can't it 'see' the declarations?
-
-// @filename: index.js
-// ---cut---
-import { sveltekit } from '@sveltejs/kit/vite';
-
-/** @type {import('vite').Plugin} */
-const myPlugin = {
-	name: 'log-request-middleware',
-	configureServer(server) {
-		server.middlewares.use((req, res, next) => {
-			console.log(`Got request ${req.url}`);
-			next();
-		});
-	}
-};
-
-/** @type {import('vite').UserConfig} */
-const config = {
-	plugins: [myPlugin, sveltekit()]
-};
-
-export default config;
-```
-
-順序を制御する方法など、詳しくは [Vite の `configureServer` のドキュメント](https://ja.vitejs.dev/guide/api-plugin.html#configureserver) をご覧ください。
-
 ### `document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？
 
 もし `document` や `window` 変数にアクセスする必要があったり、クライアントサイドだけで実行するコードが必要な場合は、`browser` チェックでラップしてください:
@@ -105,6 +72,57 @@ onMount(() => {
 	method('hello world');
 });
 ```
+
+### 別のバックエンド API サーバーを使用するにはどうすれば良いですか？
+
+外部の API サーバーにデータをリクエストするのに [`event.fetch`](/docs/load#making-fetch-requests) を使用することができますが、[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) に対応しなければならず、一般的にはリクエストのプリフライトが必要になり、結果として高レイテンシーになるなど、複雑になることにご注意ください。別のサブドメインへのリクエストも、追加の DNS ルックアップや TLS セットアップなどのためにレイテンシーが増加する可能性があります。この方法を使いたい場合は、[`handleFetch`](/docs/hooks#server-hooks-handlefetch) が参考になるかもしれません。
+
+別の方法は、頭痛の種である CORS をバイパスするためのプロキシーをセットアップすることです。本番環境では、`/api` などのパスを API サーバーに書き換えます(rewrite)。ローカルの開発環境では、Vite の [`server.proxy`](https://vitejs.dev/config/server-options.html#server-proxy) オプションを使用します。
+
+本番環境で書き換え(rewrite)をセットアップする方法は、デプロイ先のプラットフォームに依存します。もし、書き換える方法がなければ、代わりに [API route](https://kit.svelte.jp/docs/routing#server) を追加します:
+
+```js
+/// file: src/routes/api/[...path]/+server.js
+/** @type {import('./$types').RequestHandler} */
+export function GET({ params, url }) {
+	return fetch(`https://my-api-server.com/${params.path + url.search}`);
+}
+```
+
+(必要に応じて、`POST`/`PATCH` などのリクエストもプロキシし、`request.headers` も転送(forward)する必要があることにご注意ください。)
+
+### ミドルウェア(middleware)を使うにはどうすればよいですか？
+
+`adapter-node` は、プロダクションモードで使用するためのミドルウェアを自分のサーバで構築します。開発モードでは、Vite プラグインを使用して Vite にミドルウェア(middleware) を追加することができます。例えば:
+
+```js
+// @filename: ambient.d.ts
+declare module '@sveltejs/kit/vite'; // TODO this feels unnecessary, why can't it 'see' the declarations?
+
+// @filename: index.js
+// ---cut---
+import { sveltekit } from '@sveltejs/kit/vite';
+
+/** @type {import('vite').Plugin} */
+const myPlugin = {
+	name: 'log-request-middleware',
+	configureServer(server) {
+		server.middlewares.use((req, res, next) => {
+			console.log(`Got request ${req.url}`);
+			next();
+		});
+	}
+};
+
+/** @type {import('vite').UserConfig} */
+const config = {
+	plugins: [myPlugin, sveltekit()]
+};
+
+export default config;
+```
+
+順序を制御する方法など、詳しくは [Vite の `configureServer` のドキュメント](https://ja.vitejs.dev/guide/api-plugin.html#configureserver) をご覧ください。
 
 ### Yarn 2 で動作しますか？
 
