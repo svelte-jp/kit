@@ -131,7 +131,7 @@ export function handleError({ error, event }) {
 
 SvelteKit が `%sveltekit.status%` と `%sveltekit.error.message%` を、それぞれ対応する値に置き換えます。
 
-ページのレンダリング中に `load` 関数の中でエラーが発生した場合、SvelteKit はエラーが発生した場所に最も近い [`+error.svelte`](/docs/routing#error) コンポーネントをレンダリングします。
+ページのレンダリング中に `load` 関数の中でエラーが発生した場合、SvelteKit はエラーが発生した場所に最も近い [`+error.svelte`](/docs/routing#error) コンポーネントをレンダリングします。`+layout(.server).js` の `load` 関数の内側でエラーが発生した場合、ツリーの中で最も近くにあるエラー境界はそのレイアウトの上位にある `+error.svelte` ファイルです (隣ではありません)。
 
 例外は、最上位の `+layout.js` や `+layout.server.js` の中でエラーが発生した場合です。通常、最上位のレイアウトには `+error.svelte` コンポーネントが含まれているためです。この場合、SvelteKit はフォールバックエラーページを使用します。
 

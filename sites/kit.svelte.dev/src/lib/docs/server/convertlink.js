@@ -39,7 +39,9 @@ const docs_adapters = new Map([
 
 const docs_advanced_routing = new Map([
 	['Restパラメータ', 'Rest parameters'],
-	['レイアウトグループを使うときは', 'When to use layout groups']
+	['レイアウトグループを使うときは', 'When to use layout groups'],
+	['service worker の内部では', 'Inside the service worker'],
+	['その他のソリューション', 'Other solutions']
 ]);
 
 const docs_packaging = new Map([['注意事項', 'Caveats']]);
@@ -87,8 +89,8 @@ const faq = new Map([
 		'How do I include details from package.json in my application?'
 	],
 	[
-		('`document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？',
-		'How do I use a client-side only library that depends on `document` or `window`?')
+		'`document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？',
+		'How do I use a client-side only library that depends on `document` or `window`?'
 	],
 	[
 		'別のバックエンド API サーバーを使用するにはどうすれば良いですか？',

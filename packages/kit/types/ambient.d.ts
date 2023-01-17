@@ -2,41 +2,19 @@
  * `App` namespace を宣言することで、アプリ内のオブジェクトを型付けする方法を SvelteKit に伝えることが可能です。デフォルトでは、新しいプロジェクトには `src/app.d.ts` というファイルがあり、以下の内容を含んでいます:
  *
  * ```ts
- * /// <reference types="@sveltejs/kit" />
- *
- * declare namespace App {
- * 	interface Error {}
- * 	interface Locals {}
- * 	interface PageData {}
- * 	interface Platform {}
+ * declare global {
+ * 	namespace App {
+ * 		// interface Error {}
+ * 		// interface Locals {}
+ * 		// interface PageData {}
+ * 		// interface Platform {}
+ * 	}
  * }
+ *
+ * export default undefined;
  * ```
  *
  * これらのインターフェースを作成することによって、`event.locals`、`event.platform`、`load` 関数の `data` を使用する際に型の安全性を確保することができます。
- *
- * アンビエント宣言(ambient declaration)ファイルであるため、`import` 文を使用するときには注意が必要です。`import` を
- * トップレベルに追加すると、宣言ファイル (declaration file) はアンビエント (ambient) とはみなされなくなるため、他のファイルでこれらの型付けにアクセスできなくなります。
- * これを避けるには、`import(...)` 関数をお使いください:
- *
- * ```ts
- * interface Locals {
- * 	user: import('$lib/types').User;
- * }
- * ```
- * Or wrap the namespace with `declare global`:
- * ```ts
- * import { User } from '$lib/types';
- *
- * declare global {
- * 	namespace App {
- * 		interface Locals {
- * 			user: User;
- * 		}
- * 		// ...
- * 	}
- * }
- * ```
- *
  */
 declare namespace App {
 	/**
@@ -190,7 +168,7 @@ declare module '$app/navigation' {
 	/**
 	 * SvelteKit が指定された `url` にナビゲーションしたときに解決する Promise を返します(ナビゲーションに失敗した場合は、Promise はリジェクトされます)。
 	 *
-	 * @param url Where to navigate to. Note that if you've set [`config.kit.paths.base`](https://kit.svelte.dev/docs/configuration#paths) and the URL is root-relative, you need to prepend the base path if you want to navigate within the app.
+	 * @param url Where to navigate to. Note that if you've set [`config.kit.paths.base`](https://kit.svelte.jp/docs/configuration#paths) and the URL is root-relative, you need to prepend the base path if you want to navigate within the app.
 	 * @param opts Options related to the navigation
 	 */
 	export function goto(
@@ -213,7 +191,7 @@ declare module '$app/navigation' {
 			 */
 			state?: any;
 			/**
-			 * If `true`, all `load` functions of the page will be rerun. See https://kit.svelte.dev/docs/load#invalidation for more info on invalidation.
+			 * If `true`, all `load` functions of the page will be rerun. See https://kit.svelte.jp/docs/load#invalidation for more info on invalidation.
 			 */
 			invalidateAll?: boolean;
 		}

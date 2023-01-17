@@ -129,6 +129,10 @@ export async function load({ params }) {
 
 SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラー境界 (error boundary) を探します — もし上記のファイルが存在しない場合は、デフォルトのエラーページをレンダリングする前に `src/routes/blog/+error.svelte` を探しに行き、その次に `src/routes/+error.svelte` を探します。もしそれも失敗した場合は (または、最上位の `+error` の '上に' 位置する最上位の `+layout` の `load` 関数からエラーがスローされた場合)、SvelteKit は静的なフォールバックエラーページをレンダリングします。これは `src/error.html` ファイルを作成することでカスタマイズ可能です。
 
+`+layout(.server).js` の `load` 関数の内側でエラーが発生した場合、ツリーの中で最も近くにあるエラー境界はそのレイアウトの上位にある `+error.svelte` ファイルです (隣ではありません)。
+
+ルート(route)が見つからない場合 (404)、`src/routes/+error.svelte` (または、もしこのファイルが存在しない場合はデフォルトのエラーページ) が使われます。
+
 > エラーが [`handle`](/docs/hooks#server-hooks-handle) の内側や [+server.js](#server) リクエストハンドラ の内側で発生した場合は、`+error.svelte` は使用されません。
 
 エラーハンドリングに関する詳細は [こちら](/docs/errors) からお読み頂けます。

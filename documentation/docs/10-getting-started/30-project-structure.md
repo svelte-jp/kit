@@ -36,10 +36,10 @@ my-project/
 
 `src` ディレクトリには、プロジェクトの中身が格納します。
 
-- `lib` にはあなたのライブラリのコードを格納します。格納されたコードは [`$lib`](/docs/modules#$lib) エイリアスを使用してインポートしたり、[`svelte-package`](/docs/packaging) を使用して配布用にパッケージングすることができます。
+- `lib` にはあなたのライブラリのコード (ユーティリティやコンポーネント) を格納します。格納されたコードは [`$lib`](/docs/modules#$lib) エイリアスを使用してインポートしたり、[`svelte-package`](/docs/packaging) を使用して配布用にパッケージングすることができます。
   - `server` にはあなたのサーバー専用のライブラリのコードを格納します。格納されたコードは [`$lib/server`](/docs/server-only-modules) エイリアスを使用してインポートすることができます。SvelteKit はこれをクライアントコードにインポートされるのを防ぎます。
 - `params` にはアプリに必要な [param matchers](/docs/advanced-routing#matching) を格納します
-- `routes` にはアプリケーションの [ルート(routes)](/docs/routing) を格納します
+- `routes` にはアプリケーションの [ルート(routes)](/docs/routing) を格納します。単一のルート(route)でしか使われないコンポーネントをここに置くこともできます
 - `app.html` はページのテンプレートで、以下のプレースホルダーを含む HTML document です:
   - `%sveltekit.head%` — アプリに必要な `<link>` 要素や `<script>` 要素、`<svelte:head>` コンテンツ 
   - `%sveltekit.body%` — レンダリングされるページのためのマークアップです。これを直接 `<body>` の中に置くのではなく、`<div>` または他の要素の中に置く必要があります。ブラウザ拡張(browser extensions)が要素を注入するのをハイドレーションプロセスが破壊してしまう、というバグを防ぐためです。もしこうなっていない場合、SvelteKit は開発中に警告を出します

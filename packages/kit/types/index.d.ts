@@ -21,7 +21,7 @@ import { SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
 export { PrerenderOption } from './private.js';
 
 /**
- * [Adapters](https://kit.svelte.dev/docs/adapters) are responsible for taking the production build and turning it into something that can be deployed to a platform of your choosing.
+ * [Adapters](https://kit.svelte.jp/docs/adapters) are responsible for taking the production build and turning it into something that can be deployed to a platform of your choosing.
  */
 export interface Adapter {
 	/**
@@ -96,7 +96,7 @@ export interface Builder {
 	generateFallback(dest: string): Promise<void>;
 
 	/**
-	 * Generate a server-side manifest to initialise the SvelteKit [server](https://kit.svelte.dev/docs/types#public-types-server) with.
+	 * Generate a server-side manifest to initialise the SvelteKit [server](https://kit.svelte.jp/docs/types#public-types-server) with.
 	 * @param opts a relative path to the base directory of the app and optionally in which format (esm or cjs) the manifest should be generated
 	 */
 	generateManifest(opts: { relativePath: string }): string;
@@ -157,7 +157,7 @@ export interface Builder {
 
 export interface Config {
 	/**
-	 * Options passed to [`svelte.compile`](https://svelte.dev/docs#compile-time-svelte-compile).
+	 * Options passed to [`svelte.compile`](https://svelte.jp/docs#compile-time-svelte-compile).
 	 * @default {}
 	 */
 	compilerOptions?: CompileOptions;
@@ -523,8 +523,8 @@ export interface KitConfig {
 }
 
 /**
- * The [`handle`](https://kit.svelte.dev/docs/hooks#server-hooks-handle) hook runs every time the SvelteKit server receives a [request](https://kit.svelte.dev/docs/web-standards#fetch-apis-request) and
- * determines the [response](https://kit.svelte.dev/docs/web-standards#fetch-apis-response).
+ * The [`handle`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) hook runs every time the SvelteKit server receives a [request](https://kit.svelte.jp/docs/web-standards#fetch-apis-request) and
+ * determines the [response](https://kit.svelte.jp/docs/web-standards#fetch-apis-response).
  * It receives an `event` object representing the request and a function called `resolve`, which renders the route and generates a `Response`.
  * This allows you to modify response headers or bodies, or bypass SvelteKit entirely (for implementing routes programmatically, for example).
  */
@@ -536,7 +536,7 @@ export interface Handle {
 }
 
 /**
- * The server-side [`handleError`](https://kit.svelte.dev/docs/hooks#shared-hooks-handleerror) hook runs when an unexpected error is thrown while responding to a request.
+ * The server-side [`handleError`](https://kit.svelte.jp/docs/hooks#shared-hooks-handleerror) hook runs when an unexpected error is thrown while responding to a request.
  *
  * If an unexpected error is thrown during loading or rendering, this function will be called with the error and the event.
  * Make sure that this function _never_ throws an error.
@@ -546,7 +546,7 @@ export interface HandleServerError {
 }
 
 /**
- * The client-side [`handleError`](https://kit.svelte.dev/docs/hooks#shared-hooks-handleerror) hook runs when an unexpected error is thrown while navigating.
+ * The client-side [`handleError`](https://kit.svelte.jp/docs/hooks#shared-hooks-handleerror) hook runs when an unexpected error is thrown while navigating.
  *
  * If an unexpected error is thrown during loading or the following render, this function will be called with the error and the event.
  * Make sure that this function _never_ throws an error.
@@ -556,7 +556,7 @@ export interface HandleClientError {
 }
 
 /**
- * The [`handleFetch`](https://kit.svelte.dev/docs/hooks#server-hooks-handlefetch) hook allows you to modify (or replace) a `fetch` request that happens inside a `load` function that runs on the server (or during pre-rendering)
+ * The [`handleFetch`](https://kit.svelte.jp/docs/hooks#server-hooks-handlefetch) hook allows you to modify (or replace) a `fetch` request that happens inside a `load` function that runs on the server (or during pre-rendering)
  */
 export interface HandleFetch {
 	(input: { event: RequestEvent; request: Request; fetch: typeof fetch }): MaybePromise<Response>;
@@ -577,7 +577,7 @@ export interface Load<
 }
 
 /**
- * The generic form of `PageLoadEvent` and `LayoutLoadEvent`. You should import those from `./$types` (see [generated types](https://kit.svelte.dev/docs/types#generated-types))
+ * The generic form of `PageLoadEvent` and `LayoutLoadEvent`. You should import those from `./$types` (see [generated types](https://kit.svelte.jp/docs/types#generated-types))
  * rather than using `LoadEvent` directly.
  */
 export interface LoadEvent<
@@ -592,7 +592,7 @@ export interface LoadEvent<
 	 * - it can be used to make credentialed requests on the server, as it inherits the `cookie` and `authorization` headers for the page request
 	 * - it can make relative requests on the server (ordinarily, `fetch` requires a URL with an origin when used in a server context)
 	 * - internal requests (e.g. for `+server.js` routes) go directly to the handler function when running on the server, without the overhead of an HTTP call
-	 * - during server-side rendering, the response will be captured and inlined into the rendered HTML. Note that headers will _not_ be serialized, unless explicitly included via [`filterSerializedResponseHeaders`](https://kit.svelte.dev/docs/hooks#server-hooks-handle)
+	 * - during server-side rendering, the response will be captured and inlined into the rendered HTML. Note that headers will _not_ be serialized, unless explicitly included via [`filterSerializedResponseHeaders`](https://kit.svelte.jp/docs/hooks#server-hooks-handle)
 	 * - during hydration, the response will be read from the HTML, guaranteeing consistency and preventing an additional network request
 	 *
 	 * > Cookies will only be passed through if the target host is the same as the SvelteKit application or a more specific subdomain of it.
@@ -622,7 +622,7 @@ export interface LoadEvent<
 	 *
 	 * Setting the same header multiple times (even in separate `load` functions) is an error — you can only set a given header once.
 	 *
-	 * You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](https://kit.svelte.dev/docs/types#public-types-cookies) API in a server-only `load` function instead.
+	 * You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](https://kit.svelte.jp/docs/types#public-types-cookies) API in a server-only `load` function instead.
 	 *
 	 * `setHeaders` has no effect when a `load` function runs in the browser.
 	 */
@@ -755,7 +755,7 @@ export interface Navigation {
 }
 
 /**
- * The argument passed to [`beforeNavigate`](https://kit.svelte.dev/docs/modules#$app-navigation-beforenavigate) callbacks.
+ * The argument passed to [`beforeNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-beforenavigate) callbacks.
  */
 export interface BeforeNavigate extends Navigation {
 	/**
@@ -765,7 +765,7 @@ export interface BeforeNavigate extends Navigation {
 }
 
 /**
- * The argument passed to [`afterNavigate`](https://kit.svelte.dev/docs/modules#$app-navigation-afternavigate) callbacks.
+ * The argument passed to [`afterNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-afternavigate) callbacks.
  */
 export interface AfterNavigate extends Navigation {
 	/**
@@ -820,13 +820,13 @@ export interface Page<
 	 */
 	data: App.PageData & Record<string, any>;
 	/**
-	 * Filled only after a form submission. See [form actions](https://kit.svelte.dev/docs/form-actions) for more info.
+	 * Filled only after a form submission. See [form actions](https://kit.svelte.jp/docs/form-actions) for more info.
 	 */
 	form: any;
 }
 
 /**
- * The shape of a param matcher. See [matching](https://kit.svelte.dev/docs/advanced-routing#matching) for more info.
+ * The shape of a param matcher. See [matching](https://kit.svelte.jp/docs/advanced-routing#matching) for more info.
  */
 export interface ParamMatcher {
 	(param: string): boolean;
@@ -855,7 +855,7 @@ export interface RequestEvent<
 	 */
 	getClientAddress(): string;
 	/**
-	 * Contains custom data that was added to the request within the [`handle hook`](https://kit.svelte.dev/docs/hooks#server-hooks-handle).
+	 * Contains custom data that was added to the request within the [`handle hook`](https://kit.svelte.jp/docs/hooks#server-hooks-handle).
 	 */
 	locals: App.Locals;
 	/**
@@ -899,7 +899,7 @@ export interface RequestEvent<
 	 *
 	 * Setting the same header multiple times (even in separate `load` functions) is an error — you can only set a given header once.
 	 *
-	 * You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](https://kit.svelte.dev/docs/types#public-types-cookies) API instead.
+	 * You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](https://kit.svelte.jp/docs/types#public-types-cookies) API instead.
 	 */
 	setHeaders(headers: Record<string, string>): void;
 	/**
@@ -1044,7 +1044,7 @@ export interface ServerLoadEvent<
 
 /**
  * Shape of a form action method that is part of `export const actions = {..}` in `+page.server.js`.
- * See [form actions](https://kit-svelte-d4b3r0pff-svelte.vercel.app/docs/form-actions) for more information.
+ * See [form actions](https://kit.svelte.jp/docs/form-actions) for more information.
  */
 export interface Action<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
@@ -1056,7 +1056,7 @@ export interface Action<
 
 /**
  * Shape of the `export const actions = {..}` object in `+page.server.js`.
- * See [form actions](https://kit-svelte-d4b3r0pff-svelte.vercel.app/docs/form-actions) for more information.
+ * See [form actions](https://kit.svelte.jp/docs/form-actions) for more information.
  */
 export type Actions<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
@@ -1080,7 +1080,7 @@ export type ActionResult<
  * HTTP ステータスコードとオプションのメッセージで `HttpError` オブジェクトを作成します。
  * リクエストの処理中にこのオブジェクトがスローされると、SvelteKit は
  * `handleError` を呼ばずにエラーレスポンス(error response)を返します。
- * @param status The HTTP status code
+ * @param status The [HTTP status code](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses). Must be in the range 400-599.
  * @param body An object that conforms to the App.Error type. If a string is passed, it will be used as the message property.
  */
 export function error(status: number, body: App.Error): HttpError;
@@ -1094,15 +1094,16 @@ export function error(
  * [`error`](https://kit.svelte.jp/docs/modules#sveltejs-kit-error) 関数が返すオブジェクトです
  */
 export interface HttpError {
-	/** The [HTTP status code](https://httpstatusdogs.com), in the range 400-599 */
+	/** The [HTTP status code](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses), in the range 400-599. */
 	status: number;
 	/** The content of the error. */
 	body: App.Error;
 }
 
 /**
- * `Redirect` オブジェクトを作成します。リクエストの処理中にスローされると、SvelteKit は
- * リダイレクトレスポンス(redirect response)を返します。
+ * `Redirect` オブジェクトを作成します。リクエストの処理中にスローされると、SvelteKit はリダイレクトレスポンス(redirect response)を返します。
+ * @param status The [HTTP status code](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#redirection_messages). Must be in the range 300-308.
+ * @param location The location to redirect to.
  */
 export function redirect(
 	status: 300 | 301 | 302 | 303 | 304 | 305 | 306 | 307 | 308,
@@ -1113,7 +1114,7 @@ export function redirect(
  * [`redirect`](https://kit.svelte.jp/docs/modules#sveltejs-kit-redirect) 関数が返すオブジェクトです
  */
 export interface Redirect {
-	/** The [HTTP status code](https://httpstatusdogs.com), in the range 300-308. */
+	/** The [HTTP status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#redirection_messages), in the range 300-308. */
 	status: 300 | 301 | 302 | 303 | 304 | 305 | 306 | 307 | 308;
 	/** The location to redirect to. */
 	location: string;
@@ -1128,6 +1129,8 @@ export function json(data: any, init?: ResponseInit): Response;
 
 /**
  * `ActionFailure` オブジェクトを作成します。
+ * @param status The [HTTP status code](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses). Must be in the range 400-599.
+ * @param data Data associated with the failure (e.g. validation errors)
  */
 export function fail<T extends Record<string, unknown> | undefined>(
 	status: number,
@@ -1139,7 +1142,9 @@ export function fail<T extends Record<string, unknown> | undefined>(
  */
 export interface ActionFailure<T extends Record<string, unknown> | undefined = undefined>
 	extends UniqueInterface {
+	/** The [HTTP status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#client_error_responses), in the range 400-599. */
 	status: number;
+	/** Data associated with the failure (e.g. validation errors) */
 	data: T;
 }
 
