@@ -13,7 +13,7 @@ SvelteKit では、アプリを構築するだけでなく、`@sveltejs/package`
 `@sveltejs/package` の `svelte-package` コマンドを実行すると、`src/lib` のコンテンツを使用して、以下を含む `package` ディレクトリ ([変更可能](/docs/configuration)) を生成します:
 
 - カスタムで `include`/`exclude` オプションを [設定](/docs/configuration) しない限り、`src/lib` にある全てのファイルが含まれます。Svelte コンポーネントはプリプロセスされ、TypeScript ファイルは JavaScript にトランスパイルされます。
-- Svelte、JavaScript、TypeScriptファイルのために生成される型定義 (`d.ts` ファイル)。これには `typescript >= 4.0.0` をインストールする必要があります。型定義は実装の隣に置かれ、手書きの `d.ts` ファイルはそのままコピーされます。[生成を無効化](/docs/configuration) することもできますが、あまりおすすめしません。
+- Svelte、JavaScript、TypeScriptファイルのために生成される型定義 (`d.ts` ファイル)。これには `typescript >= 4.0.0` をインストールする必要があります。型定義は実装の隣に置かれ、手書きの `d.ts` ファイルはそのままコピーされます。[生成を無効化](/docs/configuration) することもできますが、あまりおすすめしません。あなたのライブラリを使用する方々が TypeScript を使うかもしれないので、その場合はこれらの型定義ファイルが必要になります。
 - プロジェクトのルート(root)からコピーされた `package.json` から、`"scripts"`、`"publishConfig.directory"`、`"publishConfig.linkDirectory"` フィールドを取り除いたもの。`"dependencies"` フィールドは含まれているため、ドキュメントやデモサイトにのみ必要なパッケージは `"devDependencies"` に追加してください。`"type": "module"` と `"exports"` フィールドは、オリジナルのファイルで定義されていない場合に追加されます。
 
 `"exports"` フィールドにはパッケージのエントリーポイントが含まれます。デフォルトでは、アンダースコアで始まるファイル(またはアンダースコアで始まるディレクトリにあるファイル)を除いて、`src/lib` にある全てのファイルをエントリーポイントとして扱いますが、この動作は [設定可能](/docs/configuration) です。もし `src/lib/index.js` や `src/lib/index.svelte` ファイルがある場合は、それがパッケージルートとして扱われます。

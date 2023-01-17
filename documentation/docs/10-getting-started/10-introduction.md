@@ -12,7 +12,7 @@ title: イントロダクション
 
 ## SvelteKitとは
 
-SvelteKit は、[Svelte](https://svelte.dev/) を使用して堅牢でハイパフォーマンスな web アプリケーションを迅速に開発するためのフレームワークです。
+SvelteKit は、[Svelte](https://svelte.jp/) を使用して堅牢でハイパフォーマンスな web アプリケーションを迅速に開発するためのフレームワークです。
 
 ## Svelteとは
 
