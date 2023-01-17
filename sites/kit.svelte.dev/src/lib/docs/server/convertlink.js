@@ -39,7 +39,10 @@ const docs_adapters = new Map([
 
 const docs_advanced_routing = new Map([
 	['Restパラメータ', 'Rest parameters'],
-	['レイアウトグループを使うときは', 'When to use layout groups'],
+	['レイアウトグループを使うときは', 'When to use layout groups']
+]);
+
+const docs_service_workers = new Map([
 	['service worker の内部では', 'Inside the service worker'],
 	['その他のソリューション', 'Other solutions']
 ]);
@@ -131,6 +134,8 @@ export function convert_link(file, heading) {
 			// 30-advanced
 			case 'docs/30-advanced/10-advanced-routing.md':
 				return docs_advanced_routing.get(heading) || heading;
+			case 'docs/30-advanced/40-service-workers.md':
+				return docs_service_workers.get(heading) || heading;
 			case 'docs/30-advanced/70-packaging.md':
 				return docs_packaging.get(heading) || heading;
 			// 40-best-practices
