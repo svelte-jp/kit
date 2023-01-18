@@ -11,8 +11,11 @@
  * 	}
  * }
  *
- * export default undefined;
+ * export {};
  * ```
+ *
+ * `export {}` の行がないと、このファイルは _ambient module_ として扱われてしまい、`import` 宣言を追加することができなくなります。
+ * ambient な `declare module` 宣言を追加する必要がある場合は、`src/ambient.d.ts` のように別のファイルに記述してください。
  *
  * これらのインターフェースを作成することによって、`event.locals`、`event.platform`、`load` 関数の `data` を使用する際に型の安全性を確保することができます。
  */
@@ -243,7 +246,8 @@ declare module '$app/navigation' {
 
 	/**
 	 * リンクをクリックしたり、`goto(...)` を呼び出したり、ブラウザの 戻る/進む を使うなどして新しい URL にナビゲーションするその直前にトリガーされるナビゲーションインターセプターです。
-	 * `cancel()` を呼び出すと、ナビゲーションが完了するのを中止します。
+	 * `cancel()` を呼び出すと、ナビゲーションが完了するのを中止します。ナビゲーションが直接現在のページをアンロードした場合、`cancel` はネイティブブラウザの
+	 * アンロード確認ダイアログが表示されます。この場合、`navigation.willUnload` が `true` になります。
 	 *
 	 * ナビゲーションがクライアントサイドではない場合、`navigation.to.route.id` は `null` になります。
 	 *

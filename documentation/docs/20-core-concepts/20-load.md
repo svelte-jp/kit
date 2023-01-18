@@ -164,7 +164,7 @@ export async function load() {
 
 ### Input
 
-ユニバーサル(universal) `load` 関数とサーバー(server) `load` 関数はどちらも、リクエストを表すプロパティ (`params`、`route`、`url`) と様々な関数 (`depends`、`fetch`、`parent`) にアクセスできます。これらについては、以下のセクションで説明します。
+ユニバーサル(universal) `load` 関数とサーバー(server) `load` 関数はどちらも、リクエストを表すプロパティ (`params`、`route`、`url`) と様々な関数 (`fetch`、`setHeaders`、`parent`、`depends`) にアクセスできます。これらについては、以下のセクションで説明します。
 
 サーバー(server) `load` 関数は `ServerLoadEvent` を引数にとって呼び出されます。`ServerLoadEvent` は、`RequestEvent` から `clientAddress`、`cookies`、`locals`、`platform`、`request` を継承しています。
 

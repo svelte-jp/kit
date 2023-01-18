@@ -1,5 +1,25 @@
 # @sveltejs/kit
 
+## 1.1.3
+
+### Patch Changes
+
+- docs: explain how to add ambient typings ([#8558](https://github.com/sveltejs/kit/pull/8558))
+
+- fix: ignore `target="_blank"` links ([#8563](https://github.com/sveltejs/kit/pull/8563))
+
+## 1.1.2
+
+### Patch Changes
+
+- fix: correct link in types documentation ([#8557](https://github.com/sveltejs/kit/pull/8557))
+
+- fix: correctly detect changed data ([#8377](https://github.com/sveltejs/kit/pull/8377))
+
+- fix: only generate type definitions with `sync` command ([#8552](https://github.com/sveltejs/kit/pull/8552))
+
+- fix: remove baseUrl to prevent wrong TypeScript auto imports if possible ([#8568](https://github.com/sveltejs/kit/pull/8568))
+
 ## 1.1.1
 
 ### Patch Changes

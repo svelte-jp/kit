@@ -12,4 +12,4 @@ SvelteKit プロジェクトは [Vite](https://ja.vitejs.dev) を使用してい
 
 ## svelte-kit sync
 
-`svelte-kit sync` は、型や `tsconfig.json` などのプロジェクト用に生成されるファイルを作成します。プロジェクトを作成すると、`prepare` script としてリストアップされ、npm ライフサイクルの一部として自動的に実行されるので、通常はこのコマンドを実行する必要はないはずです。
+`svelte-kit sync` は、`tsconfig.json` と、プロジェクト向けに生成される型 (generated types) を全て作成します (これはルーティングファイルの中で `./$types` としてインポートできます)。プロジェクトを作成すると、`prepare` script としてリストアップされ、npm ライフサイクルの一部として自動的に実行されるので、通常はこのコマンドを実行する必要はないはずです。
