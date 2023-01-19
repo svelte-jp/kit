@@ -160,7 +160,7 @@ src/routes/[u+d83e][u+dd2a]/+page.svelte
 src/routes/🤪/+page.svelte
 ```
 
-Unicode エスケープシーケンスのフォーマットは `[u+nnnn]` で、`nnnn` の部分は `0000` から `10ffff` までの適切な値です。(JavaScript の文字列エスケープとは異なり、`ffff` 以上のコードポイントを表現するためにサロゲートペアを使用する必要はありません。) Unicode エンコーディングについてもっと知りたい方は、[Programming with Unicode](https://unicodebook.readthedocs.io/unicode_encodings.html) を参照してください。
+Unicode エスケープシーケンスのフォーマットは `[u+nnnn]` で、`nnnn` の部分は `0000` から `10ffff` までの適切な値です (JavaScript の文字列エスケープとは異なり、`ffff` 以上のコードポイントを表現するためにサロゲートペアを使用する必要はありません)。Unicode エンコーディングについてもっと知りたい方は、[Programming with Unicode](https://unicodebook.readthedocs.io/unicode_encodings.html) を参照してください。
 
 > ディレクトリの先頭に `.` 文字があると、TypeScript で [問題](https://github.com/microsoft/TypeScript/issues/13399) が起きるため、例えば [`.well-known`](https://en.wikipedia.org/wiki/Well-known_URI) のようなルート(route)を作る場合はこれらの文字をエンコードしておくと良いでしょう: `src/routes/[x+2e]well-known/...`
 

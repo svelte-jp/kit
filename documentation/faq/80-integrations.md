@@ -89,7 +89,7 @@ export function GET({ params, url }) {
 }
 ```
 
-(必要に応じて、`POST`/`PATCH` などのリクエストもプロキシし、`request.headers` も転送(forward)する必要があることにご注意ください。)
+(必要に応じて、`POST`/`PATCH` などのリクエストもプロキシし、`request.headers` も転送(forward)する必要があることにご注意ください)
 
 ### ミドルウェア(middleware)を使うにはどうすればよいですか？
 
