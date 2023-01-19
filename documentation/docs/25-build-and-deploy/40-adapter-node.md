@@ -1,12 +1,12 @@
 ---
-title: Node servers
+title: Node サーバー
 ---
 
-To generate a standalone Node server, use [`adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node).
+スタンドアロンな Node サーバーを作る場合は、[`adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) を使います。
 
-## Usage
+## 使い方
 
-Install with `npm i -D @sveltejs/adapter-node`, then add the adapter to your `svelte.config.js`:
+`npm i -D @sveltejs/adapter-node` を実行してインストールし、`svelte.config.js` にこの adapter を追加します:
 
 ```js
 // @errors: 2307
@@ -20,94 +20,94 @@ export default {
 };
 ```
 
-## Deploying
+## デプロイ(Deploying)
 
-You will need the output directory (`build` by default), the project's `package.json`, and the production dependencies in `node_modules` to run the application. Production dependencies can be generated with `npm ci --prod` (you can skip this step if your app doesn't have any dependencies). You can then start your app with this command:
+アプリケーションを実行するには、出力ディレクトリ (デフォルトは `build`)、プロジェクトの `package.json`、`node_modules` の本番向けの依存関係(production dependencies)が必要です。本番向けの依存関係は `npm ci --prod` で生成することができます (あなたのアプリが何の依存関係も持たない場合はこのステップをスキップできます)。そして、このコマンドでアプリを起動することができます:
 
 ```bash
 node build
 ```
 
-Development dependencies will be bundled into your app using [Rollup](https://rollupjs.org). To control whether a given package is bundled or externalised, place it in `devDependencies` or `dependencies` respectively in your `package.json`.
+[Rollup](https://rollupjs.org) を使うと開発用の依存関係(Development dependencies)もアプリにバンドルされます。パッケージをバンドルするか外部化するかコントロールするには、そのパッケージを `package.json` の `devDependencies` か `dependencies` にそれぞれ配置します。
 
-## Environment variables
+## 環境変数
 
-In `dev` and `preview`, SvelteKit will read environent variables from your `.env` file (or `.env.local`, or `.env.[mode]`, [as determined by Vite](https://vitejs.dev/guide/env-and-mode.html#env-files).)
+`dev` と `preview` のときは、SvelteKit は `.env` ファイル (または `.env.local` や `.env.[mode]`、[Vite によって決定されているもの](https://vitejs.dev/guide/env-and-mode.html#env-files)) から環境変数を読み取ります。
 
-In production, `.env` files are _not_ automatically loaded. To do so, install `dotenv` in your project...
+プロダクションでは、`.env` ファイルは自動的に読み取れらません。そうするには、プロジェクトに `dotenv` をインストールします…
 
 ```bash
 npm install dotenv
 ```
 
-...and invoke it before running the built app:
+…そしてビルドされたアプリを実行する前にそれを呼び出します:
 
 ```diff
 -node build
 +node -r dotenv/config build
 ```
 
-### `PORT` and `HOST`
+### `PORT` と `HOST`
 
-By default, the server will accept connections on `0.0.0.0` using port 3000. These can be customised with the `PORT` and `HOST` environment variables:
+デフォルトでは、サーバーは `0.0.0.0`、port 3000 でコネクションを受け付けます。これは環境変数の `PORT` と `HOST` を使ってカスタマイズすることができます。
 
 ```
 HOST=127.0.0.1 PORT=4000 node build
 ```
 
-### `ORIGIN`, `PROTOCOL_HEADER` and `HOST_HEADER`
+### `ORIGIN`、`PROTOCOL_HEADER`、`HOST_HEADER`
 
-HTTP doesn't give SvelteKit a reliable way to know the URL that is currently being requested. The simplest way to tell SvelteKit where the app is being served is to set the `ORIGIN` environment variable:
+HTTP は SvelteKit に現在リクエストされている URL を知るための信頼できる方法を提供しません。アプリがホストされている場所を Sveltekit に伝える最も簡単な方法は、環境変数 `ORIGIN` を設定することです:
 
 ```
 ORIGIN=https://my.site node build
 ```
 
-With this, a request for the `/stuff` pathname will correctly resolve to `https://my.site/stuff`. Alternatively, you can specify headers that tell SvelteKit about the request protocol and host, from which it can construct the origin URL:
+これにより、パス名 `/stuff` に対するリクエストは正しく `https://my.site/stuff` に解決されます。別の方法として、リクエストプロトコルとホストを SvelteKit に伝えるヘッダーを指定し、そこから origin URL を組み立てることもできます:
 
 ```
 PROTOCOL_HEADER=x-forwarded-proto HOST_HEADER=x-forwarded-host node build
 ```
 
-> [`x-forwarded-proto`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto) and [`x-forwarded-host`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host) are de facto standard headers that forward the original protocol and host if you're using a reverse proxy (think load balancers and CDNs). You should only set these variables if your server is behind a trusted reverse proxy; otherwise, it'd be possible for clients to spoof these headers.
+> [`x-forwarded-proto`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Proto) と [`x-forwarded-host`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Host) は事実上の標準となっているヘッダーで、リバースプロキシー (ロードバランサーや CDN などを考えてみてください) を使用している場合に、オリジナルのプロトコルとホストを転送します。これらの変数は、あなたのサーバーが信頼できるリバースプロキシーの後ろにある場合にのみ設定すべきです。そうしないと、クライアントがこれらのヘッダーを偽装することが可能になってしまいます。
 
-If `adapter-node` can't correctly determine the URL of your deployment, you may experience this error when using [form actions](/docs/form-actions):
+`adapter-node` があなたのデプロイの URL を正しく判断することができない場合、[form actions](/docs/form-actions) を使用するとこのエラーが発生することがあります:
 
-> Cross-site POST form submissions are forbidden
+> クロスサイトの POST フォーム送信は禁止されています
 
-### `ADDRESS_HEADER` and `XFF_DEPTH`
+### `ADDRESS_HEADER` と `XFF_DEPTH`
 
-The [RequestEvent](/docs/types#public-types-requestevent) object passed to hooks and endpoints includes an `event.getClientAddress()` function that returns the client's IP address. By default this is the connecting `remoteAddress`. If your server is behind one or more proxies (such as a load balancer), this value will contain the innermost proxy's IP address rather than the client's, so we need to specify an `ADDRESS_HEADER` to read the address from:
+hooks とエンドポイントに渡される [RequestEvent](/docs/types#public-types-requestevent) オブジェクトにはクライアントの IP アドレスを返す `event.getClientAddress()` 関数が含まれています。デフォルトでは、これは接続中の `remoteAddress` です。もしサーバーが1つ以上のプロキシー (例えばロードバランサー) の後ろにある場合、この値はクライアントの IP アドレスではなく、最も内側にあるプロキシーの IP アドレスを含むことになるため、アドレスを読み取るために `ADDRESS_HEADER` を指定する必要があります:
 
 ```
 ADDRESS_HEADER=True-Client-IP node build
 ```
 
-> Headers can easily be spoofed. As with `PROTOCOL_HEADER` and `HOST_HEADER`, you should [know what you're doing](https://adam-p.ca/blog/2022/03/x-forwarded-for/) before setting these.
+> ヘッダーは簡単に偽装されます。`PROTOCOL_HEADER` や `HOST_HEADER` と同様、これらを設定する前に[自分が何をしているのか知るべき](https://adam-p.ca/blog/2022/03/x-forwarded-for/)です。
 
-If the `ADDRESS_HEADER` is `X-Forwarded-For`, the header value will contain a comma-separated list of IP addresses. The `XFF_DEPTH` environment variable should specify how many trusted proxies sit in front of your server. E.g. if there are three trusted proxies, proxy 3 will forward the addresses of the original connection and the first two proxies:
+`ADDRESS_HEADER` が `X-Forwarded-For` の場合、ヘッダーの値にはカンマで区切られた IP アドレスのリストが含まれます。環境変数 `XFF_DEPTH` には、あなたのサーバーの前に信頼できるプロキシーがいくつあるか指定する必要があります。例えば、3つの信頼できるプロキシーがある場合、プロキシー3はオリジナルのコネクションと最初の2つのプロキシーのアドレスを転送します:
 
 ```
 <client address>, <proxy 1 address>, <proxy 2 address>
 ```
 
-Some guides will tell you to read the left-most address, but this leaves you [vulnerable to spoofing](https://adam-p.ca/blog/2022/03/x-forwarded-for/):
+一番左のアドレスを読め、というガイドもありますが、これだと[スプーフィング(なりすまし)に対し脆弱](https://adam-p.ca/blog/2022/03/x-forwarded-for/)なままです:
 
 ```
 <spoofed address>, <client address>, <proxy 1 address>, <proxy 2 address>
 ```
 
-We instead read from the _right_, accounting for the number of trusted proxies. In this case, we would use `XFF_DEPTH=3`.
+代わりに、信頼できるプロキシーの数を考慮して*右*から読み込みます。この場合、`XFF_DEPTH=3` を使用します。
 
-> If you need to read the left-most address instead (and don't care about spoofing) — for example, to offer a geolocation service, where it's more important for the IP address to be _real_ than _trusted_, you can do so by inspecting the `x-forwarded-for` header within your app.
+> もし、一番左のアドレスを読む必要がある場合 (そしてスプーフィングを気にしない場合) — 例えば、位置情報サービスを提供する場合、つまり IP アドレスが*信頼できる*ことよりも*リアル*であることが重要な場合、アプリの中で `x-forwarded-for` ヘッダーを検査することでそれが可能です。
 
 ### `BODY_SIZE_LIMIT`
 
-The maximum request body size to accept in bytes including while streaming. Defaults to 512kb. You can disable this option with a value of 0 and implement a custom check in [`handle`](/docs/hooks#server-hooks-handle) if you need something more advanced.
+ストリーミング中も含め、受け付けるリクエストボディの最大サイズを byte で指定します。デフォルトは 512kb です。もっと高度な設定が必要な場合は、このオプションの値を 0 にして無効化し、[`handle`](/docs/hooks#server-hooks-handle) にカスタムのチェックを実装することができます。
 
 ## Options
 
-The adapter can be configured with various options:
+この adapter は様々なオプションで設定を行うことができます:
 
 ```js
 // @errors: 2307
@@ -128,15 +128,15 @@ export default {
 
 ### out
 
-The directory to build the server to. It defaults to `build` — i.e. `node build` would start the server locally after it has been created.
+サーバーをビルドするディレクトリです。デフォルトは `build` です。つまり、`node build` を指定すると、サーバが作成されローカルで起動します。
 
 ### precompress
 
-Enables precompressing using gzip and brotli for assets and prerendered pages. It defaults to `false`.
+アセットやプリレンダリングされたページを gzip や brotli を使って事前圧縮(precompress)するのを有効にします。デフォルトは `false` です。
 
 ### envPrefix
 
-If you need to change the name of the environment variables used to configure the deployment (for example, to deconflict with environment variables you don't control), you can specify a prefix:
+デプロイの設定に使用される環境変数の名前を変更する必要がある場合 (例えば、あなたのコントロール下にない環境変数との競合を解消するため)、接頭辞(prefix)を指定することができます:
 
 ```js
 envPrefix: 'MY_CUSTOM_';
@@ -149,11 +149,11 @@ MY_CUSTOM_ORIGIN=https://my.site \
 node build
 ```
 
-## Custom server
+## カスタムサーバー
 
-The adapter creates two files in your build directory — `index.js` and `handler.js`. Running `index.js` — e.g. `node build`, if you use the default build directory — will start a server on the configured port.
+この adapter は、ビルドのディレクトリに2つのファイルを作成します — `index.js` と `handler.js` です。デフォルトのビルドのディレクトリを使用している場合、`node build` などで `index.js` を実行すると、設定された port でサーバーが起動されます。
 
-Alternatively, you can import the `handler.js` file, which exports a handler suitable for use with [Express](https://github.com/expressjs/expressjs.com), [Connect](https://github.com/senchalabs/connect) or [Polka](https://github.com/lukeed/polka) (or even just the built-in [`http.createServer`](https://nodejs.org/dist/latest/docs/api/http.html#httpcreateserveroptions-requestlistener)) and set up your own server:
+別の方法として、[Express](https://github.com/expressjs/expressjs.com)、[Connect](https://github.com/senchalabs/connect)、[Polka](https://github.com/lukeed/polka) (またはビルトインの [`http.createServer`](https://nodejs.org/dist/latest/docs/api/http.html#httpcreateserveroptions-requestlistener)) を使用するためのハンドラーをエクスポートする `handler.js` ファイルをインポートし、独自のサーバーをセットアップすることもできます。
 
 ```js
 // @errors: 2307 7006
@@ -176,11 +176,11 @@ app.listen(3000, () => {
 });
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Is there a hook for cleaning up before the server exits?
+### サーバーが終了する前にクリーンアップするための hook はありますか？
 
-There's nothing built-in to SvelteKit for this, because such a cleanup hook depends highly on the execution environment you're on. For Node, you can use its built-in `process.on(..)` to implement a callback that runs before the server exits:
+SvelteKit にはこれに対応するためのビルトインで組み込まれているものはありません。なぜなら、このようなクリーンアップの hook はあなたの実行環境に大きく依存しているからです。Node の場合は、ビルトインの `process.on(..)` を使用して、サーバーが終了する前に実行されるコールバックを実装することができます:
 
 ```js
 // @errors: 2304 2580

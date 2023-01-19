@@ -1,16 +1,16 @@
 ---
-title: Building your app
+title: アプリをビルドする
 ---
 
-Building a SvelteKit app happens in two stages, which both happen when you run `vite build` (usually via `npm run build`).
+SvelteKit アプリのビルドは2つのステージで行われます。どちらも `vite build` (通常は `npm run build` を経由します) を実行したときに行われます。
 
-Firstly, Vite creates an optimized production build of your server code, your browser code, and your service worker (if you have one). [Prerendering](/docs/page-options#prerender) is executed at this stage, if appropriate.
+まず最初に、Vite がサーバーのコード、ブラウザのコード、service worker(もしあれば) の、最適化された本番向けビルドを作成します。必要に応じて、このステージで [プリレンダリング](/docs/page-options#prerender) が実行されます。
 
-Secondly, an _adapter_ takes this production build and tunes it for your target environment — more on this on the following pages.
+次に、*adapter* がこの本番向けビルドをあなたがデプロイしたいターゲットの環境向けに調整します — これについての詳細は以降のページにございます。
 
-## During the build
+## ビルド中に
 
-SvelteKit will load your `+page/layout(.server).js` files (and all files they import) for analysis during the build. Any code that should _not_ be executed at this stage must check that `building` from [`$app/environment`](/docs/modules#$app-environment) is `false`:
+SvelteKit はビルド中に、解析のために `+page/layout(.server).js` ファイル (とそこにインポートされている全てのファイル) を読み込みます。このステージで読み込まれるべきでないコードがある場合は、[`$app/environment`](/docs/modules#$app-environment) からインポートする `building` が `false` であることをチェックするコードを追加してください:
 
 ```diff
 +import { building } from '$app/environment';
@@ -25,6 +25,6 @@ export function load() {
 }
 ```
 
-## Preview your app
+## アプリのプレビュー
 
-After building, you can view your production build locally with `vite preview` (via `npm run preview`). Note that this will run the app in Node, and so is not a perfect reproduction of your deployed app — adapter-specific adjustments like the [`platform` object](adapters#platform-specific-context) do not apply to previews.
+ビルド後、`vite preview` (`npm run preview` 経由) を使用してローカルで本番向けビルドを確認することができます。これは Node 上でアプリを実行しているので、デプロイされるアプリの完全な再現ではないことにご注意ください。[`platform` オブジェクト](adapters#platform-specific-context) などの adapter 固有の調整はプレビューには適用されません。

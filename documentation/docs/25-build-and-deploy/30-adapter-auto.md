@@ -1,20 +1,20 @@
 ---
-title: Zero-config deployments
+title: ゼロコンフィグデプロイ
 ---
 
-When you create a new SvelteKit project with `npm create svelte@latest`, it installs [`adapter-auto`](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) by default. This adapter automatically installs and uses the correct adapter for supported environments when you deploy:
+`npm create svelte@latest` で新しい SvelteKit プロジェクトを作成した場合、デフォルトで [`adapter-auto`](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) がインストールされます。この adapter は自動で、デプロイ時に、サポートされている環境に合った adapter をインストールし、使用します:
 
 - [`@sveltejs/adapter-cloudflare`](adapter-cloudflare) for [Cloudflare Pages](https://developers.cloudflare.com/pages/)
 - [`@sveltejs/adapter-netlify`](adapter-netlify) for [Netlify](https://netlify.com/)
 - [`@sveltejs/adapter-vercel`](adapter-vercel) for [Vercel](https://vercel.com/)
 - [`svelte-adapter-azure-swa`](https://github.com/geoffrich/svelte-adapter-azure-swa) for [Azure Static Web Apps](https://docs.microsoft.com/en-us/azure/static-web-apps/)
 
-It's recommended to install the appropriate adapter to your `devDependencies` once you've settled on a target environment, since this will add the adapter to your lockfile and slightly improve install times on CI.
+デプロイするターゲットの環境が決まったら、`devDependencies` に適切な adapter をインストールすることを推奨します。これにより、lockfile に adapter が追加されるため、CI でのインストール時間が少し改善されます。
 
-## Environment-specific configuration
+## 環境固有の設定
 
-To add configuration options, such as `{ edge: true }` in [`adapter-vercel`](adapter-vercel) and [`adapter-netlify`](adapter-netlify), you must install the underlying adapter — `adapter-auto` does not take any options.
+[`adapter-vercel`](adapter-vercel) や [`adapter-netlify`](adapter-netlify) の `{ edge: true }` のような設定オプションを追加したければ、そのオプションを持つ adapter をインストールしなければなりません。`adapter-auto` はそれらのオプションを受け付けません。
 
-## Adding community adapters
+## コミュニティ adapter を追加する
 
-You can add zero-config support for additional adapters by editing [adapters.js](https://github.com/sveltejs/kit/blob/master/packages/adapter-auto/adapters.js) and opening a pull request.
+追加の adapter にゼロコンフィグサポートを追加するには、[adapters.js](https://github.com/sveltejs/kit/blob/master/packages/adapter-auto/adapters.js) を編集し、pull request を開きます。

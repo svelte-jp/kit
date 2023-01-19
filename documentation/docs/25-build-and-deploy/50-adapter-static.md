@@ -2,13 +2,13 @@
 title: Static site generation
 ---
 
-To use SvelteKit as a static site generator (SSG), use [`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static).
+SvelteKit を static site generator (SSG) として使用するには、[`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使用します。
 
-This will prerender your entire site as a collection of static files. If you'd like to prerender only some pages, you will need to use a different adapter together with [the `prerender` option](/docs/page-options#prerender).
+この adapter はサイト全体を静的なファイルのコレクションとしてプリレンダリングします。もし、一部のページのみをプリレンダリングしたい場合、別の adapter と [`prerender` オプション](/docs/page-options#prerender) を組み合わせて使用する必要があります。
 
-## Usage
+## 使い方
 
-Install with `npm i -D @sveltejs/adapter-static`, then add the adapter to your `svelte.config.js`:
+`npm i -D @sveltejs/adapter-static` を実行してインストールし、`svelte.config.js` にこの adapter を追加します:
 
 ```js
 // @errors: 2307
@@ -30,7 +30,7 @@ export default {
 };
 ```
 
-...and add the [`prerender`](/docs/page-options#prerender) option to your root layout:
+…そして [`prerender`](/docs/page-options#prerender) オプションを最上位のレイアウト(root layout)に追加します:
 
 ```js
 /// file: src/routes/+layout.js
@@ -38,15 +38,15 @@ export default {
 export const prerender = true;
 ```
 
-> You must ensure SvelteKit's [`trailingSlash`](/docs/page-options#trailingslash) option is set appropriately for your environment. If your host does not render `/a.html` upon receiving a request for `/a` then you will need to set `trailingSlash: 'always'` to create `/a/index.html` instead.
+> SvelteKit の [`trailingSlash`](/docs/page-options#trailingslash) オプションを、あなたの環境に対して適切に設定しなければなりません。もしあなたのホスト環境が、`/a` へのリクエストを受け取ったときに `/a.html` をレンダリングしない場合、`/a/index.html` を作成するために `trailingSlash: 'always'` を設定する必要があります。
 
-## Zero-config support
+## ゼロコンフィグサポート
 
-Some platforms have zero-config support (more to come in future):
+ゼロコンフィグサポートがあるプラットフォームもあります (将来増える予定):
 
 - [Vercel](https://vercel.com)
 
-On these platforms, you should omit the adapter options so that `adapter-static` can provide the optimal configuration:
+これらのプラットフォームでは、adapter のオプションを省略することで、`adapter-static` が最適な設定を提供できるようになります:
 
 ```diff
 /// file: svelte.config.js
@@ -81,13 +81,13 @@ If `true`, precompresses files with brotli and gzip. This will generate `.br` an
 
 By default, `adapter-static` checks that either all pages and endpoints (if any) of your app were prerendered, or you have the `fallback` option set. This check exists to prevent you from accidentally publishing an app where some parts of it are not accessible, because they are not contained in the final output. If you know this is ok (for example when a certain page only exists conditionally), you can set `strict` to `false` to turn off this check.
 
-## SPA mode
+## SPA モード
 
-You can use `adapter-static` to create a single-page app or SPA by specifying a **fallback page**.
+`adapter-static` を使用し、**フォールバックページ(fallback page)** を指定することで、シングルページアプリ(SPA)を作成することができます。
 
-> In most situations this is not recommended: it harms SEO, tends to slow down perceived performance, and makes your app inaccessible to users if JavaScript fails or is disabled (which happens [more often than you probably think](https://kryogenix.org/code/browser/everyonehasjs.html)).
+> ほとんどの場合、これはおすすめできません: SEO に悪影響を与え、知覚的なパフォーマンスが低下する傾向があり、もし JavaScript が失敗したり無効になっていたりする場合 (これは[あなたが思うより頻繁に](https://kryogenix.org/code/browser/everyonehasjs.html)発生します)、ユーザーはアプリにアクセスできなくなります.
 
-If you want to create a simple SPA with no prerendered routes, the necessary config looks like this:
+もし、プリレンダリングされるルート(routes)がないシンプルな SPA を作成したい場合は、必要な設定はこのようになります:
 
 ```js
 // @errors: 2307
@@ -109,13 +109,13 @@ export default {
 export const ssr = false;
 ```
 
-You can also turn only part of your app into an SPA.
+アプリの一部だけを SPA にすることもできます。
 
-Let's go through these options one by one:
+これらのオプションを1つずつ見ていきましょう:
 
-### Add fallback page
+### フォールバックページ(fallback page)を追加する
 
-The fallback page is an HTML page created by SvelteKit that loads your app and navigates to the correct route. For example [Surge](https://surge.sh/help/adding-a-200-page-for-client-side-routing), a static web host, lets you add a `200.html` file that will handle any requests that don't correspond to static assets or prerendered pages. We can create that file like so:
+フォールバックページ(fallback page)とは、アプリをロードし正しいルート(routes)にナビゲートする SvelteKit によって作成される HTML ページです。例えば、静的 web ホスティングである [Surge](https://surge.sh/help/adding-a-200-page-for-client-side-routing) では、静的なアセットやプリレンダリングページに対応しないリクエストを処理する `200.html` ファイルを追加する必要があります。このファイルはこのように作成することができます:
 
 ```js
 // @errors: 2307
@@ -131,23 +131,23 @@ export default {
 };
 ```
 
-> How to configure this behaviour does however depend on your hosting solution and is not part of SvelteKit. It is recommended to search the host's documentation on how to redirect requests.
+> ただし、この動作を設定する方法はあなたのホスティングソリューションに依存するので、Sveltekit の管轄外です。リクエストをリダイレクトする方法については、ホスティング環境のドキュメントを検索することをおすすめします。
 
-### Turn off prerendering
+### プリレンダリングをオフにする
 
-When operating in SPA mode, you can omit the [`prerender`](/docs/page-options#prerender) option from your root layout (or set it to `false`, its default value), and only pages that have the `prerender` option set will be prerendered at build time.
+SPA モードで動作させる場合、最上位のレイアウト(root layout)の [`prerender`](/docs/page-options#prerender) オプションを省略することができ (または、デフォルト値の `false` を設定)、`prerender` オプションが設定されているページのみ、ビルド時にプリレンダリングされます。
 
-SvelteKit will still crawl your app's entry points looking for prerenderable pages. If `svelte-kit build` fails because of pages that can't be loaded outside the browser, you can set `config.kit.prerender.entries` to `[]` to prevent this from happening. (Setting `config.kit.prerender.enabled` to `false` also has this effect, but would prevent the fallback page from being generated.)
+SvelteKit はプリレンダリング可能なページを探すためにアプリのエントリーポイントをクロールします。ブラウザから読み込めないページが原因で `svelte-kit build` が失敗する場合は、`config.kit.prerender.entries` を `[]` に設定することでこれを防ぐことができます。(`config.kit.prerender.enabled` を `false` に設定してもこの効果がありますが、フォールバックページが生成されなくなってしまいます。)
 
-You can also add turn off prerendering only to parts of your app, if you want other parts to be prerendered.
+アプリの一部のみプリレンダリングをオフにすることで、その他の部分をプリレンダリングすることもできます。
 
-### Turn off ssr
+### ssr をオフにする
 
-During development, SvelteKit will still attempt to server-side render your routes. This means accessing things that are only available in the browser (such as the `window` object) will result in errors, even though this would be valid in the output app. To align the behavior of SvelteKit's dev mode with your SPA, you can [add `export const ssr = false` to your root `+layout`](/docs/page-options#ssr). You can also add this option only to parts of your app, if you want other parts to be prerendered.
+開発中、SvelteKit はあなたのルート(routes)をサーバーサイドでレンダリングしようとします。つまり、ブラウザでのみ利用可能なもの (例えば `window` オブジェクト) にアクセスすると、たとえ最終的に出力されるアプリとしては有効であっても、エラーとなります。Sveltekit の開発モードの動作を SPA に合わせるには、[`export const ssr = false` を最上位(root) の `+layout` に追加](/docs/page-options#ssr) します。このオプションをアプリの一部に追加して、その他の部分をプリレンダリングすることもできます。
 
 ### Apache
 
-To run an SPA on [Apache](https://httpd.apache.org/), you should add a `static/.htaccess` file to route requests to the fallback page:
+SPA を [Apache](https://httpd.apache.org/) で実行する場合は、`static/.htaccess` ファイルを追加し、リクエストをフォールバックページ(fallback page)にルーティングする必要があります:
 
 ```
 <IfModule mod_rewrite.c>
@@ -162,11 +162,11 @@ To run an SPA on [Apache](https://httpd.apache.org/), you should add a `static/.
 
 ## GitHub Pages
 
-When building for GitHub Pages, make sure to update [`paths.base`](/docs/configuration#paths) to match your repo name, since the site will be served from <https://your-username.github.io/your-repo-name> rather than from the root.
+GitHub Pages 向けにビルドするときは、[`paths.base`](/docs/configuration#paths) をあなたのリポジトリ名に合わせて更新するようにしてください。サイトが root からではなく <https://your-username.github.io/your-repo-name> から提供されるためです。
 
-You will have to prevent GitHub's provided Jekyll from managing your site by putting an empty `.nojekyll` file in your static folder. If you do not want to disable Jekyll, change the kit's `appDir` configuration option to `'app_'` or anything not starting with an underscore. For more information, see GitHub's [Jekyll documentation](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/about-github-pages-and-jekyll#configuring-jekyll-in-your-github-pages-site).
+GitHub が提供する Jekyll が、あなたのサイトを管理するのを防ぐために、空の `.nojekyll` ファイルを static フォルダに追加する必要があります。Jekyll を無効にしたくない場合は、kit の `appDir` 設定オプションを `'app_'` またはアンダースコアで始まらないものに変更します。詳細は、GitHub の [Jekyll のドキュメント](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/about-github-pages-and-jekyll#configuring-jekyll-in-your-github-pages-site) をご参照ください。
 
-A config for GitHub Pages might look like the following:
+GitHub Pages 向けの設定は以下のようになるでしょう:
 
 ```js
 /// file: svelte.config.js

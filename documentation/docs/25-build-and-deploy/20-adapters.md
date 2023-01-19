@@ -2,9 +2,9 @@
 title: Adapters
 ---
 
-Before you can deploy your SvelteKit app, you need to _adapt_ it for your deployment target. Adapters are small plugins that take the built app as input and generate output for deployment.
+SvelteKit アプリをデプロイする前に、それをデプロイ先の環境に _合わせる(adapt)_ 必要があります。adapter は、ビルドされたアプリをインプットとして受け取りデプロイ用のアウトプットを生成する小さなプラグインです。
 
-Official adapters exist for a variety of platforms — these are documented on the following pages:
+様々なプラットフォーム向けの公式の adapter があります。これらについて以降のページにドキュメントがあります。
 
 - [`@sveltejs/adapter-cloudflare`](adapter-cloudflare) for Cloudflare Pages
 - [`@sveltejs/adapter-cloudflare-workers`](adapter-cloudflare-workers) for Cloudflare Workers
@@ -13,11 +13,11 @@ Official adapters exist for a variety of platforms — these are documented on t
 - [`@sveltejs/adapter-static`](adapter-static) for static site generation (SSG)
 - [`@sveltejs/adapter-vercel`](adapter-vercel) for Vercel
 
-Additional [community-provided adapters](https://sveltesociety.dev/components#adapters) exist for other platforms.
+加えて、他のプラットフォーム向けに、[コミュニティによって提供されている adapter](https://sveltesociety.dev/components#adapters) もございます。
 
-## Using adapters
+## adapter を使用する
 
-Your adapter is specified in `svelte.config.js`:
+adapter は `svelte.config.js` に指定します。
 
 ```js
 /// file: svelte.config.js
@@ -43,7 +43,7 @@ const config = {
 export default config;
 ```
 
-## Platform-specific context
+## プラットフォーム固有の情報
 
-Some adapters may have access to additional information about the request. For example, Cloudflare Workers can access an `env` object containing KV namespaces etc. This can be passed to the `RequestEvent` used in [hooks](/docs/hooks) and [server routes](/docs/routing#server) as the `platform` property — consult each adapter's documentation to learn more.
+adapter によっては、リクエストに関する追加情報にアクセスすることができます。例えば、Cloudflare Workers の場合は KV namespaces などを含む `env` オブジェクトにアクセスできます。これは [hooks](/docs/hooks) や [サーバールート(server routes)](/docs/routing#server) で使用される `RequestEvent` に、`platform` プロパティとして渡されます。詳しくは、各 adapter のドキュメントをご参照ください。
 
