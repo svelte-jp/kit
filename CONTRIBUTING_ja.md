@@ -28,8 +28,6 @@ SvelteKitドキュメントの日本語翻訳に貢献する方法はたくさ�
   - Docsは documentation/docs 配下にあります。
 - **FAQ**
   - FAQは documentation/faq 配下にあります。 
-- **Migrating**
-  - Migratingは documentation/migrating 配下にあります。
 
 ```
 documentation
@@ -37,17 +35,13 @@ documentation
 │   ├── 00-introduction.md      # <- Docs
 │   ...
 │
-├── faq
-│   ├── 00-other-resources.md   # <- FAQ
-│   ...
-│
-└── migrating
-    ├── 01-migrating.md         # <- Migrating
+└── faq
+    ├── 00-other-resources.md   # <- FAQ
     ...
 
 ```
 
-サイトのソース、TOPページの日本語訳は [svelte-jp/site](https://github.com/svelte-jp/sites) にあります。
+サイトのソース、TOPページの日本語訳は [sites/kit.svelte.dev](https://github.com/svelte-jp/kit/tree/master/sites/kit.svelte.dev) ディレクトリにあります。
 
 
 ### 翻訳の流れ
