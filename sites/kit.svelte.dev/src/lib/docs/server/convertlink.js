@@ -28,11 +28,44 @@ const docs_form_actions = new Map([['action の解剖学', 'Anatomy of an action
 
 const docs_page_options = new Map([['プリレンダリングしない場合', 'When not to prerender']]);
 
+// 25-build-and-deploy
+
+const docs_building_your_app = new Map([
+	['ビルド中に', 'During the build'],
+	['アプリのプレビュー', 'Preview your app']
+]);
+
 const docs_adapters = new Map([
-	['サポートされている環境', 'Supported environments'],
-	['プラットフォーム固有の情報', 'Platform-specific context'],
-	['コミュニティが提供する adapter', 'Community adapters'],
-	['custom adapter を作成する', 'Writing custom adapters']
+	['adapter を使用する', 'Using adapters'],
+	['プラットフォーム固有の情報', 'Platform-specific context']
+]);
+
+const docs_adapter_auto = new Map([
+	['環境固有の設定', 'Environment-specific configuration'],
+	['コミュニティ adapter の追加', 'Adding community adapters']
+]);
+
+const docs_adapter_node = new Map([
+	['使い方', 'Usage'],
+	['環境変数', 'Environment variables'],
+	['`PORT` と `HOST`', '`PORT` and `HOST`'],
+	['`ORIGIN`、`PROTOCOL_HEADER`、`HOST_HEADER`', '`ORIGIN`, `PROTOCOL_HEADER` and `HOST_HEADER`'],
+	['`ADDRESS_HEADER` と `XFF_DEPTH`', '`ADDRESS_HEADER` and `XFF_DEPTH`'],
+	['カスタムサーバー', 'Custom server'],
+	['トラブルシューティング', 'Troubleshooting'],
+	[
+		'サーバーが終了する前にクリーンアップするための hook はありますか？',
+		'Is there a hook for cleaning up before the server exits?'
+	]
+]);
+
+const docs_adapter_static = new Map([
+	['使い方', 'Usage'],
+	['ゼロコンフィグサポート', 'Zero-config support'],
+	['SPA モード', 'SPA mode'],
+	['フォールバックページ(fallback page)を追加する', 'Add fallback page'],
+	['プリレンダリングをオフにする', 'Turn off prerendering'],
+	['ssr をオフにする', 'Turn off ssr']
 ]);
 
 // 30-advanced
@@ -129,8 +162,17 @@ export function convert_link(file, heading) {
 				return docs_form_actions.get(heading) || heading;
 			case 'docs/20-core-concepts/40-page-options.md':
 				return docs_page_options.get(heading) || heading;
-			case 'docs/20-core-concepts/50-adapters.md':
+			// 25-build-and-deploy
+			case 'docs/25-build-and-deploy/10-building-your-app.md':
+				return docs_building_your_app.get(heading) || heading;
+			case 'docs/25-build-and-deploy/20-adapters.md':
 				return docs_adapters.get(heading) || heading;
+			case 'docs/25-build-and-deploy/30-adapter-auto.md':
+				return docs_adapter_auto.get(heading) || heading;
+			case 'docs/25-build-and-deploy/40-adapter-node.md':
+				return docs_adapter_node.get(heading) || heading;
+			case 'docs/25-build-and-deploy/50-adapter-static.md':
+				return docs_adapter_static.get(heading) || heading;
 			// 30-advanced
 			case 'docs/30-advanced/10-advanced-routing.md':
 				return docs_advanced_routing.get(heading) || heading;

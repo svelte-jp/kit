@@ -40,7 +40,7 @@ declare namespace App {
 	export interface PageData {}
 
 	/**
-	 * adapter が `event.platform` で [プラットフォーム固有の情報](https://kit.svelte.jp/docs/adapters#supported-environments-platform-specific-context) を提供する場合、ここでそれを指定することができます。
+	 * adapter が `event.platform` で [プラットフォーム固有の情報](https://kit.svelte.jp/docs/adapters#platform-specific-context) を提供する場合、ここでそれを指定することができます。
 	 */
 	export interface Platform {}
 }

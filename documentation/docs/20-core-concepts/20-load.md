@@ -192,7 +192,7 @@ export async function load() {
 
 [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、`searchParams` ([`URLSearchParams`](https://developer.mozilla.org/ja/docs/Web/API/URLSearchParams) オブジェクトとしてパースされたクエリ文字列を含む) を含んでいます。`url.hash` はサーバーで利用できないため、`load` 中にアクセスすることはできません。
 
-> 環境によっては、サーバーサイドレンダリング時のリクエストヘッダからこれが導出されることもあります。例えば [adapter-node](/docs/adapters#supported-environments-node-js) では、URL を正しく設定するために adapter の設定をする必要があるかもしれません。
+> 環境によっては、サーバーサイドレンダリング時のリクエストヘッダからこれが導出されることもあります。例えば [adapter-node](/docs/adapter-node) では、URL を正しく設定するために adapter の設定をする必要があるかもしれません。
 
 ### route
 
