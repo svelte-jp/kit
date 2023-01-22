@@ -2,21 +2,21 @@
 title: Cloudflare Pages
 ---
 
-To deploy to [Cloudflare Pages](https://developers.cloudflare.com/pages/), use [`adapter-cloudflare`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare).
+[Cloudflare Pages](https://developers.cloudflare.com/pages/) にデプロイする場合は、[`adapter-cloudflare`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare) を使用します。
 
-This adapter will be installed by default when you use [`adapter-auto`](/docs/adapter-auto), but adding it to your project is recommended so that `event.platform` is automatically typed.
+[`adapter-auto`](/docs/adapter-auto) を使用している場合、この adapter は自動でインストールされますが、プロジェクトに追加することをおすすめします。`event.platform` が自動で型付けされるからです。
 
-## Comparisons
+## 比較
 
-- `adapter-cloudflare` – supports all SvelteKit features; builds for [Cloudflare Pages](https://blog.cloudflare.com/cloudflare-pages-goes-full-stack/)
-- `adapter-cloudflare-workers` – supports all SvelteKit features; builds for Cloudflare Workers
-- `adapter-static` – only produces client-side static assets; compatible with Cloudflare Pages
+- `adapter-cloudflare` – SvelteKit の全ての機能をサポートします; [Cloudflare Pages](https://blog.cloudflare.com/cloudflare-pages-goes-full-stack/) 向けにビルドします
+- `adapter-cloudflare-workers` – SvelteKit の全ての機能をサポートします; Cloudflare Workers 向けにビルドします
+- `adapter-static` – クライアントサイドの静的なアセットを生成するのみです; Cloudflare Pages と互換性があります
 
-> Unless you have a specific reason to use `adapter-cloudflare-workers`, it's recommended that you use this adapter instead. Both adapters have equivalent functionality, but Cloudflare Pages offers features like GitHub integration with automatic builds and deploys, preview deployments, instant rollback and so on.
+> 特別な理由が無い限り、`adapter-cloudflare-workers` ではなく、この adapter を使用することをおすすめします。どちらの adapter も機能としては同等ですが、Cloudflare Pages は、GitHub インテグレーションによる自動ビルドや自動デプロイ、プレビューデプロイ、即時ロールバックなどの機能を提供します。
 
-## Usage
+## 使い方
 
-Install with `npm i -D @sveltejs/adapter-cloudflare`, then add the adapter to your `svelte.config.js`:
+`npm i -D @sveltejs/adapter-cloudflare` を実行してインストールし、`svelte.config.js` にこの adapter を追加します:
 
 ```js
 // @errors: 2307
@@ -30,23 +30,23 @@ export default {
 };
 ```
 
-## Deployment
+## デプロイメント(Deployment)
 
-Please follow the [Get Started Guide](https://developers.cloudflare.com/pages/get-started) for Cloudflare Pages to begin.
+Cloudflare Pages の始め方は、[Get Started Guide](https://developers.cloudflare.com/pages/get-started) に従ってください。
 
-When configuring your project settings, you must use the following settings:
+プロジェクトのセッティングを設定するときは、以下のセッティングを使用しなければなりません:
 
 - **Framework preset** – None
-- **Build command** – `npm run build` or `svelte-kit build`
+- **Build command** – `npm run build` または `svelte-kit build`
 - **Build output directory** – `.svelte-kit/cloudflare`
 - **Environment variables**
 	- `NODE_VERSION`: `16`
 
-> You need to add a `NODE_VERSION` environment variable to both the "production" and "preview" environments. You can add this during project setup or later in the Pages project settings. SvelteKit requires Node `16.14` or later, so you should use `16` as the `NODE_VERSION` value.
+> "production" 環境と "preview" 環境のどちらにも、環境変数 `NODE_VERSION` を追加する必要があります。これは、プロジェクトセットアップ時や、後で Pages プロジェクトのセッティングで追加できます。SvelteKit は Node `16.14` 以降を要求するため、`NODE_VERSION` の値として `16` を使用する必要があります。
 
-## Environment variables
+## 環境変数
 
-The [`env`](https://developers.cloudflare.com/workers/runtime-apis/fetch-event#parameters) object, containing KV/DO namespaces etc, is passed to SvelteKit via the `platform` property along with `context` and `caches`, meaning you can access it in hooks and endpoints:
+KV/DO namespaces などを含んでいる [`env`](https://developers.cloudflare.com/workers/runtime-apis/fetch-event#parameters) オブジェクトは、`context` や `caches` と一緒に `platform` プロパティ経由で SvelteKit に渡されます。つまり、hooks とエンドポイントの中でアクセスできるということです:
 
 ```js
 // @errors: 7031
@@ -55,7 +55,7 @@ export async function POST({ request, platform }) {
 }
 ```
 
-To make these types available to your app, reference them in your `src/app.d.ts`:
+これらの型をアプリで使えるようにするには、`src/app.d.ts` でこれらを参照します:
 
 ```diff
 /// file: src/app.d.ts
@@ -69,18 +69,18 @@ declare namespace App {
 }
 ```
 
-> `platform.env` is only available in the production build. Use [wrangler](https://developers.cloudflare.com/workers/cli-wrangler) to test it locally
+> `platform.env` は本番向けビルドでのみ利用することができます。ローカルでテストするには [wrangler](https://developers.cloudflare.com/workers/cli-wrangler) を使ってください
 
 ## Notes
 
-Functions contained in the `/functions` directory at the project's root will _not_ be included in the deployment, which is compiled to a [single `_worker.js` file](https://developers.cloudflare.com/pages/platform/functions/#advanced-mode). Functions should be implemented as [server endpoints](https://kit.svelte.dev/docs/routing#server) in your SvelteKit app.
+プロジェクトの root にある `/functions` ディレクトリに含まれる関数はデプロイメントには含まれず、[1つの `_worker.js` ファイル](https://developers.cloudflare.com/pages/platform/functions/#advanced-mode)にコンパイルされます。関数は、あなたの SvelteKit アプリの [サーバーエンドポイント(server endpoints)](https://kit.svelte.jp/docs/routing#server) として実装する必要があります。
 
-The `_headers` and `_redirects` files specific to Cloudflare Pages can be used for static asset responses (like images) by putting them into the `/static` folder.
+Cloudflare Pages 固有の `_headers` ファイルと `_redirects` ファイルについては、`/static` フォルダに置くことで、静的アセットのレスポンス (画像など) に使用することができます。
 
-However, they will have no effect on responses dynamically rendered by SvelteKit, which should return custom headers or redirect responses from [server endpoints](https://kit.svelte.dev/docs/routing#server) or with the [`handle`](https://kit.svelte.dev/docs/hooks#server-hooks-handle) hook.
+しかし、SvelteKit が動的にレンダリングするレスポンスには効果がありません。この場合にカスタムヘッダーやリダイレクトレスポンスを返すには、[サーバーエンドポイント(server endpoints)](https://kit.svelte.jp/docs/routing#server) や [`handle`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) hook から返す必要があります。
 
-## Troubleshooting
+## トラブルシューティング
 
-### Accessing the file system
+### ファイルシステムにアクセスする
 
-You can't access the file system through methods like `fs.readFileSync` in Serverless/Edge environments. If you need to access files that way, do that during building the app through [prerendering](https://kit.svelte.dev/docs/page-options#prerender). If you have a blog for example and don't want to manage your content through a CMS, then you need to prerender the content (or prerender the endpoint from which you get it) and redeploy your blog everytime you add new content.
+Serverless/Edge 環境では、`fs.readFileSync` などのメソッドでファイルシステムにアクセスすることはできません。もしこのような方法でファイルにアクセスする必要がある場合、アプリのビルド中に[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)でこれを行ってください。例えば、ブログを持っていて、CMS でコンテンツを管理したくない場合、コンテンツをプリレンダリングし (またはコンテンツを取得するエンドポイントをプリレンダリングし)、新しいコンテンツを追加するたびにブログを再デプロイする必要があります。
