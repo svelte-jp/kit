@@ -16,7 +16,7 @@ SvelteKit の中心は、 _ファイルシステムベースのルーター_ で
 
 ### +page.svelte
 
-`+page.svelte` コンポーネントはアプリのページを定義します。デフォルトでは、ページは最初のリクエストではサーバー ([SSR](/docs/glossary#ssr)) でレンダリングされ、その後のナビゲーションではブラウザ ([CSR](/docs/glossary#csr-and-spa)) でレンダリングされます。
+`+page.svelte` コンポーネントはアプリのページを定義します。デフォルトでは、ページは最初のリクエストではサーバー ([SSR](/docs/glossary#ssr)) でレンダリングされ、その後のナビゲーションではブラウザ ([CSR](/docs/glossary#csr)) でレンダリングされます。
 
 ```svelte
 /// file: src/routes/+page.svelte
