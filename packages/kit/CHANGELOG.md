@@ -1,5 +1,27 @@
 # @sveltejs/kit
 
+## 1.2.2
+
+### Patch Changes
+
+- fix: focus management after navigation ([#8466](https://github.com/sveltejs/kit/pull/8466))
+
+## 1.2.1
+
+### Patch Changes
+
+- feat: throw error if cookie exceeds size limit ([#8591](https://github.com/sveltejs/kit/pull/8591))
+
+## 1.2.0
+
+### Minor Changes
+
+- feat: add `text(...)` helper for generating text responses ([#8371](https://github.com/sveltejs/kit/pull/8371))
+
+- feat: enable access to public env within app.html ([#8449](https://github.com/sveltejs/kit/pull/8449))
+
+- fix: add `Content-Length` header to SvelteKit-generated responses ([#8371](https://github.com/sveltejs/kit/pull/8371))
+
 ## 1.1.4
 
 ### Patch Changes

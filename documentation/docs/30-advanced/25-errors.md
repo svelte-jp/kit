@@ -139,14 +139,18 @@ SvelteKit が `%sveltekit.status%` と `%sveltekit.error.message%` を、それ�
 
 もし TypeScript を使用していてエラーの形式をカスタマイズする必要がある場合、アプリで `App.Error` インターフェイスを宣言することでそれができます (慣習ではこれを `src/app.d.ts` に書きますが、TypeScript が '参照' することができればどこでも構いません):
 
-```ts
+```diff
 /// file: src/app.d.ts
-declare namespace App {
-	interface Error {
-		code: string;
-		id: string;
+declare global {
+	namespace App {
+		interface Error {
++			code: string;
++			id: string;
+		}
 	}
 }
+
+export {};
 ```
 
 このインターフェイスは常に `message: string` プロパティを含んでいます。

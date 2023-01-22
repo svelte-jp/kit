@@ -148,12 +148,16 @@ export function handleFetch({ event, request, fetch }) {
 
 ```ts
 /// file: src/app.d.ts
-declare namespace App {
-	interface Error {
-		message: string;
-		errorId: string;
+declare global {
+	namespace App {
+		interface Error {
+			message: string;
+			errorId: string;
+		}
 	}
 }
+
+export {};
 ```
 
 ```js

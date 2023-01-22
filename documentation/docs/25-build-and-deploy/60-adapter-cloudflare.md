@@ -59,14 +59,18 @@ export async function POST({ request, platform }) {
 
 ```diff
 /// file: src/app.d.ts
-declare namespace App {
-	interface Platform {
-+		env?: {
-+			YOUR_KV_NAMESPACE: KVNamespace;
-+			YOUR_DURABLE_OBJECT_NAMESPACE: DurableObjectNamespace;
-+		};
+declare global {
+	namespace App {
+		interface Platform {
++			env?: {
++				YOUR_KV_NAMESPACE: KVNamespace;
++				YOUR_DURABLE_OBJECT_NAMESPACE: DurableObjectNamespace;
++			};
+		}
 	}
 }
+
+export {};
 ```
 
 > `platform.env` は本番向けビルドでのみ利用することができます。ローカルでテストするには [wrangler](https://developers.cloudflare.com/workers/cli-wrangler) を使ってください
