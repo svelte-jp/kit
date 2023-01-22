@@ -76,6 +76,15 @@ const docs_adapter_cloudflare = new Map([
 	['ファイルシステムにアクセスする', 'Accessing the file system']
 ]);
 
+const docs_adapter_cloudflare_workers = new Map([
+	['使い方', 'Usage'],
+	['基本設定', 'Basic Configuration'],
+	['カスタム設定', 'Custom config'],
+	['環境変数', 'Environment variables'],
+	['トラブルシューティング', 'Troubleshooting'],
+	['ファイルシステムにアクセスする', 'Accessing the file system']
+]);
+
 // 30-advanced
 
 const docs_advanced_routing = new Map([
@@ -183,6 +192,8 @@ export function convert_link(file, heading) {
 				return docs_adapter_static.get(heading) || heading;
 			case 'docs/25-build-and-deploy/60-adapter-cloudflare.md':
 				return docs_adapter_cloudflare.get(heading) || heading;
+			case 'docs/25-build-and-deploy/70-adapter-cloudflare-workers.md':
+				return docs_adapter_cloudflare_workers.get(heading) || heading;
 			// 30-advanced
 			case 'docs/30-advanced/10-advanced-routing.md':
 				return docs_advanced_routing.get(heading) || heading;

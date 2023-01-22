@@ -2,15 +2,15 @@
 title: Cloudflare Workers
 ---
 
-To deploy to [Cloudflare Workers](https://workers.cloudflare.com/), use [`adapter-cloudflare-workers`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers).
+[Cloudflare Workers](https://workers.cloudflare.com/) にデプロイする場合は、[`adapter-cloudflare-workers`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers) を使用します。
 
-Unless you have a specific reason to use this adapter, we recommend using [`adapter-cloudflare`](adapter-cloudflare) instead.
+この adapter を使用する特別な理由がない限り、代わりに [`adapter-cloudflare`](adapter-cloudflare) を使用することをおすすめします。
 
-> Requires [Wrangler v2](https://developers.cloudflare.com/workers/wrangler/get-started/).
+> [Wrangler v2](https://developers.cloudflare.com/workers/wrangler/get-started/) が必要です。
 
-## Usage
+## 使い方
 
-Install with `npm i -D @sveltejs/adapter-cloudflare-workers`, then add the adapter to your `svelte.config.js`:
+`npm i -D @sveltejs/adapter-cloudflare-workers` を実行してインストールし、`svelte.config.js` にこの adapter を追加します:
 
 ```js
 // @errors: 2307
@@ -24,9 +24,9 @@ export default {
 };
 ```
 
-## Basic Configuration
+## 基本設定
 
-This adapter expects to find a [wrangler.toml](https://developers.cloudflare.com/workers/platform/sites/configuration) file in the project root. It should look something like this:
+この adapter では、プロジェクトの root に [wrangler.toml](https://developers.cloudflare.com/workers/platform/sites/configuration) ファイルを置くことを想定しています。内容としては以下のようなものです:
 
 ```toml
 /// file: wrangler.toml
@@ -42,28 +42,28 @@ compatibility_date = "2021-11-12"
 workers_dev = true
 ```
 
-`<your-service-name>` can be anything. `<your-account-id>` can be found by logging into your [Cloudflare dashboard](https://dash.cloudflare.com) and grabbing it from the end of the URL:
+`<your-service-name>` は何でも構いません。`<your-account-id>` は、[Cloudflare dashboard](https://dash.cloudflare.com) にログインし、URL の末尾から取得できます:
 
 ```
 https://dash.cloudflare.com/<your-account-id>
 ```
 
-> You should add the `.cloudflare` directory (or whichever directories you specified for `main` and `site.bucket`) to your `.gitignore`.
+> `.cloudflare` ディレクトリ (または `main` と `site.bucket` に指定したディレクトリ) を `.gitignore` に追加する必要があります。
 
-You will need to install [wrangler](https://developers.cloudflare.com/workers/wrangler/get-started/) and log in, if you haven't already:
+[wrangler](https://developers.cloudflare.com/workers/wrangler/get-started/) をインストールしてログインする必要がありますが、もしまだやっていなければ:
 
 ```
 npm i -g wrangler
 wrangler login
 ```
 
-Then, you can build your app and deploy it:
+その後、アプリをビルドしデプロイすることができます:
 
 ```sh
 wrangler publish
 ```
 
-## Custom config
+## カスタム設定
 
 If you would like to use a config file other than `wrangler.toml`, you can do like so:
 
@@ -79,9 +79,9 @@ export default {
 };
 ```
 
-## Environment variables
+## 環境変数
 
-The [`env`](https://developers.cloudflare.com/workers/runtime-apis/fetch-event#parameters) object, containing KV/DO namespaces etc, is passed to SvelteKit via the `platform` property along with `context` and `caches`, meaning you can access it in hooks and endpoints:
+KV/DO namespaces などを含んでいる [`env`](https://developers.cloudflare.com/workers/runtime-apis/fetch-event#parameters) オブジェクトは、`context` や `caches` と一緒に `platform` プロパティ経由で SvelteKit に渡されます。つまり、hooks とエンドポイントの中でアクセスできるということです:
 
 ```js
 // @errors: 7031
@@ -90,7 +90,7 @@ export async function POST({ request, platform }) {
 }
 ```
 
-To make these types available to your app, reference them in your `src/app.d.ts`:
+これらの型をアプリで使えるようにするには、`src/app.d.ts` でこれらを参照します:
 
 ```diff
 /// file: src/app.d.ts
@@ -108,10 +108,10 @@ declare global {
 export {};
 ```
 
-> `platform.env` is only available in the production build. Use [wrangler](https://developers.cloudflare.com/workers/cli-wrangler) to test it locally
+> `platform.env` は本番向けビルドでのみ利用することができます。ローカルでテストするには [wrangler](https://developers.cloudflare.com/workers/cli-wrangler) を使ってください
 
-## Troubleshooting
+## トラブルシューティング
 
-### Accessing the file system
+### ファイルシステムにアクセスする
 
-You can't access the file system through methods like `fs.readFileSync` in Serverless/Edge environments. If you need to access files that way, do that during building the app through [prerendering](https://kit.svelte.dev/docs/page-options#prerender). If you have a blog for example and don't want to manage your content through a CMS, then you need to prerender the content (or prerender the endpoint from which you get it) and redeploy your blog everytime you add new content.
+Serverless/Edge 環境では、`fs.readFileSync` などのメソッドでファイルシステムにアクセスすることはできません。もしこのような方法でファイルにアクセスする必要がある場合、アプリのビルド中に[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)でこれを行ってください。例えば、ブログを持っていて、CMS でコンテンツを管理したくない場合、コンテンツをプリレンダリングし (またはコンテンツを取得するエンドポイントをプリレンダリングし)、新しいコンテンツを追加するたびにブログを再デプロイする必要があります。
