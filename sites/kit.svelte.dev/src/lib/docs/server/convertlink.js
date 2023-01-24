@@ -210,11 +210,8 @@ export function convert_link(file, heading) {
 				return docs_adapter_cloudflare_workers.get(heading) || heading;
 			case 'docs/25-build-and-deploy/80-adapter-netlify.md':
 				return docs_adapter_netlify.get(heading) || heading;
-<<<<<<< HEAD
 			case 'docs/25-build-and-deploy/90-adapter-vercel.md':
 				return docs_adapter_vercel.get(heading) || heading;
-=======
->>>>>>> upstream/master
 			// 30-advanced
 			case 'docs/30-advanced/10-advanced-routing.md':
 				return docs_advanced_routing.get(heading) || heading;
