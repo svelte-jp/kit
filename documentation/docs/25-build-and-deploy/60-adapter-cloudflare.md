@@ -4,7 +4,7 @@ title: Cloudflare Pages
 
 [Cloudflare Pages](https://developers.cloudflare.com/pages/) にデプロイする場合は、[`adapter-cloudflare`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare) を使用します。
 
-[`adapter-auto`](/docs/adapter-auto) を使用している場合、この adapter は自動でインストールされますが、プロジェクトに追加することをおすすめします。`event.platform` が自動で型付けされるからです。
+[`adapter-auto`](/docs/adapter-auto) を使用している場合、この adapter は自動でインストールされますが、それよりもこの adapter 自体をプロジェクトに追加することをおすすめします。`event.platform` が自動で型付けされるからです。
 
 ## 比較
 
