@@ -2,7 +2,7 @@
 title: ゼロコンフィグデプロイ
 ---
 
-`npm create svelte@latest` で新しい SvelteKit プロジェクトを作成した場合、デフォルトで [`adapter-auto`](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) がインストールされます。この adapter は自動で、デプロイ時に、サポートされている環境に合った adapter をインストールし、使用します:
+`npm create svelte@latest` で新しい SvelteKit プロジェクトを作成した場合、デフォルトで [`adapter-auto`](https://github.com/sveltejs/kit/tree/master/packages/adapter-auto) がインストールされます。この adapter はデプロイ時に自動でサポートされている環境に合った adapter をインストールして使用します:
 
 - [`@sveltejs/adapter-cloudflare`](adapter-cloudflare) for [Cloudflare Pages](https://developers.cloudflare.com/pages/)
 - [`@sveltejs/adapter-netlify`](adapter-netlify) for [Netlify](https://netlify.com/)

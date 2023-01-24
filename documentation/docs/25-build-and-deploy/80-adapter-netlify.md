@@ -2,13 +2,13 @@
 title: Netlify
 ---
 
-To deploy to Netlify, use [`adapter-netlify`](https://github.com/sveltejs/kit/tree/master/packages/adapter-netlify).
+Netlify にデプロイする場合は、[`adapter-netlify`](https://github.com/sveltejs/kit/tree/master/packages/adapter-netlify) を使用します。
 
-This adapter will be installed by default when you use [`adapter-auto`](/docs/adapter-auto), but adding it to your project allows you to specify Netlify-specific options.
+[`adapter-auto`](/docs/adapter-auto) を使用している場合、この adapter は自動でインストールされますが、この adapter 自体をプロジェクトに追加すれば Netlify 固有のオプションを指定できるようになります。
 
-## Usage
+## 使い方
 
-Install with `npm i -D @sveltejs/adapter-netlify`, then add the adapter to your `svelte.config.js`:
+`npm i -D @sveltejs/adapter-netlify` を実行してインストールし、`svelte.config.js` にこの adapter を追加します:
 
 ```js
 // @errors: 2307
@@ -32,7 +32,7 @@ export default {
 };
 ```
 
-Then, make sure you have a [netlify.toml](https://docs.netlify.com/configure-builds/file-based-configuration) file in the project root. This will determine where to write static assets based on the `build.publish` settings, as per this sample configuration:
+そして、プロジェクトの root に [netlify.toml](https://docs.netlify.com/configure-builds/file-based-configuration) ファイルを置くのを忘れないでください。このファイルの `build.publish` に基づいて静的なアセットをどこに書き込むか決定します。こちらのサンプルの設定をご覧ください:
 
 ```toml
 [build]
@@ -40,15 +40,15 @@ Then, make sure you have a [netlify.toml](https://docs.netlify.com/configure-bui
 	publish = "build"
 ```
 
-If the `netlify.toml` file or the `build.publish` value is missing, a default value of `"build"` will be used. Note that if you have set the publish directory in the Netlify UI to something else then you will need to set it in `netlify.toml` too, or use the default value of `"build"`.
+`netlify.toml` ファイルが見つからない、もしくは `build.publish` の値が見つからない場合、`"build"` のデフォルト値が使用されます。Netlify の UI で publish ディレクトリを他の場所に設定する場合は、`netlify.toml` にも同じ場所を設定するか、`"build"` のデフォルト値を使用する必要があることにご注意ください。
 
 ### Node version
 
-New projects will use Node 16 by default. However, if you're upgrading a project you created a while ago it may be stuck on an older version. See [the Netlify docs](https://docs.netlify.com/configure-builds/manage-dependencies/#node-js-and-javascript) for details on manually specifying Node 16 or newer.
+新しいプロジェクトではデフォルトで Node 16 が使用されます。しかし、少し前に作成したプロジェクトをアップグレードする場合、古いバージョンで止まってしまうかもしれません。手動で Node 16 以降を指定する場合、詳細は [Netlify のドキュメント](https://docs.netlify.com/configure-builds/manage-dependencies/#node-js-and-javascript)をご参照ください。
 
 ## Netlify Edge Functions (beta)
 
-SvelteKit supports the beta release of [Netlify Edge Functions](https://docs.netlify.com/netlify-labs/experimental-features/edge-functions/). If you pass the option `edge: true` to the `adapter` function, server-side rendering will happen in a Deno-based edge function that's deployed close to the site visitor. If set to `false` (the default), the site will deploy to standard Node-based Netlify Functions.
+SvelteKit は ベータリリースの [Netlify Edge Functions](https://docs.netlify.com/netlify-labs/experimental-features/edge-functions/) をサポートしています。`adapter` 関数に `edge: true` オプションを渡すと、サイト訪問者に近い場所にデプロイされる Deno ベースの edge function でサーバーサイドレンダリングが行われるようになります。`false` を設定した場合 (デフォルト)、サイトはスタンダードな Node ベースの Netlify Functions にデプロイされます。
 
 ```js
 // @errors: 2307
@@ -66,26 +66,26 @@ export default {
 };
 ```
 
-## Netlify alternatives to SvelteKit functionality
+## SvelteKit の機能を代替する Netlify の機能
 
-You may build your app using functionality provided directly by SvelteKit without relying on any Netlify functionality. Using the SvelteKit versions of these features will allow them to be used in dev mode, tested with integration tests, and to work with other adapters should you ever decide to switch away from Netlify. However, in some scenarios you may find it beneficial to use the Netlify versions of these features. One example would be if you're migrating an app that's already hosted on Netlify to SvelteKit.
+Netlify の機能に依存することなく、SvelteKit が直接提供する機能を使ってアプリを構築することができます。こういった機能は SvelteKit のほうを選択すると、開発モードでその機能を使用でき、インテグレーションテストが可能になり、Netlify から切り替えることになった場合に他の adapter で動作させることができます。しかし、シナリオによっては Netlify のほうの機能を使用したほうが有益な場合もあります。例えば、すでに Netlify でホストされているアプリを SvelteKit に移行する場合です。
 
-### Redirect rules
+### リダイレクトルール(Redirect rules)
 
-During compilation, redirect rules are automatically appended to your `_redirects` file. (If it doesn't exist yet, it will be created.) That means:
+コンパイル時に、リダイレクトルールは自動で `_redirects` ファイルに追記されます (もし存在しない場合は、作成されます)。つまり:
 
-- `[[redirects]]` in `netlify.toml` will never match as `_redirects` has a [higher priority](https://docs.netlify.com/routing/redirects/#rule-processing-order). So always put your rules in the [`_redirects` file](https://docs.netlify.com/routing/redirects/#syntax-for-the-redirects-file).
-- `_redirects` shouldn't have any custom "catch all" rules such as `/* /foobar/:splat`. Otherwise the automatically appended rule will never be applied as Netlify is only processing [the first matching rule](https://docs.netlify.com/routing/redirects/#rule-processing-order).
+- `_redirects` のほうが[優先度が高い](https://docs.netlify.com/routing/redirects/#rule-processing-order)ため、`netlify.toml` にある `[[redirects]]` には決してマッチしません。そのため、ルールは常に [`_redirects` ファイル](https://docs.netlify.com/routing/redirects/#syntax-for-the-redirects-file)に記載してください。
+- `_redirects` には、`/* /foobar/:splat` のようなカスタムの "catch all" ルールを置くべきではありません。そうしないと、自動で追加されたルールが適用されなくなります。Netlify は[最初にマッチしたルール](https://docs.netlify.com/routing/redirects/#rule-processing-order)だけを処理するからです。
 
 ### Netlify Forms
 
-1. Create your Netlify HTML form as described [here](https://docs.netlify.com/forms/setup/#html-forms), e.g. as `/routes/contact/+page.svelte`. (Don't forget to add the hidden `form-name` input element!)
-2. Netlify's build bot parses your HTML files at deploy time, which means your form must be [prerendered](https://kit.svelte.dev/docs/page-options#prerender) as HTML. You can either add `export const prerender = true` to your `contact.svelte` to prerender just that page or set the `kit.prerender.force: true` option to prerender all pages.
-3. If your Netlify form has a [custom success message](https://docs.netlify.com/forms/setup/#success-messages) like `<form netlify ... action="/success">` then ensure the corresponding `/routes/success/+page.svelte` exists and is prerendered.
+1. [こちら](https://docs.netlify.com/forms/setup/#html-forms)にあるように、例えば `/routes/contact/+page.svelte` に、Netlify HTML form を作成します。(hidden の `form-name` input 要素を追加するのを忘れずに！)
+2. Netlify の build bot はデプロイ時にあなたの HTML ファイルをパースします。つまり、あなたの form は HTML として[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)されるようにしておかないといけません。あなたの `contact.svelte` に `export const prerender = true` を追加してそのページだけプリレンダリングするか、または `kit.prerender.force: true` オプションを設定して全てのページをプリレンダリングするようにしておくか、で対応できます。
+3. あなたの Netlify form に `<form netlify ... action="/success">` のような[カスタムの成功メッセージ](https://docs.netlify.com/forms/setup/#success-messages)がある場合、それに対応する `/routes/success/+page.svelte` が存在しプリレンダリングされるか確認してください。
 
 ### Netlify Functions
 
-With this adapter, SvelteKit endpoints are hosted as [Netlify Functions](https://docs.netlify.com/functions/overview/). Netlify function handlers have additional context, including [Netlify Identity](https://docs.netlify.com/visitor-access/identity/) information. You can access this context via the `event.platform.context` field inside your hooks and `+page.server` or `+layout.server` endpoints. These are [serverless functions](https://docs.netlify.com/functions/overview/) when the `edge` property is `false` in the adapter config or [edge functions](https://docs.netlify.com/edge-functions/overview/#app) when it is `true`.
+この adapter によって、SvelteKit エンドポイントは [Netlify Functions](https://docs.netlify.com/functions/overview/) としてホストされます。Netlify function ハンドラには追加のコンテキストがあり、[Netlify Identity](https://docs.netlify.com/visitor-access/identity/) 情報が含まれています。このコンテキストは、あなたの hooks や `+page.server` と `+layout.server` エンドポイント の中で `event.platform.context` フィールドを介してアクセスできます。adapter config の `edge` プロパティが `false` の場合は[serverless functions](https://docs.netlify.com/functions/overview/)、`true` の場合は [edge functions](https://docs.netlify.com/edge-functions/overview/#app) となります。
 
 ```js
 // @errors: 2705 7006
@@ -96,7 +96,7 @@ export const load = async (event) => {
 };
 ```
 
-Additionally, you can add your own Netlify functions by creating a directory for them and adding the configuration to your `netlify.toml` file. For example:
+さらに、ディレクトリを追加して `netlify.toml` に設定を追加することで、独自の Netlify functions を追加することができます。例えば:
 
 ```toml
 [build]
@@ -107,8 +107,8 @@ Additionally, you can add your own Netlify functions by creating a directory for
 	directory = "functions"
 ```
 
-## Troubleshooting
+## トラブルシューティング
 
-### Accessing the file system
+### ファイルシステムにアクセスする
 
-You can't access the file system through methods like `fs.readFileSync` in Serverless/Edge environments. If you need to access files that way, do that during building the app through [prerendering](https://kit.svelte.dev/docs/page-options#prerender). If you have a blog for example and don't want to manage your content through a CMS, then you need to prerender the content (or prerender the endpoint from which you get it) and redeploy your blog everytime you add new content.
+Serverless/Edge 環境では、`fs.readFileSync` などのメソッドでファイルシステムにアクセスすることはできません。もしこのような方法でファイルにアクセスする必要がある場合、アプリのビルド中に[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)でこれを行ってください。例えば、ブログを持っていて、CMS でコンテンツを管理したくない場合、コンテンツをプリレンダリングし (またはコンテンツを取得するエンドポイントをプリレンダリングし)、新しいコンテンツを追加するたびにブログを再デプロイする必要があります。

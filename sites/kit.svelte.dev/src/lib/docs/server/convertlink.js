@@ -85,6 +85,13 @@ const docs_adapter_cloudflare_workers = new Map([
 	['ファイルシステムにアクセスする', 'Accessing the file system']
 ]);
 
+const docs_adapter_netlify = new Map([
+	['使い方', 'Usage'],
+	['SvelteKit の機能を代替する Netlify の機能', 'Netlify alternatives to SvelteKit functionality'],
+	['トラブルシューティング', 'Troubleshooting'],
+	['ファイルシステムにアクセスする', 'Accessing the file system']
+]);
+
 // 30-advanced
 
 const docs_advanced_routing = new Map([
@@ -194,6 +201,8 @@ export function convert_link(file, heading) {
 				return docs_adapter_cloudflare.get(heading) || heading;
 			case 'docs/25-build-and-deploy/70-adapter-cloudflare-workers.md':
 				return docs_adapter_cloudflare_workers.get(heading) || heading;
+			case 'docs/25-build-and-deploy/80-adapter-netlify.md':
+				return docs_adapter_netlify.get(heading) || heading;
 			// 30-advanced
 			case 'docs/30-advanced/10-advanced-routing.md':
 				return docs_advanced_routing.get(heading) || heading;
