@@ -92,6 +92,13 @@ const docs_adapter_netlify = new Map([
 	['ファイルシステムにアクセスする', 'Accessing the file system']
 ]);
 
+const docs_adapter_vercel = new Map([
+	['使い方', 'Usage'],
+	['環境変数', 'Environment variables'],
+	['トラブルシューティング', 'Troubleshooting'],
+	['ファイルシステムにアクセスする', 'Accessing the file system']
+]);
+
 // 30-advanced
 
 const docs_advanced_routing = new Map([
@@ -203,6 +210,8 @@ export function convert_link(file, heading) {
 				return docs_adapter_cloudflare_workers.get(heading) || heading;
 			case 'docs/25-build-and-deploy/80-adapter-netlify.md':
 				return docs_adapter_netlify.get(heading) || heading;
+			case 'docs/25-build-and-deploy/90-adapter-vercel.md':
+				return docs_adapter_vercel.get(heading) || heading;
 			// 30-advanced
 			case 'docs/30-advanced/10-advanced-routing.md':
 				return docs_advanced_routing.get(heading) || heading;
