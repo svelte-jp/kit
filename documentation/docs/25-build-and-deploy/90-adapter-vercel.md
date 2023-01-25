@@ -2,13 +2,13 @@
 title: Vercel
 ---
 
-To deploy to Vercel, use [`adapter-vercel`](https://github.com/sveltejs/kit/tree/master/packages/adapter-vercel).
+Vercel にデプロイする場合は、[`adapter-vercel`](https://github.com/sveltejs/kit/tree/master/packages/adapter-vercel) を使用します。
 
-This adapter will be installed by default when you use [`adapter-auto`](/docs/adapter-auto), but adding it to your project allows you to specify Vercel-specific options.
+[`adapter-auto`](/docs/adapter-auto) を使用している場合、この adapter は自動でインストールされますが、この adapter 自体をプロジェクトに追加すれば Vercel 固有のオプションを指定できるようになります。
 
-## Usage
+## 使い方
 
-Install with `npm i -D @sveltejs/adapter-vercel`, then add the adapter to your `svelte.config.js`:
+`npm i -D @sveltejs/adapter-vercel` を実行してインストールし、`svelte.config.js` にこの adapter を追加します:
 
 ```js
 // @errors: 2307
@@ -36,9 +36,9 @@ export default {
 };
 ```
 
-## Environment Variables
+## 環境変数
 
-Vercel makes a set of [deployment-specific environment variables](https://vercel.com/docs/concepts/projects/environment-variables#system-environment-variables) available. Like other environment variables, these are accessible from `$env/static/private` and `$env/dynamic/private` (sometimes — more on that later), and inaccessible from their public counterparts. To access one of these variables from the client:
+Vercel では[デプロイメント固有の環境変数](https://vercel.com/docs/concepts/projects/environment-variables#system-environment-variables)一式を使用できます。他の環境変数と同様、`$env/static/private` と `$env/dynamic/private` からアクセスでき (詳細は後述)、public のほうからはアクセスできません。クライアントからこれらの変数にアクセスするには:
 
 ```js
 // @errors: 2305
@@ -63,20 +63,20 @@ export function load() {
 <p>This staging environment was deployed from {data.deploymentGitBranch}.</p>
 ```
 
-Since all of these variables are unchanged between build time and run time when building on Vercel, we recommend using `$env/static/private` — which will statically replace the variables, enabling optimisations like dead code elimination — rather than `$env/dynamic/private`. If you're deploying with `edge: true` you _must_ use `$env/static/private`, as `$env/dynamic/private` and `$env/dynamic/public` are not currently populated in edge functions on Vercel.
+Vercel でビルドする場合、これらの変数は全てビルド時と実行時で変わらないため、`$env/dynamic/private` ではなく、変数を静的に置換しデッドコードの削除などの最適化ができる `$env/static/private` の使用をおすすめします。`edge: true` にしてデプロイする場合は、`$env/static/private` を使用しなければなりません。`$env/dynamic/private` と `$env/dynamic/public` は、現在のところ Vercel の edge functions では設定されないためです。
 
 ## Notes
 
 ### Vercel functions
 
-Vercel functions contained in the `/api` directory at the project's root will _not_ be included in the deployment — these should be implemented as [server endpoints](https://kit.svelte.dev/docs/routing#server) in your SvelteKit app.
+プロジェクトの root にある `/api` ディレクトリにある Vercel functions はデプロイメントに含まれません。これらは SvelteKit アプリの [サーバーエンドポイント(server endpoints)](https://kit.svelte.jp/docs/routing#server) として実装する必要があります。
 
 ### Node version
 
-Projects created before a certain date will default to using Node 14, while SvelteKit requires Node 16 or later. You can [change the Node version in your project settings](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/node-js#node.js-version).
+ある時期より前に作成されたプロジェクトはデフォルトで Node 14 を使用していますが、SvelteKit には Node 16 以降が必要です。[プロジェクトの設定で Node のバージョンを変更する](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/node-js#node.js-version)ことができます。
 
-## Troubleshooting
+## トラブルシューティング
 
-### Accessing the file system
+### ファイルシステムにアクセスする
 
-You can't access the file system through methods like `fs.readFileSync` in Serverless/Edge environments. If you need to access files that way, do that during building the app through [prerendering](https://kit.svelte.dev/docs/page-options#prerender). If you have a blog for example and don't want to manage your content through a CMS, then you need to prerender the content (or prerender the endpoint from which you get it) and redeploy your blog everytime you add new content.
+Serverless/Edge 環境では、`fs.readFileSync` などのメソッドでファイルシステムにアクセスすることはできません。もしこのような方法でファイルにアクセスする必要がある場合、アプリのビルド中に[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)でこれを行ってください。例えば、ブログを持っていて、CMS でコンテンツを管理したくない場合、コンテンツをプリレンダリングし (またはコンテンツを取得するエンドポイントをプリレンダリングし)、新しいコンテンツを追加するたびにブログを再デプロイする必要があります。
