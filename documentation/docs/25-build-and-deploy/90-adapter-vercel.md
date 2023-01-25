@@ -4,7 +4,7 @@ title: Vercel
 
 Vercel にデプロイする場合は、[`adapter-vercel`](https://github.com/sveltejs/kit/tree/master/packages/adapter-vercel) を使用します。
 
-[`adapter-auto`](/docs/adapter-auto) を使用している場合、この adapter は自動でインストールされますが、この adapter 自体をプロジェクトに追加すれば Vercel 固有のオプションを指定できるようになります。
+[`adapter-auto`](adapter-auto) を使用している場合、この adapter は自動でインストールされますが、この adapter 自体をプロジェクトに追加すれば Vercel 固有のオプションを指定できるようになります。
 
 ## 使い方
 

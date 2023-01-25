@@ -56,7 +56,6 @@ export const actions = {
 
 ```diff
 /// file: src/routes/login/+page.server.js
-
 /** @type {import('./$types').Actions} */
 export const actions = {
 -	default: async (event) => {
@@ -107,7 +106,7 @@ export const actions = {
 action はそれぞれ `RequestEvent` オブジェクトを受け取って、`request.formData()` でデータを読み込むことができます。リクエスト (例えば、cookie をセットしてユーザーをログインさせるなど) を処理したあと、action は次の更新まで、対応するページでは `form` プロパティで、アプリ全体では `$page.form` で利用可能なデータで応答することができます。
 
 ```js
-// @errors: 2339 2304
+// @errors: 2304
 /// file: src/routes/login/+page.server.js
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ cookies }) {
@@ -155,7 +154,6 @@ export const actions = {
 無効なデータが原因でリクエストが処理できなかった場合、再試行できるようにするために、直前に送信した form の値とともに validation error をユーザーに返すことができます。`fail` 関数は、HTTP ステータスコード (通常、validation error の場合は 400 か 422) をデータとともに返します。ステータスコードは `$page.status` から使用することができ、data は `form` から使用することができます:
 
 ```diff
-// @errors: 2339 2304
 /// file: src/routes/login/+page.server.js
 +import { fail } from '@sveltejs/kit';
 
@@ -211,10 +209,9 @@ export const actions = {
 
 ### Redirects
 
-redirect (と error) は [`load`](/docs/load#redirects) のそれと同じように機能します:
+redirect (と error) は [`load`](load#redirects) のそれと同じように機能します:
 
 ```diff
-// @errors: 2339 2304
 /// file: src/routes/login/+page.server.js
 +import { fail, redirect } from '@sveltejs/kit';
 
@@ -340,7 +337,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 - 成功レスポンスの場合は、`<form>` 要素をリセットして `invalidateAll` で全てのデータを無効化・最新化(invalidate)します。
 - リダイレクトレスポンスの場合は `goto` を呼び出します
 - エラーが発生した場合はもっとも近くにある `+error` 境界をレンダリングします
-- 適切な要素に [フォーカスをリセット](/docs/accessibility#focus-management) します
+- 適切な要素に [フォーカスをリセット](accessibility#focus-management) します
 
 この挙動をカスタマイズするために、form が送信される直前に実行される `SubmitFunction` 関数を提供することができます。そして (オプションで) `ActionResult` を引数に取るコールバックを返すことができます。もしコールバックを返す場合、上述のデフォルトの動作はトリガーされません。元に戻すには、`update` を呼び出してください。
 
@@ -399,7 +396,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 - `redirect` — `goto(result.location)` を呼び出します
 - `error` — もっとも近くにある `+error` 境界を `result.error` でレンダリングします
 
-いずれの場合でも、[フォーカスはリセットされます](/docs/accessibility#focus-management)。
+いずれの場合でも、[フォーカスはリセットされます](accessibility#focus-management)。
 
 ### Custom event listener
 
@@ -458,7 +455,7 @@ const response = await fetch(this.action, {
 
 ## Alternatives
 
-サーバーにデータを送信する方法として、プログレッシブな強化(progressively enhance)を行うことができるため Form actions は望ましい方法ですが、[`+server.js`](/docs/routing#server) ファイルを使用して (例えば) JSON API を公開することもできます。
+サーバーにデータを送信する方法として、プログレッシブな強化(progressively enhance)を行うことができるため Form actions は望ましい方法ですが、[`+server.js`](routing#server) ファイルを使用して (例えば) JSON API を公開することもできます。
 
 ## GET vs POST
 
@@ -475,4 +472,4 @@ const response = await fetch(this.action, {
 </form>
 ```
 
-`<a>` 要素と同じように、[`data-sveltekit-reload`](/docs/link-options#data-sveltekit-reload) 属性と [`data-sveltekit-noscroll`](/docs/link-options#data-sveltekit-noscroll) 属性を `<form>` に設定することができ、ルーターの挙動をコントロールすることができます。
+`<a>` 要素と同じように、[`data-sveltekit-reload`](link-options#data-sveltekit-reload) 属性と [`data-sveltekit-noscroll`](link-options#data-sveltekit-noscroll) 属性を `<form>` に設定することができ、ルーターの挙動をコントロールすることができます。

@@ -2,7 +2,7 @@
 title: Loading data
 ---
 
-[`+page.svelte`](/docs/routing#page-page-svelte) コンポーネント (と [`+layout.svelte`](/docs/routing#layout-layout-svelte) コンポーネント) をレンダリングする前に、データを取得する必要があるケースが多いでしょう。`load` 関数を定義することでこれができるようになります。
+[`+page.svelte`](routing#page-page-svelte) コンポーネント (と [`+layout.svelte`](routing#layout-layout-svelte) コンポーネント) をレンダリングする前に、データを取得する必要があるケースが多いでしょう。`load` 関数を定義することでこれができるようになります。
 
 ## Page data
 
@@ -57,7 +57,7 @@ export async function load({ params }) {
 }
 ```
 
-型が `PageLoad` から `PageServerLoad` に変わっていることにご注意ください。サーバー(server) `load` 関数では追加の引数にアクセスすることができます。どのような場合に `+page.js` を使用し、どのような場合に `+page.server.js` を使用するのかを理解するには、[Universal vs server](/docs/load#universal-vs-server) を参照してください。
+型が `PageLoad` から `PageServerLoad` に変わっていることにご注意ください。サーバー(server) `load` 関数では追加の引数にアクセスすることができます。どのような場合に `+page.js` を使用し、どのような場合に `+page.server.js` を使用するのかを理解するには、[Universal vs server](load#universal-vs-server) を参照してください。
 
 ## Layout data
 
@@ -192,7 +192,7 @@ export async function load() {
 
 [`URL`](https://developer.mozilla.org/ja/docs/Web/API/URL) のインスタンスで、`origin`、`hostname`、`pathname`、`searchParams` ([`URLSearchParams`](https://developer.mozilla.org/ja/docs/Web/API/URLSearchParams) オブジェクトとしてパースされたクエリ文字列を含む) を含んでいます。`url.hash` はサーバーで利用できないため、`load` 中にアクセスすることはできません。
 
-> 環境によっては、サーバーサイドレンダリング時のリクエストヘッダからこれが導出されることもあります。例えば [adapter-node](/docs/adapter-node) では、URL を正しく設定するために adapter の設定をする必要があるかもしれません。
+> 環境によっては、サーバーサイドレンダリング時のリクエストヘッダからこれが導出されることもあります。例えば [adapter-node](adapter-node) では、URL を正しく設定するために adapter の設定をする必要があるかもしれません。
 
 ### route
 
@@ -226,7 +226,7 @@ export function load({ route }) {
 - ページリクエストの `cookie` と `authorization` ヘッダーを継承するので、サーバー上でクレデンシャル付きのリクエストを行うことができます
 - サーバー上で、相対パスのリクエストを行うことができます (通常、`fetch` はサーバーのコンテキストで使用する場合にはオリジン付きの URL が必要です)
 - サーバーで動作している場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません
-- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](/docs/hooks#server-hooks-handle) で明示的に指定されない限り、シリアライズされないことにご注意ください。そして、ハイドレーション中は、レスポンスは HTML から読み込まれるため、一貫性が保証され、追加のネットワークリクエストを防ぎます。もし、`load` 関数の `fetch` ではなくブラウザの `fetch` を使用しているときにブラウザコンソールに警告が出た場合は、これが理由です。
+- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](hooks#server-hooks-handle) で明示的に指定されない限り、シリアライズされないことにご注意ください。そして、ハイドレーション中は、レスポンスは HTML から読み込まれるため、一貫性が保証され、追加のネットワークリクエストを防ぎます。もし、`load` 関数の `fetch` ではなくブラウザの `fetch` を使用しているときにブラウザコンソールに警告が出た場合は、これが理由です。
 
 ```js
 /// file: src/routes/items/[id]/+page.js
@@ -243,7 +243,7 @@ export async function load({ fetch, params }) {
 
 ## Cookies and headers
 
-サーバー(server) `load` 関数では [`cookies`](/docs/types#public-types-cookies) を取得したり設定したりすることができます。
+サーバー(server) `load` 関数では [`cookies`](types#public-types-cookies) を取得したり設定したりすることができます。
 
 ```js
 /// file: src/routes/+layout.server.js
@@ -356,7 +356,7 @@ export async function load({ params, parent }) {
 
 ## Errors
 
-`load` 中にエラーがスローされた場合、最も近くにある [`+error.svelte`](/docs/routing#error) がレンダリングされます。想定されるエラーには、`@sveltejs/kit` からインポートできる `error` ヘルパーを使用して HTTP ステータスコードとオプションのメッセージを指定できます:
+`load` 中にエラーがスローされた場合、最も近くにある [`+error.svelte`](routing#error) がレンダリングされます。想定されるエラーには、`@sveltejs/kit` からインポートできる `error` ヘルパーを使用して HTTP ステータスコードとオプションのメッセージを指定できます:
 
 ```js
 /// file: src/routes/admin/+layout.server.js
@@ -386,7 +386,7 @@ export function load({ locals }) {
 }
 ```
 
-予期せぬエラーがスローされた場合、SvelteKit は [`handleError`](/docs/hooks#shared-hooks-handleerror) を呼び出し、それを 500 Internal Error として処理します。
+予期せぬエラーがスローされた場合、SvelteKit は [`handleError`](hooks#shared-hooks-handleerror) を呼び出し、それを 500 Internal Error として処理します。
 
 ## Redirects
 
@@ -498,7 +498,7 @@ export async function load() {
 
 ### Manual invalidation
 
-現在のページに適用される `load` 関数は、[`invalidate(url)`](/docs/modules#$app-navigation-invalidate) を使用することで再実行させることもできます。これは `url` に依存しているすべての `load` 関数を再実行させるものです。[`invalidateAll()`](/docs/modules#$app-navigation-invalidateall) は、すべての `load` 関数を再実行させます。
+現在のページに適用される `load` 関数は、[`invalidate(url)`](modules#$app-navigation-invalidate) を使用することで再実行させることもできます。これは `url` に依存しているすべての `load` 関数を再実行させるものです。[`invalidateAll()`](modules#$app-navigation-invalidateall) は、すべての `load` 関数を再実行させます。
 
 `load` 関数が `fetch(url)` や `depends(url)` を呼び出している場合、その `load` 関数は `url` に依存しています。`url` には `[a-z]:` から始まるカスタムの識別子を指定することができることにご注意ください:
 
@@ -544,10 +544,10 @@ export async function load({ fetch, depends }) {
 - `params` のプロパティを参照していて、その値が変更された場合
 - `url` のプロパティを参照していて (例えば `url.pathname` や `url.search`)、その値が変更された場合
 - `await parent()` を呼び出していて、親の `load` 関数が再実行されたとき
-- [`fetch`](#making-fetch-requests) や [`depends`](/docs/types#public-types-loadevent) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](/docs/modules#$app-navigation-invalidate) で無効(invalid)であるとマークされた場合
-- [`invalidateAll()`](/docs/modules#$app-navigation-invalidateall) によって全ての有効な `load` 関数が強制的に再実行された場合
+- [`fetch`](#making-fetch-requests) や [`depends`](types#public-types-loadevent) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](modules#$app-navigation-invalidate) で無効(invalid)であるとマークされた場合
+- [`invalidateAll()`](modules#$app-navigation-invalidateall) によって全ての有効な `load` 関数が強制的に再実行された場合
 
-`load` 関数の再実行は、対応する `+layout.svelte` や `+page.svelte` 内の `data` プロパティが更新されるだけで、コンポーネントは再作成されることはありません。結果として、内部の状態は保持されます。もし、この挙動がお望みでなければ、[`afterNavigate`](/docs/modules#$app-navigation-afternavigate) コールバック内でリセットしたり、コンポーネントを [`{#key ...}`](https://svelte.jp/docs#template-syntax-key) ブロックでラップしたりしてリセットすることができます。
+`load` 関数の再実行は、対応する `+layout.svelte` や `+page.svelte` 内の `data` プロパティが更新されるだけで、コンポーネントは再作成されることはありません。結果として、内部の状態は保持されます。もし、この挙動がお望みでなければ、[`afterNavigate`](modules#$app-navigation-afternavigate) コールバック内でリセットしたり、コンポーネントを [`{#key ...}`](https://svelte.jp/docs#template-syntax-key) ブロックでラップしたりしてリセットすることができます。
 
 ## 状態の共有(Shared state)
 

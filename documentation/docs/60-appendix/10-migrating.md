@@ -5,7 +5,7 @@ rank: 1
 
 SvelteKit は Sapper の後継であり、その設計の多くの要素を共有しています。
 
-もし、既存の Sapper アプリを SvelteKit に移行する予定がある場合、いくつかの変更が必要になります。移行する際には、[examples](/docs/additional-resources#examples) を見ていただくと参考になると思います。
+もし、既存の Sapper アプリを SvelteKit に移行する予定がある場合、いくつかの変更が必要になります。移行する際には、[examples](additional-resources#examples) を見ていただくと参考になると思います。
 
 ## package.json
 
@@ -19,14 +19,14 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 
 ### devDependencies
 
-`devDependencies` から `sapper` を削除し、`@sveltejs/kit` と使用予定の [adapter](/docs/adapters)に置き換えます([次のセクション](/docs/migrating#project-files-configuration)をご覧ください)。
+`devDependencies` から `sapper` を削除し、`@sveltejs/kit` と使用予定の [adapter](adapters)に置き換えます([次のセクション](migrating#project-files-configuration)をご覧ください)。
 
 ### scripts
 
 `sapper` を参照しているスクリプトを全て更新します:
 
-- `sapper build` は、Node [adapter](/docs/adapters) を使用した `vite build` に更新します 
-- `sapper export` は、static [adapter](/docs/adapters) を使用した `vite build` に更新します 
+- `sapper build` は、Node [adapter](adapters) を使用した `vite build` に更新します 
+- `sapper export` は、static [adapter](adapters) を使用した `vite build` に更新します 
 - `sapper dev` は `vite dev` に更新します
 - `node __sapper__/build` は `node build` に更新します
 
@@ -36,11 +36,11 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 
 ### Configuration
 
-[こちら](/docs/configuration)に記載されている通り、`webpack.config.js` または `rollup.config.js` を `svelte.config.js` に置き換えてください。Svelte の preprocessor オプション は `config.preprocess` に移動してください。
+[こちら](configuration)に記載されている通り、`webpack.config.js` または `rollup.config.js` を `svelte.config.js` に置き換えてください。Svelte の preprocessor オプション は `config.preprocess` に移動してください。
 
-[adapter](/docs/adapters) を追加する必要があります。`sapper build` は [adapter-node](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) とおおよそ同じで、`sapper export` は [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) とおおよそ同じですが、デプロイ先のプラットフォーム向けにデザインされた adapter を使用するのも良いでしょう。
+[adapter](adapters) を追加する必要があります。`sapper build` は [adapter-node](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) とおおよそ同じで、`sapper export` は [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) とおおよそ同じですが、デプロイ先のプラットフォーム向けにデザインされた adapter を使用するのも良いでしょう。
 
-[Vite](https://vitejs.dev) では自動的に処理されないファイルタイプのプラグインを使用している場合は、Vite において同等なことを行う方法を探し、[Vite config](/docs/project-structure#project-files-vite-config-js) に追加する必要があります。
+[Vite](https://vitejs.dev) では自動的に処理されないファイルタイプのプラグインを使用している場合は、Vite において同等なことを行う方法を探し、[Vite config](project-structure#project-files-vite-config-js) に追加する必要があります。
 
 ### src/client.js
 
@@ -52,7 +52,7 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 ### src/service-worker.js
 
-`@sapper/service-worker` からインポートするほとんどのものは、[`$service-worker`](/docs/modules#$service-worker) に同等なものがあります:
+`@sapper/service-worker` からインポートするほとんどのものは、[`$service-worker`](modules#$service-worker) に同等なものがあります:
 
 - `files` は変更されていません
 - `routes` は削除されました
@@ -67,36 +67,39 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 ### src/node_modules
 
-Sapper アプリでよくあるパターンとして、内部ライブラリを `src/node_modules` 内のディレクトリに配置する、というものがあります。これは Vite だと動作しないため、代わりに [`src/lib`](/docs/modules#$lib) を使用します。
+Sapper アプリでよくあるパターンとして、内部ライブラリを `src/node_modules` 内のディレクトリに配置する、というものがあります。これは Vite だと動作しないため、代わりに [`src/lib`](modules#$lib) を使用します。
 
 ## ページとレイアウト
 
 ### 名前が変わったファイル
 
-ルート(Routes)は曖昧さをなくすためフォルダ名のみで構成されるようになり、`+page.svelte` までのフォルダ名がルート(route)に対応するようになりました。概要は [ルーティングのドキュメント](/docs/routing) をご参照ください。以下は 新/旧 の比較です:
+ルート(Routes)は曖昧さをなくすためフォルダ名のみで構成されるようになり、`+page.svelte` までのフォルダ名がルート(route)に対応するようになりました。概要は [ルーティングのドキュメント](routing) をご参照ください。以下は 新/旧 の比較です:
 
 | Old                       | New                       |
 | ------------------------- | ------------------------- |
 | routes/about/index.svelte | routes/about/+page.svelte |
 | routes/about.svelte       | routes/about/+page.svelte |
 
-カスタムのエラーページコンポーネントは `_error.svelte` から `+error.svelte` にリネームしてください。また、どの `_layout.svelte` ファイルも、同様に `+layout.svelte` にリネームしてください。[その他のファイルは無視されます](/docs/routing#other-files).
+カスタムのエラーページコンポーネントは `_error.svelte` から `+error.svelte` にリネームしてください。また、どの `_layout.svelte` ファイルも、同様に `+layout.svelte` にリネームしてください。[その他のファイルは無視されます](routing#other-files).
 
 ### Imports
 
-`@sapper/app` からインポートしていた `goto`、`prefetch`、`prefetchRoutes` は、[`$app/navigation`](/docs/modules#$app-navigation) からインポートする `goto`、`preloadData`、`preloadCode` にそれぞれ置き換えてください。
+`@sapper/app` からインポートしていた `goto`、`prefetch`、`prefetchRoutes` は、[`$app/navigation`](modules#$app-navigation) からインポートする `goto`、`preloadData`、`preloadCode` にそれぞれ置き換えてください。
 
-`@sapper/app` からインポートしていた `stores` については置き換える必要があります — 以下の [Stores](/docs/migrating#pages-and-layouts-stores)) をご覧ください。
+`@sapper/app` からインポートしていた `stores` については置き換える必要があります — 以下の [Stores](migrating#pages-and-layouts-stores)) をご覧ください。
 
-`src/node_modules` にあるディレクトリからインポートしてたファイルは、[`$lib`](/docs/modules#$lib) からのインポートに置き換えてください。
+`src/node_modules` にあるディレクトリからインポートしてたファイルは、[`$lib`](modules#$lib) からのインポートに置き換えてください。
 
 ### Preload
 
 以前と同様に、ページやレイアウトではレンダリングが行われる前にデータをロードできる関数をエクスポートすることができます。
 
-この関数は `preload` から [`load`](/docs/load) にリネームされ、その API が変更されました。2 つの引数 — `page` と `session` — の代わりに、両方を 1 つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
+この関数は `preload` から [`load`](load) にリネームされ、その API が変更されました。2 つの引数 — `page` と `session` — の代わりに、両方を 1 つにまとめた引数と、`fetch` (`this.fetch` からの置き換え)、そして新たに `stuff` オブジェクトが追加されました。
 
-`this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。代わりに、[`fetch`](/docs/load#making-fetch-requests) を input メソッドから使用できるようになり、[`error`](/docs/load#errors) と [`redirect`](/docs/load#redirects) の両方がスローされるようになりました。.
+`this` オブジェクトはなくなり、その結果 `this.fetch`、`this.error`、`this.redirect` もなくなりました。代わりに、[`fetch`](load#making-fetch-requests) を input メソッドから使用できるようになり、[`error`](load#errors) と [`redirect`](load#redirects) の両方がスローされるようになりました。.
+This function has been renamed from `preload` to [`load`](load), it now lives in a `+page.js` (or `+layout.js`) next to its `+page.svelte` (or `+layout.svelte`), and its API has changed. Instead of two arguments — `page` and `session` — there is a single `event` argument.
+
+There is no more `this` object, and consequently no `this.fetch`, `this.error` or `this.redirect`. Instead, you can get [`fetch`](load#making-fetch-requests) from the input methods, and both [`error`](load#errors) and [`redirect`](load#redirects) are now thrown.
 
 ### Stores
 
@@ -114,11 +117,11 @@ const { preloading, page, session } = stores();
 
 `page` と `session` ストアはまだ存在しています。`preloading` は、`from` プロパティと `to` プロパティを含む `navigating` ストアに置き換えられました。`page` は `url`、`params` を持つようになりましたが、`path` と `query` はありません。
 
-SvelteKit では、それらにアクセスする方法が異なります。`stores` は `getStores` になりましたが、[`$app/stores`](/docs/modules#$app-stores) から直接 `navigating`、`page`、`session` をインポートできるので、ほとんどの場合は必要ありません。
+SvelteKit では、それらにアクセスする方法が異なります。`stores` は `getStores` になりましたが、[`$app/stores`](modules#$app-stores) から直接 `navigating`、`page`、`session` をインポートできるので、ほとんどの場合は必要ありません。
 
 ### ルーティング
 
-ルート(routes) の正規表現はもうサポートされていません。代わりに、[advanced route matching](/docs/advanced-routing#matching) をお使いください。
+ルート(routes) の正規表現はもうサポートされていません。代わりに、[advanced route matching](advanced-routing#matching) をお使いください。
 
 ### Segments
 
@@ -137,7 +140,7 @@ Sapper では、相対 URL は、現在のページに対してではなく、ba
 
 ## Endpoints
 
-Sapper では、[サーバールート(server routes)](/docs/routing#server) は、Node の `http` モジュール によって公開される `req` と `res` オブジェクト(または Polka や Express などのフレームワークが提供するその拡張版) を受け取っていました。
+Sapper では、[サーバールート(server routes)](routing#server) は、Node の `http` モジュール によって公開される `req` と `res` オブジェクト(または Polka や Express などのフレームワークが提供するその拡張版) を受け取っていました。
 
 SvelteKit は、アプリが動作する場所に依存しないように設計されています(Node サーバーで動作し、サーバーレスプラットフォームや Cloudflare Worker でも同様に動作します)。そのため、もう `req` と `res` を直接扱いません。エンドポイントを、新しいシグネチャに合わせて更新する必要があります。
 
@@ -149,7 +152,7 @@ SvelteKit は、アプリが動作する場所に依存しないように設計�
 
 ### HTML minifier
 
-Sapper はデフォルトで `html-minifier` を含んでいました。SvelteKit はこれを含まないのですが、本番環境向けの依存関係(prod dependency)としてこれを追加し、[hook](/docs/hooks#server-hooks-handle) で使用することができます:
+Sapper はデフォルトで `html-minifier` を含んでいました。SvelteKit はこれを含まないのですが、本番環境向けの依存関係(prod dependency)としてこれを追加し、[hook](hooks#server-hooks-handle) で使用することができます:
 
 ```js
 // @filename: ambient.d.ts

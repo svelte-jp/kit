@@ -8,11 +8,11 @@ title: Errors
 
 SvelteKit は想定されるエラーと予期せぬエラーを区別します。どちらもデフォルトではシンプルな `{ message: string }` オブジェクトとして表現されます。
 
-以下の例のように、`code` やトラッキング `id` を追加することができます。(TypeScript を使用する場合、[Type safety](/docs/errors#type-safety) で説明したように `Error` 型を再定義する必要があります)
+以下の例のように、`code` やトラッキング `id` を追加することができます。(TypeScript を使用する場合、[Type safety](errors#type-safety) で説明したように `Error` 型を再定義する必要があります)
 
 ## Expected errors
 
-想定されるエラーとは、`@sveltejs/kit` からインポートされる [`error`](/docs/modules#sveltejs-kit-error) を使用して作成されるものを指します:
+想定されるエラーとは、`@sveltejs/kit` からインポートされる [`error`](modules#sveltejs-kit-error) を使用して作成されるものを指します:
 
 ```js
 /// file: src/routes/blog/[slug]/+page.server.js
@@ -40,7 +40,7 @@ export async function load({ params }) {
 }
 ```
 
-こうすると、SvelteKit はレスポンスのステータスコードを 404 に設定し、[`+error.svelte`](/docs/routing#error) コンポーネントをレンダリングします。`$page.error` は `error(...)` に第二引数として渡されたオブジェクトです。
+こうすると、SvelteKit はレスポンスのステータスコードを 404 に設定し、[`+error.svelte`](routing#error) コンポーネントをレンダリングします。`$page.error` は `error(...)` に第二引数として渡されたオブジェクトです。
 
 ```svelte
 /// file: src/routes/+error.svelte
@@ -77,7 +77,7 @@ throw error(404, {
 { "message": "Internal Error" }
 ```
 
-予期せぬエラーは [`handleError`](/docs/hooks#shared-hooks-handleerror) hook を通ります。ここで、独自のエラーハンドリングを追加することができます。例えば、レポーティングサービスにエラーを送ったり、カスタムのエラーオブジェクトを返したりすることができます。
+予期せぬエラーは [`handleError`](hooks#shared-hooks-handleerror) hook を通ります。ここで、独自のエラーハンドリングを追加することができます。例えば、レポーティングサービスにエラーを送ったり、カスタムのエラーオブジェクトを返したりすることができます。
 
 ```js
 /// file: src/hooks.server.js
@@ -110,7 +110,7 @@ export function handleError({ error, event }) {
 
 ## Responses
 
-もし `handle` の中や [`+server.js`](/docs/routing#server) リクエストハンドラの中でエラーが発生した場合、SvelteKit はリクエストの `Accept` ヘッダー に応じて、フォールバックエラーページか、エラーオブジェクトの JSON 表現をレスポンスとして返します。
+もし `handle` の中や [`+server.js`](routing#server) リクエストハンドラの中でエラーが発生した場合、SvelteKit はリクエストの `Accept` ヘッダー に応じて、フォールバックエラーページか、エラーオブジェクトの JSON 表現をレスポンスとして返します。
 
 `src/error.html` ファイルを追加することで、フォールバックエラーページをカスタマイズすることができます:
 
@@ -131,7 +131,7 @@ export function handleError({ error, event }) {
 
 SvelteKit が `%sveltekit.status%` と `%sveltekit.error.message%` を、それぞれ対応する値に置き換えます。
 
-ページのレンダリング中に `load` 関数の中でエラーが発生した場合、SvelteKit はエラーが発生した場所に最も近い [`+error.svelte`](/docs/routing#error) コンポーネントをレンダリングします。`+layout(.server).js` の `load` 関数の内側でエラーが発生した場合、ツリーの中で最も近くにあるエラー境界はそのレイアウトの上位にある `+error.svelte` ファイルです (隣ではありません)。
+ページのレンダリング中に `load` 関数の中でエラーが発生した場合、SvelteKit はエラーが発生した場所に最も近い [`+error.svelte`](routing#error) コンポーネントをレンダリングします。`+layout(.server).js` の `load` 関数の内側でエラーが発生した場合、ツリーの中で最も近くにあるエラー境界はそのレイアウトの上位にある `+error.svelte` ファイルです (隣ではありません)。
 
 例外は、最上位の `+layout.js` や `+layout.server.js` の中でエラーが発生した場合です。通常、最上位のレイアウトには `+error.svelte` コンポーネントが含まれているためです。この場合、SvelteKit はフォールバックエラーページを使用します。
 

@@ -64,7 +64,7 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 
 …リンクがクリックされたときにフルページナビゲーションが発生します。
 
-`rel="external"` 属性があるリンクも同様に扱われます。加えて、[プリレンダリング中](/docs/page-options#prerender) は無視されます。
+`rel="external"` 属性があるリンクも同様に扱われます。加えて、[プリレンダリング中](page-options#prerender) は無視されます。
 
 ## data-sveltekit-noscroll
 

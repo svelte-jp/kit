@@ -61,7 +61,7 @@ export function load(event) {
 }
 ```
 
-> もし 404 のケースをハンドリングしていない場合、[`handleError`](/docs/hooks#shared-hooks-handleerror) によって表示が行われます。
+> もし 404 のケースをハンドリングしていない場合、[`handleError`](hooks#shared-hooks-handleerror) によって表示が行われます。
 
 ## Optional parameters
 
@@ -71,7 +71,7 @@ optional のルートパラメータ(route parameter)は rest パラメータに
 
 ## マッチング(Matching)
 
-`src/routes/archive/[page]` のようなルート(route)は `/archive/3` にマッチしますが、`/archive/potato` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"3"` や `"potato"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](/docs/configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
+`src/routes/archive/[page]` のようなルート(route)は `/archive/3` にマッチしますが、`/archive/potato` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"3"` や `"potato"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
 
 ```js
 /// file: src/params/integer.js

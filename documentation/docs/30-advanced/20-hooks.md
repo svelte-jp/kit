@@ -11,7 +11,7 @@ hooks ファイルは2つあり、どちらもオプションです:
 
 これらのモジュールのコードはアプリケーションの起動時に実行されるので、データベースクライアントの初期化などに有用です。
 
-> これらのファイルの場所は [`config.kit.files.hooks`](/docs/configuration#files) で設定できます。
+> これらのファイルの場所は [`config.kit.files.hooks`](configuration#files) で設定できます。
 
 ## Server hooks
 
@@ -19,7 +19,7 @@ hooks ファイルは2つあり、どちらもオプションです:
 
 ### handle
 
-この関数は SvelteKit のサーバーが [リクエスト](/docs/web-standards#fetch-apis-request) を受けるたびに (アプリの実行中であろうと、[プリレンダリング](/docs/page-options#prerender)であろうと) 実行され、[レスポンス](/docs/web-standards#fetch-apis-response) を決定します。リクエストを表す `event` オブジェクトと、ルート(route)をレンダリングしレスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでルート(routes)を実装する場合など)。
+この関数は SvelteKit のサーバーが [リクエスト](web-standards#fetch-apis-request) を受けるたびに (アプリの実行中であろうと、[プリレンダリング](page-options#prerender)であろうと) 実行され、[レスポンス](web-standards#fetch-apis-response) を決定します。リクエストを表す `event` オブジェクトと、ルート(route)をレンダリングしレスポンスを生成する `resolve` という関数を受け取ります。これにより、レスポンスのヘッダーやボディを変更したり、SvelteKitを完全にバイパスすることができます (例えば、プログラムでルート(routes)を実装する場合など)。
 
 ```js
 /// file: src/hooks.server.js
@@ -66,7 +66,7 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-[`sequence` ヘルパー関数](/docs/modules#sveltejs-kit-hooks)を使用すると、複数の `handle` 関数を定義することができます。
+[`sequence` ヘルパー関数](modules#sveltejs-kit-hooks)を使用すると、複数の `handle` 関数を定義することができます。
 
 `resolve` はオプションの第2引数をサポートしており、レスポンスのレンダリング方法をより詳細にコントロールすることができます。そのパラメータは、以下のフィールドを持つオブジェクトです:
 
@@ -88,7 +88,7 @@ export async function handle({ event, resolve }) {
 }
 ```
 
-`resolve(...)` は決してエラーをスローせず、適切なステータスコードと `Promise<Response>` を返すことにご注意ください。もし `handle` 中に他の場所でエラーがスローされた場合、それは致命的(fatal)なものとして扱われ、SvelteKit は `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズ可能なフォールバックエラーページをレスポンスとして返します。エラーハンドリングの詳細は [こちら](/docs/errors) からお読み頂けます。
+`resolve(...)` は決してエラーをスローせず、適切なステータスコードと `Promise<Response>` を返すことにご注意ください。もし `handle` 中に他の場所でエラーがスローされた場合、それは致命的(fatal)なものとして扱われ、SvelteKit は `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズ可能なフォールバックエラーページをレスポンスとして返します。エラーハンドリングの詳細は [こちら](errors) からお読み頂けます。
 
 ### handleFetch
 
@@ -219,7 +219,7 @@ export function handleError({ error, event }) {
 
 > `src/hooks.client.js` では、`handleError` の型は `HandleServerError` ではなく `HandleClientError` で、`event` は `RequestEvent` ではなく `NavigationEvent` です。 
 
-この関数は _想定される_ エラー (`@sveltejs/kit` からインポートされる [`error`](/docs/modules#sveltejs-kit-error) 関数でスローされるエラー) の場合は呼び出されません。
+この関数は _想定される_ エラー (`@sveltejs/kit` からインポートされる [`error`](modules#sveltejs-kit-error) 関数でスローされるエラー) の場合は呼び出されません。
 
 開発中、Svelte のコードの構文エラーでエラーが発生した場合、渡される error には、エラーの場所のハイライトが付与された `frame` プロパティがあります。
 

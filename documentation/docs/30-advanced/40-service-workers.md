@@ -4,9 +4,9 @@ title: Service workers
 
 Service Worker は、アプリ内部でネットワークリクエストを処理するプロキシサーバーとして機能します。これによりアプリをオフラインで動作させることが可能になります。もしオフラインサポートが不要な場合（または構築するアプリの種類によって現実的に実装できない場合）でも、ビルドした JS と CSS を事前にキャッシュしてナビゲーションを高速化するために Service Worker を使用する価値はあります。
 
-SvelteKit では、`src/service-worker.js` ファイル (または `src/service-worker.ts` や `src/service-worker/index.js` など) がある場合、バンドルされ、自動的に登録されます。必要に応じて、[service worker の ロケーション](/docs/configuration#files) を変更することができます。 
+SvelteKit では、`src/service-worker.js` ファイル (または `src/service-worker.ts` や `src/service-worker/index.js` など) がある場合、バンドルされ、自動的に登録されます。必要に応じて、[service worker の ロケーション](configuration#files) を変更することができます。 
 
-service worker を独自のロジックで登録する必要がある場合や、その他のソリューションを使う場合は、[自動登録を無効化](/docs/configuration#serviceworker) することができます。デフォルトの登録方法は次のようなものです:
+service worker を独自のロジックで登録する必要がある場合や、その他のソリューションを使う場合は、[自動登録を無効化](configuration#serviceworker) することができます。デフォルトの登録方法は次のようなものです:
 
 ```js
 if ('serviceWorker' in navigator) {
@@ -18,7 +18,7 @@ if ('serviceWorker' in navigator) {
 
 ## service worker の内部では
 
-service worker の内部では、[`$service-worker` モジュール](/docs/modules#$service-worker) にアクセスでき、これによって全ての静的なアセット、ビルドファイル、プリレンダリングページへのパスが提供されます。また、アプリのバージョン文字列の提供され、一意なキャッシュ名を作成するのに使用することができます。Vite の設定に `define` (グローバル変数の置換に使用) を指定している場合、それはサーバー/クライアントのビルドだけでなく、service worker にも適用されます。
+service worker の内部では、[`$service-worker` モジュール](modules#$service-worker) にアクセスでき、これによって全ての静的なアセット、ビルドファイル、プリレンダリングページへのパスが提供されます。また、アプリのバージョン文字列の提供され、一意なキャッシュ名を作成するのに使用することができます。Vite の設定に `define` (グローバル変数の置換に使用) を指定している場合、それはサーバー/クライアントのビルドだけでなく、service worker にも適用されます。
 
 次の例では、ビルドされたアプリと `static` にあるファイルをすぐに(eagerly)キャッシュし、その他全てのリクエストはそれらの発生時にキャッシュします。これにより、各ページは一度アクセスするとオフラインで動作するようになります。
 

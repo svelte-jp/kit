@@ -17,7 +17,8 @@ my-project/
 │ │ └ [your routes]
 │ ├ app.html
 │ ├ error.html
-│ └ hooks.js
+│ ├ hooks.client.js
+│ └ hooks.server.js
 ├ static/
 │ └ [your static assets]
 ├ tests/
@@ -34,23 +35,24 @@ my-project/
 
 ### src
 
-`src` ディレクトリには、プロジェクトの中身が格納します。
+`src` ディレクトリには、プロジェクトの中身が格納されます。`src/routes` と `src/app.html` 以外は全て省略できます。
 
-- `lib` にはあなたのライブラリのコード (ユーティリティやコンポーネント) を格納します。格納されたコードは [`$lib`](/docs/modules#$lib) エイリアスを使用してインポートしたり、[`svelte-package`](/docs/packaging) を使用して配布用にパッケージングすることができます。
-  - `server` にはあなたのサーバー専用のライブラリのコードを格納します。格納されたコードは [`$lib/server`](/docs/server-only-modules) エイリアスを使用してインポートすることができます。SvelteKit はこれをクライアントコードにインポートされるのを防ぎます。
-- `params` にはアプリに必要な [param matchers](/docs/advanced-routing#matching) を格納します
-- `routes` にはアプリケーションの [ルート(routes)](/docs/routing) を格納します。単一のルート(route)でしか使われないコンポーネントをここに置くこともできます
+- `lib` にはあなたのライブラリのコード (ユーティリティやコンポーネント) を格納します。格納されたコードは [`$lib`](modules#$lib) エイリアスを使用してインポートしたり、[`svelte-package`](packaging) を使用して配布用にパッケージングすることができます。
+  - `server` にはあなたのサーバー専用のライブラリのコードを格納します。格納されたコードは [`$lib/server`](server-only-modules) エイリアスを使用してインポートすることができます。SvelteKit はこれをクライアントコードにインポートされるのを防ぎます。
+- `params` にはアプリに必要な [param matchers](advanced-routing#matching) を格納します
+- `routes` にはアプリケーションの [ルート(routes)](routing) を格納します。単一のルート(route)でしか使われないコンポーネントをここに置くこともできます
 - `app.html` はページのテンプレートで、以下のプレースホルダーを含む HTML document です:
   - `%sveltekit.head%` — アプリに必要な `<link>` 要素や `<script>` 要素、`<svelte:head>` コンテンツ 
   - `%sveltekit.body%` — レンダリングされるページのためのマークアップです。これを直接 `<body>` の中に置くのではなく、`<div>` または他の要素の中に置く必要があります。ブラウザ拡張(browser extensions)が要素を注入するのをハイドレーションプロセスが破壊してしまう、というバグを防ぐためです。もしこうなっていない場合、SvelteKit は開発中に警告を出します
-  - `%sveltekit.assets%` — [`paths.assets`](/docs/configuration#paths) が指定されている場合は [`paths.assets`](/docs/configuration#paths)、指定されていない場合は [`paths.base`](/docs/configuration#paths) への相対パス
-  - `%sveltekit.nonce%` — マニュアルで含めるリンクやスクリプトの [CSP](/docs/configuration#csp) nonce (使用する場合)
+  - `%sveltekit.assets%` — [`paths.assets`](configuration#paths) が指定されている場合は [`paths.assets`](configuration#paths)、指定されていない場合は [`paths.base`](configuration#paths) への相対パス
+  - `%sveltekit.nonce%` — マニュアルで含めるリンクやスクリプトの [CSP](configuration#csp) nonce (使用する場合)
   - `%sveltekit.env.[NAME]%` - これはレンダリング時に環境変数の `[NAME]` に置き換えられます。この環境変数は [`publicPrefix`](https://kit.svelte.jp/docs/configuration#env) で始まる必要があります (通常は `PUBLIC_` です)。もしマッチしない場合は `''` にフォールバックします。
-- `error.html` (optional) 全てが失敗したときにレンダリングされるページです。以下のプレースホルダーを含めることができます:
+- `error.html` は、全てが失敗したときにレンダリングされるページです。以下のプレースホルダーを含めることができます:
   - `%sveltekit.status%` — HTTP ステータス
   - `%sveltekit.error.message%` — エラーメッセージ
-- `hooks.js` (optional) アプリケーションの [hooks](/docs/hooks)
-- `service-worker.js` (optional) [service worker](/docs/service-workers)
+- `hooks.client.js` にはクライアントの [hooks](hooks) を記述します
+- `hooks.server.js` にはサーバーの [hooks](hooks) を記述します
+- `service-worker.js` には [service worker](service-workers) を記述します
 
 TypeScript を使用している場合、`.js` の代わりに `.ts` ファイルを使用することができます。
 
@@ -72,7 +74,7 @@ TypeScript を使用している場合、`.js` の代わりに `.ts` ファイ�
 
 ### svelte.config.js
 
-このファイルには Svelte と SvelteKit の [コンフィグレーション](/docs/configuration) が含まれています。
+このファイルには Svelte と SvelteKit の[設定](configuration)が含まれています。
 
 ### tsconfig.json
 
@@ -80,10 +82,10 @@ TypeScript を使用している場合、`.js` の代わりに `.ts` ファイ�
 
 ### vite.config.js
 
-SvelteKit プロジェクトは実は、[`@sveltejs/kit/vite`](/docs/modules#sveltejs-kit-vite) プラグインと、その他の [Vite の設定](https://ja.vitejs.dev/config/) をともに使用した [Vite](https://ja.vitejs.dev) プロジェクトです。
+SvelteKit プロジェクトは実は、[`@sveltejs/kit/vite`](modules#sveltejs-kit-vite) プラグインと、その他の [Vite の設定](https://ja.vitejs.dev/config/) を一緒に使用した [Vite](https://ja.vitejs.dev) プロジェクトです。
 
 ## その他のファイル
 
 ### .svelte-kit
 
-開発してプロジェクトをビルドすると、SvelteKit は `.svelte-kit` ディレクトリ ([`outDir`](/docs/configuration#outdir) で変更可能です) にファイルを生成します。その中身を気にすることなく、いつでも削除することができます (次に `dev` や `build` を実行したときに再生成されます)。
+開発してプロジェクトをビルドすると、SvelteKit は `.svelte-kit` ディレクトリ ([`outDir`](configuration#outdir) で変更可能です) にファイルを生成します。その中身を気にすることなく、いつでも削除することができます (次に `dev` や `build` を実行したときに再生成されます)。

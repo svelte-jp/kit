@@ -71,13 +71,13 @@ PROTOCOL_HEADER=x-forwarded-proto HOST_HEADER=x-forwarded-host node build
 
 > [`x-forwarded-proto`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Proto) と [`x-forwarded-host`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Host) は事実上の標準となっているヘッダーで、リバースプロキシー (ロードバランサーや CDN などを考えてみてください) を使用している場合に、オリジナルのプロトコルとホストを転送します。これらの変数は、あなたのサーバーが信頼できるリバースプロキシーの後ろにある場合にのみ設定すべきです。そうしないと、クライアントがこれらのヘッダーを偽装することが可能になってしまいます。
 
-`adapter-node` があなたのデプロイの URL を正しく判断することができない場合、[form actions](/docs/form-actions) を使用するとこのエラーが発生することがあります:
+`adapter-node` があなたのデプロイの URL を正しく判断することができない場合、[form actions](form-actions) を使用するとこのエラーが発生することがあります:
 
 > クロスサイトの POST フォーム送信は禁止されています
 
 ### `ADDRESS_HEADER` と `XFF_DEPTH`
 
-hooks とエンドポイントに渡される [RequestEvent](/docs/types#public-types-requestevent) オブジェクトにはクライアントの IP アドレスを返す `event.getClientAddress()` 関数が含まれています。デフォルトでは、これは接続中の `remoteAddress` です。もしサーバーが1つ以上のプロキシー (例えばロードバランサー) の後ろにある場合、この値はクライアントの IP アドレスではなく、最も内側にあるプロキシーの IP アドレスを含むことになるため、アドレスを読み取るために `ADDRESS_HEADER` を指定する必要があります:
+hooks とエンドポイントに渡される [RequestEvent](types#public-types-requestevent) オブジェクトにはクライアントの IP アドレスを返す `event.getClientAddress()` 関数が含まれています。デフォルトでは、これは接続中の `remoteAddress` です。もしサーバーが1つ以上のプロキシー (例えばロードバランサー) の後ろにある場合、この値はクライアントの IP アドレスではなく、最も内側にあるプロキシーの IP アドレスを含むことになるため、アドレスを読み取るために `ADDRESS_HEADER` を指定する必要があります:
 
 ```
 ADDRESS_HEADER=True-Client-IP node build
@@ -103,7 +103,7 @@ ADDRESS_HEADER=True-Client-IP node build
 
 ### `BODY_SIZE_LIMIT`
 
-ストリーミング中も含め、受け付けるリクエストボディの最大サイズを byte で指定します。デフォルトは 512kb です。もっと高度な設定が必要な場合は、このオプションの値を 0 にして無効化し、[`handle`](/docs/hooks#server-hooks-handle) にカスタムのチェックを実装することができます。
+ストリーミング中も含め、受け付けるリクエストボディの最大サイズを byte で指定します。デフォルトは 512kb です。もっと高度な設定が必要な場合は、このオプションの値を 0 にして無効化し、[`handle`](hooks#server-hooks-handle) にカスタムのチェックを実装することができます。
 
 ## Options
 
