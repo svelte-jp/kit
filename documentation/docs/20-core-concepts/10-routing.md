@@ -8,7 +8,7 @@ SvelteKit の中心は、 _ファイルシステムベースのルーター_ で
 - `src/routes/about` は `/about` ルート(route)を作成します
 - `src/routes/blog/[slug]` は _パラメータ_ `slug` を使ったルート(route)を作成します。パラメータは、ユーザーからのリクエストが `/blog/hello-world` のようなページに行われた場合に、動的にデータを読み込むために使用することができます
 
-> [プロジェクトの設定](/docs/configuration) を編集することで、`src/routes` から別のディレクトリに変更することができます。
+> [プロジェクトの設定](configuration) を編集することで、`src/routes` から別のディレクトリに変更することができます。
 
 ルート(route)のディレクトリはそれぞれ1つ以上の _ルートファイル(route files)_ を格納します。ルートファイル(route files)には `+` という接頭辞が付いているので、それで見分けることができます。
 
@@ -16,7 +16,7 @@ SvelteKit の中心は、 _ファイルシステムベースのルーター_ で
 
 ### +page.svelte
 
-`+page.svelte` コンポーネントはアプリのページを定義します。デフォルトでは、ページは最初のリクエストではサーバー ([SSR](/docs/glossary#ssr)) でレンダリングされ、その後のナビゲーションではブラウザ ([CSR](/docs/glossary#csr)) でレンダリングされます。
+`+page.svelte` コンポーネントはアプリのページを定義します。デフォルトでは、ページは最初のリクエストではサーバー ([SSR](glossary#ssr)) でレンダリングされ、その後のナビゲーションではブラウザ ([CSR](glossary#csr)) でレンダリングされます。
 
 ```svelte
 /// file: src/routes/+page.svelte
@@ -65,7 +65,7 @@ export function load({ params }) {
 }
 ```
 
-この関数は `+page.svelte` とともに実行されます。サーバーサイドレンダリング中はサーバーで実行され、クライアントサイドナビゲーション中はブラウザで実行されます。API の詳細は [`load`](/docs/load) をご参照ください。
+この関数は `+page.svelte` とともに実行されます。サーバーサイドレンダリング中はサーバーで実行され、クライアントサイドナビゲーション中はブラウザで実行されます。API の詳細は [`load`](load) をご参照ください。
 
 `+page.js` では、`load` だけでなくページの動作(behaviour)を設定するための値をエクスポートすることができます:
 
@@ -73,11 +73,11 @@ export function load({ params }) {
 - `export const ssr = true` または `false`
 - `export const csr = true` または `false`
 
-これらに関するより詳しい情報は [page options](/docs/page-options) をご覧ください。
+これらに関するより詳しい情報は [page options](page-options) をご覧ください。
 
 ### +page.server.js
 
-`load` 関数をサーバー上でのみ実行できるようにしたい場合 — 例えば、データベースからデータを取得したり、API キーのようなプライベートな[環境変数](/docs/modules#$env-static-private)にアクセスしたりする必要がある場合 — `+page.js` を `+page.server.js` にリネームし、`PageLoad` 型を `PageServerLoad` に変更します。
+`load` 関数をサーバー上でのみ実行できるようにしたい場合 — 例えば、データベースからデータを取得したり、API キーのようなプライベートな[環境変数](modules#$env-static-private)にアクセスしたりする必要がある場合 — `+page.js` を `+page.server.js` にリネームし、`PageLoad` 型を `PageServerLoad` に変更します。
 
 ```js
 /// file: src/routes/blog/[slug]/+page.server.js
@@ -108,11 +108,11 @@ export async function load({ params }) {
 }
 ```
 
-クライアントサイドナビゲーション中は、SvelteKit はサーバーからこのデータを読み込みます。つまり、その戻り値は [devalue](https://github.com/rich-harris/devalue) によってシリアライズできなければならないということです。この API の詳細については [`load`](/docs/load) をご参照ください。
+クライアントサイドナビゲーション中は、SvelteKit はサーバーからこのデータを読み込みます。つまり、その戻り値は [devalue](https://github.com/rich-harris/devalue) によってシリアライズできなければならないということです。この API の詳細については [`load`](load) をご参照ください。
 
-`+page.js` のように、`+page.server.js` は [page options](/docs/page-options) (`prerender`、`ssr`、`csr`) をエクスポートできます。
+`+page.js` のように、`+page.server.js` は [page options](page-options) (`prerender`、`ssr`、`csr`) をエクスポートできます。
 
-また、`+page.server.js` ファイルは _actions_ をエクスポートできます。`load` がサーバーからデータを読み取る場合、`actions` は `<form>` 要素を使用してサーバーにデータを書き込むことができます。これらの使い方を学ぶには、[form actions](/docs/form-actions) セクションをご参照ください。
+また、`+page.server.js` ファイルは _actions_ をエクスポートできます。`load` がサーバーからデータを読み取る場合、`actions` は `<form>` 要素を使用してサーバーにデータを書き込むことができます。これらの使い方を学ぶには、[form actions](form-actions) セクションをご参照ください。
 
 ## +error
 
@@ -133,9 +133,9 @@ SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラ�
 
 ルート(route)が見つからない場合 (404)、`src/routes/+error.svelte` (または、もしこのファイルが存在しない場合はデフォルトのエラーページ) が使われます。
 
-> エラーが [`handle`](/docs/hooks#server-hooks-handle) の内側や [+server.js](#server) リクエストハンドラ の内側で発生した場合は、`+error.svelte` は使用されません。
+> エラーが [`handle`](hooks#server-hooks-handle) の内側や [+server.js](#server) リクエストハンドラ の内側で発生した場合は、`+error.svelte` は使用されません。
 
-エラーハンドリングに関する詳細は [こちら](/docs/errors) からお読み頂けます。
+エラーハンドリングに関する詳細は [こちら](errors) からお読み頂けます。
 
 ## +layout
 
@@ -205,11 +205,11 @@ SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラ�
 <slot></slot>
 ```
 
-デフォルトでは、各レイアウトはその上にあるレイアウトを継承します。そうしたくない場合は、[advanced layouts](/docs/advanced-routing#advanced-layouts) が役に立つでしょう。
+デフォルトでは、各レイアウトはその上にあるレイアウトを継承します。そうしたくない場合は、[advanced layouts](advanced-routing#advanced-layouts) が役に立つでしょう。
 
 ### +layout.js
 
-`+page.svelte` が `+page.js` からデータを読み込むように、`+layout.svelte` コンポーネントは `+layout.js` の [`load`](/docs/load) 関数からデータを取得することができます。
+`+page.svelte` が `+page.js` からデータを読み込むように、`+layout.svelte` コンポーネントは `+layout.js` の [`load`](load) 関数からデータを取得することができます。
 
 ```js
 /// file: src/routes/settings/+layout.js
@@ -224,7 +224,7 @@ export function load() {
 }
 ```
 
-`+layout.js` が [page options](/docs/page-options) (`prerender`、`ssr`、`csr`) をエクスポートする場合、それは子ページのデフォルトとしても使用されます。
+`+layout.js` が [page options](page-options) (`prerender`、`ssr`、`csr`) をエクスポートする場合、それは子ページのデフォルトとしても使用されます。
 
 レイアウトの `load` 関数から返されるデータは全ての子ページで利用することができます:
 
@@ -238,13 +238,13 @@ export function load() {
 </script>
 ```
 
-> しばしば、ページ間をナビゲーションしているときにレイアウトデータが変更されないことがあります。SvelteKit は必要に応じてインテリジェントに [`load`](/docs/load) 関数を再実行します。
+> しばしば、ページ間をナビゲーションしているときにレイアウトデータが変更されないことがあります。SvelteKit は必要に応じてインテリジェントに [`load`](load) 関数を再実行します。
 
 ### +layout.server.js
 
 サーバー上でレイアウトの `load` 関数を実行するためには、それを `+layout.server.js` に移動し、`LayoutLoad` 型を `LayoutServerLoad` に変更します。
 
-`+layout.js` と同様に、`+layout.server.js` では [page options](/docs/page-options) — `prerender`、`ssr`、`csr` をエクスポートすることができます。
+`+layout.js` と同様に、`+layout.server.js` では [page options](page-options) — `prerender`、`ssr`、`csr` をエクスポートすることができます。
 
 ## +server
 
@@ -275,9 +275,9 @@ export function GET({ url }) {
 
 `Response` の第一引数には [`ReadableStream`](https://developer.mozilla.org/ja/docs/Web/API/ReadableStream) を指定することができ、大量のデータをストリームしたり、server-sent events を作成したりすることができます (AWS Lambda のような、レスポンスをバッファするプラットフォームにデプロイする場合は除きます)。
 
-便宜上、`@sveltejs/kit` の `error`、`redirect`、`json` メソッドを使用することは可能です (ただし、使用する必要はありません)。
+便宜上、`@sveltejs/kit` の [`error`](modules#sveltejs-kit-error)、[`redirect`](modules#sveltejs-kit-redirect)、[`json`](modules#sveltejs-kit-json) メソッドを使用することは可能です (ただし、使用する必要はありません)。
 
-エラーがスローされる場合 (`throw error(...)` によるスローや、予期せぬエラーがスローされるどちらでも)、レスポンスは `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズすることができるフォールバックエラーページとなります。この場合、[`+error.svelte`](#error) コンポーネントはレンダリングされません。エラーハンドリングに関する詳細は [こちら](/docs/errors) からお読み頂けます。
+エラーがスローされる場合 (`throw error(...)` によるスローや、予期せぬエラーがスローされるどちらでも)、レスポンスは `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズすることができるフォールバックエラーページとなります。この場合、[`+error.svelte`](#error) コンポーネントはレンダリングされません。エラーハンドリングに関する詳細は [こちら](errors) からお読み頂けます。
 
 ### Receiving data
 
@@ -321,7 +321,7 @@ export async function POST({ request }) {
 }
 ```
 
-> 一般的には、ブラウザからサーバーにデータを送信する方法としては [form actions](/docs/form-actions) のほうがより良い方法です。
+> 一般的には、ブラウザからサーバーにデータを送信する方法としては [form actions](form-actions) のほうがより良い方法です。
 
 ### Content negotiation
 
@@ -350,4 +350,4 @@ export async function POST({ request }) {
 
 ルート(route)ディレクトリ内のその他のファイルは SvelteKit から無視されます。つまり、コンポーネントやユーティリティモジュールを、それらを必要とするルート(routes)に配置することができます。
 
-コンポーネントやモジュールが複数のルート(routes)から必要な場合、[`$lib`](/docs/modules#$lib) にそれらを配置すると良いでしょう。
+コンポーネントやモジュールが複数のルート(routes)から必要な場合、[`$lib`](modules#$lib) にそれらを配置すると良いでしょう。

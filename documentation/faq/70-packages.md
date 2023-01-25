@@ -9,7 +9,7 @@ title: パッケージをインクルードしようとするとエラーが発�
 - `exports` は `main` や `module` などの他のエントリーポイントのフィールドよりも優先されます。`exports` フィールドを追加すると、deep import を妨げることになるため、後方互換性が失われる場合があります。
 - `"type": "module"` が指定されていない限り、ESM ファイルは `.mjs` で終わる必要があり、CommonJS ファイルは `.cjs` で終わる必要があります。
 -  `exports` が定義されていない場合、`main` を定義する必要があり、それは CommonJS ファイル か ESM ファイル でなければならず、前項に従わなければならない。`module` フィールドが定義されている場合、ESM ファイルを参照している必要があります。
-- Svelte コンポーネントは、コンパイルされていない `.svelte` ファイルとして配布し、パッケージに含まれる JS は ESM のみとして記述していなければなりません。TypeScript などのカスタムスクリプトや SCSS などのスタイル言語は、それぞれ vanilla JS と CSS にするために前処理(preprocess)をしなければなりません。Svelte ライブラリのパッケージングには、[`svelte-package`](/docs/packaging) を使用することを推奨しています。このパッケージによって、これらの作業が行われます。
+- Svelte コンポーネントは、コンパイルされていない `.svelte` ファイルとして配布し、パッケージに含まれる JS は ESM のみとして記述していなければなりません。TypeScript などのカスタムスクリプトや SCSS などのスタイル言語は、それぞれ vanilla JS と CSS にするために前処理(preprocess)をしなければなりません。Svelte ライブラリのパッケージングには、[`svelte-package`](docs/packaging) を使用することを推奨しています。このパッケージによって、これらの作業が行われます。
 
 ライブラリが ESM バージョンを配布している場合、特に Svelte コンポーネントライブラリがその依存関係に含まれている場合、Vite を使用するとブラウザ上で最適に動作します。ライブラリの作者に ESM バージョンを提供するよう提案すると良いでしょう。しかし、CommonJS (CJS) の依存関係も上手く扱えるようにするため、デフォルトで、[`vite-plugin-svelte` が Vite にそれらを事前バンドルするよう指示します](https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/faq.md#what-is-going-on-with-vite-and-pre-bundling-dependencies)。Vite は `esbuild` を使ってそれらを ESM に変換します。
 

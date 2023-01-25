@@ -6,7 +6,7 @@ title: Server-only modules
 
 ## Private environment variables
 
-[modules](/docs/modules) セクションで説明されている `$env/static/private` モジュールと `$env/dynamic/private` モジュールは、[`hooks.server.js`](/docs/hooks#server-hooks) や [`+page.server.js`](/docs/routing#page-page-server-js) のようなサーバー上でのみ実行されるモジュールにのみインポートすることが可能です。
+[modules](modules) セクションで説明されている `$env/static/private` モジュールと `$env/dynamic/private` モジュールは、[`hooks.server.js`](hooks#server-hooks) や [`+page.server.js`](routing#page-page-server-js) のようなサーバー上でのみ実行されるモジュールにのみインポートすることが可能です。
 
 ## Your modules
 
