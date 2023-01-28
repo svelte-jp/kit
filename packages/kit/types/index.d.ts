@@ -21,16 +21,16 @@ import { SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
 export { PrerenderOption } from './private.js';
 
 /**
- * [Adapters](https://kit.svelte.jp/docs/adapters) are responsible for taking the production build and turning it into something that can be deployed to a platform of your choosing.
+ * [Adapters](https://kit.svelte.jp/docs/adapters) は、本番向けビルドを、あなたが選んだプラットフォームにデプロイできる形式に変換する役割を担います。
  */
 export interface Adapter {
 	/**
-	 * The name of the adapter, using for logging. Will typically correspond to the package name.
+	 * adapter の名前です。ログに使用されます。通常はパッケージー名と同じものになります。
 	 */
 	name: string;
 	/**
-	 * This function is called after SvelteKit has built your app.
-	 * @param builder An object provided by SvelteKit that contains methods for adapting the app
+	 * SvelteKit がアプリをビルドしたあとにこの関数が呼ばれます。
+	 * @param builder SvelteKit が提供するオブジェクトで、アプリを対象の環境に合わせる(adapt)ためのメソッドが含まれています
 	 */
 	adapt(builder: Builder): MaybePromise<void>;
 }
@@ -68,76 +68,76 @@ type UnpackValidationError<T> = T extends ActionFailure<infer X>
 	: T;
 
 /**
- * This object is passed to the `adapt` function of adapters.
- * It contains various methods and properties that are useful for adapting the app.
+ * このオブジェクトは adapter の `adapt` 関数に渡されます。
+ * アプリを対象の環境に合わせる(adapt)のに役立つ様々なメソッドとプロパティが含まれています。
  */
 export interface Builder {
-	/** Print messages to the console. `log.info` and `log.minor` are silent unless Vite's `logLevel` is `info`. */
+	/** メッセージをコンソールにプリントします。Vite の `logLevel` が `info` でない限り、`log.info` と `log.minor` はサイレントです。 */
 	log: Logger;
-	/** Remove `dir` and all its contents. */
+	/** `dir` とそのコンテンツを全て削除します。 */
 	rimraf(dir: string): void;
-	/** Create `dir` and any required parent directories. */
+	/** `dir` とそれに必要な親ディレクトリを作成します。 */
 	mkdirp(dir: string): void;
 
-	/** The fully resolved `svelte.config.js`. */
+	/** 完全に解決(resolve)された `svelte.config.js` です。 */
 	config: ValidatedConfig;
-	/** Information about prerendered pages and assets, if any. */
+	/** プリレンダリングされたページとアセット情報です (もしあれば)。 */
 	prerendered: Prerendered;
 
 	/**
-	 * Create separate functions that map to one or more routes of your app.
-	 * @param fn A function that groups a set of routes into an entry point
+	 * アプリの1つ以上のルート(routes)にマップする別の関数を作成します。
+	 * @param fn 一連のルート(routes)をエントリーポイントにまとめる関数
 	 */
 	createEntries(fn: (route: RouteDefinition) => AdapterEntry): Promise<void>;
 
 	/**
-	 * Generate a fallback page for a static webserver to use when no route is matched. Useful for single-page apps.
+	 * 静的な web サーバーが、マッチするルート(route)がない場合に使用するフォールバックページ(fallback page)を生成します。シングルページアプリにとって有用です。
 	 */
 	generateFallback(dest: string): Promise<void>;
 
 	/**
-	 * Generate a server-side manifest to initialise the SvelteKit [server](https://kit.svelte.jp/docs/types#public-types-server) with.
-	 * @param opts a relative path to the base directory of the app and optionally in which format (esm or cjs) the manifest should be generated
+	 * SvelteKit [サーバー](https://kit.svelte.jp/docs/types#public-types-server)を初期化するためのサーバーサイド manifest を生成します。
+	 * @param opts アプリのベースディレクトリに対する相対パスと、オプションで、生成される manifest の形式 (esm または cjs) を指定
 	 */
 	generateManifest(opts: { relativePath: string }): string;
 
 	/**
-	 * Resolve a path to the `name` directory inside `outDir`, e.g. `/path/to/.svelte-kit/my-adapter`.
-	 * @param name path to the file, relative to the build directory
+	 * `outDir` 内の `name` ディレクトリへのパス (例: `/path/to/.svelte-kit/my-adapter`) を解決します。
+	 * @param name ファイルへのパスで、ビルドディレクトリに対して相対
 	 */
 	getBuildDirectory(name: string): string;
-	/** Get the fully resolved path to the directory containing client-side assets, including the contents of your `static` directory. */
+	/** クライアントサイドのアセット (`static` ディレクトリのコンテンツを含む) があるディレクトリへの完全に解決されたパスを取得します。 */
 	getClientDirectory(): string;
-	/** Get the fully resolved path to the directory containing server-side code. */
+	/** サーバーサイドコードがあるディレクトリへの完全に解決されたパスを取得します。 */
 	getServerDirectory(): string;
-	/** Get the application path including any configured `base` path, e.g. `/my-base-path/_app`. */
+	/** 設定された `base` パスを含むアプリケーションパス (例: `/my-base-path/_app`) を取得します。 */
 	getAppPath(): string;
 
 	/**
-	 * Write client assets to `dest`.
-	 * @param dest the destination folder
-	 * @returns an array of files written to `dest`
+	 * クライアントのアセットを `dest` に書き込みます。
+	 * @param dest 書き込み先のフォルダ
+	 * @returns `dest` に書き込まれたファイルの配列
 	 */
 	writeClient(dest: string): string[];
 	/**
-	 * Write prerendered files to `dest`.
-	 * @param dest the destination folder
-	 * @returns an array of files written to `dest`
+	 * プリレンダリングされたファイルを `dest` に書き込みます。
+	 * @param dest 書き込み先のフォルダ
+	 * @returns `dest` に書き込まれたファイルの配列
 	 */
 	writePrerendered(dest: string): string[];
 	/**
-	 * Write server-side code to `dest`.
-	 * @param dest the destination folder
-	 * @returns an array of files written to `dest`
+	 * サーバーサイドのコードを `dest` に書き込みます。
+	 * @param dest 書き込み先のフォルダ
+	 * @returns `dest` に書き込まれたファイルの配列
 	 */
 	writeServer(dest: string): string[];
 	/**
-	 * Copy a file or directory.
-	 * @param from the source file or directory
-	 * @param to the destination file or directory
-	 * @param opts.filter a function to determine whether a file or directory should be copied
-	 * @param opts.replace a map of strings to replace
-	 * @returns an array of files that were copied
+	 * ファイルやディレクトリをコピーします。
+	 * @param from コピー元のファイルやディレクトリ
+	 * @param to コピー先のファイルやディレクトリ
+	 * @param opts.filter ファイルやディレクトリをコピーするかどうか判定するための関数
+	 * @param opts.replace 置換する文字列のマップ
+	 * @returns コピーされたファイルの配列
 	 */
 	copy(
 		from: string,
@@ -149,8 +149,8 @@ export interface Builder {
 	): string[];
 
 	/**
-	 * Compress files in `directory` with gzip and brotli, where appropriate. Generates `.gz` and `.br` files alongside the originals.
-	 * @param {string} directory The directory containing the files to be compressed
+	 * 必要に応じて、`directory` にあるファイルを gzip や brotli で圧縮します。`.gz` ファイルや `.br` ファイルはオリジナルと同じ場所に生成されます。
+	 * @param {string} directory 圧縮したいファイルを含むディレクトリ
 	 */
 	compress(directory: string): Promise<void>;
 }
@@ -185,8 +185,8 @@ export interface Config {
 export interface Cookies {
 	/**
 	 * 事前に `cookies.set` で設定された cookie や、またはリクエストヘッダーから cookie を取得します。
-	 * @param name the name of the cookie
-	 * @param opts the options, passed directly to `cookie.parse`. See documentation [here](https://github.com/jshttp/cookie#cookieparsestr-options)
+	 * @param name cookie の名前
+	 * @param opts 直接 `cookie.parse` に渡されるオプション。ドキュメントは[こちら](https://github.com/jshttp/cookie#cookieparsestr-options)
 	 */
 	get(name: string, opts?: import('cookie').CookieParseOptions): string | undefined;
 
@@ -195,19 +195,19 @@ export interface Cookies {
 	 *
 	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており (http://localhost の場合は例外として `secure` は `false` です)、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。`sameSite` オプションのデフォルトは `lax` です。
 	 *
-	 * デフォルトでは、cookie の `path` は 現在のパス名の 'directory' です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
-	 * @param name the name of the cookie
-	 * @param value the cookie value
-	 * @param opts the options, passed directory to `cookie.serialize`. See documentation [here](https://github.com/jshttp/cookie#cookieserializename-value-options)
+	 * デフォルトでは、cookie の `path` は 現在のパス名の 'ディレクトリ' です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
+	 * @param name cookie の名前
+	 * @param value cookie の値
+	 * @param opts 直接 `cookie.serialize` に渡されるオプション。ドキュメントは[こちら](https://github.com/jshttp/cookie#cookieserializename-value-options)
 	 */
 	set(name: string, value: string, opts?: import('cookie').CookieSerializeOptions): void;
 
 	/**
 	 * 値に空文字列(empty string)を設定したり、有効期限(expiry date)を過去に設定することで、cookie を削除します。
 	 *
-	 * By default, the `path` of a cookie is the 'directory' of the current pathname. In most cases you should explicitly set `path: '/'` to make the cookie available throughout your app.
-	 * @param name the name of the cookie
-	 * @param opts the options, passed directory to `cookie.serialize`. The `path` must match the path of the cookie you want to delete. See documentation [here](https://github.com/jshttp/cookie#cookieserializename-value-options)
+	 * デフォルトでは、cookie の `path` は現在のパス名の 'ディレクトリ' です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
+	 * @param name cookie の名前
+	 * @param opts 直接 `cookie.serialize` に渡されるオプション。`path` はあなたが削除したい cookie の path と一致する必要があります。ドキュメントは[こちら](https://github.com/jshttp/cookie#cookieserializename-value-options)
 	 */
 	delete(name: string, opts?: import('cookie').CookieSerializeOptions): void;
 
@@ -218,9 +218,9 @@ export interface Cookies {
 	 *
 	 * デフォルトでは、cookie の `path` は 現在のパス名です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
 	 *
-	 * @param name the name of the cookie
-	 * @param value the cookie value
-	 * @param opts the options, passed directory to `cookie.serialize`. See documentation [here](https://github.com/jshttp/cookie#cookieserializename-value-options)
+	 * @param name cookie の名前
+	 * @param value cookie の値
+	 * @param opts 直接 `cookie.serialize` に渡されるオプション。ドキュメントは[こちら](https://github.com/jshttp/cookie#cookieserializename-value-options)
 	 */
 	serialize(name: string, value: string, opts?: import('cookie').CookieSerializeOptions): string;
 }
@@ -523,10 +523,10 @@ export interface KitConfig {
 }
 
 /**
- * The [`handle`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) hook runs every time the SvelteKit server receives a [request](https://kit.svelte.jp/docs/web-standards#fetch-apis-request) and
- * determines the [response](https://kit.svelte.jp/docs/web-standards#fetch-apis-response).
- * It receives an `event` object representing the request and a function called `resolve`, which renders the route and generates a `Response`.
- * This allows you to modify response headers or bodies, or bypass SvelteKit entirely (for implementing routes programmatically, for example).
+ * [`handle`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) hook は SvelteKit サーバーが[リクエスト](https://kit.svelte.jp/docs/web-standards#fetch-apis-request)を受け取るたびに実行され、
+ * [レスポンス](https://kit.svelte.jp/docs/web-standards#fetch-apis-response)を決定します。
+ * リクエストを表す `event` オブジェクトと、`resolve` と呼ばれる、ルート(route)をレンダリングして `Response` を生成する関数を受け取ります。
+ * これによってレスポンスヘッダーとボディを変更したり、SvelteKit を完全にバイパスすることができます (例えば、プログラムによるルート(routes)実装など)。
  */
 export interface Handle {
 	(input: {
@@ -536,27 +536,27 @@ export interface Handle {
 }
 
 /**
- * The server-side [`handleError`](https://kit.svelte.jp/docs/hooks#shared-hooks-handleerror) hook runs when an unexpected error is thrown while responding to a request.
+ * サーバーサイドの [`handleError`](https://kit.svelte.jp/docs/hooks#shared-hooks-handleerror) hook は、リクエストの応答中に予期せぬエラー(unexpected error)がスローされたときに実行されます。
  *
- * If an unexpected error is thrown during loading or rendering, this function will be called with the error and the event.
- * Make sure that this function _never_ throws an error.
+ * もし予期せぬエラーが load か レンダリング中にスローされた場合、この関数はその error と event を引数に取って呼び出されます。
+ * この関数では決してエラーをスローしないようにしてください。
  */
 export interface HandleServerError {
 	(input: { error: unknown; event: RequestEvent }): MaybePromise<void | App.Error>;
 }
 
 /**
- * The client-side [`handleError`](https://kit.svelte.jp/docs/hooks#shared-hooks-handleerror) hook runs when an unexpected error is thrown while navigating.
+ * クライアントサイドの [`handleError`](https://kit.svelte.jp/docs/hooks#shared-hooks-handleerror) hook は、ナビゲーション中に予期せぬエラー(unexpected error)がスローされたときに実行されます。
  *
- * If an unexpected error is thrown during loading or the following render, this function will be called with the error and the event.
- * Make sure that this function _never_ throws an error.
+ * もし予期せぬエラーが load かその後のレンダリング中にスローされた場合、この関数はその error と error と event を引数に取って呼び出されます。
+ * この関数では決してエラーをスローしないようにしてください。
  */
 export interface HandleClientError {
 	(input: { error: unknown; event: NavigationEvent }): MaybePromise<void | App.Error>;
 }
 
 /**
- * The [`handleFetch`](https://kit.svelte.jp/docs/hooks#server-hooks-handlefetch) hook allows you to modify (or replace) a `fetch` request that happens inside a `load` function that runs on the server (or during pre-rendering)
+ * [`handleFetch`](https://kit.svelte.jp/docs/hooks#server-hooks-handlefetch) hook によって、サーバーで(またはプリレンダリング中に)実行される `load` 関数の内側で実行される `fetch` リクエストを変更 (または置換) することができます
  */
 export interface HandleFetch {
 	(input: { event: RequestEvent; request: Request; fetch: typeof fetch }): MaybePromise<Response>;
@@ -577,8 +577,8 @@ export interface Load<
 }
 
 /**
- * The generic form of `PageLoadEvent` and `LayoutLoadEvent`. You should import those from `./$types` (see [generated types](https://kit.svelte.jp/docs/types#generated-types))
- * rather than using `LoadEvent` directly.
+ * `PageLoadEvent` と `LayoutLoadEvent` のジェネリック型。`LoadEvent` を直接使用するのではなく、
+ * `./$types` ([generated types](https://kit.svelte.jp/docs/types#generated-types) 参照) をインポートしたほうが良いでしょう。
  */
 export interface LoadEvent<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
@@ -587,23 +587,23 @@ export interface LoadEvent<
 	RouteId extends string | null = string | null
 > extends NavigationEvent<Params, RouteId> {
 	/**
-	 * `fetch` is equivalent to the [native `fetch` web API](https://developer.mozilla.org/en-US/docs/Web/API/fetch), with a few additional features:
+	 * `fetch` は[ネイティブの `fetch` web API](https://developer.mozilla.org/en-US/docs/Web/API/fetch) と同等ですが、いくつか機能が追加されています:
 	 *
-	 * - it can be used to make credentialed requests on the server, as it inherits the `cookie` and `authorization` headers for the page request
-	 * - it can make relative requests on the server (ordinarily, `fetch` requires a URL with an origin when used in a server context)
-	 * - internal requests (e.g. for `+server.js` routes) go directly to the handler function when running on the server, without the overhead of an HTTP call
-	 * - during server-side rendering, the response will be captured and inlined into the rendered HTML. Note that headers will _not_ be serialized, unless explicitly included via [`filterSerializedResponseHeaders`](https://kit.svelte.jp/docs/hooks#server-hooks-handle)
-	 * - during hydration, the response will be read from the HTML, guaranteeing consistency and preventing an additional network request
+	 * - ページリクエストの `cookie` と `authorization` ヘッダーを継承するため、サーバー上で認証情報付きのリクエストを行うのに使用することができます。
+	 * - サーバー上で相対パスのリクエストを行うことができます (通常、`fetch` は、サーバーのコンテキストで使用する場合 origin 付きの URL が必要です)
+	 * - サーバー上で実行されている場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は、直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません。
+	 * - サーバーサイドレンダリングでは、レスポンスはキャプチャされ、レンダリングされた HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) を介して明示的に含めない限り、シリアライズされないことにご注意ください。
+	 * - ハイドレーションでは、レスポンスは HTML から読み取られるため、一貫性が保証され、追加のネットワークリクエストを防ぎます
 	 *
-	 * > Cookies will only be passed through if the target host is the same as the SvelteKit application or a more specific subdomain of it.
+	 * > Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。
 	 */
 	fetch: typeof fetch;
 	/**
-	 * Contains the data returned by the route's server `load` function (in `+layout.server.js` or `+page.server.js`), if any.
+	 * ルート(route) の、`+layout.server.js` や `+page.server.js` にあるサーバー `load` 関数から返されたデータがあれば、それが含まれます。
 	 */
 	data: Data;
 	/**
-	 * If you need to set headers for the response, you can do so using the this method. This is useful if you want the page to be cached, for example:
+	 * レスポンスにヘッダーを設定する必要がある場合、このメソッドを使ってそれを実現することができます。これはページをキャッシュさせる場合に便利です。例えば:
 	 *
 	 *	```js
 	 *	/// file: src/routes/blog/+page.js
@@ -620,30 +620,30 @@ export interface LoadEvent<
 	 *	}
 	 *	```
 	 *
-	 * Setting the same header multiple times (even in separate `load` functions) is an error — you can only set a given header once.
+	 * 同じヘッダーを複数回設定することは (たとえ別々の `load` 関数であっても) エラーとなります。指定したヘッダーを設定できるのは一度だけです。
 	 *
-	 * You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](https://kit.svelte.jp/docs/types#public-types-cookies) API in a server-only `load` function instead.
+	 * `set-cookie` ヘッダーは、`setHeaders` では追加できません。代わりに、サーバー `load` 関数で [`cookies`](https://kit.svelte.jp/docs/types#public-types-cookies) API を使用してください。
 	 *
-	 * `setHeaders` has no effect when a `load` function runs in the browser.
+	 * ブラウザで `load` 関数を実行している場合、`setHeaders` には何の効果もありません。
 	 */
 	setHeaders(headers: Record<string, string>): void;
 	/**
-	 * `await parent()` returns data from parent `+layout.js` `load` functions.
-	 * Implicitly, a missing `+layout.js` is treated as a `({ data }) => data` function, meaning that it will return and forward data from parent `+layout.server.js` files.
+	 * `await parent()` は、親の `+layout.js` の `load` 関数から data を返します。
+	 * `+layout.js` が存在しない場合は、暗黙的に `({ data }) => data` 関数として扱われます。つまり、親の `+layout.server.js` ファイルから data を返したり転送します。
 	 *
-	 * Be careful not to introduce accidental waterfalls when using `await parent()`. If for example you only want to merge parent data into the returned output, call it _after_ fetching your other data.
+	 * `await parent()` を使用する場合、偶発的なウォーターフォールを引き起こさないようにご注意ください。例えば、親の data を戻り値にマージしたいだけであれば、他のデータを取得したあとにこれを呼び出すようにしてください。
 	 */
 	parent(): Promise<ParentData>;
 	/**
-	 * This function declares that the `load` function has a _dependency_ on one or more URLs or custom identifiers, which can subsequently be used with [`invalidate()`](/docs/modules#$app-navigation-invalidate) to cause `load` to rerun.
+	 * この関数は、`load` 関数が1つ以上の URL またはカスタムの識別子に依存していることを宣言します。この依存関係は、あとで [`invalidate()`](/docs/modules#$app-navigation-invalidate) で `load` を再実行させるのに使用されます。
 	 *
-	 * Most of the time you won't need this, as `fetch` calls `depends` on your behalf — it's only necessary if you're using a custom API client that bypasses `fetch`.
+	 * `fetch` はあなたの代わりに `depends` を呼び出すので、ほとんどの場合これは必要ありません。必要になるのは、`fetch` をバイパスするカスタムの API クライアントを使用している場合のみです。
 	 *
-	 * URLs can be absolute or relative to the page being loaded, and must be [encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
+	 * URL はロードされるページに対して絶対パスか相対パスで、[エンコード](https://developer.mozilla.org/ja/docs/Glossary/percent-encoding)されている必要があります。
 	 *
-	 * Custom identifiers have to be prefixed with one or more lowercase letters followed by a colon to conform to the [URI specification](https://www.rfc-editor.org/rfc/rfc3986.html).
+	 * カスタムの識別子は、[URI 仕様](https://www.rfc-editor.org/rfc/rfc3986.html) に準拠するため、1つ以上の小文字で始まり、それに続いてコロンを付ける必要があります。
 	 *
-	 * The following example shows how to use `depends` to register a dependency on a custom identifier, which is `invalidate`d after a button click, making the `load` function rerun.
+	 * 以下の例では、`depends` を使用してカスタムの識別子を依存関係に登録する方法を示しています。これにより、ボタンがクリックされると `invalidate` が実行され、`load` 関数が再実行されます。
 	 *
 	 * ```js
 	 * /// file: src/routes/+page.js
@@ -728,57 +728,57 @@ export type NavigationType = 'enter' | 'form' | 'leave' | 'link' | 'goto' | 'pop
 
 export interface Navigation {
 	/**
-	 * Where navigation was triggered from
+	 * ナビゲーションがトリガーされた場所
 	 */
 	from: NavigationTarget | null;
 	/**
-	 * Where navigation is going to/has gone to
+	 * ナビゲーションの行き先/行った先
 	 */
 	to: NavigationTarget | null;
 	/**
-	 * The type of navigation:
-	 * - `form`: The user submitted a `<form>`
-	 * - `leave`: The user is leaving the app by closing the tab or using the back/forward buttons to go to a different document
-	 * - `link`: Navigation was triggered by a link click
-	 * - `goto`: Navigation was triggered by a `goto(...)` call or a redirect
-	 * - `popstate`: Navigation was triggered by back/forward navigation
+	 * ナビゲーションのタイプ:
+	 * - `form`: ユーザーが `<form>` を送信した場合
+	 * - `leave`: ユーザーがタブを閉じようとしたり 戻る/進む ボタンで違うドキュメントに行こうとしてアプリから離れようとした場合
+	 * - `link`: リンクがクリックされてナビゲーションがトリガーされた場合
+	 * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
+	 * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
 	 */
 	type: Omit<NavigationType, 'enter'>;
 	/**
-	 * Whether or not the navigation will result in the page being unloaded (i.e. not a client-side navigation)
+	 * ナビゲーションの結果、ページがアンロードされるかどうか (すなわちクライアントサイドナビゲーションではない)
 	 */
 	willUnload: boolean;
 	/**
-	 * In case of a history back/forward navigation, the number of steps to go back/forward
+	 * ヒストリーの 戻る/進む ナビゲーションの場合、戻る/進むのステップ数
 	 */
 	delta?: number;
 }
 
 /**
- * The argument passed to [`beforeNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-beforenavigate) callbacks.
+ * [`beforeNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-beforenavigate) コールバックに渡される引数です。
  */
 export interface BeforeNavigate extends Navigation {
 	/**
-	 * Call this to prevent the navigation from starting.
+	 * ナビゲーションを開始しないようにするためには、これを呼び出してください。
 	 */
 	cancel(): void;
 }
 
 /**
- * The argument passed to [`afterNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-afternavigate) callbacks.
+ * [`afterNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-afternavigate) コールバックに渡される引数です。
  */
 export interface AfterNavigate extends Navigation {
 	/**
-	 * The type of navigation:
-	 * - `enter`: The app has hydrated
-	 * - `form`: The user submitted a `<form>`
-	 * - `link`: Navigation was triggered by a link click
-	 * - `goto`: Navigation was triggered by a `goto(...)` call or a redirect
-	 * - `popstate`: Navigation was triggered by back/forward navigation
+	 * ナビゲーションのタイプ:
+	 * - `enter`: アプリがハイドレーションされた場合
+	 * - `form`: ユーザーが `<form>` を送信した場合
+	 * - `link`: リンクをクリックしてナビゲーションがトリガーされた場合
+	 * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
+	 * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
 	 */
 	type: Omit<NavigationType, 'leave'>;
 	/**
-	 * Since `afterNavigate` is called after a navigation completes, it will never be called with a navigation that unloads the page.
+	 * `afterNavigate` はナビゲーションの完了後に呼び出されるため、ページをアンロードするナビゲーションでは決して呼び出されません。
 	 */
 	willUnload: false;
 }
@@ -1043,8 +1043,8 @@ export interface ServerLoadEvent<
 }
 
 /**
- * Shape of a form action method that is part of `export const actions = {..}` in `+page.server.js`.
- * See [form actions](https://kit.svelte.jp/docs/form-actions) for more information.
+ * `+page.server.js` にある `export const actions = {..}` の一部である form action メソッドの形です。
+ * 詳細は [form actions](https://kit.svelte.jp/docs/form-actions) をご参照ください。
  */
 export interface Action<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
@@ -1055,8 +1055,8 @@ export interface Action<
 }
 
 /**
- * Shape of the `export const actions = {..}` object in `+page.server.js`.
- * See [form actions](https://kit.svelte.jp/docs/form-actions) for more information.
+ * `+page.server.js` にある `export const actions = {..}` オブジェクトの形です。
+ * 詳細は [form actions](https://kit.svelte.jp/docs/form-actions) をご参照ください。
  */
 export type Actions<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
@@ -1080,8 +1080,8 @@ export type ActionResult<
  * HTTP ステータスコードとオプションのメッセージで `HttpError` オブジェクトを作成します。
  * リクエストの処理中にこのオブジェクトがスローされると、SvelteKit は
  * `handleError` を呼ばずにエラーレスポンス(error response)を返します。
- * @param status The [HTTP status code](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses). Must be in the range 400-599.
- * @param body An object that conforms to the App.Error type. If a string is passed, it will be used as the message property.
+ * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)、400-599 の範囲内でなければならない。
+ * @param body App.Error 型に準拠するオブジェクト。string が渡された場合、メッセージプロパティとして使用される。
  */
 export function error(status: number, body: App.Error): HttpError;
 export function error(
@@ -1094,9 +1094,9 @@ export function error(
  * [`error`](https://kit.svelte.jp/docs/modules#sveltejs-kit-error) 関数が返すオブジェクトです
  */
 export interface HttpError {
-	/** The [HTTP status code](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses), in the range 400-599. */
+	/** [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)、400-599 の範囲内。 */
 	status: number;
-	/** The content of the error. */
+	/** エラーのコンテンツ */
 	body: App.Error;
 }
 
@@ -1136,8 +1136,8 @@ export function text(body: string, init?: ResponseInit): Response;
 
 /**
  * `ActionFailure` オブジェクトを作成します。
- * @param status The [HTTP status code](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses). Must be in the range 400-599.
- * @param data Data associated with the failure (e.g. validation errors)
+ * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)。400-599 の範囲内でなければならない。
+ * @param data 失敗(failure)に関連するデータ (例: validation errors)
  */
 export function fail<T extends Record<string, unknown> | undefined>(
 	status: number,
@@ -1149,9 +1149,9 @@ export function fail<T extends Record<string, unknown> | undefined>(
  */
 export interface ActionFailure<T extends Record<string, unknown> | undefined = undefined>
 	extends UniqueInterface {
-	/** The [HTTP status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#client_error_responses), in the range 400-599. */
+	/** [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)、400-599 の範囲内。 */
 	status: number;
-	/** Data associated with the failure (e.g. validation errors) */
+	/** 失敗(failure)に関連するデータ (例: validation errors) */
 	data: T;
 }
 
