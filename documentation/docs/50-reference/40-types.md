@@ -4,13 +4,13 @@ title: Types
 
 ## Public types
 
-The following types can be imported from `@sveltejs/kit`:
+以下の型は `@sveltejs/kit` からインポートすることができます:
 
 > TYPES: @sveltejs/kit
 
 ## Private types
 
-The following are referenced by the public types documented above, but cannot be imported directly:
+以下は上記の public types から参照されていますが、直接インポートすることはできません:
 
 > TYPES: Private types
 
