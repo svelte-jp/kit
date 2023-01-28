@@ -503,6 +503,14 @@ export interface KitConfig {
 		 */
 		files?(filepath: string): boolean;
 	};
+	typescript?: {
+		/**
+		 * A function that allows you to edit the generated `tsconfig.json`. You can mutate the config (recommended) or return a new one.
+		 * This is useful for — to example — extend a shared `tsconfig.json` in a monorepo root
+		 * @default (config) => config
+		 */
+		config?: (config: Record<string, any>) => Record<string, any> | void;
+	};
 	/**
 	 * アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、そこに古いコンテンツがある可能性があります。そうでなくとも、アプリのルートマニフェスト(route manifest)が、もう存在しない JavaScript ファイルを指している可能性があります。SvelteKit は、ここで指定された `name` (デフォルトではビルドのタイムスタンプ) を使用して新しいバージョンがデプロイされたことを検知し、従来のフルページナビゲーションにフォールバックすることにより、この問題を解決しています。
 	 *
@@ -1080,6 +1088,7 @@ export type ActionResult<
  * HTTP ステータスコードとオプションのメッセージで `HttpError` オブジェクトを作成します。
  * リクエストの処理中にこのオブジェクトがスローされると、SvelteKit は
  * `handleError` を呼ばずにエラーレスポンス(error response)を返します。
+ * スローされた redirect をキャッチしないようにしてください、意味がなくなります。
  * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)、400-599 の範囲内でなければならない。
  * @param body App.Error 型に準拠するオブジェクト。string が渡された場合、メッセージプロパティとして使用される。
  */
@@ -1102,8 +1111,9 @@ export interface HttpError {
 
 /**
  * `Redirect` オブジェクトを作成します。リクエストの処理中にスローされると、SvelteKit はリダイレクトレスポンス(redirect response)を返します。
- * @param status The [HTTP status code](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#redirection_messages). Must be in the range 300-308.
- * @param location The location to redirect to.
+ * スローされた redirect をキャッチしないようにしてください、意味がなくなります。
+ * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#redirection_messages)。300-308 の範囲内でなければならない。
+ * @param location リダイレクト先のロケーション。
  */
 export function redirect(
 	status: 300 | 301 | 302 | 303 | 304 | 305 | 306 | 307 | 308,
