@@ -48,7 +48,7 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 ### src/server.js
 
-`adapter-node` を使用する場合は、[custom server](https://github.com/sveltejs/kit/tree/master/packages/adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜならSvelteKit アプリはサーバーレス環境でも実行だからです。
+`adapter-node` を使用する場合は、[custom server](/docs/adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜならSvelteKit アプリはサーバーレス環境でも実行だからです。
 
 ### src/service-worker.js
 
