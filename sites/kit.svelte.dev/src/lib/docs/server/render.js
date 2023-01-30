@@ -54,7 +54,7 @@ export function replace_placeholders(content) {
 					if (t.name === 'Config' || t.name === 'KitConfig') {
 						// special case — we want these to be on a separate page
 						children =
-							'<div class="ts-block-property-details">\n\nSee the [configuration reference](/docs/configuration) for details.</div>';
+							'<div class="ts-block-property-details">\n\n詳細は [configuration reference](/docs/configuration) をご参照ください。</div>';
 					}
 
 					const markdown = `<div class="ts-block">${fence(t.snippet)}` + children + `</div>`;
