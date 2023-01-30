@@ -237,7 +237,7 @@ declare module '$app/navigation' {
 	 * まだ取得されていないルート(routes)のコードをプログラム的にインポートします。
 	 * 通常、後続のナビゲーションを高速にするためにこれを呼び出します。
 	 *
-	 * You can specify routes by any matching pathname such as `/about` (to match `src/routes/about.svelte`) or `/blog/*` (to match `src/routes/blog/[slug].svelte`).
+	 * You can specify routes by any matching pathname such as `/about` (to match `src/routes/about/+page.svelte`) or `/blog/*` (to match `src/routes/blog/[slug]/+page.svelte`).
 	 *
 	 * `preloadData` とは異なり、この関数は `load` 関数を呼び出しません。
 	 * モジュールのインポートが完了したときに解決される Promise を返します。

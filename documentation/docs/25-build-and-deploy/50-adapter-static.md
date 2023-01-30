@@ -137,7 +137,7 @@ export default {
 
 SPA モードで動作させる場合、最上位のレイアウト(root layout)の [`prerender`](page-options#prerender) オプションを省略することができ (または、デフォルト値の `false` を設定)、`prerender` オプションが設定されているページのみ、ビルド時にプリレンダリングされます。
 
-SvelteKit はプリレンダリング可能なページを探すためにアプリのエントリーポイントをクロールします。ブラウザから読み込めないページが原因で `svelte-kit build` が失敗する場合は、`config.kit.prerender.entries` を `[]` に設定することでこれを防ぐことができます (`config.kit.prerender.enabled` を `false` に設定してもこの効果がありますが、フォールバックページが生成されなくなってしまいます)。
+SvelteKit はプリレンダリング可能なページを探すためにアプリのエントリーポイントをクロールします。ブラウザから読み込めないページが原因で `svelte-kit build` が失敗する場合は、`config.kit.prerender.entries` を `[]` に設定することでこれを防ぐことができます。
 
 アプリの一部のみプリレンダリングをオフにすることで、その他の部分をプリレンダリングすることもできます。
 
