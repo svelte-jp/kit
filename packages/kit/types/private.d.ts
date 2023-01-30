@@ -4,22 +4,22 @@
 
 export interface AdapterEntry {
 	/**
-	 * A string that uniquely identifies an HTTP service (e.g. serverless function) and is used for deduplication.
-	 * For example, `/foo/a-[b]` and `/foo/[c]` are different routes, but would both
-	 * be represented in a Netlify _redirects file as `/foo/:param`, so they share an ID
+	 * HTTP サービス (例: serverless function) を一意に識別するための文字列で、重複を排除するために使用されます。
+	 * 例えば、`/foo/a-[b]` と `/foo/[c]` は別のルート(routes)ですが、
+	 * Netlify の _redirects ファイルではどちらも `/foo/:param` として表現されるので、ID を共有します
 	 */
 	id: string;
 
 	/**
-	 * A function that compares the candidate route with the current route to determine
-	 * if it should be treated as a fallback for the current route. For example, `/foo/[c]`
-	 * is a fallback for `/foo/a-[b]`, and `/[...catchall]` is a fallback for all routes
+	 * 候補のルート(route)と現在のルート(route)を比較し、
+	 * 候補のルートを現在のルートのフォールバック(fallback)として扱うべきかどうかを判断する関数です。例えば、`/foo/[c]`
+	 * は `/foo/a-[b]` のフォールバックで、`/[...catchall]` は全てのルートのフォールバックです。
 	 */
 	filter(route: RouteDefinition): boolean;
 
 	/**
-	 * A function that is invoked once the entry has been created. This is where you
-	 * should write the function to the filesystem and generate redirect manifests.
+	 * エントリーが作成されると呼び出される関数です。
+	 * ここで、関数をファイルシステムに書き込み、リダイレクトマニフェストを生成します。
 	 */
 	complete(entry: { generateManifest(opts: { relativePath: string }): string }): MaybePromise<void>;
 }
@@ -153,27 +153,27 @@ export type MaybePromise<T> = T | Promise<T>;
 
 export interface Prerendered {
 	/**
-	 * A map of `path` to `{ file }` objects, where a path like `/foo` corresponds to `foo.html` and a path like `/bar/` corresponds to `bar/index.html`.
+	 * `path` と `{ file }` オブジェクトの map で、`/foo` という path に対応する `foo.html`、`/bar/` という path に対応する `bar/index.html`、となります。
 	 */
 	pages: Map<
 		string,
 		{
-			/** The location of the .html file relative to the output directory */
+			/** .html ファイルのロケーションで、output ディレクトリからの相対です */
 			file: string;
 		}
 	>;
 	/**
-	 * A map of `path` to `{ type }` objects.
+	 * `path` と `{ type }` オブジェクトの map です。
 	 */
 	assets: Map<
 		string,
 		{
-			/** The MIME type of the asset */
+			/** アセット(asset) の MIME type です */
 			type: string;
 		}
 	>;
 	/**
-	 * A map of redirects encountered during prerendering.
+	 * プリレンダリング中に発生したリダイレクトの map です。
 	 */
 	redirects: Map<
 		string,
@@ -182,7 +182,7 @@ export interface Prerendered {
 			location: string;
 		}
 	>;
-	/** An array of prerendered paths (without trailing slashes, regardless of the trailingSlash config) */
+	/** プリレンダリングされた path の配列 (trailingSlash の設定に関わらず、末尾のスラッシュは取り除かれる) */
 	paths: string[];
 }
 

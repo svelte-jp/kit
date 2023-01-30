@@ -687,50 +687,50 @@ export interface NavigationEvent<
 	RouteId extends string | null = string | null
 > {
 	/**
-	 * The parameters of the current page - e.g. for a route like `/blog/[slug]`, a `{ slug: string }` object
+	 * 現在のページのパラメータ - 例えば `/blog/[slug]` というルート(route)の場合は、`{ slug: string }` オブジェクト
 	 */
 	params: Params;
 	/**
-	 * Info about the current route
+	 * 現在のルート(route)に関する情報
 	 */
 	route: {
 		/**
-		 * The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`
+		 * 現在のルート(route)の ID - 例えば `src/routes/blog/[slug]` の場合は、`/blog/[slug]` となる
 		 */
 		id: RouteId;
 	};
 	/**
-	 * The URL of the current page
+	 * 現在のページの URL
 	 */
 	url: URL;
 }
 
 /**
- * Information about the target of a specific navigation.
+ * 特定のナビゲーションのターゲットに関する情報
  */
 export interface NavigationTarget {
 	/**
-	 * Parameters of the target page - e.g. for a route like `/blog/[slug]`, a `{ slug: string }` object.
-	 * Is `null` if the target is not part of the SvelteKit app (could not be resolved to a route).
+	 * ターゲットページのパラメータ - 例えば `/blog/[slug]` というルート(route)の場合、`{ slug: string }` オブジェクト。
+	 * ターゲットが SvelteKit アプリではない場合 (ルート(route)として解決できない場合) は `null` となる。
 	 */
 	params: Record<string, string> | null;
 	/**
-	 * Info about the target route
+	 * ターゲットのルート(route)に関する情報
 	 */
 	route: { id: string | null };
 	/**
-	 * The URL that is navigated to
+	 * ナビゲーション先の URL
 	 */
 	url: URL;
 }
 
 /**
- * - `enter`: The app has hydrated
- * - `form`: The user submitted a `<form>`
- * - `leave`: The user is leaving the app by closing the tab or using the back/forward buttons to go to a different document
- * - `link`: Navigation was triggered by a link click
- * - `goto`: Navigation was triggered by a `goto(...)` call or a redirect
- * - `popstate`: Navigation was triggered by back/forward navigation
+ * - `enter`: アプリがハイドレーションされた場合
+ * - `form`: ユーザーが `<form>` を送信した場合
+ * - `leave`: ユーザーがタブを閉じようとしたり 戻る/進む ボタンで違うドキュメントに行こうとしてアプリから離れようとした場合
+ * - `link`: リンクをクリックしてナビゲーションがトリガーされた場合
+ * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
+ * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
  */
 export type NavigationType = 'enter' | 'form' | 'leave' | 'link' | 'goto' | 'popstate';
 
@@ -792,49 +792,49 @@ export interface AfterNavigate extends Navigation {
 }
 
 /**
- * The shape of the `$page` store
+ * `$page` store の形です
  */
 export interface Page<
 	Params extends Record<string, string> = Record<string, string>,
 	RouteId extends string | null = string | null
 > {
 	/**
-	 * The URL of the current page
+	 * 現在のページの URL
 	 */
 	url: URL;
 	/**
-	 * The parameters of the current page - e.g. for a route like `/blog/[slug]`, a `{ slug: string }` object
+	 * 現在のページのパラメータ - 例えば `/blog/[slug]` というルート(route)の場合は、`{ slug: string }` オブジェクト
 	 */
 	params: Params;
 	/**
-	 * Info about the current route
+	 * 現在のルート(route)に関する情報
 	 */
 	route: {
 		/**
-		 * The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`
+		 * 現在のルート(route)の ID - 例えば `src/routes/blog/[slug]` の場合、`/blog/[slug]` となる
 		 */
 		id: RouteId;
 	};
 	/**
-	 * Http status code of the current page
+	 * 現在のページの Http ステータスコード
 	 */
 	status: number;
 	/**
-	 * The error object of the current page, if any. Filled from the `handleError` hooks.
+	 * 現在のページのエラーオブジェクト(存在する場合)。`handleError` hook から注入される。
 	 */
 	error: App.Error | null;
 	/**
-	 * The merged result of all data from all `load` functions on the current page. You can type a common denominator through `App.PageData`.
+	 * 現在のページにおいて、全ての `load` 関数からの全ての data がマージされた結果。共通の部分については `App.PageData` を通じて型付けできます。
 	 */
 	data: App.PageData & Record<string, any>;
 	/**
-	 * Filled only after a form submission. See [form actions](https://kit.svelte.jp/docs/form-actions) for more info.
+	 * form が送信された後にのみ注入される。詳細については [form actions](https://kit.svelte.jp/docs/form-actions) を参照。
 	 */
 	form: any;
 }
 
 /**
- * The shape of a param matcher. See [matching](https://kit.svelte.jp/docs/advanced-routing#matching) for more info.
+ * param matcher の形です。詳細については [matching](https://kit.svelte.jp/docs/advanced-routing#matching) を参照。
  */
 export interface ParamMatcher {
 	(param: string): boolean;
@@ -845,50 +845,50 @@ export interface RequestEvent<
 	RouteId extends string | null = string | null
 > {
 	/**
-	 * Get or set cookies related to the current request
+	 * 現在のリクエストに関する cookie を取得または設定する
 	 */
 	cookies: Cookies;
 	/**
-	 * `fetch` is equivalent to the [native `fetch` web API](https://developer.mozilla.org/en-US/docs/Web/API/fetch), with a few additional features:
+	 * `fetch` は[ネイティブの `fetch` web API](https://developer.mozilla.org/ja/docs/Web/API/fetch) と同等ですが、いくつか機能が追加されています:
 	 *
-	 * - it can be used to make credentialed requests on the server, as it inherits the `cookie` and `authorization` headers for the page request
-	 * - it can make relative requests on the server (ordinarily, `fetch` requires a URL with an origin when used in a server context)
-	 * - internal requests (e.g. for `+server.js` routes) go directly to the handler function when running on the server, without the overhead of an HTTP call
+	 * - ページリクエストの `cookie` と `authorization` ヘッダーを継承しているため、サーバー上で認証情報付きのリクエストを行うのに使用することができます
+	 * - サーバー上で相対パスのリクエストを行うことができます (通常、`fetch` は、サーバーのコンテキストで使用する場合 origin 付きの URL が必要です)
+	 * - サーバー上で実行されている場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は、直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません
 	 *
-	 * > Cookies will only be passed through if the target host is the same as the SvelteKit application or a more specific subdomain of it.
+	 * > Cookie は、ターゲットホストが SvelteKit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。
 	 */
 	fetch: typeof fetch;
 	/**
-	 * The client's IP address, set by the adapter.
+	 * クライアントの IP アドレスで、adapter によって設定される。
 	 */
 	getClientAddress(): string;
 	/**
-	 * Contains custom data that was added to the request within the [`handle hook`](https://kit.svelte.jp/docs/hooks#server-hooks-handle).
+	 * [`handle hook`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) 内でリクエストに追加されるカスタムの data が含まれる。
 	 */
 	locals: App.Locals;
 	/**
-	 * The parameters of the current page or endpoint - e.g. for a route like `/blog/[slug]`, a `{ slug: string }` object
+	 * 現在のページやエンドポイントのパラメータ - 例えば `/blog/[slug]` というルート(route)の場合は、`{ slug: string }` オブジェクト
 	 */
 	params: Params;
 	/**
-	 * Additional data made available through the adapter.
+	 * adapter を通じて利用可能になる追加の data。
 	 */
 	platform: Readonly<App.Platform> | undefined;
 	/**
-	 * The original request object
+	 * オリジナルのリクエストオブジェクト
 	 */
 	request: Request;
 	/**
-	 * Info about the current route
+	 * 現在のルート(route)に関する情報
 	 */
 	route: {
 		/**
-		 * The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`
+		 * 現在のルート(route)の ID - 例えば `src/routes/blog/[slug]` の場合、`/blog/[slug]` となる
 		 */
 		id: RouteId;
 	};
 	/**
-	 * If you need to set headers for the response, you can do so using the this method. This is useful if you want the page to be cached, for example:
+	 * レスポンスにヘッダーを設定する必要がある場合、このメソッドを使ってそれを実現することができます。これはページをキャッシュさせる場合に便利です。例えば:
 	 *
 	 *	```js
 	 *	/// file: src/routes/blog/+page.js
@@ -905,18 +905,18 @@ export interface RequestEvent<
 	 *	}
 	 *	```
 	 *
-	 * Setting the same header multiple times (even in separate `load` functions) is an error — you can only set a given header once.
+	 * 同じヘッダーを複数回設定することは (たとえ別々の `load` 関数であっても) エラーとなります。指定したヘッダーを設定できるのは一度だけです。
 	 *
-	 * You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](https://kit.svelte.jp/docs/types#public-types-cookies) API instead.
+	 * `set-cookie` ヘッダーは、`setHeaders` では追加できません。代わりに、[`cookies`](https://kit.svelte.jp/docs/types#public-types-cookies) API を使用してください。
 	 */
 	setHeaders(headers: Record<string, string>): void;
 	/**
-	 * The URL of the current page or endpoint.
+	 * 現在のページまたはエンドポイントの URL。
 	 */
 	url: URL;
 	/**
-	 * `true` if the request comes from the client asking for `+page/layout.server.js` data. The `url` property will be stripped of the internal information
-	 * related to the data request in this case. Use this property instead if the distinction is important to you.
+	 * クライアントから `+page/layout.server.js` の data を要求するリクエストが来た場合は `true` となります。この場合、`url` プロパティからその data へのリクエストに関する内部情報が取り除かれます。
+	 * もしあなたにとってこの区別が重要な場合、このプロパティを使用してください。
 	 */
 	isDataRequest: boolean;
 }
@@ -935,23 +935,23 @@ export interface RequestHandler<
 
 export interface ResolveOptions {
 	/**
-	 * Applies custom transforms to HTML. If `done` is true, it's the final chunk. Chunks are not guaranteed to be well-formed HTML
-	 * (they could include an element's opening tag but not its closing tag, for example)
-	 * but they will always be split at sensible boundaries such as `%sveltekit.head%` or layout/page components.
-	 * @param input the html chunk and the info if this is the last chunk
+	 * カスタムの変換を HTML に適用します。`done` が true である場合、それは最後のチャンクです。チャンクが整形された HTML
+	 * であることは保証されませんが (例えば、要素の開始タグは含むが終了タグは含まれない、など)、
+	 * 常に `%sveltekit.head%` やレイアウト(layout)/ページ(page)コンポーネントなどのような理にかなった境界 (sensible boundaries) で分割されます。
+	 * @param input html のチャンクとこれが最後のチャンクかどうかの情報
 	 */
 	transformPageChunk?(input: { html: string; done: boolean }): MaybePromise<string | undefined>;
 	/**
-	 * Determines which headers should be included in serialized responses when a `load` function loads a resource with `fetch`.
-	 * By default, none will be included.
-	 * @param name header name
-	 * @param value header value
+	 * `load` 関数が `fetch` でリソースを読み込むときに、シリアライズされるレスポンスにどのヘッダーを含めるかを決定します。
+	 * デフォルトでは何も含まれません。
+	 * @param name ヘッダーの名前
+	 * @param value ヘッダーの値
 	 */
 	filterSerializedResponseHeaders?(name: string, value: string): boolean;
 	/**
-	 * Determines what should be added to the `<head>` tag to preload it.
-	 * By default, `js`, `css` and `font` files will be preloaded.
-	 * @param input the type of the file and its path
+	 * `<head>` タグにどのファイルをプリロードの対象として追加するか決定します。
+	 * デフォルトでは、`js`、`css`、`font` ファイルがプリロードされます。
+	 * @param input ファイルのタイプとそのパス
 	 */
 	preload?(input: { type: 'font' | 'css' | 'js' | 'asset'; path: string }): boolean;
 }
@@ -1005,21 +1005,21 @@ export interface ServerLoadEvent<
 	RouteId extends string | null = string | null
 > extends RequestEvent<Params, RouteId> {
 	/**
-	 * `await parent()` returns data from parent `+layout.server.js` `load` functions.
+	 * `await parent()` は、親の `+layout.server.js` の `load` 関数から data を返します。
 	 *
-	 * Be careful not to introduce accidental waterfalls when using `await parent()`. If for example you only want to merge parent data into the returned output, call it _after_ fetching your other data.
+	 * `await parent()` を使用する場合、偶発的なウォーターフォールを引き起こさないようにご注意ください。例えば、親の data を戻り値にマージしたいだけであれば、他のデータを取得したあとにこれを呼び出すようにしてください。
 	 */
 	parent(): Promise<ParentData>;
 	/**
-	 * This function declares that the `load` function has a _dependency_ on one or more URLs or custom identifiers, which can subsequently be used with [`invalidate()`](/docs/modules#$app-navigation-invalidate) to cause `load` to rerun.
+	 * この関数は、`load` 関数が1つ以上の URL またはカスタムの識別子に依存していることを宣言します。この依存関係は、あとで [`invalidate()`](/docs/modules#$app-navigation-invalidate) で `load` を再実行させるのに使用されます。
 	 *
-	 * Most of the time you won't need this, as `fetch` calls `depends` on your behalf — it's only necessary if you're using a custom API client that bypasses `fetch`.
+	 * `fetch` はあなたの代わりに `depends` を呼び出すので、ほとんどの場合これは必要ありません。必要になるのは、`fetch` をバイパスするカスタムの API クライアントを使用している場合のみです。
 	 *
-	 * URLs can be absolute or relative to the page being loaded, and must be [encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
+	 * URL はロードされるページに対して絶対パスか相対パスで、[エンコード](https://developer.mozilla.org/ja/docs/Glossary/percent-encoding)されている必要があります。
 	 *
-	 * Custom identifiers have to be prefixed with one or more lowercase letters followed by a colon to conform to the [URI specification](https://www.rfc-editor.org/rfc/rfc3986.html).
+	 * カスタムの識別子は、[URI 仕様](https://www.rfc-editor.org/rfc/rfc3986.html)に準拠するため、1つ以上の小文字で始まり、それに続いてコロンを付ける必要があります。
 	 *
-	 * The following example shows how to use `depends` to register a dependency on a custom identifier, which is `invalidate`d after a button click, making the `load` function rerun.
+	 * 以下の例では、`depends` を使用してカスタムの識別子を依存関係に登録する方法を示しています。これにより、ボタンがクリックされると `invalidate` が実行され、`load` 関数が再実行されます。
 	 *
 	 * ```js
 	 * /// file: src/routes/+page.js
@@ -1124,9 +1124,9 @@ export function redirect(
  * [`redirect`](https://kit.svelte.jp/docs/modules#sveltejs-kit-redirect) 関数が返すオブジェクトです
  */
 export interface Redirect {
-	/** The [HTTP status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#redirection_messages), in the range 300-308. */
+	/** [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#redirection_messages)。300-308 の範囲内。 */
 	status: 300 | 301 | 302 | 303 | 304 | 305 | 306 | 307 | 308;
-	/** The location to redirect to. */
+	/** リダイレクト先のロケーション。 */
 	location: string;
 }
 
@@ -1182,8 +1182,8 @@ export interface SubmitFunction<
 				action: URL;
 				result: ActionResult<Success, Invalid>;
 				/**
-				 * Call this to get the default behavior of a form submission response.
-				 * @param options Set `reset: false` if you don't want the `<form>` values to be reset after a successful submission.
+				 * フォーム送信(form submission)のレスポンスのデフォルトの動作を取得するためにこれを呼び出します。
+				 * @param options 送信(submission)に成功したあとに `<form>` の値をリセットしたくない場合は、`reset: false` を設定します。
 				 */
 				update(options?: { reset: boolean }): Promise<void>;
 		  }) => void)
