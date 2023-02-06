@@ -170,6 +170,7 @@ declare module '$app/navigation' {
 	export function disableScrollHandling(): void;
 	/**
 	 * SvelteKit が指定された `url` にナビゲーションしたときに解決する Promise を返します(ナビゲーションに失敗した場合は、Promise はリジェクトされます)。
+	 * 外部の URL の場合は、`goto(url)` を呼び出す代わりに `window.location = url` を使用してください。
 	 *
 	 * @param url Where to navigate to. Note that if you've set [`config.kit.paths.base`](https://kit.svelte.jp/docs/configuration#paths) and the URL is root-relative, you need to prepend the base path if you want to navigate within the app.
 	 * @param opts Options related to the navigation
@@ -430,4 +431,11 @@ declare module '@sveltejs/kit/vite' {
 	 */
 	export function sveltekit(): Promise<Plugin[]>;
 	export { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+}
+
+/** Internal version of $app/paths */
+declare module '$internal/paths' {
+	export const base: `/${string}`;
+	export let assets: `https://${string}` | `http://${string}`;
+	export function set_assets(path: string): void;
 }

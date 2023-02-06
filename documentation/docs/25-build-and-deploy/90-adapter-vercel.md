@@ -25,7 +25,9 @@ export default {
 			edge: false,
 
 			// an array of dependencies that esbuild should treat
-			// as external when bundling functions
+			// as external when bundling functions. this only applies
+			// to edge functions, and should only be used to exclude
+			// optional dependencies that will not run outside Node
 			external: [],
 
 			// if true, will split your app into multiple functions
@@ -69,7 +71,7 @@ Vercel でビルドする場合、これらの変数は全てビルド時と実�
 
 ### Vercel functions
 
-プロジェクトの root にある `/api` ディレクトリにある Vercel functions はデプロイメントに含まれません。これらは SvelteKit アプリの [サーバーエンドポイント(server endpoints)](https://kit.svelte.jp/docs/routing#server) として実装する必要があります。
+プロジェクトの root の `api` ディレクトリに Vercel functions がある場合、`/api/*` に対するリクエストは SvelteKit で処理されません。Vercel functions に JavaScript 以外の言語を使用する必要が無いのであれば、SvelteKit アプリの [API ルート(routes)](https://kit.svelte.jp/docs/routing#server) として実装すると良いでしょう。逆に Vercel functions に JavaScript 以外の言語を使用する必要がある場合は、SvelteKit アプリに `/api/*` ルート(routes)を含めないようにしてください。
 
 ### Node version
 
