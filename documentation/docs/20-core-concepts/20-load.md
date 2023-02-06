@@ -417,6 +417,8 @@ export function load({ locals }) {
 
 > スローされた redirect をキャッチしないようにしてください、意味がなくなります。
 
+In the browser, you can also navigate programmatically outside of a `load` function using [`goto`](modules#$app-navigation-goto) from [`$app.navigation`](modules#$app-navigation).
+
 ## Promise unwrapping
 
 トップレベルの promise は await されるので、ウォータフォールを作ることなく、複数の promise を簡単に返すことができます:

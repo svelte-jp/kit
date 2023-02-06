@@ -65,7 +65,7 @@ wrangler publish
 
 ## カスタム設定
 
-If you would like to use a config file other than `wrangler.toml`, you can do like so:
+`wrangler.toml` 以外の設定ファイルを使用したい場合は、以下のようにします:
 
 ```js
 // @errors: 2307
