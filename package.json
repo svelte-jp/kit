@@ -5,7 +5,8 @@
 	"private": true,
 	"scripts": {
 		"test": "pnpm test -r --filter=./packages/*",
-		"test:cross-platform": "pnpm -r test:cross-platform --filter=./packages/*",
+		"test:cross-platform:dev": "pnpm run --dir packages/kit test:cross-platform:dev",
+		"test:cross-platform:build": "pnpm run --dir packages/kit test:cross-platform:build",
 		"test:vite-ecosystem-ci": "pnpm test --dir packages/kit",
 		"check": "pnpm -r check",
 		"lint": "pnpm -r lint",
@@ -30,6 +31,8 @@
 		"@rollup/plugin-json": "^6.0.0",
 		"@rollup/plugin-node-resolve": "^15.0.1",
 		"@svitejs/changesets-changelog-github-compact": "^1.1.0",
+		"eslint": "^8.33.0",
+		"eslint-plugin-unicorn": "^45.0.2",
 		"playwright": "^1.29.2",
 		"prettier": "^2.8.0",
 		"rollup": "^3.7.0",
@@ -43,7 +46,7 @@
 		"textlint-rule-no-mix-dearu-desumasu": "^4.0.1",
 		"textlint-rule-preset-jtf-style": "^2.3.8"
 	},
-	"packageManager": "pnpm@7.26.2",
+	"packageManager": "pnpm@7.26.3",
 	"engines": {
 		"pnpm": "^7.0.0"
 	},

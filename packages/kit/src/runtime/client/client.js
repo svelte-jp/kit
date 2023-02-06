@@ -26,6 +26,7 @@ import { parse } from './parse.js';
 
 import Root from '__GENERATED__/root.svelte';
 import { nodes, server_loads, dictionary, matchers, hooks } from '__CLIENT__/manifest.js';
+import { base } from '$internal/paths';
 import { HttpError, Redirect } from '../control.js';
 import { stores } from './singletons.js';
 import { unwrap_promises } from '../../utils/promises.js';
@@ -66,11 +67,10 @@ function update_scroll_positions(index) {
 /**
  * @param {{
  *   target: HTMLElement;
- *   base: string;
  * }} opts
  * @returns {import('./types').Client}
  */
-export function create_client({ target, base }) {
+export function create_client({ target }) {
 	const container = __SVELTEKIT_EMBEDDED__ ? target : document.documentElement;
 	/** @type {Array<((url: URL) => boolean)>} */
 	const invalidated = [];
@@ -343,7 +343,8 @@ export function create_client({ target, base }) {
 			}
 
 			if (autoscroll) {
-				const deep_linked = url.hash && document.getElementById(url.hash.slice(1));
+				const deep_linked =
+					url.hash && document.getElementById(decodeURIComponent(url.hash.slice(1)));
 				if (scroll) {
 					scrollTo(scroll.x, scroll.y);
 				} else if (deep_linked) {
@@ -593,12 +594,17 @@ export function create_client({ target, base }) {
 					}
 
 					// we must fixup relative urls so they are resolved from the target page
-					const resolved = new URL(requested, url).href;
-					depends(resolved);
+					const resolved = new URL(requested, url);
+					depends(resolved.href);
+
+					// match ssr serialized data url, which is important to find cached responses
+					if (resolved.origin === url.origin) {
+						requested = resolved.href.slice(url.origin.length);
+					}
 
 					// prerendered pages may be served from any origin, so `initial_fetch` urls shouldn't be resolved
 					return started
-						? subsequent_fetch(requested, resolved, init)
+						? subsequent_fetch(requested, resolved.href, init)
 						: initial_fetch(requested, init);
 				},
 				setHeaders: () => {}, // noop
@@ -722,30 +728,29 @@ export function create_client({ target, base }) {
 		const url_changed = current.url ? id !== current.url.pathname + current.url.search : false;
 		const route_changed = current.route ? route.id !== current.route.id : false;
 
-		const invalid_server_nodes = loaders.reduce((acc, loader, i) => {
+		let parent_invalid = false;
+		const invalid_server_nodes = loaders.map((loader, i) => {
 			const previous = current.branch[i];
 
 			const invalid =
 				!!loader?.[0] &&
 				(previous?.loader !== loader[1] ||
-					has_changed(
-						acc.some(Boolean),
-						route_changed,
-						url_changed,
-						previous.server?.uses,
-						params
-					));
+					has_changed(parent_invalid, route_changed, url_changed, previous.server?.uses, params));
 
-			acc.push(invalid);
-			return acc;
-		}, /** @type {boolean[]} */ ([]));
+			if (invalid) {
+				// For the next one
+				parent_invalid = true;
+			}
+
+			return invalid;
+		});
 
 		if (invalid_server_nodes.some(Boolean)) {
 			try {
 				server_data = await load_data(url, invalid_server_nodes);
 			} catch (error) {
 				return load_root_error_page({
-					status: 500,
+					status: error instanceof HttpError ? error.status : 500,
 					error: await handle_error(error, { url, params, route: { id: route.id } }),
 					url,
 					route
@@ -1693,7 +1698,8 @@ async function load_data(url, invalid) {
 
 	if (!res.ok) {
 		// error message is a JSON-stringified string which devalue can't handle at the top level
-		throw new Error(data);
+		// turn it into a HttpError to not call handleError on the client again (was already handled on the server)
+		throw new HttpError(res.status, data);
 	}
 
 	// revive devalue-flattened data

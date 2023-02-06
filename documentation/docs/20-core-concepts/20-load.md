@@ -322,6 +322,7 @@ export async function load({ parent }) {
 ```
 
 ```svelte
+/// file: src/routes/abc/+page.svelte
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -417,6 +418,8 @@ export function load({ locals }) {
 
 > スローされた redirect をキャッチしないようにしてください、意味がなくなります。
 
+ブラウザでは、[`$app.navigation`](modules#$app-navigation) からインポートできる [`goto`](modules#$app-navigation-goto) を使うことで、`load` 関数の外側でプログラム的にナビゲーションを行うことができます。
+
 ## Promise unwrapping
 
 トップレベルの promise は await されるので、ウォータフォールを作ることなく、複数の promise を簡単に返すことができます:
@@ -436,6 +439,7 @@ export function load() {
 ```
 
 ```svelte
+/// file: src/routes/+page.svelte
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
