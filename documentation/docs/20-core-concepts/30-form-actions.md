@@ -365,6 +365,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 独自のコールバックを提供する場合は、最も近くにある `+error` 境界を表示するなど、デフォルトの `use:enhance` の一部を再現する必要があるでしょう。ほとんどの場合、コールバックに渡された `update` を呼び出すだけで十分です。もっとカスタマイズが必要な場合は、`applyAction` を使用してそれを行うことができます:
 
 ```diff
+/// file: src/routes/login/+page.svelte
 <script>
 +	import { enhance, applyAction } from '$app/forms';
 

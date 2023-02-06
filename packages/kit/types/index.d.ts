@@ -50,9 +50,11 @@ export type AwaitedProperties<input extends Record<string, any> | void> =
 		? OptionalUnion<AwaitedPropertiesUnion<input>>
 		: AwaitedPropertiesUnion<input>;
 
-export type AwaitedActions<T extends Record<string, (...args: any) => any>> = {
-	[Key in keyof T]: OptionalUnion<UnpackValidationError<Awaited<ReturnType<T[Key]>>>>;
-}[keyof T];
+export type AwaitedActions<T extends Record<string, (...args: any) => any>> = OptionalUnion<
+	{
+		[Key in keyof T]: UnpackValidationError<Awaited<ReturnType<T[Key]>>>;
+	}[keyof T]
+>;
 
 // Takes a union type and returns a union type where each type also has all properties
 // of all possible types (typed as undefined), making accessing them more ergonomic
@@ -453,6 +455,7 @@ export interface KitConfig {
 		 * - `(details) => void` — `status`、`path`、`referrer`、`referenceType`、`message` プロパティを持つ `details` オブジェクトを引数に取るカスタムのエラーハンドラです。この関数から `throw` されると、ビルドが失敗します
 		 *
 		 * ```js
+		 * /// file: svelte.config.js
 		 * /// type: import('@sveltejs/kit').Config
 		 * const config = {
 		 *   kit: {
