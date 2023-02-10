@@ -7,13 +7,15 @@ import { CompileOptions } from 'svelte/types/compiler/interfaces';
 import {
 	AdapterEntry,
 	CspDirectives,
+	HttpMethod,
 	Logger,
 	MaybePromise,
 	Prerendered,
 	PrerenderHttpErrorHandlerValue,
 	PrerenderMissingIdHandlerValue,
+	PrerenderOption,
 	RequestOptions,
-	RouteDefinition,
+	RouteSegment,
 	UniqueInterface
 } from './private.js';
 import { SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
@@ -85,10 +87,13 @@ export interface Builder {
 	config: ValidatedConfig;
 	/** プリレンダリングされたページとアセット情報です (もしあれば)。 */
 	prerendered: Prerendered;
+	/** An array of dynamic (not prerendered) routes */
+	routes: RouteDefinition[];
 
 	/**
 	 * アプリの1つ以上のルート(routes)にマップする別の関数を作成します。
 	 * @param fn 一連のルート(routes)をエントリーポイントにまとめる関数
+	 * @deprecated Use `builder.routes` instead
 	 */
 	createEntries(fn: (route: RouteDefinition) => AdapterEntry): Promise<void>;
 
@@ -101,7 +106,7 @@ export interface Builder {
 	 * SvelteKit [サーバー](https://kit.svelte.jp/docs/types#public-types-server)を初期化するためのサーバーサイド manifest を生成します。
 	 * @param opts アプリのベースディレクトリに対する相対パスと、オプションで、生成される manifest の形式 (esm または cjs) を指定
 	 */
-	generateManifest(opts: { relativePath: string }): string;
+	generateManifest(opts: { relativePath: string; routes?: RouteDefinition[] }): string;
 
 	/**
 	 * `outDir` 内の `name` ディレクトリへのパス (例: `/path/to/.svelte-kit/my-adapter`) を解決します。
@@ -515,14 +520,29 @@ export interface KitConfig {
 		config?: (config: Record<string, any>) => Record<string, any> | void;
 	};
 	/**
-	 * アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、そこに古いコンテンツがある可能性があります。そうでなくとも、アプリのルートマニフェスト(route manifest)が、もう存在しない JavaScript ファイルを指している可能性があります。SvelteKit は、ここで指定された `name` (デフォルトではビルドのタイムスタンプ) を使用して新しいバージョンがデプロイされたことを検知し、従来のフルページナビゲーションにフォールバックすることにより、この問題を解決しています。
+	 * アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、そこに古いコンテンツがある可能性があります。そうでなくとも、アプリのルートマニフェスト(route manifest)が、もう存在しない JavaScript ファイルを指している可能性があります。
+	 * SvelteKit helps you solve this problem through version management.
+	 * If SvelteKit encounters an error while loading the page and detects that a new version has been deployed (using the `name` specified here, which defaults to a timestamp of the build) it will fall back to traditional full-page navigation.
+	 * Not all navigations will result in an error though, for example if the JavaScript for the next page is already loaded. If you still want to force a full-page navigation in these cases, use techniques such as setting the `pollInverval` and then using `beforeNavigate`:
+	 * ```html
+	 * /// +layout.svelte
+	 * <script>
+	 * import { beforeNavigate } from '$app/navigation';
+	 * import { updated } from '$app/stores';
+	 *
+	 * beforeNavigate(({ willUnload, to }) => {
+	 *   if ($updated && !willUnload && to?.url) {
+	 *     location.href = to.route.url.href;
+	 *   }
+	 * });
+	 * </script>
+	 * ```
 	 *
 	 * `pollInterval` を 0 以外の値に設定した場合、SvelteKit はバックグラウンドで新しいバージョンをポーリングし、それを検知すると [`updated`](/docs/modules#$app-stores-updated) ストアの値を `true` にします。
 	 */
 	version?: {
 		/**
-		 * アプリの現在のバージョンの文字列です。
-		 * @default Date.now().toString()
+		 * アプリの現在のバージョンの文字列です。If specified, this must be deterministic (e.g. a commit ref rather than `Math.random()` or Date.now().toString()`), otherwise defaults to a timestamp of the build
 		 */
 		name?: string;
 		/**
@@ -959,6 +979,15 @@ export interface ResolveOptions {
 	preload?(input: { type: 'font' | 'css' | 'js' | 'asset'; path: string }): boolean;
 }
 
+export interface RouteDefinition<Config = any> {
+	id: string;
+	pattern: RegExp;
+	prerender: PrerenderOption;
+	segments: RouteSegment[];
+	methods: HttpMethod[];
+	config: Config;
+}
+
 export class Server {
 	constructor(manifest: SSRManifest);
 	init(options: ServerInitOptions): Promise<void>;
@@ -1077,6 +1106,13 @@ export type Actions<
 
 /**
  * fetch を通じて form action を呼び出したとき、そのレスポンスはこれらの形となります。
+ * ```svelte
+ * <form method="post" use:enhance={() => {
+ *   return ({ result }) => {
+ * 		// result is of type ActionResult
+ *   };
+ * }}
+ * ```
  */
 export type ActionResult<
 	Success extends Record<string, unknown> | undefined = Record<string, any>,
@@ -1191,4 +1227,12 @@ export interface SubmitFunction<
 				update(options?: { reset: boolean }): Promise<void>;
 		  }) => void)
 	>;
+}
+
+/**
+ * The type of `export const snapshot` exported from a page or layout component.
+ */
+export interface Snapshot<T = any> {
+	capture: () => T;
+	restore: (snapshot: T) => void;
 }

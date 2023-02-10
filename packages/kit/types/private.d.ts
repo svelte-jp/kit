@@ -2,6 +2,8 @@
 // but which cannot be imported from `@sveltejs/kit`. Care should
 // be taken to avoid breaking changes when editing this file
 
+import { RouteDefinition } from './index.js';
+
 export interface AdapterEntry {
 	/**
 	 * HTTP サービス (例: serverless function) を一意に識別するための文字列で、重複を排除するために使用されます。
@@ -12,8 +14,11 @@ export interface AdapterEntry {
 
 	/**
 	 * 候補のルート(route)と現在のルート(route)を比較し、
-	 * 候補のルートを現在のルートのフォールバック(fallback)として扱うべきかどうかを判断する関数です。例えば、`/foo/[c]`
-	 * は `/foo/a-[b]` のフォールバックで、`/[...catchall]` は全てのルートのフォールバックです。
+	 * 候補のルートを現在のルートのフォールバック(fallback)として扱うべきかどうかを判断する関数です。
+	 *
+	 * Use cases:
+	 * - Fallback pages: `/foo/[c]` is a fallback for `/foo/a-[b]`, and `/[...catchall]` is a fallback for all routes
+	 * - Grouping routes that share a common `config`: `/foo` should be deployed to the edge, `/bar` and `/baz` should be deployed to a serverless function
 	 */
 	filter(route: RouteDefinition): boolean;
 
@@ -210,13 +215,6 @@ export type PrerenderMap = Map<string, PrerenderOption>;
 export interface RequestOptions {
 	getClientAddress(): string;
 	platform?: App.Platform;
-}
-
-export interface RouteDefinition {
-	id: string;
-	pattern: RegExp;
-	segments: RouteSegment[];
-	methods: HttpMethod[];
 }
 
 export interface RouteSegment {

@@ -22,7 +22,9 @@ export default {
 
 ## デプロイ(Deploying)
 
-アプリケーションを実行するには、出力ディレクトリ (デフォルトは `build`)、プロジェクトの `package.json`、`node_modules` の本番向けの依存関係(production dependencies)が必要です。本番向けの依存関係は `npm ci --prod` で生成することができます (あなたのアプリが何の依存関係も持たない場合はこのステップをスキップできます)。そして、このコマンドでアプリを起動することができます:
+First, build your app with `npm run build`. This will create the production server in the output directory specified in the adapter options, defaulting to `build`.
+
+アプリケーションを実行するには、出力ディレクトリ、プロジェクトの `package.json`、`node_modules` の本番向けの依存関係(production dependencies)が必要です。本番向けの依存関係は `npm ci --prod` で生成することができます (あなたのアプリが何の依存関係も持たない場合はこのステップをスキップできます)。そして、このコマンドでアプリを起動することができます:
 
 ```bash
 node build

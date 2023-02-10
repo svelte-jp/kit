@@ -292,16 +292,22 @@ declare module '$app/stores' {
 
 	/**
 	 * ページのデータの値を含む読み取り可能なストア(readable store)です。
+	 *
+	 * On the server, this store can only be subscribed to during component initialization. In the browser, it can be subscribed to at any time.
 	 */
 	export const page: Readable<Page>;
 	/**
 	 * 読み取り可能なストア(readable store)です。
 	 * ナビゲーションが開始すると、その値は `from`、`to`、`type`、(もし `type === 'popstate'` の場合) `delta` プロパティを持つ `Navigation` オブジェクトです。
 	 * ナビゲーションが終了すると、その値は `null` に戻ります。
+	 *
+	 * On the server, this store can only be subscribed to during component initialization. In the browser, it can be subscribed to at any time.
 	 */
 	export const navigating: Readable<Navigation | null>;
 	/**
 	 * 読み取り可能なストア(readable store)で、初期値は `false` です。[`version.pollInterval`](https://kit.svelte.jp/docs/configuration#version) が 0 以外の値である場合、SvelteKit はアプリの新しいバージョンをポーリングし、それを検知するとこのストアの値を `true` に更新します。`updated.check()` は、ポーリングに関係なくすぐにチェックするよう強制します。
+	 *
+	 * On the server, this store can only be subscribed to during component initialization. In the browser, it can be subscribed to at any time.
 	 */
 	export const updated: Readable<boolean> & { check(): Promise<boolean> };
 

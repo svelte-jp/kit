@@ -125,3 +125,51 @@ export const trailingSlash = 'always';
 このオプションは [プリレンダリング](#prerender) にも影響します。`trailingSlash` が `always` の場合 `/about` というルート(route)は `about/index.html` ファイルとなり、それ以外の場合は `about.html` が作成され、静的な Web サーバの慣習を反映したものになります。
 
 > 末尾のスラッシュを無視することは推奨されません。相対パスのセマンティクスが2つのケースで異なり(`/x` からの `./y` は `/y` ですが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別の URL として扱われ、SEO 上有害となるからです。
+
+## config
+
+With the concept of [adapters](/docs/adapters), SvelteKit is able to run on a variety of platforms. Each of these might have specific configuration to further tweak the deployment — for example on Vercel you could choose to deploy some parts of your app on the edge and others on serverless environments.
+
+`config` is an object with key-value pairs at the top level. Beyond that, the concrete shape is dependent on the adapter you're using. Every adapter should provide a `Config` interface to import for type safety. Consult the documentation of your adapter for more information.
+
+```js
+// @filename: ambient.d.ts
+declare module 'some-adapter' {
+	export interface Config { runtime: string }
+}
+
+// @filename: index.js
+// ---cut---
+/// file: src/routes/+page.js
+/** @type {import('some-adapter').Config} */
+export const config = {
+	runtime: 'edge'
+};
+```
+
+`config` objects are merged at the top level (but _not_ deeper levels). This means you don't need to repeat all the values in a `+page.js` if you want to only override some of the values in the upper `+layout.js`. For example this layout configuration...
+
+```js
+/// file: src/routes/+layout.js
+export const config = {
+	runtime: 'edge',
+	regions: 'all',
+	foo: {
+		bar: true
+	}
+}
+```
+
+...is overridden by this page configuration...
+
+```js
+/// file: src/routes/+page.js
+export const config = {
+	regions: ['us1', 'us2'],
+	foo: {
+		baz: true
+	}
+}
+```
+
+...which results in the config value `{ runtime: 'edge', regions: ['us1', 'us2'], foo: { baz: true } }` for that page.
