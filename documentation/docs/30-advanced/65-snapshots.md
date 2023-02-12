@@ -2,11 +2,11 @@
 title: Snapshots
 ---
 
-Ephemeral DOM state — like scroll positions on sidebars, the content of `<input>` elements and so on — is discarded when you navigate from one page to another.
+例えばサイドバーのスクロールポジションや、`<input>` 要素の中身などの、一時的な DOM の状態(state)は、あるページから別のページに移動するときに破棄されます。
 
-For example, if the user fills out a form but clicks a link before submitting, then hits the browser's back button, the values they filled in will be lost. In cases where it's valuable to preserve that input, you can take a _snapshot_ of DOM state, which can then be restored if the user navigates back.
+例えば、ユーザーがフォームに入力し、それを送信する前にリンクをクリックして、それからブラウザの戻るボタンを押した場合、フォームに入力されていた値は失われます。入力内容を保持しておくことが重要な場合、DOM の状態を _スナップショット(snapshot)_ として記録することができ、ユーザーが戻ってきたときに復元することができます。
 
-To do this, export a `snapshot` object with `capture` and `restore` methods from a `+page.svelte` or `+layout.svelte`:
+これを行うには、`+page.svelte` や `+layout.svelte` で、`capture` メソッドと `restore` メソッドを持つ `snapshot` オブジェクトをエクスポートします:
 
 ```svelte
 /// file: +page.svelte
@@ -26,8 +26,8 @@ To do this, export a `snapshot` object with `capture` and `restore` methods from
 </form>
 ```
 
-When you navigate away from this page, the `capture` function is called immediately before the page updates, and the returned value is associated with the current entry in the browser's history stack. If you navigate back, the `restore` function is called with the stored value as soon as the page is updated.
+このページから離れるとき、ページが更新される直前に `capture` 関数が呼ばれ、戻り値がブラウザの history スタックの現在のエントリーに関連付けられます。もしこのページに戻ってきた場合、ページが更新されるとすぐに保存された値とともに `restore` 関数が呼ばれます。
 
-The data must be serializable as JSON so that it can be persisted to `sessionStorage`. This allows the state to be restored when the page is reloaded, or when the user navigates back from a different site.
+データは `sessionStorage` に永続化できるように、JSON としてシリアライズ可能でなければなりません。これにより、ページがリロードされたときや、ユーザーが別のサイトから戻ってきたときにも、状態を復元することができます。
 
-> Avoid returning very large objects from `capture` — once captured, objects will be retained in memory for the duration of the session, and in extreme cases may be too large to persist to `sessionStorage`.
+> 大きすぎるオブジェクトを `capture` から返さないようにしてください。一度 capture されたオブジェクトは、そのセッションの間はメモリ上に保持されるので、極端な場合には、大きすぎて `sessionStorage` に永続化できない可能性があります。

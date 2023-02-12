@@ -125,7 +125,7 @@ const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self
 const sw = self as unknown as ServiceWorkerGlobalScope;
 ```
 
-これにより、`HTMLElement` のような service worker の中では使用できない DOM の型付けへのアクセスが無効になり、正しい global が初期化されます。`self` を `sw` に再代入することで、プロセス内で型をキャストすることができます (いくつか方法がありますが、これが追加のファイルを必要としない最も簡単な方法です)。ファイルの残りの部分では、`self` の代わりに `sw` を使用します。The reference to the SvelteKit types ensures that the `$service-worker` import has proper type definitions.
+これにより、`HTMLElement` のような service worker の中では使用できない DOM の型付けへのアクセスが無効になり、正しい global が初期化されます。`self` を `sw` に再代入することで、プロセス内で型をキャストすることができます (いくつか方法がありますが、これが追加のファイルを必要としない最も簡単な方法です)。ファイルの残りの部分では、`self` の代わりに `sw` を使用します。SvelteKit の型を参照することで、`$service-worker` import に適切な型定義があることを保証することができます。
 
 ## その他のソリューション
 

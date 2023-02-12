@@ -18,17 +18,17 @@ import adapter from '@sveltejs/adapter-vercel';
 export default {
 	kit: {
 		adapter: adapter({
-			// see the 'Deployment configuration' section below
+			// 以下の 'デプロイメントの設定' セクションを参照
 		})
 	}
 };
 ```
 
-## Deployment configuration
+## デプロイメントの設定
 
-To control how your routes are deployed to Vercel as functions, you can specify deployment configuration, either through the option shown above or with [`export const config`](/docs/page-options#config) inside `+server.js`, `+page(.server).js` and `+layout(.server).js` files.
+Vercel にルート(routes)を function としてデプロイする方法をコントロールするには、デプロイメントの設定を、上記に示すオプションか、`+server.js`、`+page(.server).js`、`+layout(.server).js` ファイルの中の [`export const config`](/docs/page-options#config) を使用して、行うことができます。
 
-For example you could deploy some parts of your app as [Edge Functions](https://vercel.com/docs/concepts/functions/edge-functions)...
+例えば、アプリの一部を [Edge Functions](https://vercel.com/docs/concepts/functions/edge-functions) としてデプロイして…
 
 ```js
 /// file: about/+page.js
@@ -38,7 +38,7 @@ export const config = {
 };
 ```
 
-...and others as [Serverless Functions](https://vercel.com/docs/concepts/functions/serverless-functions) (note that by specifying `config` inside a layout, it applies to all child pages):
+…他の部分を [Serverless Functions](https://vercel.com/docs/concepts/functions/serverless-functions) としてデプロイすることができます (layout の内側の `config` は、すべての子ページに適用されます):
 
 ```js
 /// file: admin/+layout.js
@@ -48,28 +48,28 @@ export const config = {
 };
 ```
 
-The following options apply to all functions:
+以下のオプションはすべての function に適用されます:
 
-- `runtime`: `'edge'`, `'nodejs16.x'` or `'nodejs18.x'`. By default, the adapter will select `'nodejs16.x'` or `'nodejs18.x'` depending on the Node version your project is configured to use on the Vercel dashboard
-- `regions`: an array of [edge network regions](https://vercel.com/docs/concepts/edge-network/regions) (defaulting to `["iad1"]` for serverless functions) or `'all'` if `runtime` is `edge` (its default). Note that multiple regions for serverless functions are only supported on Enterprise plans
-- `split`: if `true`, causes a route to be deployed as an individual function. If `split` is set to `true` at the adapter level, all routes will be deployed as individual functions
+- `runtime`: `'edge'`、`'nodejs16.x'`、`'nodejs18.x'`。デフォルトでは、プロジェクトの Node のバージョンに応じて adapter が `'nodejs16.x'` か `'nodejs18.x'` を選択します。プロジェクトの Node バージョンは Vercel のダッシュボードから設定することができます。
+- `regions`: [edge network regions](https://vercel.com/docs/concepts/edge-network/regions) の配列 (serverless functions のデフォルトは `["iad1"]`) か、`runtime` が `edge` (デフォルト) の場合は `'all'` です。serverless functions の場合の複数の regions のサポートは Enterprise Plan のみです。
+- `split`: `true` の場合、ルート(route)は個別の function としてデプロイされます。`split` を adapter レベルで `true` にする場合、すべてのルート(route)が個別の function としてデプロイされます。
 
-Additionally, the following options apply to edge functions:
-- `envVarsInUse`: an array of environment variables that should be accessible inside the edge function
-- `external`: an array of dependencies that esbuild should treat as external when bundling functions. This should only be used to exclude optional dependencies that will not run outside Node
+加えて、以下のオプションは edge function に適用されます:
+- `envVarsInUse`: edge function の内側からアクセスできる環境変数の配列です
+- `external`: esbuild が function をバンドルする際に外部(external)として扱う依存関係(dependencies)の配列です。Node の外側で実行されないオプションの依存関係(optional dependencies)を除外したいときにのみ使用してください
 
-And the following option apply to serverless functions:
-- `memory`: the amount of memory available to the function. Defaults to `1024` Mb, and can be decreased to `128` Mb or [increased](https://vercel.com/docs/concepts/limits/overview#serverless-function-memory) in 64Mb increments up to `3008` Mb on Pro or Enterprise accounts
-- `maxDuration`: maximum execution duration of the function. Defaults to `10` seconds for Hobby accounts, `60` for Pro and `900` for Enterprise
-- `isr`: configuration Incremental Static Regeneration, described below
+そして以下のオプションは serverless function に適用されます:
+- `memory`: function で利用できるメモリ量です。デフォルトは `1024` Mb で、`128` Mb まで減らすことができます。また、Pro または Enterprise アカウントの場合は、`3008` Mb まで[増やす](https://vercel.com/docs/concepts/limits/overview#serverless-function-memory)ことができます。間隔は 64Mb 単位です。
+- `maxDuration`: function の最大実行時間。デフォルトで、Hobby アカウントの場合は `10` 秒、Pro の場合は `60`、Enterprise の場合は `900` です。
+- `isr`: Incremental Static Regeneration の設定、詳細は後述
 
-If your functions need to access data in a specific region, it's recommended that they be deployed in the same region (or close to it) for optimal performance.
+function から特定の region のデータにアクセスする必要がある場合は、パフォーマンスを最適化するためそれと同じ region (またはその知覚) にデプロイすることをおすすめします。
 
 ## Incremental Static Regeneration
 
-Vercel supports [Incremental Static Regeneration](https://vercel.com/docs/concepts/incremental-static-regeneration/overview) (ISR), which provides the performance and cost advantages of prerendered content with the flexibility of dynamically rendered content.
+Vercel は [Incremental Static Regeneration](https://vercel.com/docs/concepts/incremental-static-regeneration/overview) (ISR) をサポートしており、これにより、プリレンダリングコンテンツが持つパフォーマンスとコストの利点と、ダイナミックレンダリングコンテンツが持つ柔軟性の両方を提供することができます。
 
-To add ISR to a route, include the `isr` property in your `config` object:
+ISR をルート(route)に追加するには、`config` オブジェクトに `isr` プロパティを含めます:
 
 ```js
 /// file: blog/[slug]/+page.server.js
@@ -84,28 +84,28 @@ import { BYPASS_TOKEN } from '$env/static/private';
 
 export const config = {
 	isr: {
-		// Expiration time (in seconds) before the cached asset will be re-generated by invoking the Serverless Function.
-		// Setting the value to `false` means it will never expire.
+		// キャッシュされたアセットが Serverless Function を呼び出して再生成されるまでの有効期限 (秒単位)。
+		// 値に `false` を設定すると、無期限になります。
 		expiration: 60,
 
-		// Option group number of the asset. Assets with the same group number will all be re-validated at the same time.
+		// アセットの、任意のグループナンバーです。同じグループナンバーのアセットは、同時に再バリデート(re-validated)されます。
 		group: 1,
 
-		// Random token that can be provided in the URL to bypass the cached version of the asset, by requesting the asset
-		// with a __prerender_bypass=<token> cookie.
+		// URL で提供されるランダムな token で、アセットへのリクエストに 
+		// __prerender_bypass=<token> cookie を用いることで、アセットのキャッシュされたバージョンを回避することができます。
 		//
-		// Making a `GET` or `HEAD` request with `x-prerender-revalidate: <token>` will force the asset to be re-validated.
+		// `GET` や `HEAD` リクエストに `x-prerender-revalidate: <token>` を付けると、アセットの再バリデート(re-validated)を強制することができます。
 		bypassToken: BYPASS_TOKEN,
 
-		// List of query string parameter names that will be cached independently.
-		// If an empty array, query values are not considered for caching.
-		// If `undefined` each unique query value is cached independently
+		// 独立してキャッシュされるクエリ文字列パラメータ名のリストです。
+		// 空の配列の場合、クエリの値はキャッシュの対象とはなりません。
+		// `undefined` の場合、一意なクエリ値ごとに独立してキャッシュされます。
 		allowQuery: ['search']
 	}
 };
 ```
 
-The `expiration` property is required; all others are optional.
+`expiration` プロパティは必須で、その他は任意です。
 
 ## 環境変数
 

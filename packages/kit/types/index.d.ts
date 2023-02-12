@@ -1105,7 +1105,7 @@ export type Actions<
 > = Record<string, Action<Params, OutputData, RouteId>>;
 
 /**
- * fetch を通じて form action を呼び出したとき、そのレスポンスはこれらの形となります。
+ * fetch を通じて form action を呼び出したとき、そのレスポンスはこれらのうちいずれかの形となります。
  * ```svelte
  * <form method="post" use:enhance={() => {
  *   return ({ result }) => {

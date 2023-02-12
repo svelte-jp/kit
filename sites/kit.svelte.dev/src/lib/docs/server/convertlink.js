@@ -94,6 +94,7 @@ const docs_adapter_netlify = new Map([
 
 const docs_adapter_vercel = new Map([
 	['使い方', 'Usage'],
+	['デプロイメントの設定', 'Deployment configuration'],
 	['環境変数', 'Environment variables'],
 	['トラブルシューティング', 'Troubleshooting'],
 	['ファイルシステムにアクセスする', 'Accessing the file system']

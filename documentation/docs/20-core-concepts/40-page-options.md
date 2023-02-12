@@ -128,9 +128,9 @@ export const trailingSlash = 'always';
 
 ## config
 
-With the concept of [adapters](/docs/adapters), SvelteKit is able to run on a variety of platforms. Each of these might have specific configuration to further tweak the deployment — for example on Vercel you could choose to deploy some parts of your app on the edge and others on serverless environments.
+[adapter](/docs/adapters) のコンセプトにより、SvelteKit は様々なプラットフォーム上で実行することができます。しかし、各プラットフォームには、デプロイメントをさらに微調整するための特定の設定があるかもしれません — 例えば Vercel では、アプリのある部分はエッジに、他の部分はサーバーレス環境にデプロイするのを選択することができます。
 
-`config` is an object with key-value pairs at the top level. Beyond that, the concrete shape is dependent on the adapter you're using. Every adapter should provide a `Config` interface to import for type safety. Consult the documentation of your adapter for more information.
+`config` はトップレベルで key-value ペアを持つオブジェクトです。その他の具体的な形は、使用する adapter に依存します。すべての adapter は型安全性のためにインポート可能な `Config` インターフェースを提供することになっています。詳細な情報については、使用する adapter のドキュメントを参照してください。
 
 ```js
 // @filename: ambient.d.ts
@@ -147,7 +147,7 @@ export const config = {
 };
 ```
 
-`config` objects are merged at the top level (but _not_ deeper levels). This means you don't need to repeat all the values in a `+page.js` if you want to only override some of the values in the upper `+layout.js`. For example this layout configuration...
+`config` オブジェクトはトップレベル(top level)でマージされます (より深いレベル(deeper levels)ではマージされません)。つまり、より上位にある `+layout.js` にある値の一部を上書きしたい場合に、`+page.js` にある全ての値を繰り返す必要はないということです。例えばこの layout の設定は…
 
 ```js
 /// file: src/routes/+layout.js
@@ -160,7 +160,7 @@ export const config = {
 }
 ```
 
-...is overridden by this page configuration...
+…この page の設定で上書きされ…
 
 ```js
 /// file: src/routes/+page.js
@@ -172,4 +172,4 @@ export const config = {
 }
 ```
 
-...which results in the config value `{ runtime: 'edge', regions: ['us1', 'us2'], foo: { baz: true } }` for that page.
+…このページの設定の値は `{ runtime: 'edge', regions: ['us1', 'us2'], foo: { baz: true } }` となります。
