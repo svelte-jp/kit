@@ -304,6 +304,8 @@ export interface KitConfig {
 	 * > `mode` が `'auto'` の場合、SvelteKit は動的にレンダリングされるページには nonce を使用し、プリレンダリングされたページには hash を使用します。プリレンダリングされたページに nonce を使用するのは安全ではないため、禁止されています。
 	 *
 	 * > 多くの [Svelte transitions](https://svelte.jp/tutorial/transition) はインラインの `<style>` 要素を作成することで動作することにご注意ください。アプリでこれらを使用する場合は、`style-src` ディレクティブを指定しないようにするか、`unsafe-inline` を追加する必要があります。
+	 *
+	 * もしこのレベルの設定では不十分で、より動的な要件がある場合は、[`handle` hook](https://kit.svelte.jp/docs/hooks#server-hooks-handle) を使用して独自の CSP を動かすことができます。
 	 */
 	csp?: {
 		/**
@@ -1127,7 +1129,7 @@ export type ActionResult<
  * HTTP ステータスコードとオプションのメッセージで `HttpError` オブジェクトを作成します。
  * リクエストの処理中にこのオブジェクトがスローされると、SvelteKit は
  * `handleError` を呼ばずにエラーレスポンス(error response)を返します。
- * スローされた redirect をキャッチしないようにしてください、意味がなくなります。
+ * スローされた redirect をキャッチしないようにしてください、SvelteKit が処理するのを妨げてしまいます。
  * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)、400-599 の範囲内でなければならない。
  * @param body App.Error 型に準拠するオブジェクト。string が渡された場合、メッセージプロパティとして使用される。
  */
@@ -1150,7 +1152,7 @@ export interface HttpError {
 
 /**
  * `Redirect` オブジェクトを作成します。リクエストの処理中にスローされると、SvelteKit はリダイレクトレスポンス(redirect response)を返します。
- * スローされた redirect をキャッチしないようにしてください、意味がなくなります。
+ * スローされた redirect をキャッチしないようにしてください、SvelteKit が処理するのを妨げてしまいます。
  * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#redirection_messages)。300-308 の範囲内でなければならない。
  * @param location リダイレクト先のロケーション。
  */

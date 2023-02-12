@@ -1,5 +1,17 @@
 # @sveltejs/kit
 
+## 1.5.5
+
+### Patch Changes
+
+- fix: warn after failed data preloads in dev ([#8985](https://github.com/sveltejs/kit/pull/8985))
+
+## 1.5.4
+
+### Patch Changes
+
+- fix: support all relevant vite cli flags ([#8977](https://github.com/sveltejs/kit/pull/8977))
+
 ## 1.5.3
 
 ### Patch Changes

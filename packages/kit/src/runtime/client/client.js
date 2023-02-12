@@ -311,7 +311,7 @@ export function create_client({ target }) {
 				);
 				return false;
 			}
-		} else if (/** @type {number} */ (navigation_result.props?.page?.status) >= 400) {
+		} else if (/** @type {number} */ (navigation_result.props.page?.status) >= 400) {
 			const updated = await stores.updated.check();
 			if (updated) {
 				await native_navigation(url);
@@ -329,6 +329,14 @@ export function create_client({ target }) {
 		if (previous_history_index) {
 			update_scroll_positions(previous_history_index);
 			capture_snapshot(previous_history_index);
+		}
+
+		// ensure the url pathname matches the page's trailing slash option
+		if (
+			navigation_result.props.page?.url &&
+			navigation_result.props.page.url.pathname !== url.pathname
+		) {
+			url.pathname = navigation_result.props.page?.url.pathname;
 		}
 
 		if (opts && opts.details) {
@@ -355,6 +363,7 @@ export function create_client({ target }) {
 		if (started) {
 			current = navigation_result.state;
 
+			// reset url before updating page store
 			if (navigation_result.props.page) {
 				navigation_result.props.page.url = url;
 			}
@@ -1256,7 +1265,22 @@ export function create_client({ target }) {
 			if (!options.reload) {
 				if (priority <= options.preload_data) {
 					const intent = get_navigation_intent(/** @type {URL} */ (url), false);
-					if (intent) preload_data(intent);
+					if (intent) {
+						if (__SVELTEKIT_DEV__) {
+							preload_data(intent).then((result) => {
+								if (result.type === 'loaded' && result.state.error) {
+									console.warn(
+										`Preloading data for ${intent.url.pathname} failed with the following error: ${result.state.error.message}\n` +
+											'If this error is transient, you can ignore it. Otherwise, consider disabling preloading for this route. ' +
+											'This route was preloaded due to a data-sveltekit-preload-data attribute. ' +
+											'See https://kit.svelte.dev/docs/link-options for more info'
+									);
+								}
+							});
+						} else {
+							preload_data(intent);
+						}
+					}
 				} else if (priority <= options.preload_code) {
 					preload_code(get_url_path(/** @type {URL} */ (url)));
 				}
