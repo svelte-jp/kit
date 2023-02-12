@@ -24,6 +24,7 @@ service worker の内部では、[`$service-worker` モジュール](modules#$se
 
 ```js
 // @errors: 2339
+/// <reference types="@sveltejs/kit" />
 import { build, files, version } from '$service-worker';
 
 // Create a unique cache name for this deployment
@@ -108,6 +109,7 @@ navigator.serviceWorker.register('/service-worker.js', {
 service worker に適切な型を設定するには、マニュアルで設定が必要です。`service-worker.js` の中で、ファイルの先頭に以下を追加してください:
 
 ```original-js
+/// <reference types="@sveltejs/kit" />
 /// <reference no-default-lib="true"/>
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
@@ -115,6 +117,7 @@ service worker に適切な型を設定するには、マニュアルで設定�
 const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self));
 ```
 ```generated-ts
+/// <reference types="@sveltejs/kit" />
 /// <reference no-default-lib="true"/>
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
@@ -122,7 +125,7 @@ const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self
 const sw = self as unknown as ServiceWorkerGlobalScope;
 ```
 
-これにより、`HTMLElement` のような service worker の中では使用できない DOM の型付けへのアクセスが無効になり、正しい global が初期化されます。`self` を `sw` に再代入することで、プロセス内で型をキャストすることができます (いくつか方法がありますが、これが追加のファイルを必要としない最も簡単な方法です)。ファイルの残りの部分では、`self` の代わりに `sw` を使用します。
+これにより、`HTMLElement` のような service worker の中では使用できない DOM の型付けへのアクセスが無効になり、正しい global が初期化されます。`self` を `sw` に再代入することで、プロセス内で型をキャストすることができます (いくつか方法がありますが、これが追加のファイルを必要としない最も簡単な方法です)。ファイルの残りの部分では、`self` の代わりに `sw` を使用します。SvelteKit の型を参照することで、`$service-worker` import に適切な型定義があることを保証することができます。
 
 ## その他のソリューション
 

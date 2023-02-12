@@ -125,3 +125,51 @@ export const trailingSlash = 'always';
 このオプションは [プリレンダリング](#prerender) にも影響します。`trailingSlash` が `always` の場合 `/about` というルート(route)は `about/index.html` ファイルとなり、それ以外の場合は `about.html` が作成され、静的な Web サーバの慣習を反映したものになります。
 
 > 末尾のスラッシュを無視することは推奨されません。相対パスのセマンティクスが2つのケースで異なり(`/x` からの `./y` は `/y` ですが、`/x/` からは `/x/y` となります)、`/x` と `/x/` は別の URL として扱われ、SEO 上有害となるからです。
+
+## config
+
+[adapter](/docs/adapters) のコンセプトにより、SvelteKit は様々なプラットフォーム上で実行することができます。しかし、各プラットフォームには、デプロイメントをさらに微調整するための特定の設定があるかもしれません — 例えば Vercel では、アプリのある部分はエッジに、他の部分はサーバーレス環境にデプロイするのを選択することができます。
+
+`config` はトップレベルで key-value ペアを持つオブジェクトです。その他の具体的な形は、使用する adapter に依存します。すべての adapter は型安全性のためにインポート可能な `Config` インターフェースを提供することになっています。詳細な情報については、使用する adapter のドキュメントを参照してください。
+
+```js
+// @filename: ambient.d.ts
+declare module 'some-adapter' {
+	export interface Config { runtime: string }
+}
+
+// @filename: index.js
+// ---cut---
+/// file: src/routes/+page.js
+/** @type {import('some-adapter').Config} */
+export const config = {
+	runtime: 'edge'
+};
+```
+
+`config` オブジェクトはトップレベル(top level)でマージされます (より深いレベル(deeper levels)ではマージされません)。つまり、より上位にある `+layout.js` にある値の一部を上書きしたい場合に、`+page.js` にある全ての値を繰り返す必要はないということです。例えばこの layout の設定は…
+
+```js
+/// file: src/routes/+layout.js
+export const config = {
+	runtime: 'edge',
+	regions: 'all',
+	foo: {
+		bar: true
+	}
+}
+```
+
+…この page の設定で上書きされ…
+
+```js
+/// file: src/routes/+page.js
+export const config = {
+	regions: ['us1', 'us2'],
+	foo: {
+		baz: true
+	}
+}
+```
+
+…このページの設定の値は `{ runtime: 'edge', regions: ['us1', 'us2'], foo: { baz: true } }` となります。

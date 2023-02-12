@@ -416,7 +416,7 @@ export function load({ locals }) {
 }
 ```
 
-> スローされた redirect をキャッチしないようにしてください、意味がなくなります。
+> スローされた redirect をキャッチしないようにしてください、SvelteKit が処理するのを妨げてしまいます。
 
 ブラウザでは、[`$app.navigation`](modules#$app-navigation) からインポートできる [`goto`](modules#$app-navigation-goto) を使うことで、`load` 関数の外側でプログラム的にナビゲーションを行うことができます。
 
