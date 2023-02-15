@@ -21,7 +21,8 @@ title: Snapshots
 </script>
 
 <form method="POST">
-	<textarea bind:value={comment} />
+	<label for="comment">Comment</label>
+	<textarea id="comment" bind:value={comment} />
 	<button>Post comment</button>
 </form>
 ```

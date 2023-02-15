@@ -248,7 +248,7 @@ export function load() {
 
 ## +server
 
-ページと同様に、`+server.js` ファイル (よく 'API ルート(API route)' または 'エンドポイント(endpoint)' とも呼ばれる) でルート(routes) を定義でき、これによってレスポンスを完全にコントロールすることができます。`+server.js` ファイル (または `+server.ts`) は `GET`、`POST`、`PATCH`、`PUT`、`DELETE` などの HTTP verbs に対応する関数をエクスポートします。これは `RequestEvent` を引数に取り、[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) オブジェクトを返します。
+ページと同様に、`+server.js` ファイル (よく 'API ルート(API route)' または 'エンドポイント(endpoint)' とも呼ばれる) でルート(routes) を定義でき、これによってレスポンスを完全にコントロールすることができます。`+server.js` ファイル (または `+server.ts`) は `GET`、`POST`、`PATCH`、`PUT`、`DELETE`、`OPTIONS` といった HTTP verbs に対応する関数をエクスポートします。これは `RequestEvent` を引数に取り、[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) オブジェクトを返します。
 
 例えば、`GET` ハンドラーを使用した `/api/random-number` ルート(route)を作成できます:
 
@@ -279,9 +279,11 @@ export function GET({ url }) {
 
 エラーがスローされる場合 (`throw error(...)` によるスローや、予期せぬエラーがスローされるどちらでも)、レスポンスは `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズすることができるフォールバックエラーページとなります。この場合、[`+error.svelte`](#error) コンポーネントはレンダリングされません。エラーハンドリングに関する詳細は [こちら](errors) からお読み頂けます。
 
+> When creating an `OPTIONS` handler, note that Vite will inject `Access-Control-Allow-Origin` and `Access-Control-Allow-Methods` headers — these will not be present in production unless you add them.
+
 ### Receiving data
 
-`+server.js` ファイルは、`POST`/`PUT`/`PATCH`/`DELETE` ハンドラをエクスポートすることで、完全な API を作成することができます:
+`+server.js` ファイルは、`POST`/`PUT`/`PATCH`/`DELETE`/`OPTIONS` ハンドラをエクスポートすることで、完全な API を作成することができます:
 
 ```svelte
 /// file: src/routes/add/+page.svelte
@@ -327,7 +329,7 @@ export async function POST({ request }) {
 
 `+server.js` ファイルは `+page` ファイルと同じディレクトリに置くことができ、これによって同じルート(route)がページにも API エンドポイントにもなるようにすることができます。これがどちらなのか判断するために、SvelteKit は以下のルールを適用します:
 
-- `PUT`/`PATCH`/`DELETE` リクエストは、ページには適用されないため、常に `+server.js` で処理されます。
+- `PUT`/`PATCH`/`DELETE`/`OPTIONS` リクエストは、ページには適用されないため、常に `+server.js` で処理されます。
 - `GET`/`POST` リクエストは、`accept` ヘッダーが `text/html` を優先している場合 (言い換えると、ブラウザのページリクエストの場合)、ページリクエストとして扱われます。それ以外の場合は `+server.js` で処理されます。
 
 ## $types

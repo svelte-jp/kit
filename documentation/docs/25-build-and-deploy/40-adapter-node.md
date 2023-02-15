@@ -122,7 +122,8 @@ export default {
 			// default options are shown
 			out: 'build',
 			precompress: false,
-			envPrefix: ''
+			envPrefix: '',
+			polyfill: true
 		})
 	}
 };
@@ -139,6 +140,10 @@ export default {
 ### envPrefix
 
 デプロイの設定に使用される環境変数の名前を変更する必要がある場合 (例えば、あなたのコントロール下にない環境変数との競合を解消するため)、接頭辞(prefix)を指定することができます:
+
+### polyfill
+
+Controlls whether your build will load polyfills for missing modules. It defaults to `true`, and should only be disabled when using Node 18.11 or greater.
 
 ```js
 envPrefix: 'MY_CUSTOM_';

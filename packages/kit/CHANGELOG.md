@@ -1,5 +1,29 @@
 # @sveltejs/kit
 
+## 1.6.0
+
+### Minor Changes
+
+- feat: add `OPTIONS` server method ([#8731](https://github.com/sveltejs/kit/pull/8731))
+
+### Patch Changes
+
+- fix: solve `missing "./paths" specifier in "@sveltejs/kit" package` error occurring in all projects ([#9050](https://github.com/sveltejs/kit/pull/9050))
+
+## 1.5.7
+
+### Patch Changes
+
+- fix: use internal alias that won't collide with user aliases ([#9022](https://github.com/sveltejs/kit/pull/9022))
+
+## 1.5.6
+
+### Patch Changes
+
+- fix: ssr defaults preventing minification for client build ([#9012](https://github.com/sveltejs/kit/pull/9012))
+
+- fix: client-side trailing slash redirect when preloading data ([#8982](https://github.com/sveltejs/kit/pull/8982))
+
 ## 1.5.5
 
 ### Patch Changes
