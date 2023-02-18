@@ -87,7 +87,7 @@ export interface Builder {
 	config: ValidatedConfig;
 	/** プリレンダリングされたページとアセット情報です (もしあれば)。 */
 	prerendered: Prerendered;
-	/** An array of dynamic (not prerendered) routes */
+	/** 動的な (プリレンダリングされていない) ルート(routes)の配列です */
 	routes: RouteDefinition[];
 
 	/**
