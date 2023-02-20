@@ -13,7 +13,8 @@
 		"format": "pnpm -r format",
 		"precommit": "pnpm format && pnpm lint",
 		"release": "changeset publish",
-		"textlint": "node -e \"var shell=require('shelljs');var files=shell.find(['./CONTRIBUTING_ja.md','./documentation/**/*.md']).join(' ');if(shell.exec('textlint -f pretty-error '+files).code!==0){shell.exit(1)};\""
+		"textlint": "node -e \"var shell=require('shelljs');var files=shell.find(['./CONTRIBUTING_ja.md','./documentation/**/*.md']).join(' ');if(shell.exec('textlint -f pretty-error '+files).code!==0){shell.exit(1)};\"",
+		"start": "cd sites/kit.svelte.dev && npm run dev"
 	},
 	"repository": {
 		"type": "git",
