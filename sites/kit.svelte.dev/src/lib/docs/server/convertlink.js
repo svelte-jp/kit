@@ -157,7 +157,7 @@ const faq = new Map([
 		'How do I include details from package.json in my application?'
 	],
 	[
-		'`document` や `window` に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？',
+		'<code>document</code> や <code>window</code> に依存しているクライアントサイドオンリーなライブラリはどう使えばよいですか？',
 		'How do I use a client-side only library that depends on `document` or `window`?'
 	],
 	[
@@ -175,6 +175,9 @@ const faq = new Map([
  */
 export function convert_link(file, heading) {
 	if (file.startsWith('faq')) {
+		if (heading.includes('クライアントサイドオンリー')) {
+			console.log(heading);
+		}
 		return faq.get(heading) || heading;
 	} else {
 		switch (file) {
