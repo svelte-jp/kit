@@ -169,6 +169,7 @@ GitHub が提供する Jekyll が、あなたのサイトを管理するのを�
 GitHub Pages 向けの設定は以下のようになるでしょう:
 
 ```js
+// @errors: 2307
 /// file: svelte.config.js
 import adapter from '@sveltejs/adapter-static';
 
