@@ -164,23 +164,24 @@ SPA を [Apache](https://httpd.apache.org/) で実行する場合は、`static/.
 
 GitHub Pages 向けにビルドするときは、[`paths.base`](configuration#paths) をあなたのリポジトリ名に合わせて更新するようにしてください。サイトが root からではなく <https://your-username.github.io/your-repo-name> から提供されるためです。
 
-GitHub が提供する Jekyll が、あなたのサイトを管理するのを防ぐために、空の `.nojekyll` ファイルを static フォルダに追加する必要があります。Jekyll を無効にしたくない場合は、kit の `appDir` 設定オプションを `'app_'` またはアンダースコアで始まらないものに変更します。詳細は、GitHub の [Jekyll のドキュメント](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/about-github-pages-and-jekyll#configuring-jekyll-in-your-github-pages-site) をご参照ください。
+GitHub が提供する Jekyll が、あなたのサイトを管理するのを防ぐために、空の `.nojekyll` ファイルを `static` フォルダに追加する必要があります。
 
 GitHub Pages 向けの設定は以下のようになるでしょう:
 
 ```js
+// @errors: 2307
 /// file: svelte.config.js
+import adapter from '@sveltejs/adapter-static';
+
 const dev = process.argv.includes('dev');
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
+		adapter: adapter(),
 		paths: {
 			base: dev ? '' : '/your-repo-name',
-		},
-		// If you are not using a .nojekyll file, change your appDir to something not starting with an underscore.
-		// For example, instead of '_app', use 'app_', 'internal', etc.
-		appDir: 'internal',
+		}
 	}
 };
 ```

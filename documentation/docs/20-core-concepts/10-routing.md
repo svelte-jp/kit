@@ -279,7 +279,7 @@ export function GET({ url }) {
 
 エラーがスローされる場合 (`throw error(...)` によるスローや、予期せぬエラーがスローされるどちらでも)、レスポンスは `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズすることができるフォールバックエラーページとなります。この場合、[`+error.svelte`](#error) コンポーネントはレンダリングされません。エラーハンドリングに関する詳細は [こちら](errors) からお読み頂けます。
 
-> When creating an `OPTIONS` handler, note that Vite will inject `Access-Control-Allow-Origin` and `Access-Control-Allow-Methods` headers — these will not be present in production unless you add them.
+> `OPTIONS` ハンドラを作成する場合、Vite が `Access-Control-Allow-Origin` ヘッダーと `Access-Control-Allow-Methods` ヘッダーを注入することにご注意ください。本番環境では、あなたが明示的に追加しない限り注入されないはずです。
 
 ### Receiving data
 

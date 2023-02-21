@@ -88,18 +88,14 @@ export const config = {
 		// 値に `false` を設定すると、無期限になります。
 		expiration: 60,
 
-		// アセットの、任意のグループナンバーです。同じグループナンバーのアセットは、同時に再バリデート(re-validated)されます。
-		group: 1,
-
 		// URL で提供されるランダムな token で、アセットへのリクエストに 
 		// __prerender_bypass=<token> cookie を用いることで、アセットのキャッシュされたバージョンを回避することができます。
 		//
 		// `GET` や `HEAD` リクエストに `x-prerender-revalidate: <token>` を付けると、アセットの再バリデート(re-validated)を強制することができます。
 		bypassToken: BYPASS_TOKEN,
 
-		// 独立してキャッシュされるクエリ文字列パラメータ名のリストです。
-		// 空の配列の場合、クエリの値はキャッシュの対象とはなりません。
-		// `undefined` の場合、一意なクエリ値ごとに独立してキャッシュされます。
+		// 有効なクエリパラメータのリストです。他のパラメータ (例えば utm tracking codes) は無視され、
+		// コンテンツが不必要に再生成されないようにします
 		allowQuery: ['search']
 	}
 };

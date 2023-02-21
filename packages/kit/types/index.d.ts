@@ -18,7 +18,7 @@ import {
 	RouteSegment,
 	UniqueInterface
 } from './private.js';
-import { SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
+import { AssetDependencies, SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
 
 export { PrerenderOption } from './private.js';
 
@@ -534,7 +534,7 @@ export interface KitConfig {
 	 *
 	 * beforeNavigate(({ willUnload, to }) => {
 	 *   if ($updated && !willUnload && to?.url) {
-	 *     location.href = to.route.url.href;
+	 *     location.href = to.url.href;
 	 *   }
 	 * });
 	 * </script>
@@ -1008,11 +1008,9 @@ export interface SSRManifest {
 
 	/** private fields */
 	_: {
-		entry: {
-			file: string;
-			imports: string[];
-			stylesheets: string[];
-			fonts: string[];
+		client: {
+			start: AssetDependencies;
+			app: AssetDependencies;
 		};
 		nodes: SSRNodeLoader[];
 		routes: SSRRoute[];

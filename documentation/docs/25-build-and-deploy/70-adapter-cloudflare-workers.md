@@ -112,6 +112,10 @@ export {};
 
 ## トラブルシューティング
 
+### Worker size limits
+
+Workers にデプロイする場合、SvelteKit が生成したサーバーは1つのファイルにバンドルされます。minify 後に Worker が [そのサイズの上限](https://developers.cloudflare.com/workers/platform/limits/#worker-size) を超過する場合、Wrangler が Worker の公開に失敗します。通常、この制限に引っかかることはほとんどありませんが、一部の大きいライブラリではこれが発生することがあります。その場合、大きいライブラリをクライアントサイドでのみインポートするようにすることで、Worker のサイズを小さくすることができます。詳細は [FAQ](/faq#how-do-i-use-a-client-side-only-library-that-depends-on-document-or-window) をご覧ください。
+
 ### ファイルシステムにアクセスする
 
 Serverless/Edge 環境では、`fs.readFileSync` などのメソッドでファイルシステムにアクセスすることはできません。もしこのような方法でファイルにアクセスする必要がある場合、アプリのビルド中に[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)でこれを行ってください。例えば、ブログを持っていて、CMS でコンテンツを管理したくない場合、コンテンツをプリレンダリングし (またはコンテンツを取得するエンドポイントをプリレンダリングし)、新しいコンテンツを追加するたびにブログを再デプロイする必要があります。

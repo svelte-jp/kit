@@ -42,16 +42,21 @@ export interface Asset {
 	type: string | null;
 }
 
+export interface AssetDependencies {
+	file: string;
+	imports: string[];
+	stylesheets: string[];
+	fonts: string[];
+}
+
 export interface BuildData {
 	app_dir: string;
 	app_path: string;
 	manifest_data: ManifestData;
 	service_worker: string | null;
-	client_entry: {
-		file: string;
-		imports: string[];
-		stylesheets: string[];
-		fonts: string[];
+	client: {
+		start: AssetDependencies;
+		app: AssetDependencies;
 	} | null;
 	server_manifest: import('vite').Manifest;
 }
@@ -78,6 +83,11 @@ export type CSRRoute = {
 	leaf: [has_server_load: boolean, node_loader: CSRPageNodeLoader];
 };
 
+export interface Deferred {
+	fulfil: (value: any) => void;
+	reject: (error: Error) => void;
+}
+
 export type GetParams = (match: RegExpExecArray) => Record<string, string>;
 
 export interface ServerHooks {
@@ -88,6 +98,11 @@ export interface ServerHooks {
 
 export interface ClientHooks {
 	handleError: HandleClientError;
+}
+
+export interface Env {
+	private: Record<string, string>;
+	public: Record<string, string>;
 }
 
 export class InternalServer extends Server {
@@ -187,18 +202,20 @@ export interface RouteData {
 	} | null;
 }
 
-export type ServerData =
-	| {
-			type: 'redirect';
-			location: string;
-	  }
-	| {
-			type: 'data';
-			/**
-			 * If `null`, then there was no load function
-			 */
-			nodes: Array<ServerDataNode | ServerDataSkippedNode | ServerErrorNode | null>;
-	  };
+export type ServerRedirectNode = {
+	type: 'redirect';
+	location: string;
+};
+
+export type ServerNodesResponse = {
+	type: 'data';
+	/**
+	 * If `null`, then there was no load function <- TODO is this outdated now with the recent changes?
+	 */
+	nodes: Array<ServerDataNode | ServerDataSkippedNode | ServerErrorNode | null>;
+};
+
+export type ServerDataResponse = ServerRedirectNode | ServerNodesResponse;
 
 /**
  * Signals a successful response of the server `load` function.
@@ -207,9 +224,23 @@ export type ServerData =
  */
 export interface ServerDataNode {
 	type: 'data';
+	/**
+	 * The serialized version of this contains a serialized representation of any deferred promises,
+	 * which will be resolved later through chunk nodes.
+	 */
 	data: Record<string, any> | null;
 	uses: Uses;
 	slash?: TrailingSlash;
+}
+
+/**
+ * Resolved data/error of a deferred promise.
+ */
+export interface ServerDataChunkNode {
+	type: 'chunk';
+	id: number;
+	data?: Record<string, any>;
+	error?: any;
 }
 
 /**
@@ -293,9 +324,8 @@ export interface SSRNode {
 		config?: any;
 	};
 
-	// store this in dev so we can print serialization errors
-	universal_id?: string;
-	server_id?: string;
+	universal_id: string;
+	server_id: string;
 }
 
 export type SSRNodeLoader = () => Promise<SSRNode>;
@@ -319,6 +349,7 @@ export interface SSROptions {
 		}): string;
 		error(values: { message: string; status: number }): string;
 	};
+	version_hash: string;
 }
 
 export interface SSRErrorPage {

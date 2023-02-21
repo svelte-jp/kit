@@ -37,7 +37,7 @@ Cloudflare Pages の始め方は、[Get Started Guide](https://developers.cloudf
 プロジェクトのセッティングを設定するときは、以下のセッティングを使用しなければなりません:
 
 - **Framework preset** – None
-- **Build command** – `npm run build` または `svelte-kit build`
+- **Build command** – `npm run build` または `vite build`
 - **Build output directory** – `.svelte-kit/cloudflare`
 - **Environment variables**
 	- `NODE_VERSION`: `16`

@@ -174,7 +174,7 @@ export async function load() {
 
 ユニバーサル(universal) `load` 関数は、任意の値(カスタムクラスやコンポーネントコンストラクタなどを含む)を含むオブジェクトを返すことができます。
 
-サーバー(server) `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ、つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照などを返さなければなりません。
+サーバー(server) `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ (つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照など) を返さなければなりません。Your data can include [promises](#streaming-with-promises), in which case it will be streamed to browsers.
 
 ### どちらを使用すべきか
 
@@ -420,35 +420,58 @@ export function load({ locals }) {
 
 ブラウザでは、[`$app.navigation`](modules#$app-navigation) からインポートできる [`goto`](modules#$app-navigation-goto) を使うことで、`load` 関数の外側でプログラム的にナビゲーションを行うことができます。
 
-## Promise unwrapping
+## Streaming with promises
 
-トップレベルの promise は await されるので、ウォータフォールを作ることなく、複数の promise を簡単に返すことができます:
+戻り値の _トップレベル_ にある promise は await されるので、ウォーターフォールが作られることなく複数の promise を簡単に返すことができます。サーバー(server) `load` を使用する場合、 _ネストした_ promise は解決されると同時にブラウザにストリームされます。これにより、遅くて重要でないデータがある場合でも、すべてのデータが利用可能になる前にページのレンダリングを開始することができるので便利です:
 
 ```js
-/// file: src/routes/+page.js
-/** @type {import('./$types').PageLoad} */
+/// file: src/routes/+page.server.js
+/** @type {import('./$types').PageServerLoad} */
 export function load() {
 	return {
-		a: Promise.resolve('a'),
-		b: Promise.resolve('b'),
-		c: {
-			value: Promise.resolve('c')
+		one: Promise.resolve(1),
+		two: Promise.resolve(2),
+		streamed: {
+			three: new Promise((fulfil) => {
+				setTimeout(() => {
+					fulfil(3)
+				}, 1000);
+			})
 		}
 	};
 }
 ```
+
+これはロード状態(loading states)のスケルトンを作成するのに便利です、例えば:
 
 ```svelte
 /// file: src/routes/+page.svelte
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
-
-	console.log(data.a); // 'a'
-	console.log(data.b); // 'b'
-	console.log(data.c.value); // `Promise {...}`
 </script>
+
+<p>
+	one: {data.one}
+</p>
+<p>
+	two: {data.two}
+</p>
+<p>
+	three:
+	{#await data.streamed.three}
+		Loading...
+	{:then value}
+		{value}
+	{:catch error}
+		{error.message}
+	{/await}
+</p>
 ```
+
+AWS Lambda のような ストリーミングをサポートしないプラットフォームでは、レスポンスはバッファされます。つまり、すべての promise が解決してからでないとページがレンダリングされないということです。
+
+> ストリーミングデータは JavaScript が有効なときにのみ動作します。ページがサーバーでレンダリングされる場合、ユニバーサル(universal) `load` 関数からはネストした promise を返すのは避けたほうがよいでしょう、ストリーミングされないからです (代わりに、関数がブラウザで再実行されるときに promise が再作成されます)。
 
 ## Parallel loading
 
@@ -501,6 +524,8 @@ export async function load() {
 …もし、`/blog/trying-the-raw-meat-diet` から `/blog/i-regret-my-choices` に移動したら、`params.slug` が変更されているので、`+page.server.js` のほうは再実行されるでしょう。`+layout.server.js` のほうは再実行されません、なぜならデータがまだ有効だからです。言い換えると、`db.getPostSummaries()` を2回呼び出すことはないということです。
 
 `await parent()` を呼び出している `load` 関数は、親の `load` 関数が再実行された場合に再実行されます。
+
+依存関係の追跡は、`load` 関数から返したあとには適用されません。例えば、ネストした [promise](#streaming-with-promises) の内側で `params.x` にアクセスしている場合、`params.x` が変更されても関数の再実行は行われません (ご心配なく、誤ってこれを行っても開発中に警告が表示されます)。代わりに、`load` 関数の本体部分でパラメータにアクセスしてください。
 
 ### Manual invalidation
 

@@ -143,7 +143,7 @@ export default {
 
 ### polyfill
 
-Controlls whether your build will load polyfills for missing modules. It defaults to `true`, and should only be disabled when using Node 18.11 or greater.
+ビルドが存在しないモジュールの polyfill を読み込むかどうかをコントロールします。デフォルトは `true` で、Node 18.11 以降を使用している場合にのみ無効にしてください。
 
 ```js
 envPrefix: 'MY_CUSTOM_';
