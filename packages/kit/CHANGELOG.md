@@ -1,5 +1,33 @@
 # @sveltejs/kit
 
+## 1.8.7
+
+### Patch Changes
+
+- fix: correct not found message when setting `paths.base` ([#9232](https://github.com/sveltejs/kit/pull/9232))
+
+## 1.8.6
+
+### Patch Changes
+
+- fix: bundle SvelteKit when using Vitest ([#9172](https://github.com/sveltejs/kit/pull/9172))
+
+## 1.8.5
+
+### Patch Changes
+
+- fix: allow relative fetch to endpoint outside app from within `handle` ([#9198](https://github.com/sveltejs/kit/pull/9198))
+
+## 1.8.4
+
+### Patch Changes
+
+- fix: include .mjs files in precompression ([#9179](https://github.com/sveltejs/kit/pull/9179))
+
+- fix: revert mjs extension usage by default, make it an option ([#9179](https://github.com/sveltejs/kit/pull/9179))
+
+- chore: dummy changeset to force a release ([#9207](https://github.com/sveltejs/kit/pull/9207))
+
 ## 1.8.3
 
 ### Patch Changes

@@ -223,4 +223,8 @@ export function handleError({ error, event }) {
 
 開発中、Svelte のコードの構文エラーでエラーが発生した場合、渡される error には、エラーの場所のハイライトが付与された `frame` プロパティがあります。
 
-> `handleError` 自体が決してエラーをスローしないことを確認してください。
+> `handleError` 自体が決してエラーをスローしないようにしてください。
+
+## その他の参考資料
+
+- [Tutorial: Hooks](https://learn.svelte.jp/tutorial/handle)

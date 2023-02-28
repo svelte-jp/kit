@@ -333,8 +333,8 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 引数が無い場合、`use:enhance` は、ブラウザネイティブの動作を、フルページリロードを除いてエミュレートします。それは:
 
-- action が送信元のページと同じ場所にある場合に限り、成功レスポンスまたは不正なレスポンスに応じて、`form` プロパティと `$page.form` と `$page.status` を更新します。例えば、`<form action="/somewhere/else" ..>` というようなフォームの場合、`form` と `$page` は更新されません。これは、ネイティブのフォーム送信では action があるページにリダイレクトされるからです。
-- 成功レスポンスの場合は、`<form>` 要素をリセットして `invalidateAll` で全てのデータを無効化・最新化(invalidate)します。
+- action が送信元のページと同じ場所にある場合に限り、成功レスポンスまたは不正なレスポンスに応じて、`form` プロパティと `$page.form` と `$page.status` を更新します。例えば、`<form action="/somewhere/else" ..>` というようなフォームの場合、`form` と `$page` は更新されません。これは、ネイティブのフォーム送信では action があるページにリダイレクトされるからです。どちらにしても更新させたい場合は、[`applyAction`](#progressive-enhancement-applyaction) を使用してください
+- 成功レスポンスの場合は、`<form>` 要素をリセットして `invalidateAll` で全てのデータを無効化・最新化(invalidate)します
 - リダイレクトレスポンスの場合は `goto` を呼び出します
 - エラーが発生した場合はもっとも近くにある `+error` 境界をレンダリングします
 - 適切な要素に [フォーカスをリセット](accessibility#focus-management) します
@@ -473,4 +473,8 @@ const response = await fetch(this.action, {
 </form>
 ```
 
-`<a>` 要素と同じように、[`data-sveltekit-reload`](link-options#data-sveltekit-reload) 属性と [`data-sveltekit-noscroll`](link-options#data-sveltekit-noscroll) 属性を `<form>` に設定することができ、ルーターの挙動をコントロールすることができます。
+この form を送信すると `/search?q=...` に移動して load 関数が実行されますが、action は実行されません。`<a>` 要素と同じように、[`data-sveltekit-reload`](link-options#data-sveltekit-reload) 属性と [`data-sveltekit-noscroll`](link-options#data-sveltekit-noscroll) 属性を `<form>` に設定することができ、ルーターの挙動をコントロールすることができます。
+
+## その他の参考資料
+
+- [Tutorial: Forms](https://learn.svelte.jp/tutorial/the-form-element)

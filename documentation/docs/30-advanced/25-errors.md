@@ -154,3 +154,8 @@ export {};
 ```
 
 このインターフェイスは常に `message: string` プロパティを含んでいます。
+
+## その他の参考資料
+
+- [Tutorial: Errors and redirects](https://learn.svelte.jp/tutorial/error-basics)
+- [Tutorial: Hooks](https://learn.svelte.jp/tutorial/handle)

@@ -157,15 +157,6 @@ export type RecursiveRequired<T> = {
 
 export type RequiredResolveOptions = Required<ResolveOptions>;
 
-export interface Respond {
-	(
-		request: Request,
-		options: SSROptions,
-		manifest: SSRManifest,
-		state: SSRState
-	): Promise<Response>;
-}
-
 export interface RouteParam {
 	name: string;
 	matcher: string;
@@ -263,16 +254,21 @@ export interface ServerErrorNode {
 	status?: number;
 }
 
+export interface ServerMetadataRoute {
+	config: any;
+	api: {
+		methods: HttpMethod[];
+	};
+	page: {
+		methods: Array<'GET' | 'POST'>;
+	};
+	methods: HttpMethod[];
+	prerender: PrerenderOption | undefined;
+}
+
 export interface ServerMetadata {
 	nodes: Array<{ has_server_load: boolean }>;
-	routes: Map<
-		string,
-		{
-			prerender: PrerenderOption | undefined;
-			methods: HttpMethod[];
-			config: any;
-		}
-	>;
+	routes: Map<string, ServerMetadataRoute>;
 }
 
 export interface SSRComponent {
@@ -337,6 +333,7 @@ export interface SSROptions {
 	embedded: boolean;
 	env_public_prefix: string;
 	hooks: ServerHooks;
+	preload_strategy: ValidatedConfig['kit']['output']['preloadStrategy'];
 	root: SSRComponent['default'];
 	service_worker: boolean;
 	templates: {
@@ -350,10 +347,6 @@ export interface SSROptions {
 		error(values: { message: string; status: number }): string;
 	};
 	version_hash: string;
-}
-
-export interface SSRErrorPage {
-	id: '__error';
 }
 
 export interface PageNodeIndexes {
@@ -380,7 +373,14 @@ export interface SSRRoute {
 export interface SSRState {
 	fallback?: string;
 	getClientAddress(): string;
-	initiator?: SSRRoute | SSRErrorPage;
+	/**
+	 * True if we're currently attempting to render an error page
+	 */
+	error: boolean;
+	/**
+	 * Allows us to prevent `event.fetch` from making infinitely looping internal requests
+	 */
+	depth: number;
 	platform?: any;
 	prerendering?: PrerenderOptions;
 	/**

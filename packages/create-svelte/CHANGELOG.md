@@ -1,5 +1,23 @@
 # create-svelte
 
+## 3.1.0
+
+### Minor Changes
+
+- feat: use `@clack/prompts` ([#9219](https://github.com/sveltejs/kit/pull/9219))
+
+## 3.0.4
+
+### Patch Changes
+
+- docs: inform about adapter-auto not supporting all environments ([#9196](https://github.com/sveltejs/kit/pull/9196))
+
+## 3.0.3
+
+### Patch Changes
+
+- chore: enhance library skeleton readme with some library instructions ([#9128](https://github.com/sveltejs/kit/pull/9128))
+
 ## 3.0.2
 
 ### Patch Changes

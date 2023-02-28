@@ -39,6 +39,12 @@ const plugin = function (defaults = {}) {
 			builder.rimraf(dir);
 			builder.rimraf(tmp);
 
+			if (fs.existsSync('vercel.json')) {
+				const vercel_file = fs.readFileSync('vercel.json', 'utf-8');
+				const vercel_config = JSON.parse(vercel_file);
+				validate_vercel_json(builder, vercel_config);
+			}
+
 			const files = fileURLToPath(new URL('./files', import.meta.url).href);
 
 			const dirs = {
@@ -216,11 +222,6 @@ const plugin = function (defaults = {}) {
 					/** @type {import('@sveltejs/kit').RouteDefinition<any>[]} */ (group.routes)
 				);
 
-				if (singular) {
-					// Special case: One function for all routes
-					static_config.routes.push({ src: '/.*', dest: `/${name}` });
-				}
-
 				for (const route of group.routes) {
 					functions.set(route.pattern.toString(), name);
 				}
@@ -284,6 +285,12 @@ const plugin = function (defaults = {}) {
 				} else if (!singular) {
 					static_config.routes.push({ src: src + '(?:/__data.json)?$', dest: `/${name}` });
 				}
+			}
+
+			if (singular) {
+				// Common case: One function for all routes
+				// Needs to happen after ISR or else regex swallows all other matches
+				static_config.routes.push({ src: '/.*', dest: `/fn` });
 			}
 
 			builder.log.minor('Copying assets...');
@@ -487,7 +494,8 @@ async function create_function_bundle(builder, entry, dir, config) {
 				memory: config.memory,
 				maxDuration: config.maxDuration,
 				handler: path.relative(base + ancestor, entry),
-				launcherType: 'Nodejs'
+				launcherType: 'Nodejs',
+				experimentalResponseStreaming: !config.isr
 			},
 			null,
 			'\t'
@@ -495,6 +503,59 @@ async function create_function_bundle(builder, entry, dir, config) {
 	);
 
 	write(`${dir}/package.json`, JSON.stringify({ type: 'module' }));
+}
+
+/**
+ *
+ * @param {import('@sveltejs/kit').Builder} builder
+ * @param {any} vercel_config
+ */
+function validate_vercel_json(builder, vercel_config) {
+	if (builder.routes.length > 0 && !builder.routes[0].api) {
+		// bail — we're on an older SvelteKit version that doesn't
+		// populate `route.api.methods`, so we can't check
+		// to see if cron paths are valid
+		return;
+	}
+
+	const crons = /** @type {Array<unknown>} */ (
+		Array.isArray(vercel_config?.crons) ? vercel_config.crons : []
+	);
+
+	/** For a route to be considered 'valid', it must be an API route with a GET handler */
+	const valid_routes = builder.routes.filter((route) => route.api.methods.includes('GET'));
+
+	/** @type {Array<string>} */
+	const unmatched_paths = [];
+
+	for (const cron of crons) {
+		if (typeof cron !== 'object' || cron === null || !('path' in cron)) {
+			continue;
+		}
+
+		const { path } = cron;
+		if (typeof path !== 'string') {
+			continue;
+		}
+
+		for (const route of valid_routes) {
+			if (route.pattern.test(path)) {
+				continue;
+			}
+		}
+
+		unmatched_paths.push(path);
+	}
+
+	builder.log.warn(
+		`\nvercel.json defines cron tasks that use paths that do not correspond to an API route with a GET handler (ignore this if the request is handled in your \`handle\` hook):`
+	);
+
+	for (const path of unmatched_paths) {
+		console.log(`    - ${path}`);
+	}
+
+	console.log('');
 }
 
 export default plugin;

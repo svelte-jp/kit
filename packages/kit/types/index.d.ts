@@ -422,6 +422,20 @@ export interface KitConfig {
 	 * @default ".svelte-kit"
 	 */
 	outDir?: string;
+	/**
+	 * Options related to the build output format
+	 */
+	output?: {
+		/**
+		 * SvelteKit will preload the JavaScript modules needed for the initial page to avoid import 'waterfalls', resulting in faster application startup. There
+		 * are three strategies with different trade-offs:
+		 * - `modulepreload` - uses `<link rel="modulepreload">`. This delivers the best results in Chromium-based browsers, but is currently ignored by Firefox and Safari (though support is coming to Safari soon).
+		 * - `preload-js` - uses `<link rel="preload">`. Prevents waterfalls in Chromium and Safari, but Chromium will parse each module twice (once as a script, once as a module). Causes modules to be requested twice in Firefox. This is a good setting if you want to maximise performance for users on iOS devices at the cost of a very slight degradation for Chromium users.
+		 * - `preload-mjs` - uses `<link rel="preload">` but with the `.mjs` extension which prevents double-parsing in Chromium. Some static webservers will fail to serve .mjs files with a `Content-Type: application/javascript` header, which will cause your application to break. If that doesn't apply to you, this is the option that will deliver the best performance for the largest number of users, until `modulepreload` is more widely supported.
+		 * @default "modulepreload"
+		 */
+		preloadStrategy?: 'modulepreload' | 'preload-js' | 'preload-mjs';
+	};
 	paths?: {
 		/**
 		 * アプリのファイルが提供される絶対パス(absolute path)です。これは、何らかのストレージバケットからファイルを提供する場合に有用です。
@@ -525,7 +539,7 @@ export interface KitConfig {
 	 * アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、そこに古いコンテンツがある可能性があります。そうでなくとも、アプリのルートマニフェスト(route manifest)が、もう存在しない JavaScript ファイルを指している可能性があります。
 	 * SvelteKit helps you solve this problem through version management.
 	 * If SvelteKit encounters an error while loading the page and detects that a new version has been deployed (using the `name` specified here, which defaults to a timestamp of the build) it will fall back to traditional full-page navigation.
-	 * Not all navigations will result in an error though, for example if the JavaScript for the next page is already loaded. If you still want to force a full-page navigation in these cases, use techniques such as setting the `pollInverval` and then using `beforeNavigate`:
+	 * Not all navigations will result in an error though, for example if the JavaScript for the next page is already loaded. If you still want to force a full-page navigation in these cases, use techniques such as setting the `pollInterval` and then using `beforeNavigate`:
 	 * ```html
 	 * /// +layout.svelte
 	 * <script>
@@ -544,7 +558,7 @@ export interface KitConfig {
 	 */
 	version?: {
 		/**
-		 * アプリの現在のバージョンの文字列です。If specified, this must be deterministic (e.g. a commit ref rather than `Math.random()` or Date.now().toString()`), otherwise defaults to a timestamp of the build
+		 * アプリの現在のバージョンの文字列です。If specified, this must be deterministic (e.g. a commit ref rather than `Math.random()` or `Date.now().toString()`), otherwise defaults to a timestamp of the build
 		 */
 		name?: string;
 		/**
@@ -892,7 +906,7 @@ export interface RequestEvent<
 	 */
 	locals: App.Locals;
 	/**
-	 * 現在のページやエンドポイントのパラメータ - 例えば `/blog/[slug]` というルート(route)の場合は、`{ slug: string }` オブジェクト
+	 * 現在のルート(route)のパラメータ - 例えば `/blog/[slug]` というルート(route)の場合は、`{ slug: string }` オブジェクト
 	 */
 	params: Params;
 	/**
@@ -936,7 +950,7 @@ export interface RequestEvent<
 	 */
 	setHeaders(headers: Record<string, string>): void;
 	/**
-	 * 現在のページまたはエンドポイントの URL。
+	 * リクエストされた URL。
 	 */
 	url: URL;
 	/**
@@ -983,6 +997,12 @@ export interface ResolveOptions {
 
 export interface RouteDefinition<Config = any> {
 	id: string;
+	api: {
+		methods: HttpMethod[];
+	};
+	page: {
+		methods: Extract<HttpMethod, 'GET' | 'POST'>[];
+	};
 	pattern: RegExp;
 	prerender: PrerenderOption;
 	segments: RouteSegment[];

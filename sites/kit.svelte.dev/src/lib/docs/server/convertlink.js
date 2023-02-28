@@ -16,17 +16,27 @@ const docs_project_structure = new Map([
 
 // 20-core-concepts
 
-const docs_routing = new Map([['その他のファイル', 'Other files']]);
+const docs_routing = new Map([
+	['その他のファイル', 'Other files'],
+	['その他の参考資料', 'Further reading']
+]);
 
 const docs_load = new Map([
 	['どちらを使用すべきか', 'When to use which'],
 	['URL data を使用する', 'Using URL data'],
-	['fetch リクエストの作成', 'Making fetch requests']
+	['fetch リクエストの作成', 'Making fetch requests'],
+	['その他の参考資料', 'Further reading']
 ]);
 
-const docs_form_actions = new Map([['action の解剖学', 'Anatomy of an action']]);
+const docs_form_actions = new Map([
+	['action の解剖学', 'Anatomy of an action'],
+	['その他の参考資料', 'Further reading']
+]);
 
-const docs_page_options = new Map([['プリレンダリングしない場合', 'When not to prerender']]);
+const docs_page_options = new Map([
+	['プリレンダリングしない場合', 'When not to prerender'],
+	['その他の参考資料', 'Further reading']
+]);
 
 // 25-build-and-deploy
 
@@ -104,7 +114,12 @@ const docs_adapter_vercel = new Map([
 
 const docs_advanced_routing = new Map([
 	['Restパラメータ', 'Rest parameters'],
-	['レイアウトグループを使うときは', 'When to use layout groups']
+	['レイアウトグループを使うときは', 'When to use layout groups'],
+	['その他の参考資料', 'Further reading']
+]);
+
+const docs_hooks = new Map([
+	['その他の参考資料', 'Further reading']
 ]);
 
 const docs_service_workers = new Map([
@@ -219,6 +234,8 @@ export function convert_link(file, heading) {
 			// 30-advanced
 			case 'docs/30-advanced/10-advanced-routing.md':
 				return docs_advanced_routing.get(heading) || heading;
+			case 'docs/30-advanced/20-hooks.md':
+				return docs_hooks.get(heading) || heading;
 			case 'docs/30-advanced/40-service-workers.md':
 				return docs_service_workers.get(heading) || heading;
 			case 'docs/30-advanced/70-packaging.md':
