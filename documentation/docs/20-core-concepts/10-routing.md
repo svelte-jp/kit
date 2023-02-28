@@ -353,3 +353,9 @@ export async function POST({ request }) {
 ルート(route)ディレクトリ内のその他のファイルは SvelteKit から無視されます。つまり、コンポーネントやユーティリティモジュールを、それらを必要とするルート(routes)に配置することができます。
 
 コンポーネントやモジュールが複数のルート(routes)から必要な場合、[`$lib`](modules#$lib) にそれらを配置すると良いでしょう。
+
+## その他の参考資料
+
+- [Tutorial: Routing](https://learn.svelte.jp/tutorial/pages)
+- [Tutorial: API routes](https://learn.svelte.jp/tutorial/get-handlers)
+- [Docs: Advanced routing](advanced-routing)

@@ -4,7 +4,7 @@ title: イントロダクション
 
 ## 始める前に
 
-> Svelte や SvelteKit が初めてなら、この[インタラクティブなチュートリアル](https://learn.svelte.jp)をチェックしてみることをおすすめします(このインタラクティブなチュートリアルはまだexperimentalです)。
+> Svelte や SvelteKit が初めてなら、こちらの[インタラクティブなチュートリアル](https://learn.svelte.jp)をチェックしてみることをおすすめします。
 >
 > 行き詰まったら、[Discord chatroom](https://svelte.dev/chat) でヘルプを求めてください。(日本語翻訳版 追記：上記のDiscordはSvelte本体のもので、英語でコミュニケーションが行われています。もし日本語で質問したり交流したいのであれば、[Svelte日本のDiscord](https://discord.com/invite/YTXq3ZtBbx)にどうぞ！)
 

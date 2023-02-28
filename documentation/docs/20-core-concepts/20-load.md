@@ -583,3 +583,9 @@ export async function load({ fetch, depends }) {
 ## 状態の共有(Shared state)
 
 多くのサーバー環境では、アプリの単一のインスタンスが複数のユーザーにサービスを提供することになります。そのため、リクエストごと(per-request)、ユーザーごと(per-user)の状態を `load` 関数の外側の共有変数に保存してはいけません。代わりに、`event.locals` に保存するようにしてください。
+
+## その他の参考資料
+
+- [Tutorial: Loading data](https://learn.svelte.jp/tutorial/page-data)
+- [Tutorial: Errors and redirects](https://learn.svelte.jp/tutorial/error-basics)
+- [Tutorial: Advanced loading](https://learn.svelte.jp/tutorial/await-parent)
