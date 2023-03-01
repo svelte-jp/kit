@@ -456,7 +456,30 @@ const response = await fetch(this.action, {
 
 ## Alternatives
 
-サーバーにデータを送信する方法として、プログレッシブな強化(progressively enhance)を行うことができるため Form actions は望ましい方法ですが、[`+server.js`](routing#server) ファイルを使用して (例えば) JSON API を公開することもできます。
+サーバーにデータを送信する方法として、プログレッシブな強化(progressively enhance)を行うことができるため Form actions は望ましい方法ですが、[`+server.js`](routing#server) ファイルを使用して (例えば) JSON API を公開することもできます。それは例えばこのように行います:
+
+```svelte
+/// file: send-message/+page.svelte
+<script>
+	function rerun() {
+		fetch('/api/ci', {
+			method: 'POST'
+		});
+	}
+</script>
+
+<button on:click={rerun}>Rerun CI</button>
+```
+
+```js
+// @errors: 2355 1360
+/// file: api/ci/+server.js
+
+/** @type {import('./$types').RequestHandler} */
+export function POST() {
+	// do something
+}
+```
 
 ## GET vs POST
 

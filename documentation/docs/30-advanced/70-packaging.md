@@ -213,6 +213,7 @@ npm publish
 ```diff
 -import { something } from './something';
 +import { something } from './something/index.js';
+```
 
 TypeScript を使用している場合、同じように `.ts` ファイルをインポートする必要がありますが、`.js` ファイルの末尾を使用する必要があります、`.ts` ファイルの末尾ではありません (これは TypeScript の設計上の決定によるもので、私たちの管轄外です)。`tsconfig.json` または `jsconfig.json` に `"moduleResolution": "NodeNext"` を設定すると、これに対処できます。
 
