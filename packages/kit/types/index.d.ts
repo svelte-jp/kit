@@ -164,18 +164,18 @@ export interface Builder {
 
 export interface Config {
 	/**
-	 * Options passed to [`svelte.compile`](https://svelte.jp/docs#compile-time-svelte-compile).
+	 * [`svelte.compile`](https://svelte.jp/docs#compile-time-svelte-compile) に渡されるオプションです。
 	 * @default {}
 	 */
 	compilerOptions?: CompileOptions;
 	/**
-	 * List of file extensions that should be treated as Svelte files.
+	 * Svelte ファイルとして扱うべきファイルの拡張子のリストです。
 	 * @default [".svelte"]
 	 */
 	extensions?: string[];
-	/** SvelteKit options */
+	/** SvelteKit オプション */
 	kit?: KitConfig;
-	/** [`@sveltejs/package`](/docs/packaging) options. */
+	/** [`@sveltejs/package`](/docs/packaging) オプション。 */
 	package?: {
 		source?: string;
 		dir?: string;
@@ -183,9 +183,9 @@ export interface Config {
 		exports?(filepath: string): boolean;
 		files?(filepath: string): boolean;
 	};
-	/** Preprocessor options, if any. Preprocessing can alternatively also be done through Vite's preprocessor capabilities. */
+	/** プリプロセッサ のオプション (もしあれば)。プリプロセスは Vite のプリプロセッサによって行うこともできます。 */
 	preprocess?: any;
-	/** Any additional options required by tooling that integrates with Svelte. */
+	/** Svelte とインテグレートするツールに必要な追加のオプション。 */
 	[key: string]: any;
 }
 
@@ -423,15 +423,15 @@ export interface KitConfig {
 	 */
 	outDir?: string;
 	/**
-	 * Options related to the build output format
+	 * ビルドの出力フォーマットに関するオプション
 	 */
 	output?: {
 		/**
-		 * SvelteKit will preload the JavaScript modules needed for the initial page to avoid import 'waterfalls', resulting in faster application startup. There
-		 * are three strategies with different trade-offs:
-		 * - `modulepreload` - uses `<link rel="modulepreload">`. This delivers the best results in Chromium-based browsers, but is currently ignored by Firefox and Safari (though support is coming to Safari soon).
-		 * - `preload-js` - uses `<link rel="preload">`. Prevents waterfalls in Chromium and Safari, but Chromium will parse each module twice (once as a script, once as a module). Causes modules to be requested twice in Firefox. This is a good setting if you want to maximise performance for users on iOS devices at the cost of a very slight degradation for Chromium users.
-		 * - `preload-mjs` - uses `<link rel="preload">` but with the `.mjs` extension which prevents double-parsing in Chromium. Some static webservers will fail to serve .mjs files with a `Content-Type: application/javascript` header, which will cause your application to break. If that doesn't apply to you, this is the option that will deliver the best performance for the largest number of users, until `modulepreload` is more widely supported.
+		 * SvelteKit は初期ページに必要な JavaScript モジュールをプリロードすることで、インポートの 'ウォーターフォール' を回避し、アプリケーションの起動を高速化します。
+		 * 異なるトレードオフを持つ3つの戦略があります:
+		 * - `modulepreload` - `<link rel="modulepreload">` を使用します。これは Chromium ベースのブラウザではベストな結果をもたらしますが、現時点では Firefox と Safari では無視されます (ただし Safari には近々サポートが提供される見込みです)。
+		 * - `preload-js` - `<link rel="preload">` を使用します。Chromium と Safari でウォーターフォールを防ぎますが、Chromium は書くモジュールを2回パースします (script として1回、module として1回)。Firefox ではモジュールが2回リクエストされるようになります。これは、Chromium ユーザーのパフォーマンスをわずかに低下させるのと引き換えに、iOS デバイスのユーザーのパフォーマンスを最大化したい場合には有効な設定です。
+		 * - `preload-mjs` - `<link rel="preload">` を使用しますが、`.mjs` 拡張子であるため、Chromium が二重でパースすることを防ぎます。一部の静的 Web サーバーでは、.mjs ファイルを `Content-Type: application/javascript` ヘッダーとともに提供すると失敗となり、アプリケーションを壊すことになります。それがもしあなたにあてはまらないのなら、`modulepreload` がより広くサポートされるまで、これが多くのユーザーにベストなパフォーマンスをもたらすオプションです。
 		 * @default "modulepreload"
 		 */
 		preloadStrategy?: 'modulepreload' | 'preload-js' | 'preload-mjs';
@@ -441,12 +441,20 @@ export interface KitConfig {
 		 * アプリのファイルが提供される絶対パス(absolute path)です。これは、何らかのストレージバケットからファイルを提供する場合に有用です。
 		 * @default ""
 		 */
-		assets?: string;
+		assets?: '' | `http://${string}` | `https://${string}`;
 		/**
 		 * ルート相対なパス(root-relative path)です。空文字(empty string)以外を指定する場合、先頭は `/` を付ける必要があり、末尾には `/` を付けてはいけません (例: `/base-path`)。アプリがどこから提供されるかを指定することで、アプリをルートではないパス(non-root path)で動作させることができます。ルート相対(root-relative)なリンクには、先頭に base の値を追加しなければなりません。そうしないとリンクが `base` ではなくドメインのルート(root)を指してしまいます(これはブラウザの動作によるものです)。これを行うには、[`base` from `$app/paths`](/docs/modules#$app-paths-base) をインポートして `<a href="{base}/your-page">Link</a>` のようにします。もし、これを頻繁に書くようであれば、再利用可能なコンポーネントに抽出するのも良いでしょう。
 		 * @default ""
 		 */
-		base?: string;
+		base?: '' | `/${string}`;
+		/**
+		 * Whether to use relative asset paths. By default, if `paths.assets` is not external, SvelteKit will replace `%sveltekit.assets%` with a relative path and use relative paths to reference build artifacts, but `base` and `assets` imported from `$app/paths` will be as specified in your config.
+		 *
+		 * If `true`, `base` and `assets` imported from `$app/paths` will be replaced with relative asset paths during server-side rendering, resulting in portable HTML.
+		 * If `false`, `%sveltekit.assets%` and references to build artifacts will always be root-relative paths, unless `paths.assets` is an external URL
+		 * @default undefined
+		 */
+		relative?: boolean | undefined;
 	};
 	/**
 	 * [プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender) をご覧ください。
@@ -537,9 +545,9 @@ export interface KitConfig {
 	};
 	/**
 	 * アプリが使用されているときにアプリの新しいバージョンをデプロイするとクライアントサイドのナビゲーションにバグが発生することがあります。次に開くページのコードがすでにロードされている場合、そこに古いコンテンツがある可能性があります。そうでなくとも、アプリのルートマニフェスト(route manifest)が、もう存在しない JavaScript ファイルを指している可能性があります。
-	 * SvelteKit helps you solve this problem through version management.
-	 * If SvelteKit encounters an error while loading the page and detects that a new version has been deployed (using the `name` specified here, which defaults to a timestamp of the build) it will fall back to traditional full-page navigation.
-	 * Not all navigations will result in an error though, for example if the JavaScript for the next page is already loaded. If you still want to force a full-page navigation in these cases, use techniques such as setting the `pollInterval` and then using `beforeNavigate`:
+	 * SvelteKit はバージョン管理によってこの問題を解決します。
+	 * SvelteKit がページの読込中にエラーに遭遇し、新しいバージョンがデプロイされていることを検知した場合 (ここで指定される `name` を使用します。デフォルトはビルドのタイムスタンプです)、従来のフルページナビゲーションにフォールバックされます。
+	 * しかし、すべてのナビゲーションがエラーとなるわけではありません。例えば次のページの JavaScript がすでに読み込まれている場合です。このような場合でもフルページナビゲーションを強制したい場合は、`pollInterval` を設定してから `beforeNavigate` を使用する、などのテクニックを使用します:
 	 * ```html
 	 * /// +layout.svelte
 	 * <script>
@@ -558,7 +566,7 @@ export interface KitConfig {
 	 */
 	version?: {
 		/**
-		 * アプリの現在のバージョンの文字列です。If specified, this must be deterministic (e.g. a commit ref rather than `Math.random()` or `Date.now().toString()`), otherwise defaults to a timestamp of the build
+		 * アプリの現在のバージョンの文字列です。これを指定する場合は、決定論的なものでないといけません (例えば `Math.random()` や `Date.now().toString()` ではなく commit ref )。指定しない場合は、ビルドのタイムスタンプがデフォルトとなります
 		 */
 		name?: string;
 		/**

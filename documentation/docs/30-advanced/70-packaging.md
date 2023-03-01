@@ -6,22 +6,22 @@ SvelteKit では、アプリを構築するだけでなく、`@sveltejs/package`
 
 アプリを作成するとき、`src/routes` のコンテンツが公開される部分となります。[`src/lib`](modules#$lib) にはアプリの内部ライブラリが含まれます。
 
-A component library has the exact same structure as a SvelteKit app, except that `src/lib` is the public-facing bit, and your root `package.json` is used to publish the package. `src/routes` might be a documentation or demo site that accompanies the library, or it might just be a sandbox you use during development.
+コンポーネントライブラリは SvelteKit アプリと同じ構造ですが、`src/lib` が公開される部分である点が異なります。パッケージの公開にはプロジェクトの最上位(root)の `package.json` が使用されます。`src/routes` を、ライブラリに付属するドキュメントやデモサイト、または開発中に使用するサンドボックスにすることもあるでしょう。
 
-Running the `svelte-package` command from `@sveltejs/package` will take the contents of `src/lib` and generate a `dist` directory (which can be [configured](#options)) containing the following:
+`@sveltejs/package` の `svelte-package` コマンドを実行すると、`src/lib` の中身を取り込み、以下を含む `dist` ([設定で変更](#options)できます) ディレクトリを生成します:
 
-- All the files in `src/lib`. Svelte components will be preprocessed, TypeScript files will be transpiled to JavaScript.
-- Type definitions (`d.ts` files) which are generated for Svelte, JavaScript and TypeScript files. You need to install `typescript >= 4.0.0` for this. Type definitions are placed next to their implementation, hand-written `d.ts` files are copied over as is. You can [disable generation](#options), but we strongly recommend against it — people using your library might use TypeScript, for which they require these type definition files.
+- `src/lib` にある全てのファイル。Svelte コンポーネントはプリプロセスされ、TypeScript ファイルは JavaScript にトランスパイルされます。
+- Svelte、JavaScript、TypeScript ファイル向けに生成される型定義 (`d.ts` ファイル)。このために、`typescript >= 4.0.0` をインストールする必要があります。型定義はその実装と同じ場所に配置され、手書きの `d.ts` ファイルはそのままコピーされます。[生成を無効](#options)にすることもできますが、それはおすすめできません。あなたのライブラリを使用する人は TypeScript を使用しているかもしれません。その場合、この型定義ファイルが必要になります。
 
-> `@sveltejs/package` version 1 generated a `package.json`. This is no longer the case and it will now use the `package.json` from your project and validate that it is correct instead. If you're still on version 1, see [this PR](https://github.com/sveltejs/kit/pull/8922) for migration instructions.
+> `@sveltejs/package` バージョン1は `package.json` を生成していましたが、この仕様は変更され、現在はプロジェクトの `package.json` を使用しそれが正しいか検証するようになりました。もしまだバージョン1を使用している場合は、[この PR](https://github.com/sveltejs/kit/pull/8922) にある移行手順(Migration instructions)をご覧ください。
 
-## Anatomy of a package.json
+## package.json の構造
 
-Since you're now building a library for public use, the contents of your `package.json` will become more important. Through it, you configure the entry points of your package, which files are published to npm, and which dependencies your library has. Let's go through the most important fields one by one.
+公開するライブラリをビルドするのであれば、`package.json` の内容がとても重要になります。これを通して、パッケージのエントリーポイントや、どのファイルを npm に公開するか、そしてあなたのライブラリの依存関係を設定することができます。それでは、重要なフィールドをひとつずつ見ていきましょう。
 
 ### name
 
-This is the name of your package. It will be available for others to install using that name, and visible on `https://npmjs.com/package/<name>`.
+これはパッケージの名前です。他の人はこの名前を使用してインストールすることになります。そして `https://npmjs.com/package/<name>` のように表示されるようになります。
 
 ```json
 {
@@ -29,11 +29,11 @@ This is the name of your package. It will be available for others to install usi
 }
 ```
 
-Read more about it [here](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name).
+詳細については[こちら](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#name)をお読みください。
 
 ### license
 
-Every package should have a license field so people know how they are allowed to use it. A very popular license which is also very permissive in terms of distribution and reuse without warranty is `MIT`.
+すべてのパッケージにはライセンスフィールドがあるべきです。なぜなら、人々はこれによってどのように使用することが許可されているのか知ることができるからです。配布や保証なしの再利用に関してとても寛容で、非常にポピュラーなライセンスとして、`MIT` があります。
 
 ```json
 {
@@ -41,11 +41,11 @@ Every package should have a license field so people know how they are allowed to
 }
 ```
 
-Read more about it [here](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#license). Note that you should also include a `LICENSE` file in your package.
+詳細については[こちら](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#license)をお読みください。`LICENSE` ファイルもパッケージに含めるとよいでしょう。
 
 ### files
 
-This tells npm which files it will pack up and upload to npm. It should contain your output folder (`dist` by default). Your `package.json` and `README` and `LICENSE` will always be included, so you don't need to specify them.
+ここではどのファイルを npm にアップロードするかを設定します。出力先フォルダ (デフォルトは `dist`) も含める必要があります。`package.json` と `README` と `LICENSE` は常に含まれるようになっているため、指定する必要はありません。
 
 ```json
 {
@@ -53,13 +53,13 @@ This tells npm which files it will pack up and upload to npm. It should contain 
 }
 ```
 
-To exclude unnecessary files (such as unit tests, or modules that are only imported from `src/routes` etc) you can add them to an `.npmignore` file. This will result in smaller packages that are faster to install.
+不要なファイル (例えば単体テストや、`src/routes` からのみインポートされているモジュールなど) を除外するには、`.npmignore` ファイルにそれらを追加します。これによってより小さいパッケージとなり、インストールも速くなります。
 
-Read more about it [here](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#files).
+詳細については[こちら](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#files)をお読みください。
 
 ### exports
 
-The `"exports"` field contains the package's entry points. If you set up a new library project through `npm create svelte@latest`, it's set to a single export, the package root:
+`"exports"` フィールドにはパッケージのエントリーポイントを含めます。`npm create svelte@latest` を使用して新しいライブラリプロジェクトをセットアップした場合、単一の export として、パッケージの最上位(root)が設定されています:
 
 ```json
 {
@@ -72,21 +72,21 @@ The `"exports"` field contains the package's entry points. If you set up a new l
 }
 ```
 
-This tells bundlers and tooling that your package only has one entry point, the root, and everything should be imported through that, like this:
+これにより、あなたのパッケージにはエントリーポイントが1つだけで、それは最上位(root)で、(以下のように)すべてここを通してインポートされるべきである、ということをバンドラーやツール類に伝えます:
 
 ```js
 // @errors: 2307
 import { Something } from 'your-library';
 ```
 
-The `types` and `svelte` keys are [export conditions](https://nodejs.org/api/packages.html#conditional-exports). They tell tooling what file to import when they look up the `your-library` import:
+`types` と `svelte` キーは [export conditions](https://nodejs.org/api/packages.html#conditional-exports) です。これはツール類に、`your-library` インポートを検索する際にどのファイルをインポートするかを伝えるものです:
 
-- TypeScript sees the `types` condition and looks up the type definition file. If you don't publish type definitions, omit this condition.
-- Svelte-aware tooling sees the `svelte` condition and knows this is a Svelte component library. If you publish a library that does not export any Svelte components and that could also work in non-Svelte projects (for example a Svelte store library), you can replace this condition with `default`.
+- TypeScript は `types` condition を見て、型定義ファイルを検索します。型定義を公開しない場合は、この condition を省略します。
+- Svelte を認識するツール類は `svelte` condition を見て、これが Svelte コンポーネントライブラリであることを認識します。Svelte コンポーネントをエクスポートせず、Svelte 以外のプロジェクトでも使用できるライブラリ (例えば Svelte store ライブラリ) を公開する場合、この condition を `default` に置き換えることができます。
 
-> Previous versions of `@sveltejs/package` also added a `package.json` export. This is no longer part of the template because all tooling can now deal with a `package.json` not being explicitly exported.
+> 以前のバージョンの `@sveltejs/package` は `package.json` export も追加していましたが、現在は違います。すべてのツール類が明示的にエクスポートされていない `package.json` を扱うことができるようになったからです。
 
-You can adjust `exports` to your liking and provide more entry points. For example, if instead of a `src/lib/index.js` file that re-exported components you wanted to expose a `src/lib/Foo.svelte` component directly, you could create the following export map...
+`exports` を好みに合わせて調整し、より多くのエントリーポイントを提供することができます。例えば、コンポーネントを再エクスポートする `src/lib/index.js` ファイルの代わりに、`src/lib/Foo.svelte` コンポーネントを直接公開したい場合、以下のような export map を作成できます…
 
 ```json
 {
@@ -99,7 +99,7 @@ You can adjust `exports` to your liking and provide more entry points. For examp
 }
 ```
 
-...and a consumer of your library could import the component like so:
+…そしてライブラリの使用者はコンポーネントをこのようにインポートできます:
 
 ```js
 // @filename: ambient.d.ts
@@ -110,15 +110,15 @@ declare module 'your-library/Foo.svelte';
 import Foo from 'your-library/Foo.svelte';
 ```
 
-> Beware that doing this will need additional care if you provide type definitions. Read more about the caveat [here](#typescript)
+> 型定義を提供している場合、これを行う際にさらなる注意が必要となることにお気をつけください。注意事項については[こちら](#typescript)をお読みください。
 
-In general, each key of the exports map is the path the user will have to use to import something from your package, and the value is the path to the file that will be imported or a map of export conditions which in turn contains these file paths.
+一般的に、exports map の各キーはユーザーがあなたのパッケージからなにかインポートするときに使用すべきパスであり、その値はインポートされるファイルへのパスか、またはそのファイルパスを含む export condition の map です。
 
-Read more about `exports` [here](https://nodejs.org/docs/latest-v18.x/api/packages.html#package-entry-points).
+`exports` の詳細については[こちら](https://nodejs.org/docs/latest-v18.x/api/packages.html#package-entry-points)をお読みください。
 
 ### svelte
 
-This is a legacy field that enabled tooling to recognise Svelte component libraries. It's no longer necessary when using the `svelte` [export condition](#anatomy-of-a-package-json-exports), but for backwards compatibility with outdated tooling that doesn't yet know about export conditions it's good to keep it around. It should point towards your root entry point.
+これはツール類に Svelte コンポーネントライブラリを認識できるようにするレガシーなフィールドです。`svelte` [export condition](#anatomy-of-a-package-json-exports) を使用している場合は必要ありませんが、まだ export condition を認識しない古いツールとの後方互換性のために残しておくとよいでしょう。あなたの最上位(root)のエントリーポイントを指しているはずです。
 
 ```json
 {
@@ -128,13 +128,13 @@ This is a legacy field that enabled tooling to recognise Svelte component librar
 
 ## TypeScript
 
-You should ship type definitions for your library even if you don't use TypeScript yourself so that people who do get proper intellisense when using your library. `@sveltejs/package` makes the process of generating types mostly opaque to you. By default, when packaging your library, type definitions are auto-generated for JavaScript, TypeScript and Svelte files. All you need to ensure is that the `types` condition in the [exports](#anatomy-of-a-package-json-exports) map points to the correct files. When initialising a library project through `npm create svelte@latest`, this is automatically setup for the root export.
+あなたが TypeScript を使用していないとしても、あなたのライブラリの型定義を公開したほうがよいでしょう。あなたのライブラリを使用する人が、適切なインテリセンスを得られるようになるからです。`@sveltejs/package` は型生成のプロセスをほとんど隠ぺい(opaque)してくれます。デフォルトでは、ライブラリをパッケージングする際、JavaScript、TypeScript、Svelte ファイル向けに型定義を自動生成します。あなたは [exports](#anatomy-of-a-package-json-exports) map の `types` condition が正しいファイルを指しているか確認するだけです。`npm create svelte@latest` でライブラリプロジェクトを初期化すると、root export に `types` condition が設定されます。
 
-If you have something else than a root export however — for example providing a `your-library/foo` import — you need to take additional care for providing type definitions. Unfortunately, TypeScript by default will _not_ resolve the `types` condition for an export like `{ "./foo": { "types": "./dist/foo.d.ts", ... }}`. Instead, it will search for a `foo.d.ts` relative to the root of your library (i.e. `your-library/foo.d.ts` instead of `your-library/dist/foo.d.ts`). To fix this, you have two options:
+しかし、root export 以外のもの、例えば `your-library/foo` インポートを提供する場合などは、型定義を提供する上でさらなる注意が必要です。残念ながら、TypeScript はデフォルトでは `{ "./foo": { "types": "./dist/foo.d.ts", ... }}` のような export に対して `types` condition を解決しません。代わりに、ライブラリの root からの相対で `foo.d.ts` を探します (つまり、`your-library/dist/foo.d.ts` ではなく `your-library/foo.d.ts` です)。これを修正する方法として、選択肢が2つあります:
 
-The first option is to require people using your library to set the `moduleResolution` option in their `tsconfig/jsconfig.json` to `bundler` (available since TypeScript 5, the best and recommended option in the future), `node16` or `nodenext`. This opts TypeScript into actually looking at the exports map and resolving the types correctly.
+1つ目の選択肢は、あなたのライブラリを使用する人に対し、`tsconfig/jsconfig.json` の `moduleResolution` オプション に `bundler` (TypeScript 5 から利用可能で、将来的にもベストかつ推奨のオプション) か `node16` か `nodenext` を設定してもらうように要求することです。これによって TypeScript が実際に exports map を見て正しく型を解決してくれるようになります。
 
-The second option is to (ab)use the `typesVersions` feature from TypeScript to wire up the types. This is a field inside `package.json` TypeScript uses to check for different type definitions depending on the TypeScript version, and also contains a path mapping feature for that. We leverage that path mapping feature to get what we want. For the mentioned `foo` export above, the corresponding `typesVersions` looks like this:
+2つ目の選択肢は、TypeScript の `typesVersions` 機能を使用(乱用)して、型を紐付けます。これは、TypeScript が TypeScript のバージョンによって異なる型定義をチェックするために使用している `package.json` 内のフィールドで、このためにパスマッピング機能があります。このパスマッピング機能を利用して、やりたいことを実現できます。上述の `foo` export の場合、対応する `typesVersions` はこのようになります:
 
 ```json
 {
@@ -152,17 +152,17 @@ The second option is to (ab)use the `typesVersions` feature from TypeScript to w
 }
 ```
 
-`>4.0` tells TypeScript to check the inner map if the used TypeScript version is greater than 4 (which should in practice always be true). The inner map tells TypeScript that the typings for `your-library/foo` are found within `./dist/foo.d.ts`, which essentially replicates the `exports` condition. You also have `*` as a wildcard at your disposal to make many type definitions at once available without repeating yourself. Note that if you opt into `typesVersions` you have to declare all type imports through it, including the root import (which is defined as `"index": [..]`).
+`>4.0` は、TypeScript のバージョンが 4 より大きい場合、内側の map をチェックするよう TypeScript に伝えるものです (実際には常に true となるべきものです)。内側の map は TypeScript に `your-library/foo` に対する型付けが `./dist/foo.d.ts` にあることを伝えるためのもので、実質 `exports` condition を置き換えています。また、ワイルドカードとして `*` を自由に使用できるので、同じことを繰り返すことなくたくさんの型定義を一度で使用可能にすることができます。もし `typesVersions` を選択した場合、root import (`"index": [..]` と定義される) を含む全ての型のインポートを、これを通して宣言しなければならないことにご注意ください。
 
-You can read more about that feature [here](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html#version-selection-with-typesversions).
+この機能についてより詳しい情報は[こちら](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html#version-selection-with-typesversions)でお読み頂けます。
 
-## Best practices
+## ベストプラクティス
 
-You should avoid using [SvelteKit-specific modules](modules) like `$app` in your packages unless you intend for them to only be consumable by other SvelteKit projects. E.g. rather than using `import { browser } from '$app/environment'` you could use `import { BROWSER } from 'esm-env'` ([see esm-env docs](https://github.com/benmccann/esm-env)). You may also wish to pass in things like the current URL or a navigation action as a prop rather than relying directly on `$app/stores`, `$app/navigation`, etc. Writing your app in this more generic fashion will also make it easier to setup tools for testing, UI demos and so on.
+他の SvelteKit プロジェクトからのみ使用されることを想定しているのでなければ、`$app` などの [SvelteKit 固有のモジュール](modules)をあなたのパッケージで使用するのは避けたほうがよいでしょう。例えば、`import { browser } from '$app/environment'` を使用するのではなく、`import { BROWSER } from 'esm-env'` ([esm-env ドキュメント参照](https://github.com/benmccann/esm-env)) を使用します。また、`$app/stores` や `$app/navigation` などに直接頼るのではなく、現在の URL や navigation action をプロパティとして渡すこともできます。より一般的な方法でアプリを書くことによって、テストや UI デモなどのツールのセットアップも簡単になります。
 
-Ensure that you add [aliases](/docs/configuration#alias) via `svelte.config.js` (not `vite.config.js` or `tsconfig.json`), so that they are processed by `svelte-package`.
+[エイリアス](/docs/configuration#alias) は `svelte.config.js` (`vite.config.js` や `tsconfig.json` ではなく) を経由して追加するようにしてください。`svelte-package` で処理されるからです。.
 
-You should think carefully about whether or not the changes you make to your package are a bug fix, a new feature, or a breaking change, and update the package version accordingly. Note that if you remove any paths from `exports` or any `export` conditions inside them from your existing library, that should be regarded as a breaking change.
+パッケージに加えた変更がバグフィックスなのか、新機能なのか、それとも破壊的変更(breaking change)なのかをよく考えて、それに応じてパッケージのバージョンを更新する必要があります。もし既存のライブラリから `exports` やその中の `export` condition のパスを削除した場合、breaking change とみなされることにご注意ください。
 
 ```diff
 {
@@ -193,27 +193,28 @@ You should think carefully about whether or not the changes you make to your pac
 
 `svelte-package` は以下のオプションを受け付けます:
 
-- `-w`/`--watch` — watch files in `src/lib` for changes and rebuild the package
-- `-i`/`--input` — the input directory which contains all the files of the package. Defaults to `src/lib`
-- `-o`/`--o` — the output directory where the processed files are written to. Your `package.json`'s `exports` should point to files inside there, and the `files` array should include that folder. Defaults to `dist`
-- `-t`/`--types` — whether or not to create type definitions (`d.ts` files). We strongly recommend doing this as it fosters ecosystem library quality. Defaults to `true`
+- `-w`/`--watch` — `src/lib` にあるファイルの変更を関ししてパッケージを再ビルドします
+- `-i`/`--input` — パッケージの全てのファイルを含む入力ディレクトリ。デフォルトは `src/lib` です
+- `-o`/`--o` — 処理されたファイルが書き込まれる出力ディレクトリ。`package.json` の `exports` はここにあるファイルを指さなければならず、`files` の配列にはこのフォルダを含めなければいけません。デフォルトは `dist` です
+- `-t`/`--types` — 型定義 (`d.ts` ファイル) を作成するかどうか。エコシステムのライブラリの品質を向上させるため、作成することを強く推奨します。デフォルトは `true` です
 
-## Publishing
+## 公開(Publishing)
 
-生成されたパッケージをパブリッシュするには:
+生成されたパッケージを公開するには:
 
 ```sh
 npm publish
 ```
 
-## Caveats
+## 注意事項
 
-All relative file imports need to be fully specified, adhering to Node's ESM algorithm. This means that for a file like `src/lib/something/index.js`, you must include the filename with the extension:
+すべての相対ファイルインポートは、Node の ESM アルゴリズムに従って、フルで指定する必要があります。つまり、`src/lib/something/index.js` のようなファイルには、ファイル名と拡張子を含めなければなりません。
 
 ```diff
 -import { something } from './something';
 +import { something } from './something/index.js';
+```
 
-If you are using TypeScript, you need to import `.ts` files the same way, but using a `.js` file ending, _not_ a `.ts` file ending. (This is a TypeScript design decision outside our control.) Setting `"moduleResolution": "NodeNext"` in your `tsconfig.json` or `jsconfig.json` will help you with this.
+TypeScript を使用している場合、同じように `.ts` ファイルをインポートする必要がありますが、`.js` ファイルの末尾を使用する必要があります、`.ts` ファイルの末尾ではありません (これは TypeScript の設計上の決定によるもので、私たちの管轄外です)。`tsconfig.json` または `jsconfig.json` に `"moduleResolution": "NodeNext"` を設定すると、これに対処できます。
 
-All files except Svelte files (preprocessed) and TypeScript files (transpiled to JavaScript) are copied across as-is.
+Svelte ファイル (プロプロセスされる) と TypeScript ファイル (JavaScript にトランスパイルされる) を覗いて、全てのファイルはそのままコピーされます。

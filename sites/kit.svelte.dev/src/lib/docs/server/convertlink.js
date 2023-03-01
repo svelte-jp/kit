@@ -22,9 +22,11 @@ const docs_routing = new Map([
 ]);
 
 const docs_load = new Map([
+	['いつ、どの load 関数が実行されるのか？', 'When does which load function run?'],
 	['どちらを使用すべきか', 'When to use which'],
 	['URL data を使用する', 'Using URL data'],
 	['fetch リクエストの作成', 'Making fetch requests'],
+	['load 関数の再実行', 'Rerunning load functions'],
 	['その他の参考資料', 'Further reading']
 ]);
 
@@ -127,7 +129,11 @@ const docs_service_workers = new Map([
 	['その他のソリューション', 'Other solutions']
 ]);
 
-const docs_packaging = new Map([['注意事項', 'Caveats']]);
+const docs_packaging = new Map([
+	['package.json の構造', 'Anatomy of a package.json'],
+	['ベストプラクティス', 'Best practices'],
+	['注意事項', 'Caveats']
+]);
 
 // 40-best-practices
 

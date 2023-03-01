@@ -57,7 +57,7 @@ export async function load({ params }) {
 }
 ```
 
-型が `PageLoad` から `PageServerLoad` に変わっていることにご注意ください。サーバー(server) `load` 関数では追加の引数にアクセスすることができます。どのような場合に `+page.js` を使用し、どのような場合に `+page.server.js` を使用するのかを理解するには、[Universal vs server](load#universal-vs-server) を参照してください。
+型が `PageLoad` から `PageServerLoad` に変わっていることにご注意ください。server `load` 関数では追加の引数にアクセスすることができます。どのような場合に `+page.js` を使用し、どのような場合に `+page.server.js` を使用するのかを理解するには、[Universal vs server](load#universal-vs-server) を参照してください。
 
 ## Layout data
 
@@ -157,30 +157,38 @@ export async function load() {
 
 これまで見てきたように、`load` 関数には2つの種類があります:
 
-* `+page.js` ファイルと `+layout.js` ファイルは、サーバーとブラウザの両方で実行されるユニバーサル(universal) `load` 関数をエクスポートします
-* `+page.server.js` ファイルと `+layout.server.js` ファイルは、サーバーサイドでのみ実行されるサーバー(server) `load` 関数をエクスポートします
+* `+page.js` ファイルと `+layout.js` ファイルは、サーバーとブラウザの両方で実行される universal `load` 関数をエクスポートします
+* `+page.server.js` ファイルと `+layout.server.js` ファイルは、サーバーサイドでのみ実行される server `load` 関数をエクスポートします
 
 概念上は同じものですが、気をつけなければならない重要な違いがあります。
 
+### いつ、どの load 関数が実行されるのか？
+
+server `load` 関数は _常に_ サーバーで実行されます。
+
+デフォルトでは、universal `load` 関数は、ユーザーがはじめてページにアクセスしたときの SSR 中にサーバーで実行されます。そのあとのハイドレーション中に、[fetch リクエスト](#making-fetch-requests) で取得したレスポンスを再利用してもう一度実行されます。それ以降の universal `load` 関数の呼び出しは、すべてブラウザで行われます。この動作は [page options](page-options) によってカスタマイズすることができます。[サーバーサイドレンダリング](page-options#ssr) を無効にした場合、SPA となるため、universal `load` 関数は _常に_ クライアントで実行されるようになります。
+
+`load` 関数は実行時に呼び出されます。ページを [プリレンダリング](page-options#prerender) する場合は、ビルド時に呼び出されます。
+
 ### Input
 
-ユニバーサル(universal) `load` 関数とサーバー(server) `load` 関数はどちらも、リクエストを表すプロパティ (`params`、`route`、`url`) と様々な関数 (`fetch`、`setHeaders`、`parent`、`depends`) にアクセスできます。これらについては、以下のセクションで説明します。
+universal `load` 関数と server `load` 関数はどちらも、リクエストを表すプロパティ (`params`、`route`、`url`) と様々な関数 (`fetch`、`setHeaders`、`parent`、`depends`) にアクセスできます。これらについては、以下のセクションで説明します。
 
-サーバー(server) `load` 関数は `ServerLoadEvent` を引数にとって呼び出されます。`ServerLoadEvent` は、`RequestEvent` から `clientAddress`、`cookies`、`locals`、`platform`、`request` を継承しています。
+server `load` 関数は `ServerLoadEvent` を引数にとって呼び出されます。`ServerLoadEvent` は、`RequestEvent` から `clientAddress`、`cookies`、`locals`、`platform`、`request` を継承しています。
 
-ユニバーサル(universal) `load` 関数は、`LoadEvent` を引数にとって呼び出されます。`LoadEvent` は `data` プロパティを持っています。もし `+page.js` と `+page.server.js` (または `+layout.js` と `+layout.server.js`) の両方に `load` 関数がある場合、サーバー(server) `load` 関数の戻り値が、ユニバーサル(universal) `load` 関数の引数の `data` プロパティとなります。
+universal `load` 関数は、`LoadEvent` を引数にとって呼び出されます。`LoadEvent` は `data` プロパティを持っています。もし `+page.js` と `+page.server.js` (または `+layout.js` と `+layout.server.js`) の両方に `load` 関数がある場合、server `load` 関数の戻り値が、universal `load` 関数の引数の `data` プロパティとなります。
 
 ### Output
 
-ユニバーサル(universal) `load` 関数は、任意の値(カスタムクラスやコンポーネントコンストラクタなどを含む)を含むオブジェクトを返すことができます。
+universal `load` 関数は、任意の値(カスタムクラスやコンポーネントコンストラクタなどを含む)を含むオブジェクトを返すことができます。
 
-サーバー(server) `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ (つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照など) を返さなければなりません。Your data can include [promises](#streaming-with-promises), in which case it will be streamed to browsers.
+server `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ (つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照など) を返さなければなりません。データには [promises](#streaming-with-promises) を含めることができ、その場合はブラウザにストリーミングされます。
 
 ### どちらを使用すべきか
 
-サーバー(server) `load` 関数は、データベースやファイルシステムからデータを直接アクセスする必要がある場合や、プライベートな環境変数を使用する必要がある場合に有用です。
+server `load` 関数は、データベースやファイルシステムからデータを直接アクセスする必要がある場合や、プライベートな環境変数を使用する必要がある場合に有用です。
 
-ユニバーサル(universal) `load` 関数は、外部の API から データを `fetch` (取得) する必要があり、プライベートなクレデンシャルが必要ない場合に便利です。なぜなら、SvelteKit はあなたのサーバーを経由せずに、その API から直接データを取得することができるからです。また、Svelte コンポーネントコンストラクタのような、シリアライズできないものを返す必要がある場合にも便利です。
+universal `load` 関数は、外部の API から データを `fetch` (取得) する必要があり、プライベートなクレデンシャルが必要ない場合に便利です。なぜなら、SvelteKit はあなたのサーバーを経由せずに、その API から直接データを取得することができるからです。また、Svelte コンポーネントコンストラクタのような、シリアライズできないものを返す必要がある場合にも便利です。
 
 まれに、両方を同時に使用する必要がある場合もあります。例えば、サーバーからのデータで初期化されたカスタムクラスのインスタンスを返す必要がある場合です。
 
@@ -226,7 +234,7 @@ export function load({ route }) {
 - ページリクエストの `cookie` と `authorization` ヘッダーを継承するので、サーバー上でクレデンシャル付きのリクエストを行うことができます
 - サーバー上で、相対パスのリクエストを行うことができます (通常、`fetch` はサーバーのコンテキストで使用する場合にはオリジン付きの URL が必要です)
 - サーバーで動作している場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません
-- サーバーサイドレンダリング中は、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](hooks#server-hooks-handle) で明示的に指定されない限り、シリアライズされないことにご注意ください。そして、ハイドレーション中は、レスポンスは HTML から読み込まれるため、一貫性が保証され、追加のネットワークリクエストを防ぎます。もし、`load` 関数の `fetch` ではなくブラウザの `fetch` を使用しているときにブラウザコンソールに警告が出た場合は、これが理由です。
+- サーバーサイドレンダリング中は、`Response` オブジェクトの `text` メソッドと `json` メソッドにフックすることにより、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](hooks#server-hooks-handle) で明示的に指定されない限り、シリアライズされないことにご注意ください。そして、ハイドレーション中は、レスポンスは HTML から読み込まれるため、一貫性が保証され、追加のネットワークリクエストを防ぎます。もし、`load` 関数の `fetch` ではなくブラウザの `fetch` を使用しているときにブラウザコンソールに警告が出た場合は、これが理由です。
 
 ```js
 /// file: src/routes/items/[id]/+page.js
@@ -243,7 +251,7 @@ export async function load({ fetch, params }) {
 
 ## Cookies and headers
 
-サーバー(server) `load` 関数では [`cookies`](types#public-types-cookies) を取得したり設定したりすることができます。
+server `load` 関数では [`cookies`](types#public-types-cookies) を取得したり設定したりすることができます。
 
 ```js
 /// file: src/routes/+layout.server.js
@@ -268,7 +276,7 @@ export async function load({ cookies }) {
 
 > cookie を設定するときは、`path` プロパティにご注意ください。デフォルトでは、cookie の `path` は現在のパス名です。例えば、`admin/user` ページで cookie を設定した場合、デフォルトではその cookie は `admin` ページ配下でのみ使用することができます。多くの場合、`path` を `'/'` に設定して、アプリ全体で cookie を使用できるようにしたいでしょう。
 
-サーバー(server) `load` 関数とユニバーサル(universal) `load` 関数はどちらも `setHeaders` 関数にアクセスでき、サーバー上で実行している場合、 レスポンスにヘッダーを設定できます (ブラウザで実行している場合、`setHeaders` には何の効果もありません)。これは、ページをキャッシュさせる場合に便利です、例えば:
+server `load` 関数と universal `load` 関数はどちらも `setHeaders` 関数にアクセスでき、サーバー上で実行している場合、 レスポンスにヘッダーを設定できます (ブラウザで実行している場合、`setHeaders` には何の効果もありません)。これは、ページをキャッシュさせる場合に便利です、例えば:
 
 ```js
 // @errors: 2322 1360
@@ -422,7 +430,7 @@ export function load({ locals }) {
 
 ## Streaming with promises
 
-戻り値の _トップレベル_ にある promise は await されるので、ウォーターフォールが作られることなく複数の promise を簡単に返すことができます。サーバー(server) `load` を使用する場合、 _ネストした_ promise は解決されると同時にブラウザにストリームされます。これにより、遅くて重要でないデータがある場合でも、すべてのデータが利用可能になる前にページのレンダリングを開始することができるので便利です:
+戻り値の _トップレベル_ にある promise は await されるので、ウォーターフォールが作られることなく複数の promise を簡単に返すことができます。server `load` を使用する場合、 _ネストした_ promise は解決されると同時にブラウザにストリームされます。これにより、遅くて重要でないデータがある場合でも、すべてのデータが利用可能になる前にページのレンダリングを開始することができるので便利です:
 
 ```js
 /// file: src/routes/+page.server.js
@@ -471,13 +479,13 @@ export function load() {
 
 AWS Lambda のような ストリーミングをサポートしないプラットフォームでは、レスポンスはバッファされます。つまり、すべての promise が解決してからでないとページがレンダリングされないということです。
 
-> ストリーミングデータは JavaScript が有効なときにのみ動作します。ページがサーバーでレンダリングされる場合、ユニバーサル(universal) `load` 関数からはネストした promise を返すのは避けたほうがよいでしょう、ストリーミングされないからです (代わりに、関数がブラウザで再実行されるときに promise が再作成されます)。
+> ストリーミングデータは JavaScript が有効なときにのみ動作します。ページがサーバーでレンダリングされる場合、universal `load` 関数からはネストした promise を返すのは避けたほうがよいでしょう、ストリーミングされないからです (代わりに、関数がブラウザで再実行されるときに promise が再作成されます)。
 
 ## Parallel loading
 
-ページをレンダリング (またはページにナビゲーション) するとき、SvelteKit はすべての `load` 関数を同時に実行し、リクエストのウォーターフォールを回避します。クライアントサイドナビゲーションのときは、複数のサーバー(server) `load` 関数の呼び出し結果が単一のレスポンスにグループ化されます。すべての `load` 関数が返されると、ページがレンダリングされます。
+ページをレンダリング (またはページにナビゲーション) するとき、SvelteKit はすべての `load` 関数を同時に実行し、リクエストのウォーターフォールを回避します。クライアントサイドナビゲーションのときは、複数の server `load` 関数の呼び出し結果が単一のレスポンスにグループ化されます。すべての `load` 関数が返されると、ページがレンダリングされます。
 
-## Invalidation
+## load 関数の再実行
 
 SvelteKit は それぞれの `load` 関数の依存関係を追跡し、ナビゲーションの際に不必要に再実行されるのを回避します。
 
@@ -578,11 +586,9 @@ export async function load({ fetch, depends }) {
 - [`fetch`](#making-fetch-requests) や [`depends`](types#public-types-loadevent) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](modules#$app-navigation-invalidate) で無効(invalid)であるとマークされた場合
 - [`invalidateAll()`](modules#$app-navigation-invalidateall) によって全ての有効な `load` 関数が強制的に再実行された場合
 
+`params` と `url` は、`<a href="..">` リンクのクリックや、[`<form>` のやりとり](form-actions#get-vs-post)、[`goto`](modules#$app-navigation-goto) の呼び出し、[`redirect`](modules#sveltejs-kit-redirect) に応じて変更されます。
+
 `load` 関数の再実行は、対応する `+layout.svelte` や `+page.svelte` 内の `data` プロパティが更新されるだけで、コンポーネントは再作成されることはありません。結果として、内部の状態は保持されます。もし、この挙動がお望みでなければ、[`afterNavigate`](modules#$app-navigation-afternavigate) コールバック内でリセットしたり、コンポーネントを [`{#key ...}`](https://svelte.jp/docs#template-syntax-key) ブロックでラップしたりしてリセットすることができます。
-
-## 状態の共有(Shared state)
-
-多くのサーバー環境では、アプリの単一のインスタンスが複数のユーザーにサービスを提供することになります。そのため、リクエストごと(per-request)、ユーザーごと(per-user)の状態を `load` 関数の外側の共有変数に保存してはいけません。代わりに、`event.locals` に保存するようにしてください。
 
 ## その他の参考資料
 
