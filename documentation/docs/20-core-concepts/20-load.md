@@ -174,7 +174,7 @@ export async function load() {
 
 ユニバーサル(universal) `load` 関数は、任意の値(カスタムクラスやコンポーネントコンストラクタなどを含む)を含むオブジェクトを返すことができます。
 
-サーバー(server) `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ (つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照など) を返さなければなりません。Your data can include [promises](#streaming-with-promises), in which case it will be streamed to browsers.
+サーバー(server) `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ (つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照など) を返さなければなりません。データには [promises](#streaming-with-promises) を含めることができ、その場合はブラウザにストリーミングされます。
 
 ### どちらを使用すべきか
 

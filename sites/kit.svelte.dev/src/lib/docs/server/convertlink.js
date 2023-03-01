@@ -127,7 +127,11 @@ const docs_service_workers = new Map([
 	['その他のソリューション', 'Other solutions']
 ]);
 
-const docs_packaging = new Map([['注意事項', 'Caveats']]);
+const docs_packaging = new Map([
+	['package.json の構造', 'Anatomy of a package.json'],
+	['ベストプラクティス', 'Best practices'],
+	['注意事項', 'Caveats']
+]);
 
 // 40-best-practices
 
