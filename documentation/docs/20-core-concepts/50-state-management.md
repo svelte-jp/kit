@@ -2,13 +2,13 @@
 title: State management
 ---
 
-If you're used to building client-only apps, state management in an app that spans server and client might seem intimidating. This section provides tips for avoiding some common gotchas.
+クライアントオンリーなアプリを構築するのに慣れている場合、サーバーとクライアントにまたがった state management(状態管理) について怖く感じるかもしれません。このセクションでは、よくある落とし穴を回避するためのヒントを提供します。
 
-## Avoid shared state on the server
+## サーバーでは state の共有を避ける
 
-Browsers are _stateful_ — state is stored in memory as the user interacts with the application. Servers, on the other hand, are _stateless_ — the content of the response is determined entirely by the content of the request.
+ブラウザは state を保持します(Browsers are _stateful_) — ユーザーがアプリケーションとやりとりする際に、state はメモリ内に保存されます。一方、サーバーは state を保持しません(Servers are _stateless_) — レスポンスの内容は、完全にリクエストの内容によって決定されます。
 
-Conceptually, that is. In reality, servers are often long-lived and shared by multiple users. For that reason it's important not to store data in shared variables. For example, consider this code:
+概念としては、そうです。現実では、サーバーは長い期間存在し、複数のユーザーで共有されることが多いです。そのため、共有される変数にデータを保存しないことが重要です。例えば、こちらのコードを考えてみます:
 
 ```js
 // @errors: 7034 7005
@@ -34,13 +34,13 @@ export const actions = {
 }
 ```
 
-The `user` variable is shared by everyone who connects to this server. If Alice submitted an embarrassing secret, and Bob visited the page after her, Bob would know Alice's secret. In addition, when Alice returns to the site later in the day, the server may have restarted, losing her data.
+この `user` 変数はサーバーに接続する全員に共有されます。もしアリスが恥ずかしい秘密を送信し、ボブがアリスのあとにページにアクセスした場合、ボブはアリスの秘密を知ることになります (訳注: アリスやボブについては[こちら](https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%AA%E3%82%B9%E3%81%A8%E3%83%9C%E3%83%96))。さらに付け加えると、アリスが後でサイトに戻ってきたとき、サーバーは再起動していて彼女のデータは失われているかもしれません。
 
-Instead, you should _authenticate_ the user using [`cookies`](/docs/load#cookies-and-headers) and persist the data to a database.
+代わりに、[`cookies`](/docs/load#cookies-and-headers) を使用してユーザーを _認証_ し、データベースにデータを保存すると良いでしょう。
 
-## No side-effects in load
+## load に副作用を持たせない
 
-For the same reason, your `load` functions should be _pure_ — no side-effects (except maybe the occasional `console.log(...)`). For example, you might be tempted to write to a store inside a `load` function so that you can use the store value in your components:
+同じ理由で、`load` 関数は _純粋(pure)_ であるべきです — 副作用(side-effect)を持つべきではありません (必要なときに使用する `console.log(...)` は除く)。例えば、コンポーネントで store の値を使用できるようにするために、`load` 関数の内側で store に書き込みをしたくなるかもしれません:
 
 ```js
 /// file: +page.js
@@ -62,7 +62,7 @@ export async function load({ fetch }) {
 }
 ```
 
-As with the previous example, this puts one user's information in a place that is shared by _all_ users. Instead, just return the data...
+前の例と同様に、これはあるユーザーの情報を _すべての_ ユーザーに共有される場所に置くことになります。代わりに、ただデータを返すようにしましょう…
 
 ```diff
 /// file: +page.js
@@ -75,13 +75,13 @@ export async function load({ fetch }) {
 }
 ```
 
-...and pass it around to the components that need it, or use [`$page.data`](/docs/load#$page-data).
+…そしてそのデータを必要とするコンポーネントに渡すか、[`$page.data`](/docs/load#$page-data) を使用してください。
 
-If you're not using SSR, then there's no risk of accidentally exposing one user's data to another. But you should still avoid side-effects in your `load` functions — your application will be much easier to reason about without them.
+SSR を使用していない場合は、あるユーザーのデータを別の人に誤って公開してしまうリスクはありません。しかし、それでも `load` 関数の中で副作用を持つべきではありません — 副作用がなければ、あなたのアプリケーションはより理解がしやすいものになります。
 
-## Using stores with context
+## context と共に store を使う
 
-You might wonder how we're able to use `$page.data` and other [app stores](/docs/modules#$app-stores) if we can't use our own stores. The answer is that app stores on the server use Svelte's [context API](https://learn.svelte.dev/tutorial/context-api) — the store is attached to the component tree with `setContext`, and when you subscribe you retrieve it with `getContext`. We can do the same thing with our own stores:
+独自の store が使用できないのであれば、どうやって `$page.data` や他の [app stores](/docs/modules#$app-stores) を使用できるようにしているのだろう、と思うかもしれません。その答えは、サーバーの app stores は Svelte の [context API](https://learn.svelte.jp/tutorial/context-api) を使用しているから、です — store は `setContext` でコンポーネントツリーにアタッチされ、subscribe するときは `getContext` で取得します。同じことを独自の store でも行うことができます:
 
 ```svelte
 /// file: src/routes/+layout.svelte
@@ -92,11 +92,11 @@ You might wonder how we're able to use `$page.data` and other [app stores](/docs
 	/** @type {import('./$types').LayoutData} */
 	export let data;
 
-	// Create a store and update it when necessary...
+	// store を作成し必要に応じて更新します...
 	const user = writable();
 	$: user.set(data.user);
 
-	// ...and add it to the context for child components to access
+	// ...そして子コンポーネントがアクセスできるように context に追加します
 	setContext('user', user);
 </script>
 ```
@@ -106,18 +106,18 @@ You might wonder how we're able to use `$page.data` and other [app stores](/docs
 <script>
 	import { getContext } from 'svelte';
 
-	// Retrieve user store from context
+	// context から user store を取得します
 	const user = getContext('user');
 </script>
 
 <p>Welcome {$user.name}</p>
 ```
 
-If you're not using SSR (and can guarantee that you won't need to use SSR in future) then you can safely keep state in a shared module, without using the context API.
+SSR を使用していない場合 (そして将来的にも SSR を使用する必要がないという保証がある場合) は、context API を使用しなくても、共有されるモジュールの中で state を安全に保持することができます。
 
-## Component state is preserved
+## コンポーネントの state は保持される
 
-When you navigate around your application, SvelteKit reuses existing layout and page components. For example, if you have a route like this...
+アプリケーションの中を移動するとき、SvelteKit はすでに存在するレイアウトやページコンポーネントを再利用します。例えば、このようなルート(route)があるとして…
 
 ```svelte
 /// file: src/routes/blog/[slug]/+page.svelte
@@ -138,9 +138,9 @@ When you navigate around your application, SvelteKit reuses existing layout and 
 <div>{@html data.content}</div>
 ```
 
-...then navigating from `/blog/my-short-post` to `/blog/my-long-post` won't cause the component to be destroyed and recreated. The `data` prop (and by extension `data.title` and `data.content`) will change, but because the code isn't re-running, `estimatedReadingTime` won't be recalculated.
+…`/blog/my-short-post` から `/blog/my-long-post` への移動は、コンポーネントの破棄や再作成を引き起こしません。この `data` プロパティ (と `data.title` と `data.content`) は変更されますが、コードは再実行されないため、`estimatedReadingTime` は再計算されません。
 
-Instead, we need to make the value [_reactive_](https://learn.svelte.dev/tutorial/reactive-assignments):
+代わりに、その値を [_リアクティブ_](https://learn.svelte.jp/tutorial/reactive-assignments) にする必要があります:
 
 ```diff
 /// file: src/routes/blog/[slug]/+page.svelte
@@ -153,7 +153,7 @@ Instead, we need to make the value [_reactive_](https://learn.svelte.dev/tutoria
 </script>
 ```
 
-Reusing components like this means that things like sidebar scroll state are preserved, and you can easily animate between changing values. However, if you do need to completely destroy and remount a component on navigation, you can use this pattern:
+このようにコンポーネントを再利用すると、サイドバースクロールの state などが保持され、変化する値の間で簡単にアニメーションを行うことができます。しかし、ナビゲーション時にコンポーネントを完全に破棄して再マウントする必要がある場合、このパターンを使用できます:
 
 ```svelte
 {#key $page.url.pathname}
@@ -161,10 +161,10 @@ Reusing components like this means that things like sidebar scroll state are pre
 {/key}
 ```
 
-## Storing state in the URL
+## state を URL に保存する
 
-If you have state that should survive a reload and/or affect SSR, such as filters or sorting rules on a table, URL search parameters (like `?sort=price&order=ascending`) are a good place to put them. You can put them in `<a href="...">` or `<form action="...">` attributes, or set them programmatically via `goto('?key=value')`. They can be accessed inside `load` functions via the `url` parameter, and inside components via `$page.url.searchParams`.
+もし、テーブルのフィルターやソートルールなどのように、リロード後も保持されるべき state、または SSR に影響を与える state がある場合、URL search パラメータ (例: `?sort=price&order=ascending`) はこれらを置くのに適した場所です。これらは `<a href="...">` や `<form action="...">` の属性に置いたり、`goto('?key=value')` を使用してプログラム的に設定することもできます。`load` 関数の中では `url` パラメータを使用してアクセスでき、コンポーネントの中では `$page.url.searchParams` でアクセスできます。
 
-## Storing ephemeral state in snapshots
+## 一時的な state は snapshots に保存する
 
-Some UI state, such as 'is the accordion open?', is disposable — if the user navigates away or refreshes the page, it doesn't matter if the state is lost. In some cases, you _do_ want the data to persist if the user navigates to a different page and comes back, but storing the state in the URL or in a database would be overkill. For this, SvelteKit provides [snapshots](/docs/snapshots), which let you associate component state with a history entry.
+'アコーディオンは開いているか？' などの一部の UI の state は一時的なものですぐに捨てられます — ユーザーがページを移動したり更新したりして、その state が失われたとしてもそれほど問題ではありません。ユーザーが別のページに移動して戻ってきたときにデータを保持しておきたい場合もありますが、そのような state を URL や database に保存するのは行き過ぎでしょう。そういった場合のために、SvelteKit [snapshots](/docs/snapshots) を提供しています。これによってコンポーネントの state を履歴エントリーに関連付けることができます。

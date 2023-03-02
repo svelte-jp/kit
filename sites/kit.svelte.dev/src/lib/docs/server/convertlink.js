@@ -40,6 +40,15 @@ const docs_page_options = new Map([
 	['その他の参考資料', 'Further reading']
 ]);
 
+const docs_state_management = new Map([
+	['サーバーでは state の共有を避ける', 'Avoid shared state on the server'],
+	['load に副作用を持たせない', 'No side-effects in load'],
+	['context と共に store を使う', 'Using stores with context'],
+	['コンポーネントの state は保持される', 'Component state is preserved'],
+	['state を URL に保存する', 'Storing state in the URL'],
+	['一時的な state は snapshots に保存する', 'Storing ephemeral state in snapshots']
+]);
+
 // 25-build-and-deploy
 
 const docs_building_your_app = new Map([
@@ -218,6 +227,8 @@ export function convert_link(file, heading) {
 				return docs_form_actions.get(heading) || heading;
 			case 'docs/20-core-concepts/40-page-options.md':
 				return docs_page_options.get(heading) || heading;
+			case 'docs/20-core-concepts/50-state-management.md':
+				return docs_state_management.get(heading) || heading;
 			// 25-build-and-deploy
 			case 'docs/25-build-and-deploy/10-building-your-app.md':
 				return docs_building_your_app.get(heading) || heading;
