@@ -448,10 +448,10 @@ export interface KitConfig {
 		 */
 		base?: '' | `/${string}`;
 		/**
-		 * Whether to use relative asset paths. By default, if `paths.assets` is not external, SvelteKit will replace `%sveltekit.assets%` with a relative path and use relative paths to reference build artifacts, but `base` and `assets` imported from `$app/paths` will be as specified in your config.
+		 * 相対アセットパスを使うかどうか。デフォルトでは、`paths.assets` が外部ではない場合、SvelteKit は `%sveltekit.assets%` を相対パスに置き換え、ビルド成果物の参照に対する相対パスを使用しますが、`$app/paths` からインポートする `base` と `assets` は、あなたの設定で指定された通りになります。
 		 *
-		 * If `true`, `base` and `assets` imported from `$app/paths` will be replaced with relative asset paths during server-side rendering, resulting in portable HTML.
-		 * If `false`, `%sveltekit.assets%` and references to build artifacts will always be root-relative paths, unless `paths.assets` is an external URL
+		 * `true` の場合、`$app/paths` からインポートする `base` と `assets` は、サーバーサイドレンダリング中に相対アセットパスに置き換えられ、ポータブルな HTML になります。
+		 * `false` の場合、`%sveltekit.assets%` とビルド成果物への参照は、`paths.assets` が外部 URL でない限り、常にルート相対(root-relative)なパスとなります。
 		 * @default undefined
 		 */
 		relative?: boolean | undefined;
