@@ -198,7 +198,13 @@ export interface Cookies {
 	get(name: string, opts?: import('cookie').CookieParseOptions): string | undefined;
 
 	/**
-	 * cookie を設定します。これはレスポンスに `set-cookie` ヘッダーを追加し、また、現在のリクエスト中に `cookies.get` を通じてその cookie を利用可能にします。
+	 * 事前に `cookies.set` で設定されたすべての cookie や、またはリクエストヘッダーからすべての cookie を取得します。
+	 * @param opts 直接 `cookie.parse` に直接渡されるオプションです。ドキュメントは[こちら](https://github.com/jshttp/cookie#cookieparsestr-options)
+	 */
+	getAll(opts?: import('cookie').CookieParseOptions): Array<{ name: string; value: string }>;
+
+	/**
+	 * cookie を設定します。これはレスポンスに `set-cookie` ヘッダーを追加し、また、現在のリクエスト中に `cookies.get` か `cookies.getAll` を通じてその cookie を利用可能にします。
 	 *
 	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており (http://localhost の場合は例外として `secure` は `false` です)、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。`sameSite` オプションのデフォルトは `lax` です。
 	 *
