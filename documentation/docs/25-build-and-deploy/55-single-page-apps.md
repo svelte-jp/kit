@@ -2,20 +2,20 @@
 title: Single-page apps
 ---
 
-You can turn any SvelteKit app, using any adapter, into a fully client-rendered single-page app (SPA) by disabling SSR at the root layout:
+SvelteKit アプリは、どんな adapter を使っていても、最上位のレイアウト(root layout)で SSR を無効にすることで、完全にクライアントレンダリングされるシングルページアプリ (SPA) にすることができます。
 
 ```js
 /// file: src/routes/+layout.js
 export const ssr = false;
 ```
 
-> In most situations this is not recommended: it harms SEO, tends to slow down perceived performance, and makes your app inaccessible to users if JavaScript fails or is disabled (which happens [more often than you probably think](https://kryogenix.org/code/browser/everyonehasjs.html)).
+> ほとんどの場合、これはおすすめできません: SEO に悪影響を与え、知覚的なパフォーマンスが低下する傾向があり、もし JavaScript が失敗したり無効になっていたりする場合 (これは[あなたが思うより頻繁に](https://kryogenix.org/code/browser/everyonehasjs.html)発生します)、ユーザーはアプリにアクセスできなくなります.
 
-If you don't have any server-side logic (i.e. `+page.server.js`, `+layout.server.js` or `+server.js` files) you can use [`adapter-static`](adapter-static) to create your SPA by adding a _fallback page_.
+サーバーサイドのロジック (すなわち `+page.server.js`、`+layout.server.js`、`+server.js` ファイル) がない場合は、[`adapter-static`](adapter-static) を使い _フォールバックページ(fallback page)_ を追加することで SPA を作ることができます。
 
-## Usage
+## 使い方
 
-Install with `npm i -D @sveltejs/adapter-static`, then add the adapter to your `svelte.config.js` with the following options:
+`npm i -D @sveltejs/adapter-static` でインストールし、それから `svelte.config.js` にこの adapter と以下のオプションを追加します:
 
 ```js
 // @errors: 2307
@@ -31,13 +31,13 @@ export default {
 };
 ```
 
-The `fallback` page is an HTML page created by SvelteKit from your page template (e.g. `app.html`) that loads your app and navigates to the correct route. For example [Surge](https://surge.sh/help/adding-a-200-page-for-client-side-routing), a static web host, lets you add a `200.html` file that will handle any requests that don't correspond to static assets or prerendered pages.
+フォールバックページ(`fallback` page)とは、SvelteKit がページテンプレート(例: `app.html`)から作成する HTML ページで、アプリをロードし正しいルート(routes)にナビゲートします。例えば、静的 web ホスティングである [Surge](https://surge.sh/help/adding-a-200-page-for-client-side-routing) では、静的なアセットやプリレンダリングページに対応しないリクエストを処理する `200.html` ファイルを追加する必要があります。
 
-On some hosts it may be `index.html` or something else entirely — consult your platform's documentation.
+ホスティング環境によっては `index.html` であったり全く別のものであったりします — 使いたいプラットフォームのドキュメントをご参照ください。
 
 ## Apache
 
-To run an SPA on [Apache](https://httpd.apache.org/), you should add a `static/.htaccess` file to route requests to the fallback page:
+SPA を [Apache](https://httpd.apache.org/) で実行する場合は、`static/.htaccess` ファイルを追加し、リクエストをフォールバックページ(fallback page)にルーティングする必要があります:
 
 ```
 <IfModule mod_rewrite.c>
@@ -50,9 +50,9 @@ To run an SPA on [Apache](https://httpd.apache.org/), you should add a `static/.
 </IfModule>
 ```
 
-## Prerendering individual pages
+## ページを個別にプリレンダリングする
 
-If you want certain pages to be prerendered, you can re-enable `ssr` alongside `prerender` for just those parts of your app:
+特定のページをプリレンダリングしたい場合、アプリのその部分だけ `ssr` と `prerender` を再び有効にします:
 
 ```js
 /// file: src/routes/my-prerendered-page/+page.js
