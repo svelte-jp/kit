@@ -89,6 +89,11 @@ const docs_adapter_static = new Map([
 	['ssr をオフにする', 'Turn off ssr']
 ]);
 
+const docs_single_page_apps = new Map([
+	['使い方', 'Usage'],
+	['ページを個別にプリレンダリングする', 'Prerendering individual pages']
+]);
+
 const docs_adapter_cloudflare = new Map([
 	['比較', 'Comparisons'],
 	['使い方', 'Usage'],
