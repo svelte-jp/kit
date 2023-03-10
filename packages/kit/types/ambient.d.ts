@@ -327,6 +327,11 @@ declare module '$app/stores' {
  */
 declare module '$service-worker' {
 	/**
+	 * デプロイメントの `base` パスです。通常は、これは `config.kit.paths.base` と同じですが、`location.pathname` から計算されるので、サイトがサブディレクトリにデプロイされても正しく動作し続けます。
+	 * `base` はありますが、`assets` がないことにご注意ください。`config.kit.paths.assets` が指定されている場合に service worker を使用することができないためです。
+	 */
+	export const base: string;
+	/**
 	 * Viteが生成するファイルを表すURL文字列の配列で、`cache.addAll(build)` を使ってキャッシュするのに適しています。
 	 * 開発中は、これは空の配列となります。
 	 */

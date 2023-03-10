@@ -24,7 +24,7 @@ export default {
 
 まず、`npm run build` でアプリをビルドします。これによって adapter のオプションで指定した出力ディレクトリ (デフォルトは `build`) に本番環境用のサーバーが作成されます。
 
-アプリケーションを実行するには、出力ディレクトリ、プロジェクトの `package.json`、`node_modules` の本番向けの依存関係(production dependencies)が必要です。本番向けの依存関係は `npm ci --prod` で生成することができます (あなたのアプリが何の依存関係も持たない場合はこのステップをスキップできます)。そして、このコマンドでアプリを起動することができます:
+アプリケーションを実行するには、出力ディレクトリ、プロジェクトの `package.json`、`node_modules` の本番向けの依存関係(production dependencies)が必要です。本番向けの依存関係は、`package.json` と `package-lock.json` をコピーしてから `npm ci --omit dev` を実行すると生成することができます (あなたのアプリが何の依存関係も持たない場合はこのステップをスキップできます)。そして、このコマンドでアプリを起動することができます:
 
 ```bash
 node build
@@ -63,6 +63,9 @@ HTTP は SvelteKit に現在リクエストされている URL を知るため�
 
 ```
 ORIGIN=https://my.site node build
+
+# or e.g. for local previewing and testing
+ORIGIN=http://localhost:3000 node build
 ```
 
 これにより、パス名 `/stuff` に対するリクエストは正しく `https://my.site/stuff` に解決されます。別の方法として、リクエストプロトコルとホストを SvelteKit に伝えるヘッダーを指定し、そこから origin URL を組み立てることもできます:

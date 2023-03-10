@@ -177,6 +177,14 @@ export function create_client(app, target) {
 		});
 	}
 
+	function persist_state() {
+		update_scroll_positions(current_history_index);
+		storage.set(SCROLL_KEY, scroll_positions);
+
+		capture_snapshot(current_history_index);
+		storage.set(SNAPSHOT_KEY, snapshots);
+	}
+
 	/**
 	 * @param {string | URL} url
 	 * @param {{ noScroll?: boolean; replaceState?: boolean; keepFocus?: boolean; state?: any; invalidateAll?: boolean }} opts
@@ -379,17 +387,7 @@ export function create_client(app, target) {
 			// need to render the DOM before we can scroll to the rendered elements and do focus management
 			await tick();
 
-			const changed_focus =
-				// reset focus only if any manual focus management didn't override it
-				document.activeElement !== activeElement &&
-				// also refocus when activeElement is body already because the
-				// focus event might not have been fired on it yet
-				document.activeElement !== document.body;
-
-			if (!keepfocus && !changed_focus) {
-				await reset_focus();
-			}
-
+			// we reset scroll before dealing with focus, to avoid a flash of unscrolled content
 			if (autoscroll) {
 				const deep_linked =
 					url.hash && document.getElementById(decodeURIComponent(url.hash.slice(1)));
@@ -403,6 +401,17 @@ export function create_client(app, target) {
 				} else {
 					scrollTo(0, 0);
 				}
+			}
+
+			const changed_focus =
+				// reset focus only if any manual focus management didn't override it
+				document.activeElement !== activeElement &&
+				// also refocus when activeElement is body already because the
+				// focus event might not have been fired on it yet
+				document.activeElement !== document.body;
+
+			if (!keepfocus && !changed_focus) {
+				await reset_focus();
 			}
 		} else {
 			await tick();
@@ -1180,6 +1189,15 @@ export function create_client(app, target) {
 				route
 			});
 		}
+
+		if (__SVELTEKIT_DEV__) {
+			console.error(
+				'An error occurred while loading the page. This will cause a full page reload. (This message will only appear during development.)'
+			);
+
+			debugger;
+		}
+
 		return await native_navigation(url);
 	}
 
@@ -1437,6 +1455,8 @@ export function create_client(app, target) {
 			addEventListener('beforeunload', (e) => {
 				let should_block = false;
 
+				persist_state();
+
 				if (!navigating) {
 					// If we're navigating, beforeNavigate was already called. If we end up in here during navigation,
 					// it's due to an external or full-page-reload link, for which we don't want to call the hook again.
@@ -1466,11 +1486,7 @@ export function create_client(app, target) {
 
 			addEventListener('visibilitychange', () => {
 				if (document.visibilityState === 'hidden') {
-					update_scroll_positions(current_history_index);
-					storage.set(SCROLL_KEY, scroll_positions);
-
-					capture_snapshot(current_history_index);
-					storage.set(SNAPSHOT_KEY, snapshots);
+					persist_state();
 				}
 			});
 
@@ -1520,11 +1536,14 @@ export function create_client(app, target) {
 
 				// Ignore the following but fire beforeNavigate
 				if (external || options.reload) {
-					const navigation = before_navigate({ url, type: 'link' });
-					if (!navigation) {
+					if (before_navigate({ url, type: 'link' })) {
+						// set `navigating` to `true` to prevent `beforeNavigate` callbacks
+						// being called when the page unloads
+						navigating = true;
+					} else {
 						event.preventDefault();
 					}
-					navigating = true;
+
 					return;
 				}
 
