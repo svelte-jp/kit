@@ -9,7 +9,7 @@ import 'prism-svelte';
 import { convert_link } from './convertlink.js';
 import { escape, extract_frontmatter, transform } from './markdown.js';
 import { modules } from './type-info.js';
-import { render, replace_placeholders } from './render.js';
+import { replace_placeholders } from './render.js';
 import { parse_route_id } from '../../../../../../packages/kit/src/utils/routing.js';
 import ts from 'typescript';
 import MagicString from 'magic-string';
@@ -163,6 +163,10 @@ export async function read_file(file) {
 					// from e.g. ambient.d.ts
 					if (file.endsWith('30-modules.md')) {
 						injected.push('// @errors: 7006 7031');
+					}
+
+					if (file.endsWith('10-configuration.md')) {
+						injected.push('// @errors: 2307');
 					}
 
 					// another special case
@@ -487,14 +491,18 @@ function convert_to_ts(js_code, indent = '', offset = '') {
 						const [name, generics] = get_type_info(tag);
 
 						if (ts.isFunctionDeclaration(node)) {
-							const is_export = node.modifiers?.some(
-								(modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
-							)
-								? 'export '
-								: '';
-							const is_async = node.modifiers?.some(
-								(modifier) => modifier.kind === ts.SyntaxKind.AsyncKeyword
-							);
+							const is_export =
+								ts.canHaveModifiers(node) &&
+								ts
+									.getModifiers(node)
+									?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)
+									? 'export '
+									: '';
+							const is_async =
+								ts.canHaveModifiers(node) &&
+								ts
+									.getModifiers(node)
+									?.some((modifier) => modifier.kind === ts.SyntaxKind.AsyncKeyword);
 							code.overwrite(
 								node.getStart(),
 								node.name.getEnd(),
@@ -587,9 +595,11 @@ function convert_to_ts(js_code, indent = '', offset = '') {
 				imports.set(from, new Set([name]));
 			}
 			if (generics !== undefined) {
-				return [name, generics
-					.replaceAll("*", "") // get rid of JSDoc asterisks
-					.replace("  }>", "}>") // unindent closing brace
+				return [
+					name,
+					generics
+						.replaceAll('*', '') // get rid of JSDoc asterisks
+						.replace('  }>', '}>') // unindent closing brace
 				];
 			}
 		}

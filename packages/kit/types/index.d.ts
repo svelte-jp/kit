@@ -458,6 +458,8 @@ export interface KitConfig {
 		 *
 		 * `true` の場合、`$app/paths` からインポートする `base` と `assets` は、サーバーサイドレンダリング中に相対アセットパスに置き換えられ、ポータブルな HTML になります。
 		 * `false` の場合、`%sveltekit.assets%` とビルド成果物への参照は、`paths.assets` が外部 URL でない限り、常にルート相対(root-relative)なパスとなります。
+		 *
+		 * もしアプリで `<base>` 要素を使用している場合、これを `false` に設定してください。そうしないとアセットの URL が誤って現在のページではなく `<base>` URL に対して解決されてしまいます。
 		 * @default undefined
 		 */
 		relative?: boolean | undefined;
@@ -573,6 +575,21 @@ export interface KitConfig {
 	version?: {
 		/**
 		 * アプリの現在のバージョンの文字列です。これを指定する場合は、決定論的なものでないといけません (例えば `Math.random()` や `Date.now().toString()` ではなく commit ref )。指定しない場合は、ビルドのタイムスタンプがデフォルトとなります
+		 *
+		 * 例えば、現在のコミットハッシュを使用するには、`git rev-parse HEAD` を使用することができます:
+		 *
+		 * ```js
+		 * /// file: svelte.config.js
+		 * import * as child_process from 'node:child_process';
+		 *
+		 * export default {
+		 *   kit: {
+		 *     version: {
+		 *       name: child_process.execSync('git rev-parse HEAD').toString().trim()
+		 *     }
+		 *   }
+		 * };
+		 * ```
 		 */
 		name?: string;
 		/**
