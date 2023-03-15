@@ -6,6 +6,8 @@ SvelteKit では、アプリのルート(routes)間の移動に、(フレーム�
 
 `data-sveltekit-*` 属性でリンクの挙動をカスタマイズすることができます。これらは `<a>` 自身やその親要素に適用することができます。
 
+これらのオプションは、[`method="GET"`](/docs/form-actions#get-vs-post) を持つ `<form>` 要素にも適用されます。
+
 ## data-sveltekit-preload-data
 
 ユーザーがリンクをクリックしたことをブラウザが検知するより前に、(デスクトップでは) マウスがリンクをホバーしたことや、`touchstart` や `mousedown` がトリガーされることを検知することができます。どちらの場合も、`click` イベントが発生することを経験に基づいて推測することができます。
@@ -65,6 +67,28 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 …リンクがクリックされたときにフルページナビゲーションが発生します。
 
 `rel="external"` 属性があるリンクも同様に扱われます。加えて、[プリレンダリング中](page-options#prerender) は無視されます。
+
+## data-sveltekit-replacestate
+
+ナビゲーションするときにブラウザのセッション履歴(session history)に新しいエントリを作成したくない場合があります。リンクに `data-sveltekit-replacestate` 属性を追加すると…
+
+```html
+<a data-sveltekit-replacestate href="/path">Path</a>
+```
+
+…リンクがクリックされたときに、`pushState` で新しいエントリを作成する代わりに現在の `history` エントリを置き換えます。
+
+## data-sveltekit-keepfocus
+
+ナビゲーションの後に[フォーカスをリセット](/docs/accessibility#focus-management)したくない場合があります。例えば、ユーザーが入力している途中で送信をするような検索フォームがあり、テキストの input にフォーカスを維持したい場合です。`data-sveltekit-keepfocus` 属性を追加すると…
+
+```html
+<form data-sveltekit-keepfocus>
+	<input type="text" name="query">
+</form>
+```
+
+…ナビゲーション後も現在フォーカスされている要素にフォーカスが維持されるようになります。通常、リンクにこの属性を使用するのは避けてください、フォーカスされる要素が (その前にフォーカスされていた要素ではなく) `<a>` タグになってしまい、スクリーンリーダーなどの支援技術を使用するユーザーはナビゲーションの後にフォーカスが移動することを期待することが多いです。また、この属性はナビゲーションの後にもまだ存在する要素にのみ使用する必要があります。もしその要素が消えてしまうと、ユーザーのフォーカスは失われてしまい、支援技術ユーザーにとって混乱した体験となってしまいます。
 
 ## data-sveltekit-noscroll
 

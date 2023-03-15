@@ -496,7 +496,7 @@ export function POST() {
 </form>
 ```
 
-この form を送信すると `/search?q=...` に移動して load 関数が実行されますが、action は実行されません。`<a>` 要素と同じように、[`data-sveltekit-reload`](link-options#data-sveltekit-reload) 属性と [`data-sveltekit-noscroll`](link-options#data-sveltekit-noscroll) 属性を `<form>` に設定することができ、ルーターの挙動をコントロールすることができます。
+この form を送信すると `/search?q=...` に移動して load 関数が実行されますが、action は実行されません。`<a>` 要素と同じように、[`data-sveltekit-reload`](link-options#data-sveltekit-reload) 属性、 [`data-sveltekit-replacestate`](link-options#data-sveltekit-replacestate) 属性、[`data-sveltekit-keepfocus`](link-options#data-sveltekit-keepfocus) 属性、 [`data-sveltekit-noscroll`](link-options#data-sveltekit-noscroll) 属性を `<form>` に設定することができ、ルーターの挙動をコントロールすることができます。
 
 ## その他の参考資料
 
