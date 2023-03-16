@@ -348,6 +348,10 @@ export async function POST({ request }) {
 
 `load` 関数に `PageLoad`、`PageServerLoad`、`LayoutLoad`、`LayoutServerLoad` (それぞれ `+page.js`、`+page.server.js`、`+layout.js`、`+layout.server.js`) というアノテーションを付けると、`params` と戻り値が正しく型付けされることが保証されるでしょう。
 
+VS Code や、language server protocol と TypeScript plugin をサポートする IDE を使用している場合は、これらの型を _完全に_ 省略することができます！ Svelte の IDE ツール類があなたのために正しい型を挿入してくれるので、あなたはご自身で型を書くことなく型チェックすることができます。これはコマンドラインツール `svelte-check` でも機能します。
+
+`$types` の省略については、私たちの[ブログ記事](https://svelte.jp/blog/zero-config-type-safety)でより詳細な情報をお読み頂けます。
+
 ## その他のファイル
 
 ルート(route)ディレクトリ内のその他のファイルは SvelteKit から無視されます。つまり、コンポーネントやユーティリティモジュールを、それらを必要とするルート(routes)に配置することができます。

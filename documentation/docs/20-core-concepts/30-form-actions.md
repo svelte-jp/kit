@@ -349,6 +349,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 		// `data` はその `FormData` オブジェクトです
 		// `action` はフォームが POST される URL です
 		// `cancel()` は送信(submission)を中止します
+		// `submitter` は、フォームの送信を実行した `HTMLElement` です
 
 		return async ({ result, update }) => {
 			// `result` は `ActionResult` オブジェクトです
