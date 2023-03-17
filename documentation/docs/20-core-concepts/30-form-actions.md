@@ -344,7 +344,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 ```svelte
 <form
 	method="POST"
-	use:enhance={({ form, data, action, cancel }) => {
+	use:enhance={({ form, data, action, cancel, submitter }) => {
 		// `form` は `<form>` 要素です
 		// `data` はその `FormData` オブジェクトです
 		// `action` はフォームが POST される URL です
