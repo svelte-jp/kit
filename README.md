@@ -25,14 +25,17 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <table>
-  <tr>
-    <td align="center"><a href="https://github.com/tomoam"><img src="https://avatars.githubusercontent.com/u/29677552?v=4?s=100" width="100px;" alt=""/><br /><sub><b>tomoam</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=tomoam" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://yamanoku.net/"><img src="https://avatars.githubusercontent.com/u/1996642?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Okuto Oyama</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=yamanoku" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/myLifeAsaDog"><img src="https://avatars.githubusercontent.com/u/18300178?v=4?s=100" width="100px;" alt=""/><br /><sub><b>myLifeAsaDog</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=myLifeAsaDog" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://katanugramer.hatenablog.com/"><img src="https://avatars.githubusercontent.com/u/42486288?v=4?s=100" width="100px;" alt=""/><br /><sub><b>miruoo</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=miily8310s" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://qiita.com/oekazuma"><img src="https://avatars.githubusercontent.com/u/29580221?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kazuma Oe</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=oekazuma" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/dajiaji"><img src="https://avatars.githubusercontent.com/u/3192030?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ajitomi Daisuke</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=dajiaji" title="Documentation">📖</a></td>
-  </tr>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tomoam"><img src="https://avatars.githubusercontent.com/u/29677552?v=4?s=100" width="100px;" alt="tomoam"/><br /><sub><b>tomoam</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=tomoam" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://yamanoku.net/"><img src="https://avatars.githubusercontent.com/u/1996642?v=4?s=100" width="100px;" alt="Okuto Oyama"/><br /><sub><b>Okuto Oyama</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=yamanoku" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/myLifeAsaDog"><img src="https://avatars.githubusercontent.com/u/18300178?v=4?s=100" width="100px;" alt="myLifeAsaDog"/><br /><sub><b>myLifeAsaDog</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=myLifeAsaDog" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://katanugramer.hatenablog.com/"><img src="https://avatars.githubusercontent.com/u/42486288?v=4?s=100" width="100px;" alt="miruoo"/><br /><sub><b>miruoo</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=miily8310s" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://qiita.com/oekazuma"><img src="https://avatars.githubusercontent.com/u/29580221?v=4?s=100" width="100px;" alt="Kazuma Oe"/><br /><sub><b>Kazuma Oe</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=oekazuma" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dajiaji"><img src="https://avatars.githubusercontent.com/u/3192030?v=4?s=100" width="100px;" alt="Ajitomi Daisuke"/><br /><sub><b>Ajitomi Daisuke</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=dajiaji" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kimdj2"><img src="https://avatars.githubusercontent.com/u/38813699?v=4?s=100" width="100px;" alt="bondee"/><br /><sub><b>bondee</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=kimdj2" title="Documentation">📖</a></td>
+    </tr>
+  </tbody>
 </table>
 
 <!-- markdownlint-restore -->
