@@ -1,5 +1,5 @@
 <script>
-	import Section from '@sveltejs/site-kit/components/Section.svelte';
+	import { Section } from '@sveltejs/site-kit/components';
 	import Video from './Video.svelte';
 </script>
 
@@ -28,7 +28,9 @@
 			<p>
 				SvelteKit は Svelte 上に構築されています。Svelte はコンパイラを使用する UI フレームワークで、息を呑むほど簡潔にコンポーネントを書くことができ、
 				ブラウザで最小限の動作となるようにしてくれます。
-				開発者は既知の言語(HTML、CSS、JavaScript)を使うことができます。<strong>これは、web 開発へのラブレターです。</strong>
+				開発者は既知の言語(HTML、CSS、JavaScript)を使うことができます。<strong
+					>これは、web 開発へのラブレターです。</strong
+				>
 			</p>
 
 			<p>

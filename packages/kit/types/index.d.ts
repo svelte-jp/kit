@@ -1167,10 +1167,10 @@ export type Actions<
  */
 export type ActionResult<
 	Success extends Record<string, unknown> | undefined = Record<string, any>,
-	Invalid extends Record<string, unknown> | undefined = Record<string, any>
+	Failure extends Record<string, unknown> | undefined = Record<string, any>
 > =
 	| { type: 'success'; status: number; data?: Success }
-	| { type: 'failure'; status: number; data?: Invalid }
+	| { type: 'failure'; status: number; data?: Failure }
 	| { type: 'redirect'; status: number; location: string }
 	| { type: 'error'; status?: number; error: any };
 
@@ -1239,7 +1239,7 @@ export function text(body: string, init?: ResponseInit): Response;
  * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)。400-599 の範囲内でなければならない。
  * @param data 失敗(failure)に関連するデータ (例: validation errors)
  */
-export function fail<T extends Record<string, unknown> | undefined>(
+export function fail<T extends Record<string, unknown> | undefined = undefined>(
 	status: number,
 	data?: T
 ): ActionFailure<T>;
@@ -1257,7 +1257,7 @@ export interface ActionFailure<T extends Record<string, unknown> | undefined = u
 
 export interface SubmitFunction<
 	Success extends Record<string, unknown> | undefined = Record<string, any>,
-	Invalid extends Record<string, unknown> | undefined = Record<string, any>
+	Failure extends Record<string, unknown> | undefined = Record<string, any>
 > {
 	(input: {
 		action: URL;
@@ -1271,7 +1271,7 @@ export interface SubmitFunction<
 		| ((opts: {
 				form: HTMLFormElement;
 				action: URL;
-				result: ActionResult<Success, Invalid>;
+				result: ActionResult<Success, Failure>;
 				/**
 				 * フォーム送信(form submission)のレスポンスのデフォルトの動作を取得するためにこれを呼び出します。
 				 * @param options 送信(submission)に成功したあとに `<form>` の値をリセットしたくない場合は、`reset: false` を設定します。
