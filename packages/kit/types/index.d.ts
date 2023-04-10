@@ -328,13 +328,13 @@ export interface KitConfig {
 		reportOnly?: CspDirectives;
 	};
 	/**
-	 * [cross-site request forgery](https://owasp.org/www-community/attacks/csrf) 攻撃からの防御の設定です。
+	 * [cross-site request forgery (CSRF)](https://owasp.org/www-community/attacks/csrf) 攻撃からの防御の設定です。
 	 */
 	csrf?: {
 		/**
-		 * `POST` フォーム送信時、受信した `origin` ヘッダーをチェックしてサーバーのオリジン(origin)と一致するか検証することを行うかどうか。
+		 * `POST`、`PUT`、`PATCH`、`DELETE` でのフォーム送信時、受信した `origin` ヘッダーをチェックしてサーバーのオリジン(origin)と一致するか検証することを行うかどうか。
 		 *
-		 * 別のオリジンにあるあなたのアプリに対して `POST` フォーム送信をできるようにするには、このオプションを無効にする必要があります。ご注意を!
+		 * あなたのアプリに対し、別のオリジンから `POST`、`PUT`、`PATCH`、`DELETE` のリクエスト (`Content-Type` は `application/x-www-form-urlencoded`、`multipart/form-data`、`text/plain` のいずれか) をできるようにするには、このオプションを無効にする必要があります。ご注意を!
 		 * @default true
 		 */
 		checkOrigin?: boolean;
