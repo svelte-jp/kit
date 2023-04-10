@@ -1,5 +1,19 @@
 # @sveltejs/kit
 
+## 1.15.2
+
+### Patch Changes
+
+- fix: address security advisory [CVE-2023-29008](https://github.com/sveltejs/kit/security/advisories/GHSA-gv7g-x59x-wf8f) by doing a case-insensitive comparison when checking header value ([`ba436c66`](https://github.com/sveltejs/kit/commit/ba436c6685e751d968a960fbda65f24cf7a82e9f))
+
+## 1.15.1
+
+### Patch Changes
+
+- fix: pin undici to 5.20.0 ([#9591](https://github.com/sveltejs/kit/pull/9591))
+
+- fix: address security advisory [CVE-2023-29003](https://github.com/sveltejs/kit/security/advisories/GHSA-5p75-vc5g-8rv2) by including `text/plain` and `PUT`/`PATCH`/`DELETE` requests in set of blocked cross-origin requests for CSRF protection ([`bb2253d5`](https://github.com/sveltejs/kit/commit/bb2253d51d00aba2e4353952d4fb0dcde6c77123))
+
 ## 1.15.0
 
 ### Minor Changes
