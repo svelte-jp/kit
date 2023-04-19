@@ -286,6 +286,8 @@ declare module '$app/paths' {
  * そのため、ストアを使用するためには、コンポーネントの初期化の際にそのストアをサブスクライブする必要があります (コンポーネント内で `$page` という形でストアの値を参照する場合、自動的にそうなります)。
  *
  * ブラウザでは、これを心配する必要はありません。ストアはどこからでもアクセスできます。ブラウザ上でのみ実行されるコードは、いつでもこれらのストアを参照 (またはサブスクライブ) することができます。
+ *
+ * クライアント/サーバーの違いについては、ドキュメントの [state management](https://kit.svelte.jp/docs/state-management#using-stores-with-context) をお読みください。
  */
 declare module '$app/stores' {
 	import { Readable } from 'svelte/store';

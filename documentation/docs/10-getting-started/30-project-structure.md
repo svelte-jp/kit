@@ -54,9 +54,9 @@ my-project/
 - `hooks.server.js` にはサーバーの [hooks](hooks) を記述します
 - `service-worker.js` には [service worker](service-workers) を記述します
 
-TypeScript を使用している場合、`.js` の代わりに `.ts` ファイルを使用することができます。
+(プロジェクトに `.js` と `.ts` のどちらのファイルが含まれるかについては、プロジェクトの作成時に TypeScript の使用を選択したかどうかによります。このドキュメントに記載されているコードやファイル拡張子などは、ページの下にあるトグルを使って、JavaScript と TypeScript を切り替えることができます。)
 
-プロジェクトのセットアップ時に [Vitest](https://vitest.dev) を追加した場合、ユニットテストは `.test.js` (または `.test.ts`) という拡張子で `src` ディレクトリに置かれます。
+プロジェクトのセットアップ時に [Vitest](https://vitest.dev) を追加した場合、ユニットテストは `.test.js` という拡張子で `src` ディレクトリに置かれます。
 
 ### static
 

@@ -132,7 +132,7 @@ import Foo from 'your-library/Foo.svelte';
 
 しかし、root export 以外のもの、例えば `your-library/foo` インポートを提供する場合などは、型定義を提供する上でさらなる注意が必要です。残念ながら、TypeScript はデフォルトでは `{ "./foo": { "types": "./dist/foo.d.ts", ... }}` のような export に対して `types` condition を解決しません。代わりに、ライブラリの root からの相対で `foo.d.ts` を探します (つまり、`your-library/dist/foo.d.ts` ではなく `your-library/foo.d.ts` です)。これを修正する方法として、選択肢が2つあります:
 
-1つ目の選択肢は、あなたのライブラリを使用する人に対し、`tsconfig/jsconfig.json` の `moduleResolution` オプション に `bundler` (TypeScript 5 から利用可能で、将来的にもベストかつ推奨のオプション) か `node16` か `nodenext` を設定してもらうように要求することです。これによって TypeScript が実際に exports map を見て正しく型を解決してくれるようになります。
+1つ目の選択肢は、あなたのライブラリを使用する人に対し、`tsconfig.json` (または `jsconfig.json`) の `moduleResolution` オプション に `bundler` (TypeScript 5 から利用可能で、将来的にもベストかつ推奨のオプション) か `node16` か `nodenext` を設定してもらうように要求することです。これによって TypeScript が実際に exports map を見て正しく型を解決してくれるようになります。
 
 2つ目の選択肢は、TypeScript の `typesVersions` 機能を使用(乱用)して、型を紐付けます。これは、TypeScript が TypeScript のバージョンによって異なる型定義をチェックするために使用している `package.json` 内のフィールドで、このためにパスマッピング機能があります。このパスマッピング機能を利用して、やりたいことを実現できます。上述の `foo` export の場合、対応する `typesVersions` はこのようになります:
 

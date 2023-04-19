@@ -210,9 +210,6 @@ const faq = new Map([
  */
 export function convert_link(file, heading) {
 	if (file.startsWith('faq')) {
-		if (heading.includes('クライアントサイドオンリー')) {
-			console.log(heading);
-		}
 		return faq.get(heading) || heading;
 	} else {
 		switch (file) {

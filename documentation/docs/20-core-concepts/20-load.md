@@ -6,7 +6,7 @@ title: Loading data
 
 ## Page data
 
-`+page.svelte` ファイルは、`load` 関数をエクスポートする `+page.js` (または `+page.ts`) という兄弟ファイルを持つことができ、`load` 関数の戻り値は page で `data` プロパティを介して使用することができます。
+`+page.svelte` ファイルは、`load` 関数をエクスポートする `+page.js` という兄弟ファイルを持つことができ、`load` 関数の戻り値は page で `data` プロパティを介して使用することができます。
 
 ```js
 /// file: src/routes/blog/[slug]/+page.js
