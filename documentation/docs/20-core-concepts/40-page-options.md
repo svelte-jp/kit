@@ -78,8 +78,6 @@ export async function load({ fetch }) {
 
 ページの場合は、`foo` ではなく `foo/index.html` を書き込むことでこの問題を回避しています。
 
-ルーターがすでにアクティブかどうかにかかわらず、このページからのすべてのナビゲーションでクライアントサイドルーティングが無効になることにご注意ください。
-
 ### Troubleshooting
 
 'The following routes were marked as prerenderable, but were not prerendered' というようなエラーが表示されたら、それは該当のルート (またはページの場合は親レイアウト) に `export const prerender = true` があるにもかかわらず実際にはそのページがプリレンダリングされていないことが原因です (プリレンダリングクローラーがそのページにアクセスしていないため)。
