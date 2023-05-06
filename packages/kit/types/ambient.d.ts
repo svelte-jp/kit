@@ -359,6 +359,10 @@ declare module '@sveltejs/kit/hooks' {
 
 	/**
 	 * 複数の `handle` の呼び出しを middleware ライクな方法でシーケンス化するヘルパー関数です。
+	 * `handle` オプションの動作は以下の通り:
+	 * - `transformPageChunk` は、逆順に適用され、マージされます
+	 * - `preload` は順に適用され、最初のオプションが "勝ち" となり、それ以降の `preload` オプションは呼ばれません
+	 * - `filterSerializedResponseHeaders` は `preload` と同じように動作します
 	 *
 	 * ```js
 	 * /// file: src/hooks.server.js
@@ -372,6 +376,10 @@ declare module '@sveltejs/kit/hooks' {
 	 * 			// transforms are applied in reverse order
 	 * 			console.log('first transform');
 	 * 			return html;
+	 * 		},
+	 * 		preload: () => {
+	 * 			// this one wins as it's the first defined in the chain
+	 * 			console.log('first preload');
 	 * 		}
 	 * 	});
 	 * 	console.log('first post-processing');
@@ -385,6 +393,13 @@ declare module '@sveltejs/kit/hooks' {
 	 * 		transformPageChunk: ({ html }) => {
 	 * 			console.log('second transform');
 	 * 			return html;
+	 * 		},
+	 * 		preload: () => {
+	 * 			console.log('second preload');
+	 * 		},
+	 * 		filterSerializedResponseHeaders: () => {
+	 * 			// this one wins as it's the first defined in the chain
+	 *    		console.log('second filterSerializedResponseHeaders');
 	 * 		}
 	 * 	});
 	 * 	console.log('second post-processing');
@@ -398,7 +413,9 @@ declare module '@sveltejs/kit/hooks' {
 	 *
 	 * ```
 	 * first pre-processing
+	 * first preload
 	 * second pre-processing
+	 * second filterSerializedResponseHeaders
 	 * second transform
 	 * first transform
 	 * second post-processing

@@ -11,6 +11,7 @@ import {
 	Logger,
 	MaybePromise,
 	Prerendered,
+	PrerenderEntryGeneratorMismatchHandlerValue,
 	PrerenderHttpErrorHandlerValue,
 	PrerenderMissingIdHandlerValue,
 	PrerenderOption,
@@ -526,6 +527,17 @@ export interface KitConfig {
 		 */
 		handleMissingId?: PrerenderMissingIdHandlerValue;
 		/**
+		 * `entries` エクスポートで生成されたエントリーが、生成されたルート(route)とマッチしない場合の応答方法。
+		 *
+		 * - `'fail'` — ビルドを失敗させます
+		 * - `'ignore'` - 失敗(failure)を無視して継続させます
+		 * - `'warn'` — 継続しますが、警告(warning)をプリントします
+		 * - `(details) => void` — `generatedFromId`、`entry`、`matchedId`、`message` プロパティを持つ `details` オブジェクトを引数に取るカスタムのエラーハンドラです。この関数から `throw` されると、ビルドが失敗します
+		 *
+		 * @default "fail"
+		 */
+		handleEntryGeneratorMismatch?: PrerenderEntryGeneratorMismatchHandlerValue;
+		/**
 		 * `origin` — プリレンダリング時の `url.origin` の値です。レンダリングされたコンテンツに含まれていると有用な場合があります。
 		 * @default "http://sveltekit-prerender"
 		 */
@@ -557,16 +569,16 @@ export interface KitConfig {
 	 * SvelteKit がページの読込中にエラーに遭遇し、新しいバージョンがデプロイされていることを検知した場合 (ここで指定される `name` を使用します。デフォルトはビルドのタイムスタンプです)、従来のフルページナビゲーションにフォールバックされます。
 	 * しかし、すべてのナビゲーションがエラーとなるわけではありません。例えば次のページの JavaScript がすでに読み込まれている場合です。このような場合でもフルページナビゲーションを強制したい場合は、`pollInterval` を設定してから `beforeNavigate` を使用する、などのテクニックを使用します:
 	 * ```html
-	 * /// +layout.svelte
+	 * /// file: +layout.svelte
 	 * <script>
-	 * import { beforeNavigate } from '$app/navigation';
-	 * import { updated } from '$app/stores';
+	 *   import { beforeNavigate } from '$app/navigation';
+	 *   import { updated } from '$app/stores';
 	 *
-	 * beforeNavigate(({ willUnload, to }) => {
-	 *   if ($updated && !willUnload && to?.url) {
-	 *     location.href = to.url.href;
-	 *   }
-	 * });
+	 *   beforeNavigate(({ willUnload, to }) => {
+	 *     if ($updated && !willUnload && to?.url) {
+	 *       location.href = to.url.href;
+	 *     }
+	 *   });
 	 * </script>
 	 * ```
 	 *

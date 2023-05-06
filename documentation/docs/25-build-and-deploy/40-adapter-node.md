@@ -159,6 +159,8 @@ node build
 
 ビルドが存在しないモジュールの polyfill を読み込むかどうかをコントロールします。デフォルトは `true` で、Node 18.11 以降を使用している場合にのみ無効にしてください。
 
+注意事項: Node のビルトインの `crypto` global を Node 18 で使用するには、`--experimental-global-webcrypto` フラグを使用する必要があります。Node 20 ではこのフラグは必要ありません。
+
 ## カスタムサーバー
 
 この adapter は、ビルドのディレクトリに2つのファイルを作成します — `index.js` と `handler.js` です。デフォルトのビルドのディレクトリを使用している場合、`node build` などで `index.js` を実行すると、設定された port でサーバーが起動されます。
