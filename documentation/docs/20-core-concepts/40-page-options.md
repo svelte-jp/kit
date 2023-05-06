@@ -33,7 +33,7 @@ export const prerender = 'auto';
 
 > もしアプリ全体がプリレンダリングに適している場合は、[`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使うことで、任意の静的 Web サーバーで使用するのに適したファイルを出力することができます。
 
-プリレンダラはアプリの最上位(root)から開始され、プリレンダリング可能なページや `+server.js` ルート(routes)を見つけると、そのファイルを生成します。各ページは、プリレンダリングの候補である他のページを指し示す `<a>` 要素を見つけるためにスキャンされます。このため、通常はどのページにアクセスすべきか指定する必要はありません。もしプリレンダラがアクセスするページを指定する必要がある場合は、[prerender configuration](configuration#prerender) の `entries` オプションでこれを指定することができます。
+プリレンダラはアプリの最上位(root)から開始され、プリレンダリング可能なページや `+server.js` ルート(routes)を見つけると、そのファイルを生成します。各ページは、プリレンダリングの候補である他のページを指し示す `<a>` 要素を見つけるためにスキャンされます。このため、通常はどのページにアクセスすべきか指定する必要はありません。もしプリレンダラがアクセスするページを指定する必要がある場合は、[`config.kit.prerender.entries`](configuration#prerender) で指定するか、動的なルート(route)から [`entries`](#entries) 関数をエクスポートします。
 
 プリレンダリング中、[`$app/environment`](modules#$app-environment) からインポートされる `building` の値は `true` になります。
 
@@ -84,8 +84,40 @@ export async function load({ fetch }) {
 
 これらのルート(route)は動的にサーバーレンダリングできないため、該当のルート(route)にアクセスしようとしたときにエラーが発生します。それを解決するには、2つの方法があります:
 
-* SvelteKit が [`config.kit.prerender.entries`](configuration#prerender) からのリンクを辿ってそのルート(route)を見つけられることを確認してください。動的なルート(例えば `[parameters]` を持つページ) へのリンクは、他のエントリーポイントをクローリングしても見つからない場合にこのオプションに追加してください。そうしないと、SvelteKit はその parameters が持つべき値がわからないので、プリレンダリングされません。プリレンダリング可能(prerenderable)なページとしてマークされていないページは無視され、そのページから他のページ(プリレンダリング可能なものも含む)へのリンクもクローリングされません。
+* SvelteKit が [`config.kit.prerender.entries`](configuration#prerender) か [`entries`](#entries) ページオプションからのリンクを辿ってそのルート(route)を見つけられるようにしてください。動的なルート(例えば `[parameters]` を持つページ) へのリンクは、他のエントリーポイントをクローリングしても見つからない場合はこのオプションに追加してください。そうしないと、SvelteKit はその parameters が持つべき値がわからないので、プリレンダリングされません。プリレンダリング可能(prerenderable)なページとしてマークされていないページは無視され、そのページから他のページ(プリレンダリング可能なものも含む)へのリンクもクローリングされません。
 * `export const prerender = true` から `export const prerender = 'auto'` に変更してください。`'auto'` になっているルート(route)は動的にサーバーレンダリングすることができます
+
+## entries
+
+SvelteKit will discover pages to prerender automatically, by starting at _entry points_ and crawling them. By default, all your non-dynamic routes are considered entry points — for example, if you have these routes...
+SvelteKit は、 _エントリーポイント(entry points)_ を開始地点としてクローリングを行うことでページを自動的に発見します。デフォルトでは、動的でないルート(route)はすべてエントリーポイントとみなされます。例えば、以下のルートがある場合…
+
+```bash
+/             # non-dynamic
+/blog         # non-dynamic
+/blog/[slug]  # dynamic, because of `[slug]`
+```
+
+…SvelteKit は `/` と `/blog` をプリレンダリングし、その過程で `<a href="/blog/hello-world">` などのリンクを発見し、それをプリレンダリング対象とします。
+
+ほとんどの場合、これで十分です。しかし状況によっては、`/blog/hello-world` などのページに対するリンクが存在しない (あるいはプリレンダリングされたページには存在しない) 場合があります。この場合、SvelteKit にその存在を知らせる必要があります。
+
+これを行うには [`config.kit.prerender.entries`](configuration#prerender) で指定するか、動的なルート(route) に属する `+page.js` か `+page.server.js` で `entries` 関数をエクスポートします:
+
+```js
+/// file: src/routes/blog/[slug]/+page.server.js
+/** @type {import('./$types').EntryGenerator} */
+export function entries() {
+	return [
+		{ slug: 'hello-world' },
+		{ slug: 'another-blog-post' }
+	];
+}
+
+export const prerender = true;
+```
+
+`entries` は `async` 関数にすることができるので、(例えば) 上記で示したように CMS や データベースから投稿リストを取得することもできます。
 
 ## ssr
 
