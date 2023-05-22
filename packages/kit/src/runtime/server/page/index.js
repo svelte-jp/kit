@@ -118,7 +118,7 @@ export async function render_page(event, page, options, manifest, state, resolve
 		}
 
 		/** @type {Array<import('./types.js').Loaded | null>} */
-		let branch = [];
+		const branch = [];
 
 		/** @type {Error | null} */
 		let load_error = null;
@@ -150,7 +150,8 @@ export async function render_page(event, page, options, manifest, state, resolve
 								if (parent) Object.assign(data, await parent.data);
 							}
 							return data;
-						}
+						},
+						track_server_fetches: options.track_server_fetches
 					});
 				} catch (e) {
 					load_error = /** @type {Error} */ (e);

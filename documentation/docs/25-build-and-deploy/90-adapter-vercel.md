@@ -55,7 +55,6 @@ export const config = {
 - `split`: `true` の場合、ルート(route)は個別の function としてデプロイされます。`split` を adapter レベルで `true` にする場合、すべてのルート(route)が個別の function としてデプロイされます。
 
 加えて、以下のオプションは edge function に適用されます:
-- `envVarsInUse`: edge function の内側からアクセスできる環境変数の配列です
 - `external`: esbuild が function をバンドルする際に外部(external)として扱う依存関係(dependencies)の配列です。Node の外側で実行されないオプションの依存関係(optional dependencies)を除外したいときにのみ使用してください
 
 そして以下のオプションは serverless function に適用されます:
@@ -130,7 +129,7 @@ export function load() {
 <p>This staging environment was deployed from {data.deploymentGitBranch}.</p>
 ```
 
-Vercel でビルドする場合、これらの変数は全てビルド時と実行時で変わらないため、`$env/dynamic/private` ではなく、変数を静的に置換しデッドコードの削除などの最適化ができる `$env/static/private` の使用をおすすめします。`edge: true` にしてデプロイする場合は、`$env/static/private` を使用するか、`envVarsInUse` 設定を入力する必要があります。
+Vercel でビルドする場合、これらの変数は全てビルド時と実行時で変わらないため、`$env/dynamic/private` ではなく、変数を静的に置換しデッドコードの削除などの最適化ができる `$env/static/private` の使用をおすすめします。
 
 ## Notes
 

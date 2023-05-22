@@ -34,7 +34,7 @@ export function load({ params }) {
 
 生成される `$types` モジュールのおかげで、完全な型安全性を確保できます。
 
-`+page.js` ファイルの `load` 関数はサーバーでもブラウザでも実行されます。`load` 関数を*常に*サーバーで実行させたければ (例えばプライベートな環境変数を使用していたり、データベースにアクセスする場合など)、代わりに `+page.server.js` に `load` 関数を置くとよいでしょう。
+`+page.js` ファイルの `load` 関数はサーバーでもブラウザでも実行されます (ただし、`export const ssr = false` を設定した場合は[ブラウザでのみ実行されます](https://kit.svelte.jp/docs/page-options#ssr))。`load` 関数を*常に*サーバーで実行させたければ (例えばプライベートな環境変数を使用していたり、データベースにアクセスする場合など)、代わりに `+page.server.js` に `load` 関数を置くとよいでしょう。
 
 例えばブログ記事の `load` 関数をより現実的なものにするとしたら、以下のように、サーバー上でのみ実行され、データベースからデータを取得する、というものになるでしょう。
 
@@ -537,7 +537,7 @@ export async function load() {
 
 ### Manual invalidation
 
-現在のページに適用される `load` 関数は、[`invalidate(url)`](modules#$app-navigation-invalidate) を使用することで再実行させることもできます。これは `url` に依存しているすべての `load` 関数を再実行させるものです。[`invalidateAll()`](modules#$app-navigation-invalidateall) は、すべての `load` 関数を再実行させます。
+現在のページに適用される `load` 関数は、[`invalidate(url)`](modules#$app-navigation-invalidate) を使用することで再実行させることもできます。これは `url` に依存しているすべての `load` 関数を再実行させるものです。[`invalidateAll()`](modules#$app-navigation-invalidateall) は、すべての `load` 関数を再実行させます。server load 関数の場合は、クライアントに秘情報が漏れるのを防ぐため、取得した `url` に自動的に依存することはありません。
 
 `load` 関数が `fetch(url)` や `depends(url)` を呼び出している場合、その `load` 関数は `url` に依存しています。`url` には `[a-z]:` から始まるカスタムの識別子を指定することができることにご注意ください:
 
@@ -578,12 +578,14 @@ export async function load({ fetch, depends }) {
 <button on:click={rerunLoadFunction}>Update random number</button>
 ```
 
+### load 関数はいつ再実行されるのか
+
 まとめると、`load` 関数は以下のシチュエーションで再実行されます:
 
 - `params` のプロパティを参照していて、その値が変更された場合
-- `url` のプロパティを参照していて (例えば `url.pathname` や `url.search`)、その値が変更された場合
+- `url` のプロパティ (例えば `url.pathname` や `url.search`) を参照していて、その値が変更された場合。`request.url` のプロパティは追跡されません
 - `await parent()` を呼び出していて、親の `load` 関数が再実行されたとき
-- [`fetch`](#making-fetch-requests) や [`depends`](types#public-types-loadevent) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](modules#$app-navigation-invalidate) で無効(invalid)であるとマークされた場合
+- [`fetch`](#making-fetch-requests) (universal load のみ) や [`depends`](types#public-types-loadevent) を介して特定の URL に対する依存を宣言していて、その URL が [`invalidate(url)`](modules#$app-navigation-invalidate) で無効(invalid)であるとマークされた場合
 - [`invalidateAll()`](modules#$app-navigation-invalidateall) によって全ての有効な `load` 関数が強制的に再実行された場合
 
 `params` と `url` は、`<a href="..">` リンクのクリックや、[`<form>` のやりとり](form-actions#get-vs-post)、[`goto`](modules#$app-navigation-goto) の呼び出し、[`redirect`](modules#sveltejs-kit-redirect) に応じて変更されます。
