@@ -51,7 +51,7 @@ const default_preload = ({ type }) => type === 'js' || type === 'css';
  */
 export async function respond(request, options, manifest, state) {
 	/** URL but stripped from the potential `/__data.json` suffix and its search param  */
-	let url = new URL(request.url);
+	const url = new URL(request.url);
 
 	if (options.csrf_check_origin) {
 		const forbidden =
@@ -155,7 +155,7 @@ export async function respond(request, options, manifest, state) {
 
 				if (lower === 'set-cookie') {
 					throw new Error(
-						`Use \`event.cookies.set(name, value, options)\` instead of \`event.setHeaders\` to set cookies`
+						'Use `event.cookies.set(name, value, options)` instead of `event.setHeaders` to set cookies'
 					);
 				} else if (lower in headers) {
 					throw new Error(`"${key}" header is already set`);
@@ -244,7 +244,7 @@ export async function respond(request, options, manifest, state) {
 			}
 		}
 
-		const { cookies, new_cookies, get_cookie_header } = get_cookies(
+		const { cookies, new_cookies, get_cookie_header, set_internal } = get_cookies(
 			request,
 			url,
 			trailing_slash ?? 'never'
@@ -252,7 +252,14 @@ export async function respond(request, options, manifest, state) {
 
 		cookies_to_add = new_cookies;
 		event.cookies = cookies;
-		event.fetch = create_fetch({ event, options, manifest, state, get_cookie_header });
+		event.fetch = create_fetch({
+			event,
+			options,
+			manifest,
+			state,
+			get_cookie_header,
+			set_internal
+		});
 
 		if (state.prerendering && !state.prerendering.fallback) disable_search(url);
 

@@ -27,6 +27,7 @@ const docs_load = new Map([
 	['URL data を使用する', 'Using URL data'],
 	['fetch リクエストの作成', 'Making fetch requests'],
 	['load 関数の再実行', 'Rerunning load functions'],
+	['load 関数はいつ再実行されるのか', 'When do load functions re-run?'],
 	['その他の参考資料', 'Further reading']
 ]);
 

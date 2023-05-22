@@ -20,6 +20,7 @@ import {
 	UniqueInterface
 } from './private.js';
 import { BuildData, SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
+import type { PluginOptions } from '@sveltejs/vite-plugin-svelte';
 
 export { PrerenderOption } from './private.js';
 
@@ -186,6 +187,8 @@ export interface Config {
 	};
 	/** プリプロセッサ のオプション (もしあれば)。プリプロセスは Vite のプリプロセッサによって行うこともできます。 */
 	preprocess?: any;
+	/** `vite-plugin-svelte` プラグインオプション。 */
+	vitePlugin?: PluginOptions;
 	/** Svelte とインテグレートするツールに必要な追加のオプション。 */
 	[key: string]: any;
 }
@@ -339,6 +342,16 @@ export interface KitConfig {
 		 * @default true
 		 */
 		checkOrigin?: boolean;
+	};
+	/**
+	 * Here be dragons. Enable at your peril.
+	 */
+	dangerZone?: {
+		/**
+		 * Automatically add server-side `fetch`ed URLs to the `dependencies` map of `load` functions. This will expose secrets
+		 * to the client if your URL contains them.
+		 */
+		trackServerFetches?: boolean;
 	};
 	/**
 	 * アプリが別の大規模なアプリに埋め込まれているかどうか。もし `true` の場合、SvelteKit はナビゲーションなどに関係するイベントリスナーを、`window` の代わりに `%sveltekit.body%` の親に追加し、`params` を `location.pathname` から導くのではなく、サーバーから取得して渡します。
@@ -1297,3 +1310,18 @@ export interface Snapshot<T = any> {
 	capture: () => T;
 	restore: (snapshot: T) => void;
 }
+
+/**
+ * Populate a route ID with params to resolve a pathname.
+ * @example
+ * ```js
+ * resolvePath(
+ *   `/blog/[slug]/[...somethingElse]`,
+ *   {
+ *     slug: 'hello-world',
+ *     somethingElse: 'something/else'
+ *   }
+ * ); // `/blog/hello-world/something/else`
+ * ```
+ */
+export function resolvePath(id: string, params: Record<string, string | undefined>): string;
