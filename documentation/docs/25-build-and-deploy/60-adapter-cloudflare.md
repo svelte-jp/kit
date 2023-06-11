@@ -63,9 +63,9 @@ Cloudflare Pages の始め方は、[Get Started Guide](https://developers.cloudf
 
 > "production" 環境と "preview" 環境のどちらにも、環境変数 `NODE_VERSION` を追加する必要があります。これは、プロジェクトセットアップ時や、後で Pages プロジェクトのセッティングで追加できます。SvelteKit は Node `16.14` 以降を要求するため、`NODE_VERSION` の値として `16` を使用する必要があります。
 
-## 環境変数
+## Bindings
 
-KV/DO namespaces などを含んでいる [`env`](https://developers.cloudflare.com/workers/runtime-apis/fetch-event#parameters) オブジェクトは、`context` や `caches` と一緒に `platform` プロパティ経由で SvelteKit に渡されます。つまり、hooks とエンドポイントの中でアクセスできるということです:
+[`env`](https://developers.cloudflare.com/workers/runtime-apis/fetch-event#parameters) オブジェクトにはあなたのプロジェクトの [bindings](https://developers.cloudflare.com/workers/platform/environment-variables/) が含まれており、KV/DO namespaces などで構成されています。これは `platform` プロパティを介して `context` や `caches` と一緒に SvelteKit に渡されます。つまり、hooks とエンドポイントでアクセスできるということです:
 
 ```js
 // @errors: 7031
@@ -73,6 +73,8 @@ export async function POST({ request, platform }) {
 	const x = platform.env.YOUR_DURABLE_OBJECT_NAMESPACE.idFromName('x');
 }
 ```
+
+> 環境変数については、SvelteKit のビルトインの `$env` モジュールを優先的に使用したほうが良いでしょう。
 
 これらの型をアプリで使えるようにするには、`src/app.d.ts` でこれらを参照します:
 
@@ -92,7 +94,7 @@ declare global {
 export {};
 ```
 
-> `platform.env` は本番向けビルドでのみ利用することができます。ローカルでテストするには [wrangler](https://developers.cloudflare.com/workers/cli-wrangler) を使ってください
+> `platform.env` は本番向けビルドでのみ利用することができます。ローカルでテストするには [wrangler](https://developers.cloudflare.com/workers/cli-wrangler) を使ってください。
 
 ## Notes
 
