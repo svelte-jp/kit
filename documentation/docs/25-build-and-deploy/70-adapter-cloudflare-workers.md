@@ -114,7 +114,7 @@ export {};
 
 ### Worker size limits
 
-Workers にデプロイする場合、SvelteKit が生成したサーバーは1つのファイルにバンドルされます。minify 後に Worker が [そのサイズの上限](https://developers.cloudflare.com/workers/platform/limits/#worker-size) を超過する場合、Wrangler が Worker の公開に失敗します。通常、この制限に引っかかることはほとんどありませんが、一部の大きいライブラリではこれが発生することがあります。その場合、大きいライブラリをクライアントサイドでのみインポートするようにすることで、Worker のサイズを小さくすることができます。詳細は [FAQ](/faq#how-do-i-use-a-client-side-only-library-that-depends-on-document-or-window) をご覧ください。
+Workers にデプロイする場合、SvelteKit が生成したサーバーは1つのファイルにバンドルされます。minify 後に Worker が [そのサイズの上限](https://developers.cloudflare.com/workers/platform/limits/#worker-size) を超過する場合、Wrangler が Worker の公開に失敗します。通常、この制限に引っかかることはほとんどありませんが、一部の大きいライブラリではこれが発生することがあります。その場合、大きいライブラリをクライアントサイドでのみインポートするようにすることで、Worker のサイズを小さくすることができます。詳細は [FAQ](../faq#how-do-i-use-a-client-side-only-library-that-depends-on-document-or-window) をご覧ください。
 
 ### ファイルシステムにアクセスする
 

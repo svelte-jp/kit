@@ -98,7 +98,6 @@ const docs_single_page_apps = new Map([
 const docs_adapter_cloudflare = new Map([
 	['比較', 'Comparisons'],
 	['使い方', 'Usage'],
-	['環境変数', 'Environment variables'],
 	['トラブルシューティング', 'Troubleshooting'],
 	['ファイルシステムにアクセスする', 'Accessing the file system']
 ]);

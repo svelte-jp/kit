@@ -1,61 +1,50 @@
 {
-	"name": "kit",
+	"name": "kit-monorepo",
 	"version": "0.0.1",
 	"description": "monorepo for @sveltejs/kit and friends",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"test": "pnpm test -r --filter=./packages/* --filter=!./packages/create-svelte",
 		"test:cross-platform:dev": "pnpm run --dir packages/kit test:cross-platform:dev",
 		"test:cross-platform:build": "pnpm run --dir packages/kit test:cross-platform:build",
 		"test:vite-ecosystem-ci": "pnpm test --dir packages/kit",
 		"test:create-svelte": "pnpm run --dir packages/create-svelte test",
-		"check": "pnpm -r check",
-		"lint": "pnpm -r lint && eslint 'packages/**/*.js'",
+		"check": "pnpm -r prepublishOnly && pnpm -r check",
+		"lint": "pnpm -r lint && eslint --cache --cache-location node_modules/.eslintcache 'packages/**/*.js'",
 		"format": "pnpm -r format",
 		"precommit": "pnpm format && pnpm lint",
 		"release": "changeset publish",
 		"textlint": "node -e \"var shell=require('shelljs');var files=shell.find(['./CONTRIBUTING_ja.md','./documentation/**/*.md']).join(' ');if(shell.exec('textlint -f pretty-error '+files).code!==0){shell.exit(1)};\"",
 		"start": "cd sites/kit.svelte.dev && npm run dev"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/sveltejs/kit.git"
-	},
-	"author": "",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/sveltejs/kit/issues"
-	},
-	"homepage": "https://github.com/sveltejs/kit#readme",
 	"devDependencies": {
-		"@changesets/cli": "^2.26.0",
-		"@rollup/plugin-commonjs": "^25.0.0",
+		"@changesets/cli": "^2.26.1",
+		"@rollup/plugin-commonjs": "^25.0.1",
 		"@rollup/plugin-json": "^6.0.0",
-		"@rollup/plugin-node-resolve": "^15.0.1",
-		"@sveltejs/eslint-config": "^6.0.2",
+		"@rollup/plugin-node-resolve": "^15.1.0",
+		"@sveltejs/eslint-config": "^6.0.4",
 		"@svitejs/changesets-changelog-github-compact": "^1.1.0",
-		"@typescript-eslint/eslint-plugin": "^5.53.0",
-		"eslint": "^8.40.0",
+		"@typescript-eslint/eslint-plugin": "^5.59.9",
+		"eslint": "^8.42.0",
 		"eslint-config-prettier": "^8.8.0",
 		"eslint-plugin-import": "^2.27.5",
-		"eslint-plugin-svelte": "^2.28.0",
+		"eslint-plugin-svelte": "^2.30.0",
 		"eslint-plugin-unicorn": "^47.0.0",
 		"playwright": "1.30.0",
-		"prettier": "^2.8.0",
-		"rollup": "^3.7.0",
-		"svelte": "^3.56.0",
-		"tiny-glob": "^0.2.9",
-		"typescript": "^4.9.4",
-		"all-contributors-cli": "^6.20.0",
-		"shelljs": "^0.8.3",
-		"textlint": "^11.9.0",
+		"prettier": "^2.8.8",
+		"rollup": "^3.25.0",
+		"shelljs": "^0.8.5",
+		"svelte": "^3.59.1",
+		"textlint": "^13.3.2",
 		"textlint-rule-detect-bad-chars": "^1.0.2",
-		"textlint-rule-no-mix-dearu-desumasu": "^4.0.1",
-		"textlint-rule-preset-jtf-style": "^2.3.8"
+		"textlint-rule-no-mix-dearu-desumasu": "^5.0.0",
+		"textlint-rule-preset-jtf-style": "^2.3.13",
+		"tiny-glob": "^0.2.9",
+		"typescript": "^4.9.5"
 	},
-	"packageManager": "pnpm@8.4.0",
+	"packageManager": "pnpm@8.6.1",
 	"engines": {
 		"pnpm": "^8.0.0"
-	},
-	"type": "module"
+	}
 }

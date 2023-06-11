@@ -160,7 +160,7 @@ import Foo from 'your-library/Foo.svelte';
 
 他の SvelteKit プロジェクトからのみ使用されることを想定しているのでなければ、`$app` などの [SvelteKit 固有のモジュール](modules)をあなたのパッケージで使用するのは避けたほうがよいでしょう。例えば、`import { browser } from '$app/environment'` を使用するのではなく、`import { BROWSER } from 'esm-env'` ([esm-env ドキュメント参照](https://github.com/benmccann/esm-env)) を使用します。また、`$app/stores` や `$app/navigation` などに直接頼るのではなく、現在の URL や navigation action をプロパティとして渡すこともできます。より一般的な方法でアプリを書くことによって、テストや UI デモなどのツールのセットアップも簡単になります。
 
-[エイリアス](/docs/configuration#alias) は `svelte.config.js` (`vite.config.js` や `tsconfig.json` ではなく) を経由して追加するようにしてください。`svelte-package` で処理されるからです。.
+[エイリアス](configuration#alias) は `svelte.config.js` (`vite.config.js` や `tsconfig.json` ではなく) を経由して追加するようにしてください。`svelte-package` で処理されるからです。.
 
 パッケージに加えた変更がバグフィックスなのか、新機能なのか、それとも破壊的変更(breaking change)なのかをよく考えて、それに応じてパッケージのバージョンを更新する必要があります。もし既存のライブラリから `exports` やその中の `export` condition のパスを削除した場合、breaking change とみなされることにご注意ください。
 

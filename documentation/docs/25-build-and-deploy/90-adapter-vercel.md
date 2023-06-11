@@ -26,7 +26,7 @@ export default {
 
 ## デプロイメントの設定
 
-Vercel にルート(routes)を function としてデプロイする方法をコントロールするには、デプロイメントの設定を、上記に示すオプションか、`+server.js`、`+page(.server).js`、`+layout(.server).js` ファイルの中の [`export const config`](/docs/page-options#config) を使用して、行うことができます。
+Vercel にルート(routes)を function としてデプロイする方法をコントロールするには、デプロイメントの設定を、上記に示すオプションか、`+server.js`、`+page(.server).js`、`+layout(.server).js` ファイルの中の [`export const config`](page-options#config) を使用して、行うことができます。
 
 例えば、アプリの一部を [Edge Functions](https://vercel.com/docs/concepts/functions/edge-functions) としてデプロイして…
 

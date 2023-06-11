@@ -344,16 +344,16 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 ```svelte
 <form
 	method="POST"
-	use:enhance={({ form, data, action, cancel, submitter }) => {
-		// `form` は `<form>` 要素です
-		// `data` はその `FormData` オブジェクトです
+	use:enhance={({ formElement, formData, action, cancel, submitter }) => {
+		// `formElement` はこの `<form>` 要素です
+		// `formData` は送信される予定の `FormData` オブジェクトです
 		// `action` はフォームが POST される URL です
-		// `cancel()` は送信(submission)を中止します
+		// `cancel()` を呼び出すと送信(submission)を中止します
 		// `submitter` は、フォームの送信を実行した `HTMLElement` です
 
 		return async ({ result, update }) => {
 			// `result` は `ActionResult` オブジェクトです
-			// `update` は、このコールバックが設定されていない場合に起動されるロジックを起動する関数です
+			// `update` は、このコールバックが設定されていない場合に起動されるデフォルトのロジックを起動する関数です
 		};
 	}}
 >
@@ -376,11 +376,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 <form
 	method="POST"
-	use:enhance={({ form, data, action, cancel }) => {
-		// `form` は `<form>` 要素です
-		// `data` はその `FormData` オブジェクトです
-		// `action` はフォームが POST される URL です
-		// `cancel()` は送信(submission)を中止します
+	use:enhance={({ formElement, formData, action, cancel }) => {
 
 		return async ({ result }) => {
 			// `result` は `ActionResult` オブジェクトです

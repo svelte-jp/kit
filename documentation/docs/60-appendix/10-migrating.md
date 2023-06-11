@@ -48,7 +48,7 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 ### src/server.js
 
-`adapter-node` を使用する場合は、[custom server](/docs/adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜならSvelteKit アプリはサーバーレス環境でも実行だからです。
+`adapter-node` を使用する場合は、[custom server](adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜなら SvelteKit アプリはサーバーレス環境でも実行可能だからです。
 
 ### src/service-worker.js
 
@@ -148,7 +148,7 @@ SvelteKit は、アプリが動作する場所に依存しないように設計�
 
 ## インテグレーション
 
-インテグレーションに関する詳細情報については [FAQ](/faq#integrations) をご参照ください。
+インテグレーションに関する詳細情報については [FAQ](../faq#integrations) をご参照ください。
 
 ### HTML minifier
 
