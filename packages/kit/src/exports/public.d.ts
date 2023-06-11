@@ -1,7 +1,6 @@
-/// <reference types="svelte" />
-/// <reference types="vite/client" />
-
-import './ambient.js';
+import 'svelte'; // pick up `declare module "*.svelte"`
+import 'vite/client'; // pick up `declare module "*.jpg"`, etc.
+import '../types/ambient.js';
 
 import { CompileOptions } from 'svelte/types/compiler/interfaces';
 import {
@@ -16,13 +15,14 @@ import {
 	PrerenderMissingIdHandlerValue,
 	PrerenderOption,
 	RequestOptions,
-	RouteSegment,
-	UniqueInterface
-} from './private.js';
-import { BuildData, SSRNodeLoader, SSRRoute, ValidatedConfig } from './internal.js';
+	RouteSegment
+} from '../types/private.js';
+import { ActionFailure } from '../runtime/control.js';
+import { BuildData, SSRNodeLoader, SSRRoute, ValidatedConfig } from 'types';
 import type { PluginOptions } from '@sveltejs/vite-plugin-svelte';
 
-export { PrerenderOption } from './private.js';
+export { PrerenderOption } from '../types/private.js';
+export { ActionFailure };
 
 /**
  * [Adapters](https://kit.svelte.jp/docs/adapters) は、本番向けビルドを、あなたが選んだプラットフォームにデプロイできる形式に変換する役割を担います。
@@ -631,12 +631,10 @@ export interface KitConfig {
  * リクエストを表す `event` オブジェクトと、`resolve` と呼ばれる、ルート(route)をレンダリングして `Response` を生成する関数を受け取ります。
  * これによってレスポンスヘッダーとボディを変更したり、SvelteKit を完全にバイパスすることができます (例えば、プログラムによるルート(routes)実装など)。
  */
-export interface Handle {
-	(input: {
-		event: RequestEvent;
-		resolve(event: RequestEvent, opts?: ResolveOptions): MaybePromise<Response>;
-	}): MaybePromise<Response>;
-}
+export type Handle = (input: {
+	event: RequestEvent;
+	resolve(event: RequestEvent, opts?: ResolveOptions): MaybePromise<Response>;
+}) => MaybePromise<Response>;
 
 /**
  * サーバーサイドの [`handleError`](https://kit.svelte.jp/docs/hooks#shared-hooks-handleerror) hook は、リクエストの応答中に予期せぬエラー(unexpected error)がスローされたときに実行されます。
@@ -644,9 +642,10 @@ export interface Handle {
  * もし予期せぬエラーが load か レンダリング中にスローされた場合、この関数はその error と event を引数に取って呼び出されます。
  * この関数では決してエラーをスローしないようにしてください。
  */
-export interface HandleServerError {
-	(input: { error: unknown; event: RequestEvent }): MaybePromise<void | App.Error>;
-}
+export type HandleServerError = (input: {
+	error: unknown;
+	event: RequestEvent;
+}) => MaybePromise<void | App.Error>;
 
 /**
  * クライアントサイドの [`handleError`](https://kit.svelte.jp/docs/hooks#shared-hooks-handleerror) hook は、ナビゲーション中に予期せぬエラー(unexpected error)がスローされたときに実行されます。
@@ -654,30 +653,31 @@ export interface HandleServerError {
  * もし予期せぬエラーが load かその後のレンダリング中にスローされた場合、この関数はその error と error と event を引数に取って呼び出されます。
  * この関数では決してエラーをスローしないようにしてください。
  */
-export interface HandleClientError {
-	(input: { error: unknown; event: NavigationEvent }): MaybePromise<void | App.Error>;
-}
+export type HandleClientError = (input: {
+	error: unknown;
+	event: NavigationEvent;
+}) => MaybePromise<void | App.Error>;
 
 /**
  * [`handleFetch`](https://kit.svelte.jp/docs/hooks#server-hooks-handlefetch) hook によって、サーバーで(またはプリレンダリング中に)実行される `load` 関数の内側で実行される `fetch` リクエストを変更 (または置換) することができます
  */
-export interface HandleFetch {
-	(input: { event: RequestEvent; request: Request; fetch: typeof fetch }): MaybePromise<Response>;
-}
+export type HandleFetch = (input: {
+	event: RequestEvent;
+	request: Request;
+	fetch: typeof fetch;
+}) => MaybePromise<Response>;
 
 /**
  * `PageLoad` と `LayoutLoad` のジェネリックなフォームです。`Load` を直接使用するのではなく、`./$types` ([generated types](https://kit.svelte.jp/docs/types#generated-types) 参照) から
  * インポートしてください。
  */
-export interface Load<
+export type Load<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
 	InputData extends Record<string, unknown> | null = Record<string, any> | null,
 	ParentData extends Record<string, unknown> = Record<string, any>,
 	OutputData extends Record<string, unknown> | void = Record<string, any> | void,
 	RouteId extends string | null = string | null
-> {
-	(event: LoadEvent<Params, InputData, ParentData, RouteId>): MaybePromise<OutputData>;
-}
+> = (event: LoadEvent<Params, InputData, ParentData, RouteId>) => MaybePromise<OutputData>;
 
 /**
  * `PageLoadEvent` と `LayoutLoadEvent` のジェネリック型。`LoadEvent` を直接使用するのではなく、
@@ -931,9 +931,7 @@ export interface Page<
 /**
  * param matcher の形です。詳細については [matching](https://kit.svelte.jp/docs/advanced-routing#matching) を参照。
  */
-export interface ParamMatcher {
-	(param: string): boolean;
-}
+export type ParamMatcher = (param: string) => boolean;
 
 export interface RequestEvent<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
@@ -1021,12 +1019,10 @@ export interface RequestEvent<
  *
  * 1つめのジェネリックな引数(first generic argument)として `Params` を受け取りますが、代わりに [generated types](https://kit.svelte.jp/docs/types#generated-types) を使うことでこれをスキップすることができます。
  */
-export interface RequestHandler<
+export type RequestHandler<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
 	RouteId extends string | null = string | null
-> {
-	(event: RequestEvent<Params, RouteId>): MaybePromise<Response>;
-}
+> = (event: RequestEvent<Params, RouteId>) => MaybePromise<Response>;
 
 export interface ResolveOptions {
 	/**
@@ -1045,7 +1041,7 @@ export interface ResolveOptions {
 	filterSerializedResponseHeaders?(name: string, value: string): boolean;
 	/**
 	 * `<head>` タグにどのファイルをプリロードの対象として追加するか決定します。
-	 * デフォルトでは、`js`、`css`、`font` ファイルがプリロードされます。
+	 * デフォルトでは、`js` と `css` ファイルがプリロードされます。
 	 * @param input ファイルのタイプとそのパス
 	 */
 	preload?(input: { type: 'font' | 'css' | 'js' | 'asset'; path: string }): boolean;
@@ -1095,14 +1091,12 @@ export interface SSRManifest {
  * `PageServerLoad` と `LayoutServerLoad` のジェネリックなフォームです。`ServerLoad` を直接使用するのではなく、`./$types` ([generated types](https://kit.svelte.jp/docs/types#generated-types) を参照) から
  * インポートしてください。
  */
-export interface ServerLoad<
+export type ServerLoad<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
 	ParentData extends Record<string, any> = Record<string, any>,
 	OutputData extends Record<string, any> | void = Record<string, any> | void,
 	RouteId extends string | null = string | null
-> {
-	(event: ServerLoadEvent<Params, ParentData, RouteId>): MaybePromise<OutputData>;
-}
+> = (event: ServerLoadEvent<Params, ParentData, RouteId>) => MaybePromise<OutputData>;
 
 export interface ServerLoadEvent<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
@@ -1159,13 +1153,11 @@ export interface ServerLoadEvent<
  * `+page.server.js` にある `export const actions = {..}` の一部である form action メソッドの形です。
  * 詳細は [form actions](https://kit.svelte.jp/docs/form-actions) をご参照ください。
  */
-export interface Action<
+export type Action<
 	Params extends Partial<Record<string, string>> = Partial<Record<string, string>>,
 	OutputData extends Record<string, any> | void = Record<string, any> | void,
 	RouteId extends string | null = string | null
-> {
-	(event: RequestEvent<Params, RouteId>): MaybePromise<OutputData>;
-}
+> = (event: RequestEvent<Params, RouteId>) => MaybePromise<OutputData>;
 
 /**
  * `+page.server.js` にある `export const actions = {..}` オブジェクトの形です。
@@ -1197,22 +1189,7 @@ export type ActionResult<
 	| { type: 'error'; status?: number; error: any };
 
 /**
- * HTTP ステータスコードとオプションのメッセージで `HttpError` オブジェクトを作成します。
- * リクエストの処理中にこのオブジェクトがスローされると、SvelteKit は
- * `handleError` を呼ばずにエラーレスポンス(error response)を返します。
- * スローされた redirect をキャッチしないようにしてください、SvelteKit が処理するのを妨げてしまいます。
- * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)、400-599 の範囲内でなければならない。
- * @param body App.Error 型に準拠するオブジェクト。string が渡された場合、メッセージプロパティとして使用される。
- */
-export function error(status: number, body: App.Error): HttpError;
-export function error(
-	status: number,
-	// this overload ensures you can omit the argument or pass in a string if App.Error is of type { message: string }
-	body?: { message: string } extends App.Error ? App.Error | string | undefined : never
-): HttpError;
-
-/**
- * [`error`](https://kit.svelte.jp/docs/modules#sveltejs-kit-error) 関数が返すオブジェクトです
+ * [`error`](https://kit.svelte.jp/docs/modules#sveltejs-kit-error) 関数が返すオブジェクトです。
  */
 export interface HttpError {
 	/** [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)、400-599 の範囲内。 */
@@ -1222,18 +1199,7 @@ export interface HttpError {
 }
 
 /**
- * `Redirect` オブジェクトを作成します。リクエストの処理中にスローされると、SvelteKit はリダイレクトレスポンス(redirect response)を返します。
- * スローされた redirect をキャッチしないようにしてください、SvelteKit が処理するのを妨げてしまいます。
- * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#redirection_messages)。300-308 の範囲内でなければならない。
- * @param location リダイレクト先のロケーション。
- */
-export function redirect(
-	status: 300 | 301 | 302 | 303 | 304 | 305 | 306 | 307 | 308,
-	location: string
-): Redirect;
-
-/**
- * [`redirect`](https://kit.svelte.jp/docs/modules#sveltejs-kit-redirect) 関数が返すオブジェクトです
+ * [`redirect`](https://kit.svelte.jp/docs/modules#sveltejs-kit-redirect) 関数が返すオブジェクトです。
  */
 export interface Redirect {
 	/** [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#redirection_messages)。300-308 の範囲内。 */
@@ -1242,66 +1208,50 @@ export interface Redirect {
 	location: string;
 }
 
-/**
- * 与えられた data から JSON `Response` オブジェクトを作成します。
- * @param data The value that will be serialized as JSON.
- * @param init Options such as `status` and `headers` that will be added to the response. `Content-Type: application/json` and `Content-Length` headers will be added automatically.
- */
-export function json(data: any, init?: ResponseInit): Response;
-
-/**
- * Create a `Response` object from the supplied body.
- * @param body The value that will be used as-is.
- * @param init Options such as `status` and `headers` that will be added to the response. A `Content-Length` header will be added automatically.
- */
-export function text(body: string, init?: ResponseInit): Response;
-
-/**
- * `ActionFailure` オブジェクトを作成します。
- * @param status [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)。400-599 の範囲内でなければならない。
- * @param data 失敗(failure)に関連するデータ (例: validation errors)
- */
-export function fail<T extends Record<string, unknown> | undefined = undefined>(
-	status: number,
-	data?: T
-): ActionFailure<T>;
-
-/**
- * [`fail`](https://kit.svelte.jp/docs/modules#sveltejs-kit-fail) 関数が返すオブジェクトです
- */
-export interface ActionFailure<T extends Record<string, unknown> | undefined = undefined>
-	extends UniqueInterface {
-	/** [HTTP ステータスコード](https://developer.mozilla.org/ja/docs/Web/HTTP/Status#client_error_responses)、400-599 の範囲内。 */
-	status: number;
-	/** 失敗(failure)に関連するデータ (例: validation errors) */
-	data: T;
-}
-
-export interface SubmitFunction<
+export type SubmitFunction<
 	Success extends Record<string, unknown> | undefined = Record<string, any>,
 	Failure extends Record<string, unknown> | undefined = Record<string, any>
-> {
-	(input: {
-		action: URL;
-		data: FormData;
-		form: HTMLFormElement;
-		controller: AbortController;
-		submitter: HTMLElement | null;
-		cancel(): void;
-	}): MaybePromise<
-		| void
-		| ((opts: {
-				form: HTMLFormElement;
-				action: URL;
-				result: ActionResult<Success, Failure>;
-				/**
-				 * フォーム送信(form submission)のレスポンスのデフォルトの動作を取得するためにこれを呼び出します。
-				 * @param options 送信(submission)に成功したあとに `<form>` の値をリセットしたくない場合は、`reset: false` を設定します。
-				 */
-				update(options?: { reset: boolean }): Promise<void>;
-		  }) => void)
-	>;
-}
+> = (input: {
+	action: URL;
+	/**
+	 * use `formData` instead of `data`
+	 * @deprecated
+	 */
+	data: FormData;
+	formData: FormData;
+	/**
+	 * use `formElement` instead of `form`
+	 * @deprecated
+	 */
+	form: HTMLFormElement;
+	formElement: HTMLFormElement;
+	controller: AbortController;
+	submitter: HTMLElement | null;
+	cancel(): void;
+}) => MaybePromise<
+	| void
+	| ((opts: {
+			/**
+			 * use `formData` instead of `data`
+			 * @deprecated
+			 */
+			data: FormData;
+			formData: FormData;
+			/**
+			 * use `formElement` instead of `form`
+			 * @deprecated
+			 */
+			form: HTMLFormElement;
+			formElement: HTMLFormElement;
+			action: URL;
+			result: ActionResult<Success, Failure>;
+			/**
+			 * これを呼び出すと、フォーム送信(form submission)のレスポンスのデフォルトの動作を取得することができます。
+			 * @param options 送信(submission)に成功したあとに `<form>` の値をリセットしたくない場合は、`reset: false` を設定します。
+			 */
+			update(options?: { reset: boolean }): Promise<void>;
+	  }) => void)
+>;
 
 /**
  * The type of `export const snapshot` exported from a page or layout component.
@@ -1311,17 +1261,4 @@ export interface Snapshot<T = any> {
 	restore: (snapshot: T) => void;
 }
 
-/**
- * Populate a route ID with params to resolve a pathname.
- * @example
- * ```js
- * resolvePath(
- *   `/blog/[slug]/[...somethingElse]`,
- *   {
- *     slug: 'hello-world',
- *     somethingElse: 'something/else'
- *   }
- * ); // `/blog/hello-world/something/else`
- * ```
- */
-export function resolvePath(id: string, params: Record<string, string | undefined>): string;
+export * from './index.js';

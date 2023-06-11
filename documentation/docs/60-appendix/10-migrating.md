@@ -48,7 +48,11 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 ### src/server.js
 
-`adapter-node` を使用する場合は、[custom server](/docs/adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜならSvelteKit アプリはサーバーレス環境でも実行だからです。
+<<<<<<< HEAD
+`adapter-node` を使用する場合は、[custom server](adapter-node#custom-server) がこれと同等のものです。それ以外の場合は、同等のものに該当するものはありません。なぜならSvelteKit アプリはサーバーレス環境でも実行だからです。
+=======
+When using `adapter-node` the equivalent is a [custom server](adapter-node#custom-server). Otherwise, this file has no direct equivalent, since SvelteKit apps can run in serverless environments.
+>>>>>>> sveltejs/master
 
 ### src/service-worker.js
 
@@ -148,7 +152,11 @@ SvelteKit は、アプリが動作する場所に依存しないように設計�
 
 ## インテグレーション
 
+<<<<<<< HEAD
 インテグレーションに関する詳細情報については [FAQ](/faq#integrations) をご参照ください。
+=======
+See [the FAQ](../faq#integrations) for detailed information about integrations.
+>>>>>>> sveltejs/master
 
 ### HTML minifier
 

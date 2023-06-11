@@ -6,7 +6,7 @@ SvelteKit では、アプリのルート(routes)間の移動に、(フレーム�
 
 `data-sveltekit-*` 属性でリンクの挙動をカスタマイズすることができます。これらは `<a>` 自身やその親要素に適用することができます。
 
-これらのオプションは、[`method="GET"`](/docs/form-actions#get-vs-post) を持つ `<form>` 要素にも適用されます。
+これらのオプションは、[`method="GET"`](form-actions#get-vs-post) を持つ `<form>` 要素にも適用されます。
 
 ## data-sveltekit-preload-data
 
@@ -80,7 +80,7 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 
 ## data-sveltekit-keepfocus
 
-ナビゲーションの後に[フォーカスをリセット](/docs/accessibility#focus-management)したくない場合があります。例えば、ユーザーが入力している途中で送信をするような検索フォームがあり、テキストの input にフォーカスを維持したい場合です。`data-sveltekit-keepfocus` 属性を追加すると…
+ナビゲーションの後に[フォーカスをリセット](accessibility#focus-management)したくない場合があります。例えば、ユーザーが入力している途中で送信をするような検索フォームがあり、テキストの input にフォーカスを維持したい場合です。`data-sveltekit-keepfocus` 属性を追加すると…
 
 ```html
 <form data-sveltekit-keepfocus>
@@ -104,7 +104,7 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 
 ## Disabling options
 
-これらのオプションが有効になっている要素の中でこれらのオプションを無効にするには、`"off"` 値を使用します:
+これらのオプションが有効になっている要素の中でこれらのオプションを無効にするには、`"false"` 値を使用します:
 
 ```html
 <div data-sveltekit-preload-data>
@@ -113,7 +113,7 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 	<a href="/b">b</a>
 	<a href="/c">c</a>
 
-	<div data-sveltekit-preload-data="off">
+	<div data-sveltekit-preload-data="false">
 		<!-- these links will NOT be preloaded -->
 		<a href="/d">d</a>
 		<a href="/e">e</a>
@@ -122,7 +122,7 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 </div>
 ```
 
-条件によって要素に属性を適用する場合は、このようにします:
+条件によって要素に属性を適用する場合は、このようにします (`"true"` と `"false"` はどちらも使用することができます):
 
 ```html
 <div data-sveltekit-reload={shouldReload ? '' : 'off'}>
