@@ -89,7 +89,6 @@ export async function load({ fetch }) {
 
 ## entries
 
-SvelteKit will discover pages to prerender automatically, by starting at _entry points_ and crawling them. By default, all your non-dynamic routes are considered entry points — for example, if you have these routes...
 SvelteKit は、 _エントリーポイント(entry points)_ を開始地点としてクローリングを行うことでページを自動的に発見します。デフォルトでは、動的でないルート(route)はすべてエントリーポイントとみなされます。例えば、以下のルートがある場合…
 
 ```bash
@@ -177,7 +176,7 @@ export const config = {
 };
 ```
 
-`config` オブジェクトはトップレベル(top level)でマージされます (より深いレベル(deeper levels)ではマージされません)。つまり、より上位にある `+layout.js` にある値の一部を上書きしたい場合に、`+page.js` にある全ての値を繰り返す必要はないということです。例えばこの layout の設定は…
+`config` オブジェクトはトップレベル(top level)でマージされます (より深いレベル(deeper levels)ではマージされません)。つまり、より上位の `+layout.js` にある値の一部を上書きしたい場合に、`+page.js` にある全ての値を繰り返す必要はないということです。例えばこの layout の設定は…
 
 ```js
 /// file: src/routes/+layout.js
