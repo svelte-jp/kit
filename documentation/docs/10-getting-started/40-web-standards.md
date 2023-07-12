@@ -26,7 +26,7 @@ SvelteKit は、ネットワーク越しにデータを取得するために [`f
 
 ### Headers
 
-[`Headers`](https://developer.mozilla.org/ja/docs/Web/API/Headers) インターフェイスでは、SvelteKit が受信した `request.headers` を読むことと、送信する `response.headers` をセットすることができます:
+[`Headers`](https://developer.mozilla.org/ja/docs/Web/API/Headers) インターフェイスでは、受け取った `request.headers` を読み取り、送信する `response.headers` をセットすることができます。例えば以下のように、`request.headers` を取得して、[`json` という便利な関数](modules#sveltejs-kit-json)を使用して `response.headers` を変更し送信することができます:
 
 ```js
 // @errors: 2461
@@ -34,13 +34,17 @@ SvelteKit は、ネットワーク越しにデータを取得するために [`f
 import { json } from '@sveltejs/kit';
 
 /** @type {import('./$types').RequestHandler} */
-export function GET(event) {
+export function GET({ request }) {
 	// log all headers
-	console.log(...event.request.headers);
+	console.log(...request.headers);
 
+	// create a JSON Response using a header we received
 	return json({
 		// retrieve a specific header
-		userAgent: event.request.headers.get('user-agent')
+		userAgent: request.headers.get('user-agent')
+	}, {
+		// set a header on the response
+		headers: { 'x-custom-header': 'potato' }
 	});
 }
 ```

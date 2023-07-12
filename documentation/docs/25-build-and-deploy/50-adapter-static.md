@@ -38,7 +38,7 @@ export default {
 export const prerender = true;
 ```
 
-> SvelteKit の [`trailingSlash`](page-options#trailingslash) オプションを、あなたの環境に対して適切に設定しなければなりません。もしあなたのホスト環境が、`/a` へのリクエストを受け取ったときに `/a.html` をレンダリングしない場合、`/a/index.html` を作成するために `trailingSlash: 'always'` を設定する必要があります。
+> SvelteKit の [`trailingSlash`](page-options#trailingslash) オプションを、あなたの環境に対して適切に設定しなければなりません。もしあなたのホスト環境が、`/a` へのリクエストを受け取ったときに `/a.html` をレンダリングしない場合、`/a/index.html` を作成するために最上位のレイアウト(root layout)で `trailingSlash: 'always'` を設定する必要があります。
 
 ## ゼロコンフィグサポート
 
