@@ -372,6 +372,11 @@ export interface KitConfig {
 		 * @default "PUBLIC_"
 		 */
 		publicPrefix?: string;
+		/**
+		 * A prefix that signals that an environment variable is unsafe to expose to client-side code. Environment variables matching neither the public nor the private prefix will be discarded completely. See [`$env/static/private`](/docs/modules#$env-static-private) and [`$env/dynamic/private`](/docs/modules#$env-dynamic-private).
+		 * @default ""
+		 */
+		privatePrefix?: string;
 	};
 	/**
 	 * プロジェクト内の各種ファイルの場所。
@@ -449,7 +454,7 @@ export interface KitConfig {
 		/**
 		 * SvelteKit は初期ページに必要な JavaScript モジュールをプリロードすることで、インポートの 'ウォーターフォール' を回避し、アプリケーションの起動を高速化します。
 		 * 異なるトレードオフを持つ3つの戦略があります:
-		 * - `modulepreload` - `<link rel="modulepreload">` を使用します。これは Chromium ベースのブラウザではベストな結果をもたらしますが、現時点では Firefox と Safari では無視されます (ただし Safari には近々サポートが提供される見込みです)。
+		 * - `modulepreload` - `<link rel="modulepreload">` を使用します。これは Chromium ベースのブラウザ、Firefox 115 以上、Safari 17 以上ではベストな結果をもたらします。古いブラウザでは無視されます。
 		 * - `preload-js` - `<link rel="preload">` を使用します。Chromium と Safari でウォーターフォールを防ぎますが、Chromium は書くモジュールを2回パースします (script として1回、module として1回)。Firefox ではモジュールが2回リクエストされるようになります。これは、Chromium ユーザーのパフォーマンスをわずかに低下させるのと引き換えに、iOS デバイスのユーザーのパフォーマンスを最大化したい場合には有効な設定です。
 		 * - `preload-mjs` - `<link rel="preload">` を使用しますが、`.mjs` 拡張子であるため、Chromium が二重でパースすることを防ぎます。一部の静的 Web サーバーでは、.mjs ファイルを `Content-Type: application/javascript` ヘッダーとともに提供すると失敗となり、アプリケーションを壊すことになります。それがもしあなたにあてはまらないのなら、`modulepreload` がより広くサポートされるまで、これが多くのユーザーにベストなパフォーマンスをもたらすオプションです。
 		 * @default "modulepreload"
@@ -821,7 +826,7 @@ export interface NavigationTarget {
 
 /**
  * - `enter`: アプリがハイドレーションされた場合
- * - `form`: ユーザーが `<form>` を送信した場合
+ * - `form`: ユーザーが GET メソッドで `<form>` を送信した場合
  * - `leave`: ユーザーがタブを閉じようとしたり 戻る/進む ボタンで違うドキュメントに行こうとしてアプリから離れようとした場合
  * - `link`: リンクをクリックしてナビゲーションがトリガーされた場合
  * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
@@ -1012,6 +1017,10 @@ export interface RequestEvent<
 	 * もしあなたにとってこの区別が重要な場合、このプロパティを使用してください。
 	 */
 	isDataRequest: boolean;
+	/**
+	 * `true` for `+server.js` calls coming from SvelteKit without the overhead of actually making an HTTP request. This happens when you make same-origin `fetch` requests on the server.
+	 */
+	isSubRequest: boolean;
 }
 
 /**

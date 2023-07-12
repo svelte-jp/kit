@@ -99,6 +99,7 @@ const docs_adapter_cloudflare = new Map([
 	['比較', 'Comparisons'],
 	['使い方', 'Usage'],
 	['トラブルシューティング', 'Troubleshooting'],
+	['外部の資料', 'Further reading'],
 	['ファイルシステムにアクセスする', 'Accessing the file system']
 ]);
 

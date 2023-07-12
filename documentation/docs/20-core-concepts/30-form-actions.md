@@ -424,7 +424,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 		const result = deserialize(await response.text());
 
 		if (result.type === 'success') {
-			// re-run all `load` functions, following the successful update
+			// rerun all `load` functions, following the successful update
 			await invalidateAll();
 		}
 

@@ -152,7 +152,7 @@ import Foo from 'your-library/Foo.svelte';
 }
 ```
 
-`>4.0` は、TypeScript のバージョンが 4 より大きい場合、内側の map をチェックするよう TypeScript に伝えるものです (実際には常に true となるべきものです)。内側の map は TypeScript に `your-library/foo` に対する型付けが `./dist/foo.d.ts` にあることを伝えるためのもので、実質 `exports` condition を置き換えています。また、ワイルドカードとして `*` を自由に使用できるので、同じことを繰り返すことなくたくさんの型定義を一度で使用可能にすることができます。もし `typesVersions` を選択した場合、root import (`"index": [..]` と定義される) を含む全ての型のインポートを、これを通して宣言しなければならないことにご注意ください。
+`>4.0` は、TypeScript のバージョンが 4 より大きい場合、内側の map をチェックするよう TypeScript に伝えるものです (実際には常に true となるべきものです)。内側の map は TypeScript に `your-library/foo` に対する型付けが `./dist/foo.d.ts` にあることを伝えるためのもので、実質 `exports` condition を置き換えています。また、ワイルドカードとして `*` を自由に使用できるので、同じことを繰り返すことなくたくさんの型定義を一度で使用可能にすることができます。もし `typesVersions` を選択した場合、(`"index.d.ts": [..]` と定義されている) root import を含む全ての型のインポートを、これを通して宣言しなければならないことにご注意ください。
 
 この機能についてより詳しい情報は[こちら](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html#version-selection-with-typesversions)でお読み頂けます。
 

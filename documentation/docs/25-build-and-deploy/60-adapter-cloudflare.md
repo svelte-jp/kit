@@ -12,7 +12,7 @@ title: Cloudflare Pages
 - `adapter-cloudflare-workers` – SvelteKit の全ての機能をサポートします; Cloudflare Workers 向けにビルドします
 - `adapter-static` – クライアントサイドの静的なアセットを生成するのみです; Cloudflare Pages と互換性があります
 
-> 特別な理由が無い限り、`adapter-cloudflare-workers` ではなく、この adapter を使用することをおすすめします。どちらの adapter も機能としては同等ですが、Cloudflare Pages は、GitHub インテグレーションによる自動ビルドや自動デプロイ、プレビューデプロイ、即時ロールバックなどの機能を提供します。
+> 特別な理由が無い限り、`adapter-cloudflare-workers` ではなく、`adapter-cloudflare` を使用することをおすすめします。どちらの adapter も機能としては同等ですが、Cloudflare Pages は、GitHub インテグレーションによる自動ビルドや自動デプロイ、プレビューデプロイ、即時ロールバックなどの機能を提供します。
 
 ## 使い方
 
@@ -105,6 +105,10 @@ Cloudflare Pages 固有の `_headers` ファイルと `_redirects` ファイル�
 しかし、SvelteKit が動的にレンダリングするレスポンスには効果がありません。この場合にカスタムヘッダーやリダイレクトレスポンスを返すには、[サーバーエンドポイント(server endpoints)](https://kit.svelte.jp/docs/routing#server) や [`handle`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) hook から返す必要があります。
 
 ## トラブルシューティング
+
+### 外部の資料
+
+[Cloudflare の、SvelteKit サイトのデプロイに関するドキュメント](https://developers.cloudflare.com/pages/framework-guides/deploy-a-svelte-site)をご参照ください。
 
 ### ファイルシステムにアクセスする
 

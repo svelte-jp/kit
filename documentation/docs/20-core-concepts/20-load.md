@@ -566,7 +566,7 @@ export async function load({ fetch, depends }) {
 	export let data;
 
 	function rerunLoadFunction() {
-		// any of these will cause the `load` function to re-run
+		// any of these will cause the `load` function to rerun
 		invalidate('app:random');
 		invalidate('https://api.example.com/random-number');
 		invalidate(url => url.href.includes('random-number'));
