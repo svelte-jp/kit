@@ -30,7 +30,7 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 - `sapper dev` は `vite dev` に更新します
 - `node __sapper__/build` は `node build` に更新します
 
-## プロジェクトファイル
+## プロジェクトファイル <!--project-files-->
 
 アプリの大部分を占める `src/routes` の中はそのままで大丈夫ですが、いくつかのプロジェクトファイルを移動または更新する必要があります。
 
@@ -69,9 +69,9 @@ SvelteKit にはこのファイルに相当するものはありません。カ�
 
 Sapper アプリでよくあるパターンとして、内部ライブラリを `src/node_modules` 内のディレクトリに配置する、というものがあります。これは Vite だと動作しないため、代わりに [`src/lib`](modules#$lib) を使用します。
 
-## ページとレイアウト
+## ページとレイアウト <!--pages-and-layouts-->
 
-### 名前が変わったファイル
+### 名前が変わったファイル <!--renamed-files-->
 
 ルート(Routes)は曖昧さをなくすためフォルダ名のみで構成されるようになり、`+page.svelte` までのフォルダ名がルート(route)に対応するようになりました。概要は [ルーティングのドキュメント](routing) をご参照ください。以下は 新/旧 の比較です:
 
@@ -119,7 +119,7 @@ const { preloading, page, session } = stores();
 
 SvelteKit では、それらにアクセスする方法が異なります。`stores` は `getStores` になりましたが、[`$app/stores`](modules#$app-stores) から直接 `navigating`、`page`、`session` をインポートできるので、ほとんどの場合は必要ありません。
 
-### ルーティング
+### ルーティング <!--routing-->
 
 ルート(routes) の正規表現はもうサポートされていません。代わりに、[advanced route matching](advanced-routing#matching) をお使いください。
 
@@ -146,9 +146,9 @@ SvelteKit は、アプリが動作する場所に依存しないように設計�
 
 環境非依存な動作をサポートするため、グローバルコンテキストで `fetch` が利用できるようになり、`node-fetch` や `cross-fetch` などのサーバーサイドの fetch 実装をインポートする必要がなくなりました。
 
-## インテグレーション
+## インテグレーション <!--integrations-->
 
-インテグレーションに関する詳細情報については [FAQ](../faq#integrations) をご参照ください。
+インテグレーションに関する詳細情報については [インテグレーション](./integrations) をご参照ください。
 
 ### HTML minifier
 

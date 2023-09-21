@@ -6,7 +6,7 @@ Netlify にデプロイする場合は、[`adapter-netlify`](https://github.com/
 
 [`adapter-auto`](adapter-auto) を使用している場合、この adapter は自動でインストールされますが、この adapter 自体をプロジェクトに追加すれば Netlify 固有のオプションを指定できるようになります。
 
-## 使い方
+## 使い方 <!--usage-->
 
 `npm i -D @sveltejs/adapter-netlify` を実行してインストールし、`svelte.config.js` にこの adapter を追加します:
 
@@ -66,7 +66,7 @@ export default {
 };
 ```
 
-## SvelteKit の機能を代替する Netlify の機能
+## SvelteKit の機能を代替する Netlify の機能 <!--netlify-alternatives-to-sveltekit-functionality-->
 
 Netlify の機能に依存することなく、SvelteKit が直接提供する機能を使ってアプリを構築することができます。こういった機能は SvelteKit のほうを選択すると、開発モードでその機能を使用でき、インテグレーションテストが可能になり、Netlify から切り替えることになった場合に他の adapter で動作させることができます。しかし、シナリオによっては Netlify のほうの機能を使用したほうが有益な場合もあります。例えば、すでに Netlify でホストされているアプリを SvelteKit に移行する場合です。
 
@@ -107,8 +107,8 @@ export const load = async (event) => {
 	directory = "functions"
 ```
 
-## トラブルシューティング
+## トラブルシューティング <!--troubleshooting-->
 
-### ファイルシステムにアクセスする
+### ファイルシステムにアクセスする <!--accessing-the-file-system-->
 
 Serverless/Edge 環境では、`fs.readFileSync` などのメソッドでファイルシステムにアクセスすることはできません。もしこのような方法でファイルにアクセスする必要がある場合、アプリのビルド中に[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)でこれを行ってください。例えば、ブログを持っていて、CMS でコンテンツを管理したくない場合、コンテンツをプリレンダリングし (またはコンテンツを取得するエンドポイントをプリレンダリングし)、新しいコンテンツを追加するたびにブログを再デプロイする必要があります。

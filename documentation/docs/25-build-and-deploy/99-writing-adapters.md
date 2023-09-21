@@ -37,7 +37,7 @@ export default function (options) {
 	- `builder.generateManifest({ relativePath })` で生成された manifest でアプリをインスタンス化する
 	- 必要に応じて、プラットフォームからのリクエストをリスン(Listen)しそのリクエストを標準の [Request](https://developer.mozilla.org/ja/docs/Web/API/Request) に変換し、`server.respond(request, { getClientAddress })` 関数を呼び出して [Response](https://developer.mozilla.org/ja/docs/Web/API/Response) を生成して応答する
 	- `server.respond` に渡される `platform` オプションを使用してプラットフォーム固有の情報を SvelteKit に公開する
-	- 必要に応じて、ターゲットのプラットフォームで動作するよう `fetch` をグローバルにシム(shim)する。SvelteKit は、プラットフォームが `node-fetch` を使用できるようにするための `@sveltejs/kit/install-fetch` ヘルパーを提供しています
+	- 必要に応じて、ターゲットのプラットフォームで動作するよう `fetch` をグローバルにシム(shim)する。SvelteKit は、プラットフォームが `undici` を使用できるようにするための `@sveltejs/kit/node/polyfills` ヘルパーを提供しています
 - 必要に応じて、ターゲットのプラットフォームで依存関係(dependencies)をインストールするのを避けるため、出力をバンドルする
 - ユーザーの静的ファイルと生成された JS/CSS をターゲットのプラットフォームにとって適切な場所に配置する
 

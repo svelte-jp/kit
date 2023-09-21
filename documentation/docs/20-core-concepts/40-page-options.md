@@ -54,7 +54,7 @@ export async function load({ fetch }) {
 
 …それから `src/routes/my-server-route.json/+server.js` は、自身の `export const prerender = false` を含んでいなければ、プリレンダリング可能であると扱われることになります。
 
-### プリレンダリングしない場合
+### プリレンダリングしない場合 <!--when-not-to-prerender-->
 
 基本的なルールは次の通りです: ページがプリレンダリング可能であると言うためには、そのページを直接表示する2人のユーザーが、サーバーから同じコンテンツを取得できなけれなりません。
 
@@ -203,6 +203,6 @@ export const config = {
 
 …このページの設定の値は `{ runtime: 'edge', regions: ['us1', 'us2'], foo: { baz: true } }` となります。
 
-## その他の参考資料
+## その他の参考資料 <!--further-reading-->
 
 - [Tutorial: Page options](https://learn.svelte.jp/tutorial/page-options)

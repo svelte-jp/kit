@@ -55,6 +55,6 @@ Cannot import $lib/server/secrets.js into public-facing code:
 
 > Vitest のようなユニットテストフレームワークはサーバー専用のコードと公開されるコードを区別しません。そのため、テストの実行中、つまり `process.env.TEST === 'true'` となっているときは、不正なインポートの検出は無効化されます。
 
-## その他の参考資料
+## その他の参考資料 <!--further-reading-->
 
 - [Tutorial: Environment variables](https://learn.svelte.jp/tutorial/env-static-private)

@@ -18,7 +18,7 @@ title: Additional resources
 
 また、SvelteKit ユーザーが GitHub で [#sveltekit](https://github.com/topics/sveltekit) や [#sveltekit-template](https://github.com/topics/sveltekit-template) というトピックを付けて多くの例を公開しており、[Svelte Society のサイト](https://sveltesociety.dev/templates#svelte-kit) にも例が公開されています。なお、これらはメンテナーによって検証されておらず、最新ではない可能性もありますのでご注意ください。
 
-## サポート
+## サポート <!--support-->
 
 [Discord](https://svelte.dev/chat) や [StackOverflow](https://stackoverflow.com/questions/tagged/sveltekit) でヘルプを求めることができます。他の方の時間を尊重するため、まずは FAQ、Googleまたは他の検索エンジン、issue tracker、Discord のチャット履歴などから、問題に関連する情報を検索してください。回答する方より質問する方のほうが多いので、こうすることでコミュニティをスケーラブルに発展させることができると思います。
 

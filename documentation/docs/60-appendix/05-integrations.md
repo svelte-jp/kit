@@ -31,4 +31,4 @@ export default {
 
 ## Integration FAQs
 
-SvelteKit FAQ に [インテグレーションのセクション](../faq#integrations) があるので、もしまだ不明点があるようでしたら役に立つかもしれません。
+SvelteKit FAQ に [SvelteKit で X をする方法](./faq#how-do-i-use-x-with-sveltekit) があるので、もしまだ不明点があるようでしたら役に立つかもしれません。

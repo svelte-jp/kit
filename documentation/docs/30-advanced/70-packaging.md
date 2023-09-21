@@ -15,7 +15,7 @@ SvelteKit では、アプリを構築するだけでなく、`@sveltejs/package`
 
 > `@sveltejs/package` バージョン1は `package.json` を生成していましたが、この仕様は変更され、現在はプロジェクトの `package.json` を使用しそれが正しいか検証するようになりました。もしまだバージョン1を使用している場合は、[この PR](https://github.com/sveltejs/kit/pull/8922) にある移行手順(Migration instructions)をご覧ください。
 
-## package.json の構造
+## package.json の構造 <!--anatomy-of-a-package-json-->
 
 公開するライブラリをビルドするのであれば、`package.json` の内容がとても重要になります。これを通して、パッケージのエントリーポイントや、どのファイルを npm に公開するか、そしてあなたのライブラリの依存関係を設定することができます。それでは、重要なフィールドをひとつずつ見ていきましょう。
 
@@ -156,7 +156,7 @@ import Foo from 'your-library/Foo.svelte';
 
 この機能についてより詳しい情報は[こちら](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html#version-selection-with-typesversions)でお読み頂けます。
 
-## ベストプラクティス
+## ベストプラクティス <!--best-practices-->
 
 他の SvelteKit プロジェクトからのみ使用されることを想定しているのでなければ、`$app` などの [SvelteKit 固有のモジュール](modules)をあなたのパッケージで使用するのは避けたほうがよいでしょう。例えば、`import { browser } from '$app/environment'` を使用するのではなく、`import { BROWSER } from 'esm-env'` ([esm-env ドキュメント参照](https://github.com/benmccann/esm-env)) を使用します。また、`$app/stores` や `$app/navigation` などに直接頼るのではなく、現在の URL や navigation action をプロパティとして渡すこともできます。より一般的な方法でアプリを書くことによって、テストや UI デモなどのツールのセットアップも簡単になります。
 
@@ -206,7 +206,7 @@ import Foo from 'your-library/Foo.svelte';
 npm publish
 ```
 
-## 注意事項
+## 注意事項 <!--caveats-->
 
 すべての相対ファイルインポートは、Node の ESM アルゴリズムに従って、フルで指定する必要があります。つまり、`src/lib/something/index.js` のようなファイルには、ファイル名と拡張子を含めなければなりません。
 

@@ -4,7 +4,7 @@ title: State management
 
 クライアントオンリーなアプリを構築するのに慣れている場合、サーバーとクライアントにまたがった state management(状態管理) について怖く感じるかもしれません。このセクションでは、よくある落とし穴を回避するためのヒントを提供します。
 
-## サーバーでは state の共有を避ける
+## サーバーでは state の共有を避ける <!--avoid-shared-state-on-the-server-->
 
 ブラウザは state を保持します(Browsers are _stateful_) — ユーザーがアプリケーションとやりとりする際に、state はメモリ内に保存されます。一方、サーバーは state を保持しません(Servers are _stateless_) — レスポンスの内容は、完全にリクエストの内容によって決定されます。
 
@@ -36,9 +36,9 @@ export const actions = {
 
 この `user` 変数はサーバーに接続する全員に共有されます。もしアリスが恥ずかしい秘密を送信し、ボブがアリスのあとにページにアクセスした場合、ボブはアリスの秘密を知ることになります (訳注: アリスやボブについては[こちら](https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%AA%E3%82%B9%E3%81%A8%E3%83%9C%E3%83%96))。さらに付け加えると、アリスが後でサイトに戻ってきたとき、サーバーは再起動していて彼女のデータは失われているかもしれません。
 
-代わりに、[`cookies`](load#cookies-and-headers) を使用してユーザーを _認証_ し、データベースにデータを保存すると良いでしょう。
+代わりに、[`cookies`](load#cookies) を使用してユーザーを _認証_ し、データベースにデータを保存すると良いでしょう。
 
-## load に副作用を持たせない
+## load に副作用を持たせない <!--no-side-effects-in-load-->
 
 同じ理由で、`load` 関数は _純粋(pure)_ であるべきです — 副作用(side-effect)を持つべきではありません (必要なときに使用する `console.log(...)` は除く)。例えば、コンポーネントで store の値を使用できるようにするために、`load` 関数の内側で store に書き込みをしたくなるかもしれません:
 
@@ -79,12 +79,12 @@ export async function load({ fetch }) {
 
 SSR を使用していない場合は、あるユーザーのデータを別の人に誤って公開してしまうリスクはありません。しかし、それでも `load` 関数の中で副作用を持つべきではありません — 副作用がなければ、あなたのアプリケーションはより理解がしやすいものになります。
 
-## context と共に store を使う
+## context と共に store を使う <!--using-stores-with-context-->
 
 独自の store が使用できないのであれば、どうやって `$page.data` や他の [app stores](modules#$app-stores) を使用できるようにしているのだろう、と思うかもしれません。その答えは、サーバーの app stores は Svelte の [context API](https://learn.svelte.jp/tutorial/context-api) を使用しているから、です — store は `setContext` でコンポーネントツリーにアタッチされ、subscribe するときは `getContext` で取得します。同じことを独自の store でも行うことができます:
 
 ```svelte
-/// file: src/routes/+layout.svelte
+<!--- file: src/routes/+layout.svelte --->
 <script>
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
@@ -102,7 +102,7 @@ SSR を使用していない場合は、あるユーザーのデータを別の�
 ```
 
 ```svelte
-/// file: src/routes/user/+page.svelte
+<!--- file: src/routes/user/+page.svelte --->
 <script>
 	import { getContext } from 'svelte';
 
@@ -117,12 +117,12 @@ SSR を使用していない場合は、あるユーザーのデータを別の�
 
 SSR を使用していない場合 (そして将来的にも SSR を使用する必要がないという保証がある場合) は、context API を使用しなくても、共有されるモジュールの中で state を安全に保持することができます。
 
-## コンポーネントの state は保持される
+## コンポーネントの state は保持される <!--component-state-is-preserved-->
 
 アプリケーションの中を移動するとき、SvelteKit はすでに存在するレイアウトやページコンポーネントを再利用します。例えば、このようなルート(route)があるとして…
 
 ```svelte
-/// file: src/routes/blog/[slug]/+page.svelte
+<!--- file: src/routes/blog/[slug]/+page.svelte --->
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -163,10 +163,10 @@ SSR を使用していない場合 (そして将来的にも SSR を使用する
 {/key}
 ```
 
-## state を URL に保存する
+## state を URL に保存する <!--storing-state-in-the-url-->
 
 もし、テーブルのフィルターやソートルールなどのように、リロード後も保持されるべき state、または SSR に影響を与える state がある場合、URL search パラメータ (例: `?sort=price&order=ascending`) はこれらを置くのに適した場所です。これらは `<a href="...">` や `<form action="...">` の属性に置いたり、`goto('?key=value')` を使用してプログラム的に設定することもできます。`load` 関数の中では `url` パラメータを使用してアクセスでき、コンポーネントの中では `$page.url.searchParams` でアクセスできます。
 
-## 一時的な state は snapshots に保存する
+## 一時的な state は snapshots に保存する <!--storing-ephemeral-state-in-snapshots-->
 
 'アコーディオンは開いているか？' などの一部の UI の state は一時的なものですぐに捨てられます — ユーザーがページを移動したり更新したりして、その state が失われたとしてもそれほど問題ではありません。ユーザーが別のページに移動して戻ってきたときにデータを保持しておきたい場合もありますが、そのような state を URL や database に保存するのは行き過ぎでしょう。そういった場合のために、SvelteKit [snapshots](snapshots) を提供しています。これによってコンポーネントの state を履歴エントリーに関連付けることができます。

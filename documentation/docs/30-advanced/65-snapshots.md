@@ -9,7 +9,7 @@ title: Snapshots
 これを行うには、`+page.svelte` や `+layout.svelte` で、`capture` メソッドと `restore` メソッドを持つ `snapshot` オブジェクトをエクスポートします:
 
 ```svelte
-/// file: +page.svelte
+<!--- file: +page.svelte --->
 <script>
 	let comment = '';
 

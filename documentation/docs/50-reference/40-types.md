@@ -22,10 +22,10 @@ title: Types
 /// file: src/routes/[foo]/[bar]/[baz]/+page.server.js
 // @errors: 2355 2322 1360
 /** @type {import('@sveltejs/kit').RequestHandler<{
- *   foo: string;
- *   bar: string;
- *   baz: string
- * }>} */
+    foo: string;
+    bar: string;
+    baz: string
+  }>} */
 export async function GET({ params }) {
 	// ...
 }
@@ -98,7 +98,7 @@ export async function load({ params, fetch }) {
 
 > これを動作させるためには、`tsconfig.json` または `jsconfig.json` が生成された `.svelte-kit/tsconfig.json` を継承する必要があります (`.svelte-kit` の場所は [`outDir`](configuration#outdir) です):
 >
->     { "extends": "./.svelte-kit/tsconfig.json" }
+> `{ "extends": "./.svelte-kit/tsconfig.json" }`
 
 ### Default tsconfig.json
 

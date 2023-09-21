@@ -1,10 +1,13 @@
-import fs from 'node:fs';
+import { modules } from '$lib/generated/type-info.js';
+import {
+	extractFrontmatter,
+	markedTransform,
+	replaceExportTypePlaceholders,
+	slugify
+} from '@sveltejs/site-kit/markdown';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import glob from 'tiny-glob/sync.js';
-import { slugify } from '$lib/docs/server';
-import { extract_frontmatter, transform } from '$lib/docs/server/markdown.js';
-import { replace_placeholders } from '$lib/docs/server/render.js';
-import { convert_link } from '$lib/docs/server/convertlink';
+import glob from 'tiny-glob';
 
 const categories = [
 	{
@@ -12,22 +15,17 @@ const categories = [
 		label: null,
 		href: (parts) =>
 			parts.length > 1 ? `/docs/${parts[0]}#${parts.slice(1).join('-')}` : `/docs/${parts[0]}`
-	},
-	{
-		slug: 'faq',
-		label: 'FAQ',
-		href: (parts) => `/faq#${parts.join('-')}`
 	}
 ];
 
-export function content() {
+export async function content() {
 	/** @type {import('@sveltejs/site-kit/search').Block[]} */
 	const blocks = [];
 
 	for (const category of categories) {
 		const breadcrumbs = category.label ? [category.label] : [];
 
-		for (const file of glob('**/*.md', { cwd: `../../documentation/${category.slug}` })) {
+		for (const file of await glob('**/*.md', { cwd: `../../documentation/${category.slug}` })) {
 			const basename = path.basename(file);
 			const match = /\d{2}-(.+)\.md/.exec(basename);
 			if (!match) continue;
@@ -35,9 +33,9 @@ export function content() {
 			const slug = match[1];
 
 			const filepath = `../../documentation/${category.slug}/${file}`;
-			const markdown = replace_placeholders(fs.readFileSync(filepath, 'utf-8'));
+			const markdown = replaceExportTypePlaceholders(await readFile(filepath, 'utf-8'), modules);
 
-			const { body, metadata } = extract_frontmatter(markdown);
+			const { body, metadata } = extractFrontmatter(markdown);
 
 			const sections = body.trim().split(/^## /m);
 			const intro = sections.shift().trim();
@@ -50,10 +48,14 @@ export function content() {
 				rank
 			});
 
+			const headingRegex = /(.*?)(?:\s(<!--(.*?)-->))?$/;
+
 			for (const section of sections) {
 				const lines = section.split('\n');
 				const h3 = lines.shift();
-				const h3link = convert_link(`${category.slug}/${file}`, h3);
+				const h3match = headingRegex.exec(h3);
+				const h3text = h3match[1] || h3;
+				const h3slug = h3match[3] || slugify(h3);
 				const content = lines.join('\n');
 
 				const subsections = content.trim().split('### ');
@@ -61,8 +63,8 @@ export function content() {
 				const intro = subsections.shift().trim();
 
 				blocks.push({
-					breadcrumbs: [...breadcrumbs, metadata.title, h3],
-					href: category.href([slug, slugify(h3link)]),
+					breadcrumbs: [...breadcrumbs, metadata.title, h3text],
+					href: category.href([slug, h3slug]),
 					content: plaintext(intro),
 					rank
 				});
@@ -70,11 +72,13 @@ export function content() {
 				for (const subsection of subsections) {
 					const lines = subsection.split('\n');
 					const h4 = lines.shift();
-					const h4link = convert_link(`${category.slug}/${file}`, h4);
+					const h4match = headingRegex.exec(h4);
+					const h4text = h4match[1] || h4;
+					const h4slug = h4match[3] || slugify(h4);
 
 					blocks.push({
-						breadcrumbs: [...breadcrumbs, metadata.title, h3, h4],
-						href: category.href([slug, slugify(h3link), slugify(h4link)]),
+						breadcrumbs: [...breadcrumbs, metadata.title, h3text, h4text],
+						href: category.href([slug, h3slug, h4slug]),
 						content: plaintext(lines.join('\n').trim()),
 						rank
 					});
@@ -90,7 +94,7 @@ function plaintext(markdown) {
 	const block = (text) => `${text}\n`;
 	const inline = (text) => text;
 
-	return transform(markdown, {
+	return markedTransform(markdown, {
 		code: (source) =>
 			source
 				.split('// ---cut---\n')

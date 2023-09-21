@@ -2,17 +2,19 @@
 title: イントロダクション
 ---
 
-## 始める前に
+## 始める前に <!--before-we-begin-->
 
 > Svelte や SvelteKit が初めてなら、こちらの[インタラクティブなチュートリアル](https://learn.svelte.jp)をチェックしてみることをおすすめします。
 >
 > 行き詰まったら、[Discord chatroom](https://svelte.dev/chat) でヘルプを求めてください。(日本語翻訳版 追記：上記のDiscordはSvelte本体のもので、英語でコミュニケーションが行われています。もし日本語で質問したり交流したいのであれば、[Svelte日本のDiscord](https://discord.com/invite/YTXq3ZtBbx)にどうぞ！)
 
-## SvelteKitとは
+## SvelteKitとは <!--what-is-sveltekit-->
 
 SvelteKit は、[Svelte](https://svelte.jp/) を使用して堅牢でハイパフォーマンスな web アプリケーションを迅速に開発するためのフレームワークです。もしあなたが React 界隈から来たのであれば、SvelteKit は Next に似ているものです。Vue 界隈から来たのであれば、Nuxt に似ています。
 
-## Svelteとは
+SvelteKit で構築することのできるアプリケーションの種類については、[FAQ](/docs/faq#what-can-i-make-with-sveltekit) をご覧ください。
+
+## Svelteとは <!--what-is-svelte-->
 
 手短に言えば Svelte は、ナビゲーションバーやコメントセクション、コンタクトフォームなど、ユーザーがブラウザで見たり操作したりするユーザーインターフェースコンポーネントを書く方法です。Svelte コンパイラは、コンポーネントを、ページの HTML をレンダリングする実行可能な JavaScriptと、ページのスタイリングをする CSS に変換します。このガイドの残りの部分を理解するのに Svelte を知っておく必要はありませんが、もし知っていれば役に立つでしょう。より詳しく知りたい場合は、[Svelte のチュートリアル](https://svelte.jp/tutorial) をご覧ください。
 
