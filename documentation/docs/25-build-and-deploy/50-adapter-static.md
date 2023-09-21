@@ -6,7 +6,7 @@ SvelteKit を static site generator (SSG) として使用するには、[`adapte
 
 この adapter はサイト全体を静的なファイルのコレクションとしてプリレンダリングします。もし、一部のページのみをプリレンダリングして他のページは動的にサーバーでレンダリングしたい場合、別の adapter と [`prerender` オプション](page-options#prerender) を組み合わせて使用する必要があります。
 
-## 使い方
+## 使い方 <!--usage-->
 
 `npm i -D @sveltejs/adapter-static` を実行してインストールし、`svelte.config.js` にこの adapter を追加します:
 
@@ -40,7 +40,7 @@ export const prerender = true;
 
 > SvelteKit の [`trailingSlash`](page-options#trailingslash) オプションを、あなたの環境に対して適切に設定しなければなりません。もしあなたのホスト環境が、`/a` へのリクエストを受け取ったときに `/a.html` をレンダリングしない場合、`/a/index.html` を作成するために最上位のレイアウト(root layout)で `trailingSlash: 'always'` を設定する必要があります。
 
-## ゼロコンフィグサポート
+## ゼロコンフィグサポート <!--zero-config-support-->
 
 ゼロコンフィグサポートがあるプラットフォームもあります (将来増える予定):
 
@@ -109,7 +109,7 @@ const config = {
 GitHub actions を使用して、サイトが変更されたときに自動で GitHub Pages にデプロイすることができます。サンプルの workflow はこちらです:
 
 ```yaml
-/// file: .github/workflows/deploy.yml
+### file: .github/workflows/deploy.yml
 name: Deploy to GitHub Pages
 
 on:

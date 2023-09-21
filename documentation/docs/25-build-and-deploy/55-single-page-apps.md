@@ -13,7 +13,7 @@ export const ssr = false;
 
 サーバーサイドのロジック (すなわち `+page.server.js`、`+layout.server.js`、`+server.js` ファイル) がない場合は、[`adapter-static`](adapter-static) を使い _フォールバックページ(fallback page)_ を追加することで SPA を作ることができます。
 
-## 使い方
+## 使い方 <!--usage-->
 
 `npm i -D @sveltejs/adapter-static` でインストールし、それから `svelte.config.js` にこの adapter と以下のオプションを追加します:
 
@@ -50,7 +50,7 @@ SPA を [Apache](https://httpd.apache.org/) で実行する場合は、`static/.
 </IfModule>
 ```
 
-## ページを個別にプリレンダリングする
+## ページを個別にプリレンダリングする <!--prerendering-individual-pages-->
 
 特定のページをプリレンダリングしたい場合、アプリのその部分だけ `ssr` と `prerender` を再び有効にします:
 

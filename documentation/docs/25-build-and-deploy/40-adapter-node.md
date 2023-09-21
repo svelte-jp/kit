@@ -4,7 +4,7 @@ title: Node サーバー
 
 スタンドアロンな Node サーバーを作る場合は、[`adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) を使います。
 
-## 使い方
+## 使い方 <!--usage-->
 
 `npm i -D @sveltejs/adapter-node` を実行してインストールし、`svelte.config.js` にこの adapter を追加します:
 
@@ -32,7 +32,7 @@ node build
 
 [Rollup](https://rollupjs.org) を使うと開発用の依存関係(Development dependencies)もアプリにバンドルされます。パッケージをバンドルするか外部化するかコントロールするには、そのパッケージを `package.json` の `devDependencies` か `dependencies` にそれぞれ配置します。
 
-## 環境変数
+## 環境変数 <!--environment-variables-->
 
 `dev` と `preview` のときは、SvelteKit は `.env` ファイル (または `.env.local` や `.env.[mode]`、[Vite によって決定されているもの](https://vitejs.dev/guide/env-and-mode.html#env-files)) から環境変数を読み取ります。
 
@@ -49,7 +49,7 @@ npm install dotenv
 +node -r dotenv/config build
 ```
 
-### `PORT` と `HOST`
+### `PORT`、`HOST`、`SOCKET_PATH` <!--port-host-and-socket-path-->
 
 デフォルトでは、サーバーは `0.0.0.0`、port 3000 でコネクションを受け付けます。これは環境変数の `PORT` と `HOST` を使ってカスタマイズすることができます。
 
@@ -57,7 +57,13 @@ npm install dotenv
 HOST=127.0.0.1 PORT=4000 node build
 ```
 
-### `ORIGIN`、`PROTOCOL_HEADER`、`HOST_HEADER`
+その他の方法としては、指定したソケットパスでコネクションを受け付けるようサーバーを設定することができます。環境変数の `SOCKET_PATH` を使用して設定する場合、環境変数の `HOST` と `PORT` は無視されます。
+
+```
+SOCKET_PATH=/tmp/socket node build
+```
+
+### `ORIGIN`、`PROTOCOL_HEADER`、`HOST_HEADER` <!--origin-protocolheader-and-hostheader-->
 
 HTTP は SvelteKit に現在リクエストされている URL を知るための信頼できる方法を提供しません。アプリがホストされている場所を Sveltekit に伝える最も簡単な方法は、環境変数 `ORIGIN` を設定することです:
 
@@ -80,7 +86,7 @@ PROTOCOL_HEADER=x-forwarded-proto HOST_HEADER=x-forwarded-host node build
 
 > クロスサイトの POST フォーム送信は禁止されています
 
-### `ADDRESS_HEADER` と `XFF_DEPTH`
+### `ADDRESS_HEADER` と `XFF_DEPTH` <!--addressheader-and-xffdepth-->
 
 hooks とエンドポイントに渡される [RequestEvent](types#public-types-requestevent) オブジェクトにはクライアントの IP アドレスを返す `event.getClientAddress()` 関数が含まれています。デフォルトでは、これは接続中の `remoteAddress` です。もしサーバーが1つ以上のプロキシー (例えばロードバランサー) の後ろにある場合、この値はクライアントの IP アドレスではなく、最も内側にあるプロキシーの IP アドレスを含むことになるため、アドレスを読み取るために `ADDRESS_HEADER` を指定する必要があります:
 
@@ -161,7 +167,7 @@ node build
 
 注意事項: Node のビルトインの `crypto` global を Node 18 で使用するには、`--experimental-global-webcrypto` フラグを使用する必要があります。Node 20 ではこのフラグは必要ありません。
 
-## カスタムサーバー
+## カスタムサーバー <!--custom-server-->
 
 この adapter は、ビルドのディレクトリに2つのファイルを作成します — `index.js` と `handler.js` です。デフォルトのビルドのディレクトリを使用している場合、`node build` などで `index.js` を実行すると、設定された port でサーバーが起動されます。
 
@@ -188,9 +194,9 @@ app.listen(3000, () => {
 });
 ```
 
-## トラブルシューティング
+## トラブルシューティング <!--troubleshooting-->
 
-### サーバーが終了する前にクリーンアップするための hook はありますか？
+### サーバーが終了する前にクリーンアップするための hook はありますか？ <!--is-there-a-hook-for-cleaning-up-before-the-server-exits-->
 
 SvelteKit にはこれに対応するためのビルトインで組み込まれているものはありません。なぜなら、このようなクリーンアップの hook はあなたの実行環境に大きく依存しているからです。Node の場合は、ビルトインの `process.on(..)` を使用して、サーバーが終了する前に実行されるコールバックを実装することができます:
 

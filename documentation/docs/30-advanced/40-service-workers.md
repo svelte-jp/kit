@@ -16,7 +16,7 @@ if ('serviceWorker' in navigator) {
 }
 ```
 
-## service worker の内部では
+## service worker の内部では <!--inside-the-service-worker-->
 
 service worker の内部では、[`$service-worker` モジュール](modules#$service-worker) にアクセスでき、これによって全ての静的なアセット、ビルドファイル、プリレンダリングページへのパスが提供されます。また、アプリのバージョン文字列 (一意なキャッシュ名を作成するのに使用できます) と、デプロイメントの `base` パスが提供されます。Vite の設定に `define` (グローバル変数の置換に使用) を指定している場合、それはサーバー/クライアントのビルドだけでなく、service worker にも適用されます。
 
@@ -127,6 +127,6 @@ const sw = self as unknown as ServiceWorkerGlobalScope;
 
 これにより、`HTMLElement` のような service worker の中では使用できない DOM の型付けへのアクセスが無効になり、正しい global が初期化されます。`self` を `sw` に再代入することで、プロセス内で型をキャストすることができます (いくつか方法がありますが、これが追加のファイルを必要としない最も簡単な方法です)。ファイルの残りの部分では、`self` の代わりに `sw` を使用します。SvelteKit の型を参照することで、`$service-worker` import に適切な型定義があることを保証することができます。
 
-## その他のソリューション
+## その他のソリューション <!--other-solutions-->
 
 SvelteKit の service worker 実装は意図的に低レベル(low-level)です。より本格的な、よりこだわりが強い(opinionated)ソリューションが必要な場合は、[Vite PWA plugin](https://vite-pwa-org.netlify.app/frameworks/sveltekit.html) のようなソリューションをご覧になることをおすすめしております、こちらは [Workbox](https://web.dev/learn/pwa/workbox) を使用しています。service worker に関する一般的な情報をもっとお探しであれば、[MDN web docs](https://developer.mozilla.org/ja/docs/Web/API/Service_Worker_API/Using_Service_Workers) をおすすめします。

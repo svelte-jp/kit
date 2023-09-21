@@ -2,7 +2,7 @@
 title: 高度なルーティング
 ---
 
-## Restパラメータ
+## Restパラメータ <!--rest-parameters-->
 
 ルートセグメント(route segments)の数がわからない場合は、rest 構文を使用することができます。例えば GitHub のファイルビューアのようなものを実装する場合は…
 
@@ -170,7 +170,7 @@ Unicode エスケープシーケンスのフォーマットは `[u+nnnn]` で、
 
 ### (group)
 
-'アプリ' のルート(routes)としてのレイアウト (例えば `/dashboard` や `/item`) が1つあり、'マーケティング' のルート(routes)としての別のレイアウト (`/blog` や `/testimonials`) があるかもしれません。これらのルート(routes)を、ディレクトリの名前を括弧でくくることでグループ化することができます。通常のディレクトリとは異なり、`(app)` や `(marketing)` はそれらの中のルート(routes)の URL パス名には影響しません:
+'アプリ' のルート(routes)としてのレイアウト (例えば `/dashboard` や `/item`) が1つあり、'マーケティング' のルート(routes)としての別のレイアウト (`/about` や `/testimonials`) があるかもしれません。これらのルート(routes)を、ディレクトリの名前を括弧でくくることでグループ化することができます。通常のディレクトリとは異なり、`(app)` や `(marketing)` はそれらの中のルート(routes)の URL パス名には影響しません:
 
 ```diff
 src/routes/
@@ -249,12 +249,12 @@ src/routes/
 └ +layout.svelte
 ```
 
-### レイアウトグループを使うときは
+### レイアウトグループを使うときは <!--when-to-use-layout-groups-->
 
 全てのユースケースがレイアウトのグループ化に適しているわけではありませんし、無理に使用する必要もありません。あなたのユースケースが複雑な `(group)` のネストになってしまうかもしれませんし、たった1つの例外ケースのために `(group)` を導入したくないかもしれません。コンポジション (再利用可能な `load` 関数や Svelte コンポーネント) や if 文など、他の手段を使用してやりたいことを実現するのは全く問題ありません。以下の例では、最上位のレイアウト(root layout)に戻し、他のレイアウトでも使用できるコンポーネントや関数を再利用したレイアウトを示しています:
 
 ```svelte
-/// file: src/routes/nested/route/+layout@.svelte
+<!--- file: src/routes/nested/route/+layout@.svelte --->
 <script>
 	import ReusableLayout from '$lib/ReusableLayout.svelte';
 	export let data;
@@ -282,6 +282,6 @@ export function load(event) {
 }
 ```
 
-## その他の参考情報
+## その他の参考情報 <!--further-reading-->
 
 - [Tutorial: Advanced Routing](https://learn.svelte.jp/tutorial/optional-params)

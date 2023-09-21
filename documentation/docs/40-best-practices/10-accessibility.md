@@ -17,7 +17,7 @@ SvelteKit では、ページ間のナビゲーションではページのリロ�
 この動作のために、アプリの全ページにユニークで説明的なタイトルを付けるべきです。SvelteKit では、各ページに `<svelte:head>` 要素を配置することでこれを行うことができます:
 
 ```svelte
-/// file: src/routes/+page.svelte
+<!--- file: src/routes/+page.svelte --->
 <svelte:head>
 	<title>Todo List</title>
 </svelte:head>
@@ -80,7 +80,7 @@ export function handle({ event, resolve }) {
 }
 ```
 
-## 参考文献
+## その他の参考情報 <!--further-reading-->
 
 ほとんどの場合、アクセシブルな SvelteKit アプリを構築するのはアクセシブルな Web アプリを構築するのと同じです。以下の一般的なアクセシビリティ(accessibility)に関するリソースから得られる情報は、どんな Web エクスペリエンスを構築する場合でも適用できるはずです
 

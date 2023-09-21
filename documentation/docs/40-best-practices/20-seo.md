@@ -12,23 +12,23 @@ SEO で最も重要なのは、高品質なコンテンツを作ること、そ�
 
 > SvelteKit のレンダリングは高度な設定が可能です。必要であれば、[動的なレンダリング(dynamic rendering)](https://developers.google.com/search/docs/advanced/javascript/dynamic-rendering) を実装することも可能です。一般的には推奨されません、SSR には SEO 以外のメリットもあるからです。
 
-### パフォーマンス
+### パフォーマンス <!--performance-->
 
 [Core Web Vitals](https://web.dev/vitals/#core-web-vitals) のような指標は検索エンジンのランクに影響を与えます。Svelte と SvelteKit はオーバーヘッドが最小限であるため、ハイパフォーマンスなサイトを簡単に構築できです。Google の [PageSpeed Insights](https://pagespeed.web.dev/) や [Lighthouse](https://developers.google.com/web/tools/lighthouse) で、ご自身のサイトをテストすることができます。
 
-### URLの正規化
+### URLの正規化 <!--normalized-urls-->
 
 SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から、末尾のスラッシュが無いパス名にリダイレクトします ([設定](page-options#trailingslash) で逆にできます)。URLの重複は、SEOに悪影響を与えます。
 
 ## Manual setup
 
-### &lt;title&gt; と &lt;meta&gt;
+### &lt;title&gt; と &lt;meta&gt; <!--title-and-meta-->
 
 全てのページで、よく練られたユニークな `<title>` と `<meta name="description">` を [`<svelte:head>`](https://svelte.jp/docs#template-syntax-svelte-head) の内側に置くべきです。説明的な title と description の書き方に関するガイダンスと、検索エンジンにとってわかりやすいコンテンツを作るためのその他の方法については、Google の [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) のドキュメントで見つけることができます。
 
 > A common pattern is to return SEO-related `data` from page [`load`](load) functions, then use it (as [`$page.data`](modules#$app-stores)) in a `<svelte:head>` in your root [layout](routing#layout).
 
-### 構造化データ
+### 構造化データ <!--structured-data-->
 
 [構造化データ](https://developers.google.com/search/docs/advanced/structured-data/intro-structured-data) は、検索エンジンがページのコンテンツを理解するのに役立ちます。[`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess) と一緒に構造化データを使用している場合は、明示的に `ld+json` データを保持する必要があります (これは [将来変更される可能性があります](https://github.com/sveltejs/svelte-preprocess/issues/305)):
 
@@ -52,7 +52,7 @@ const config = {
 export default config;
 ```
 
-### サイトマップ
+### サイトマップ <!--sitemaps-->
 
 [サイトマップ](https://developers.google.com/search/docs/advanced/sitemaps/build-sitemap) は、検索エンジンがサイト内のページの優先順位付けをするのに役立ちます、特にコンテンツの量が多い場合は。エンドポイントを使用してサイトマップを動的に作成できます:
 
@@ -106,21 +106,64 @@ export default config;
 export const csr = false;
 ```
 
+…`amp` を `app.html` に追加します
+
+```html
+<html amp>
+...
+```
+
 …そして、`transformPageChunk` と、`@sveltejs/amp` からインポートできる `transform` を使用して、HTML を変換します:
 
 ```js
+/// file: src/hooks.server.js
 import * as amp from '@sveltejs/amp';
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	let buffer = '';
-	return resolve(event, {
+	return await resolve(event, {
 		transformPageChunk: ({ html, done }) => {
 			buffer += html;
-			if (done) return amp.transform(html);
+			if (done) return amp.transform(buffer);
 		}
 	});
 }
+```
+
+ページを amp に変換した結果として未使用の CSS が配布されてしまうのを防ぎたければ、[`dropcss`](https://www.npmjs.com/package/dropcss) を使用すると良いでしょう:
+
+```js
+/// file: src/hooks.server.js
+// @errors: 2307
+import * as amp from '@sveltejs/amp';
+import dropcss from 'dropcss';
+
+/** @type {import('@sveltejs/kit').Handle} */
+export async function handle({ event, resolve }) {
+	let buffer = '';
+
+	return await resolve(event, {
+		transformPageChunk: ({ html, done }) => {
+			buffer += html;
+
+			if (done) {
+				let css = '';
+				const markup = amp
+					.transform(buffer)
+					.replace('⚡', 'amp') // dropcss can't handle this character
+					.replace(/<style amp-custom([^>]*?)>([^]+?)<\/style>/, (match, attributes, contents) => {
+						css = contents;
+						return `<style amp-custom${attributes}></style>`;
+					});
+
+				css = dropcss({ css, html: markup }).css;
+				return markup.replace('</style>', `${css}</style>`);
+			}
+		}
+	});
+}
+
 ```
 
 > `amphtml-validator` を使用して変換された HTML を検証するのに、`handle` hook を利用するのは良いアイデアですが、非常に遅くなってしまうので、ページをプリレンダリングするときだけにしてください。

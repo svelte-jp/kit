@@ -19,20 +19,20 @@ SvelteKit の中心は、 _ファイルシステムベースのルーター_ で
 `+page.svelte` コンポーネントはアプリのページを定義します。デフォルトでは、ページは最初のリクエストではサーバー ([SSR](glossary#ssr)) でレンダリングされ、その後のナビゲーションではブラウザ ([CSR](glossary#csr)) でレンダリングされます。
 
 ```svelte
-/// file: src/routes/+page.svelte
+<!--- file: src/routes/+page.svelte --->
 <h1>Hello and welcome to my site!</h1>
 <a href="/about">About my site</a>
 ```
 
 ```svelte
-/// file: src/routes/about/+page.svelte
+<!--- file: src/routes/about/+page.svelte --->
 <h1>About this site</h1>
 <p>TODO...</p>
 <a href="/">Home</a>
 ```
 
 ```svelte
-/// file: src/routes/blog/[slug]/+page.svelte
+<!--- file: src/routes/blog/[slug]/+page.svelte --->
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -119,7 +119,7 @@ export async function load({ params }) {
 `load` 中にエラーが発生した場合、SvelteKit はデフォルトのエラーページをレンダリングします。`+error.svelte` を追加することで、ルート(route) ごとにエラーページをカスタマイズすることができます:
 
 ```svelte
-/// file: src/routes/blog/[slug]/+error.svelte
+<!--- file: src/routes/blog/[slug]/+error.svelte --->
 <script>
 	import { page } from '$app/stores';
 </script>
@@ -188,7 +188,7 @@ SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラ�
 `/settings` 配下のページにのみ適用されるレイアウトを作成することができます (トップレベルの nav を持つ最上位のレイアウト(root layout)を継承しています):
 
 ```svelte
-/// file: src/routes/settings/+layout.svelte
+<!--- file: src/routes/settings/+layout.svelte --->
 <script>
 	/** @type {import('./$types').LayoutData} */
 	export let data;
@@ -229,7 +229,7 @@ export function load() {
 レイアウトの `load` 関数から返されるデータは全ての子ページで利用することができます:
 
 ```svelte
-/// file: src/routes/settings/profile/+page.svelte
+<!--- file: src/routes/settings/profile/+page.svelte --->
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -286,7 +286,7 @@ export function GET({ url }) {
 `+server.js` ファイルは、`POST`/`PUT`/`PATCH`/`DELETE`/`OPTIONS`/`HEAD` ハンドラをエクスポートすることで、完全な API を作成することができます:
 
 ```svelte
-/// file: src/routes/add/+page.svelte
+<!--- file: src/routes/add/+page.svelte --->
 <script>
 	let a = 0;
 	let b = 0;
@@ -325,6 +325,31 @@ export async function POST({ request }) {
 
 > 一般的には、ブラウザからサーバーにデータを送信する方法としては [form actions](form-actions) のほうがより良い方法です。
 
+> If a `GET` handler is exported, a `HEAD` request will return the `content-length` of the `GET` handler's response body.
+
+### Fallback method handler
+
+Exporting the `fallback` handler will match any unhandled request methods, including methods like `MOVE` which have no dedicated export from `+server.js`.
+
+```js
+// @errors: 7031
+/// file: src/routes/api/add/+server.js
+import { json, text } from '@sveltejs/kit';
+
+export async function POST({ request }) {
+	const { a, b } = await request.json();
+	return json(a + b);
+}
+
+// This handler will respond to PUT, PATCH, DELETE, etc.
+/** @type {import('./$types').RequestHandler} */
+export async function fallback({ request }) {
+	return text(`I caught your ${request.method} request!`);
+}
+```
+
+> For `HEAD` requests, the `GET` handler takes precedence over the `fallback` handler.
+
 ### Content negotiation
 
 `+server.js` ファイルは `+page` ファイルと同じディレクトリに置くことができ、これによって同じルート(route)がページにも API エンドポイントにもなるようにすることができます。これがどちらなのか判断するために、SvelteKit は以下のルールを適用します:
@@ -340,7 +365,7 @@ export async function POST({ request }) {
 例えば、`export let data` に `PageData` (または `LayoutData` の場合は `+layout.svelte` ファイル) にアノテーションを付けると、`data` の型は `load` の戻り値であると TypeScript に伝えることができます:
 
 ```svelte
-/// file: src/routes/blog/[slug]/+page.svelte
+<!--- file: src/routes/blog/[slug]/+page.svelte --->
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -353,13 +378,13 @@ VS Code や、language server protocol と TypeScript plugin をサポートす�
 
 `$types` の省略については、私たちの[ブログ記事](https://svelte.jp/blog/zero-config-type-safety)でより詳細な情報をお読み頂けます。
 
-## その他のファイル
+## その他のファイル <!--other-files-->
 
 ルート(route)ディレクトリ内のその他のファイルは SvelteKit から無視されます。つまり、コンポーネントやユーティリティモジュールを、それらを必要とするルート(routes)に配置することができます。
 
 コンポーネントやモジュールが複数のルート(routes)から必要な場合、[`$lib`](modules#$lib) にそれらを配置すると良いでしょう。
 
-## その他の参考資料
+## その他の参考資料 <!--further-reading-->
 
 - [Tutorial: Routing](https://learn.svelte.jp/tutorial/pages)
 - [Tutorial: API routes](https://learn.svelte.jp/tutorial/get-handlers)

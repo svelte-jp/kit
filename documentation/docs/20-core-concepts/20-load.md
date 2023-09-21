@@ -22,7 +22,7 @@ export function load({ params }) {
 ```
 
 ```svelte
-/// file: src/routes/blog/[slug]/+page.svelte
+<!--- file: src/routes/blog/[slug]/+page.svelte --->
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -83,7 +83,7 @@ export async function load() {
 ```
 
 ```svelte
-/// file: src/routes/blog/[slug]/+layout.svelte
+<!--- file: src/routes/blog/[slug]/+layout.svelte --->
 <script>
 	/** @type {import('./$types').LayoutData} */
 	export let data;
@@ -141,7 +141,7 @@ export async function load() {
 場合によっては、その逆も必要かもしれません — 親レイアウトからページのデータや子レイアウトのデータにアクセスする必要があるかもしれません。例えば、最上位のレイアウト(root layout)から、`+page.js` や `+page.server.js` の `load` 関数から返された `title` プロパティにアクセスしたい場合があるでしょう。これは `$page.data` で行うことができます:
 
 ```svelte
-/// file: src/routes/+layout.svelte
+<!--- file: src/routes/+layout.svelte --->
 <script>
 	import { page } from '$app/stores';
 </script>
@@ -162,7 +162,7 @@ export async function load() {
 
 概念上は同じものですが、気をつけなければならない重要な違いがあります。
 
-### いつ、どの load 関数が実行されるのか？
+### いつ、どの load 関数が実行されるのか？ <!--when-does-which-load-function-run-->
 
 server `load` 関数は _常に_ サーバーで実行されます。
 
@@ -184,7 +184,7 @@ universal `load` 関数は、任意の値(カスタムクラスやコンポー�
 
 server `load` 関数は、ネットワークで転送できるようにするために、[devalue](https://github.com/rich-harris/devalue) でシリアライズできるデータ (つまり JSON で表現できるものに加え、`BigInt`、`Date`、`Map`、`Set`、`RegExp` や、繰り返し/循環参照など) を返さなければなりません。データには [promises](#streaming-with-promises) を含めることができ、その場合はブラウザにストリーミングされます。
 
-### どちらを使用すべきか
+### どちらを使用すべきか <!--when-to-use-which-->
 
 server `load` 関数は、データベースやファイルシステムからデータを直接アクセスする必要がある場合や、プライベートな環境変数を使用する必要がある場合に有用です。
 
@@ -192,7 +192,7 @@ universal `load` 関数は、外部の API から データを `fetch` (取得) 
 
 まれに、両方を同時に使用する必要がある場合もあります。例えば、サーバーからのデータで初期化されたカスタムクラスのインスタンスを返す必要がある場合です。
 
-## URL data を使用する
+## URL data を使用する <!--using-url-data-->
 
 多くの場合、`load` 関数は何らかの形で URL に依存します。そのため、`load` 関数では `url`、`route`、`params` を提供しています。
 
@@ -227,14 +227,15 @@ export function load({ route }) {
 }
 ```
 
-## fetch リクエストの作成
+## fetch リクエストの作成 <!--making-fetch-requests-->
 
 外部の API や `+server.js` ハンドラからデータを取得するには、提供されている `fetch` 関数を使用します。これは [ネイティブの `fetch` web API](https://developer.mozilla.org/ja/docs/Web/API/fetch) と同じように動作しますが、いくつか追加の機能があります:
 
 - ページリクエストの `cookie` と `authorization` ヘッダーを継承するので、サーバー上でクレデンシャル付きのリクエストを行うことができます
 - サーバー上で、相対パスのリクエストを行うことができます (通常、`fetch` はサーバーのコンテキストで使用する場合にはオリジン付きの URL が必要です)
 - サーバーで動作している場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません
-- サーバーサイドレンダリング中は、`Response` オブジェクトの `text` メソッドと `json` メソッドにフックすることにより、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](hooks#server-hooks-handle) で明示的に指定されない限り、シリアライズされないことにご注意ください。そして、ハイドレーション中は、レスポンスは HTML から読み込まれるため、一貫性が保証され、追加のネットワークリクエストを防ぎます。もし、`load` 関数の `fetch` ではなくブラウザの `fetch` を使用しているときにブラウザコンソールに警告が出た場合は、これが理由です。
+- サーバーサイドレンダリング中は、`Response` オブジェクトの `text` メソッドと `json` メソッドにフックすることにより、レスポンスはキャプチャされ、レンダリング済の HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](hooks#server-hooks-handle) で明示的に指定されない限り、シリアライズされないことにご注意ください。
+- ハイドレーション中は、レスポンスは HTML から読み込まれるため、一貫性が保証され、追加のネットワークリクエストを防ぎます。もし、`load` 関数の `fetch` ではなくブラウザの `fetch` を使用しているときにブラウザコンソールに警告が出た場合は、これが理由です。
 
 ```js
 /// file: src/routes/items/[id]/+page.js
@@ -247,9 +248,7 @@ export async function load({ fetch, params }) {
 }
 ```
 
-> Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。
-
-## Cookies and headers
+## Cookies
 
 server `load` 関数では [`cookies`](types#public-types-cookies) を取得したり設定したりすることができます。
 
@@ -258,7 +257,7 @@ server `load` 関数では [`cookies`](types#public-types-cookies) を取得し�
 // @filename: ambient.d.ts
 declare module '$lib/server/database' {
 	export function getUser(sessionid: string | undefined): Promise<{ name: string, avatar: string }>
-}
+rerunning-load-functions}
 
 // @filename: index.js
 // ---cut---
@@ -274,7 +273,19 @@ export async function load({ cookies }) {
 }
 ```
 
+Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ、SvelteKit から提供される `fetch` 関数を介して引き渡されます。
+
+例えば、SvelteKit が my.domain.com でサーブしている場合:
+- domain.com は cookie を受け取りません
+- my.domain.com は cookie を受け取ります
+- api.domain.dom は cookie を受け取りません
+- sub.my.domain.com は cookie を受け取ります
+
+その他の cookie は、`credentials: 'include'` がセットされているときには渡されません。なぜなら、Sveltekit はどの cookie がどのドメインに属しているかわからないからです (ブラウザはこの情報を渡さないからです)。そのため、cookie を転送するのは安全ではありません。これを回避するには、[handleFetch hook](hooks#server-hooks-handlefetch) をお使いください。
+
 > cookie を設定するときは、`path` プロパティにご注意ください。デフォルトでは、cookie の `path` は現在のパス名です。例えば、`admin/user` ページで cookie を設定した場合、デフォルトではその cookie は `admin` ページ配下でのみ使用することができます。多くの場合、`path` を `'/'` に設定して、アプリ全体で cookie を使用できるようにしたいでしょう。
+
+## Headers
 
 server `load` 関数と universal `load` 関数はどちらも `setHeaders` 関数にアクセスでき、サーバー上で実行している場合、 レスポンスにヘッダーを設定できます (ブラウザで実行している場合、`setHeaders` には何の効果もありません)。これは、ページをキャッシュさせる場合に便利です、例えば:
 
@@ -330,7 +341,7 @@ export async function load({ parent }) {
 ```
 
 ```svelte
-/// file: src/routes/abc/+page.svelte
+<!--- file: src/routes/abc/+page.svelte --->
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -424,7 +435,7 @@ export function load({ locals }) {
 }
 ```
 
-> スローされた redirect をキャッチしないようにしてください、SvelteKit が処理するのを妨げてしまいます。
+> try-catch ブロックの中で `throw redirect()` を使用してはいけません。redirect がすぐにその catch ステートメントをトリガーしてしまうからです。
 
 ブラウザでは、[`$app.navigation`](modules#$app-navigation) からインポートできる [`goto`](modules#$app-navigation-goto) を使うことで、`load` 関数の外側でプログラム的にナビゲーションを行うことができます。
 
@@ -453,7 +464,7 @@ export function load() {
 これはロード状態(loading states)のスケルトンを作成するのに便利です、例えば:
 
 ```svelte
-/// file: src/routes/+page.svelte
+<!--- file: src/routes/+page.svelte --->
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -477,15 +488,17 @@ export function load() {
 </p>
 ```
 
-AWS Lambda のような ストリーミングをサポートしないプラットフォームでは、レスポンスはバッファされます。つまり、すべての promise が解決してからでないとページがレンダリングされないということです。
+> AWS Lambda のような ストリーミングをサポートしないプラットフォームでは、レスポンスはバッファされます。つまり、すべての promise が解決してからでないとページがレンダリングされないということです。もしプロキシ (例えば NGINX) を使用している場合は、プロキシされたサーバーからのレスポンスをバッファしないようにしてください。
 
 > ストリーミングデータは JavaScript が有効なときにのみ動作します。ページがサーバーでレンダリングされる場合、universal `load` 関数からはネストした promise を返すのは避けたほうがよいでしょう、ストリーミングされないからです (代わりに、関数がブラウザで再実行されるときに promise が再作成されます)。
+
+> レスポンスのヘッダーとステータスコードは、レスポンスがストリーミングを開始すると変更することはできなくなります。そのため、ストリームされた promise の中で `setHeaders` を呼んだりリダイレクトをスローしたりすることはできません。
 
 ## Parallel loading
 
 ページをレンダリング (またはページにナビゲーション) するとき、SvelteKit はすべての `load` 関数を同時に実行し、リクエストのウォーターフォールを回避します。クライアントサイドナビゲーションのときは、複数の server `load` 関数の呼び出し結果が単一のレスポンスにグループ化されます。すべての `load` 関数が返されると、ページがレンダリングされます。
 
-## load 関数の再実行
+## load 関数の再実行 <!--rerunning-load-functions-->
 
 SvelteKit は それぞれの `load` 関数の依存関係を追跡し、ナビゲーションの際に不必要に再実行されるのを回避します。
 
@@ -558,7 +571,7 @@ export async function load({ fetch, depends }) {
 ```
 
 ```svelte
-/// file: src/routes/random-number/+page.svelte
+<!--- file: src/routes/random-number/+page.svelte --->
 <script>
 	import { invalidate, invalidateAll } from '$app/navigation';
 
@@ -578,7 +591,7 @@ export async function load({ fetch, depends }) {
 <button on:click={rerunLoadFunction}>Update random number</button>
 ```
 
-### load 関数はいつ再実行されるのか
+### load 関数はいつ再実行されるのか <!--when-do-load-functions-rerun-->
 
 まとめると、`load` 関数は以下のシチュエーションで再実行されます:
 
@@ -592,7 +605,7 @@ export async function load({ fetch, depends }) {
 
 `load` 関数の再実行は、対応する `+layout.svelte` や `+page.svelte` 内の `data` プロパティが更新されるだけで、コンポーネントは再作成されることはありません。結果として、内部の状態は保持されます。もし、この挙動がお望みでなければ、[`afterNavigate`](modules#$app-navigation-afternavigate) コールバック内でリセットしたり、コンポーネントを [`{#key ...}`](https://svelte.jp/docs#template-syntax-key) ブロックでラップしたりしてリセットすることができます。
 
-## その他の参考資料
+## その他の参考資料 <!--further-reading-->
 
 - [Tutorial: Loading data](https://learn.svelte.jp/tutorial/page-data)
 - [Tutorial: Errors and redirects](https://learn.svelte.jp/tutorial/error-basics)

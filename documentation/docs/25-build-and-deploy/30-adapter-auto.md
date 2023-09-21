@@ -12,10 +12,10 @@ title: ゼロコンフィグデプロイ
 
 デプロイするターゲットの環境が決まったら、`devDependencies` に適切な adapter をインストールすることを推奨します。これにより、lockfile に adapter が追加されるため、CI でのインストール時間が少し改善されます。
 
-## 環境固有の設定
+## 環境固有の設定 <!--environment-specific-configuration-->
 
 [`adapter-vercel`](adapter-vercel) や [`adapter-netlify`](adapter-netlify) の `{ edge: true }` のような設定オプションを追加したければ、そのオプションを持つ adapter をインストールしなければなりません。`adapter-auto` はそれらのオプションを受け付けません。
 
-## コミュニティ adapter を追加する
+## コミュニティ adapter を追加する <!--adding-community-adapters-->
 
 追加の adapter にゼロコンフィグサポートを追加するには、[adapters.js](https://github.com/sveltejs/kit/blob/master/packages/adapter-auto/adapters.js) を編集し、pull request を開きます。

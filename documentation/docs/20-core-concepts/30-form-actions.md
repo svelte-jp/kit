@@ -23,7 +23,7 @@ export const actions = {
 `/login` ページからこの action を呼び出すには、`<form>` を追加します。JavaScript は必要ありません:
 
 ```svelte
-/// file: src/routes/login/+page.svelte
+<!--- file: src/routes/login/+page.svelte --->
 <form method="POST">
 	<label>
 		Email
@@ -71,12 +71,12 @@ export const actions = {
 名前付きの action (named action) を呼び出すには、クエリパラメータに `/` を接頭辞に付与したその action の名前を追加します:
 
 ```svelte
-/// file: src/routes/login/+page.svelte
+<!--- file: src/routes/login/+page.svelte --->
 <form method="POST" action="?/register">
 ```
 
 ```svelte
-/// file: src/routes/+layout.svelte
+<!--- file: src/routes/+layout.svelte --->
 <form method="POST" action="/login?/register">
 ```
 
@@ -101,7 +101,7 @@ export const actions = {
 
 > 名前付き action (named action) の隣にデフォルトの action を置くことはできません。なぜなら リダイレクト無しで名前付き action (named action) に POST をすると、クエリパラメータが URL に保持され、それ以降デフォルトの POST をしようとしても以前 POST した名前付き action (named action) を通ってしまうからです。
 
-## action の解剖学
+## action の解剖学 <!--anatomy-of-an-action-->
 
 action はそれぞれ `RequestEvent` オブジェクトを受け取って、`request.formData()` でデータを読み込むことができます。リクエスト (例えば、cookie をセットしてユーザーをログインさせるなど) を処理したあと、action は次の更新まで、対応するページでは `form` プロパティで、アプリ全体では `$page.form` で利用可能なデータで応答することができます。
 
@@ -133,7 +133,7 @@ export const actions = {
 ```
 
 ```svelte
-/// file: src/routes/login/+page.svelte
+<!--- file: src/routes/login/+page.svelte --->
 <script>
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -401,7 +401,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 `use:enhance` ではなく、`<form>` の通常のイベントリスナーを使うことで、ご自身でプログレッシブ・エンハンスメント(progressive enhancement)を実装することもできます:
 
 ```svelte
-/// file: src/routes/login/+page.svelte
+<!--- file: src/routes/login/+page.svelte --->
 <script>
 	import { invalidateAll, goto } from '$app/navigation';
 	import { applyAction, deserialize } from '$app/forms';
@@ -412,10 +412,11 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 	/** @type {any} */
 	let error;
 
+	/** @param {{ currentTarget: EventTarget & HTMLFormElement}} event */
 	async function handleSubmit(event) {
-		const data = new FormData(this);
+		const data = new FormData(event.currentTarget);
 
-		const response = await fetch(this.action, {
+		const response = await fetch(event.currentTarget.action, {
 			method: 'POST',
 			body: data
 		});
@@ -456,7 +457,7 @@ const response = await fetch(this.action, {
 サーバーにデータを送信する方法として、プログレッシブな強化(progressively enhance)を行うことができるため Form actions は望ましい方法ですが、[`+server.js`](routing#server) ファイルを使用して (例えば) JSON API を公開することもできます。それは例えばこのように行います:
 
 ```svelte
-/// file: send-message/+page.svelte
+<!--- file: send-message/+page.svelte --->
 <script>
 	function rerun() {
 		fetch('/api/ci', {
@@ -469,7 +470,7 @@ const response = await fetch(this.action, {
 ```
 
 ```js
-// @errors: 2355 1360
+// @errors: 2355 1360 2322
 /// file: api/ci/+server.js
 
 /** @type {import('./$types').RequestHandler} */
@@ -495,6 +496,6 @@ export function POST() {
 
 この form を送信すると `/search?q=...` に移動して load 関数が実行されますが、action は実行されません。`<a>` 要素と同じように、[`data-sveltekit-reload`](link-options#data-sveltekit-reload) 属性、 [`data-sveltekit-replacestate`](link-options#data-sveltekit-replacestate) 属性、[`data-sveltekit-keepfocus`](link-options#data-sveltekit-keepfocus) 属性、 [`data-sveltekit-noscroll`](link-options#data-sveltekit-noscroll) 属性を `<form>` に設定することができ、ルーターの挙動をコントロールすることができます。
 
-## その他の参考資料
+## その他の参考資料 <!--further-reading-->
 
 - [Tutorial: Forms](https://learn.svelte.jp/tutorial/the-form-element)

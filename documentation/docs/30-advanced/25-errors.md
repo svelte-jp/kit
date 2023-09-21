@@ -43,7 +43,7 @@ export async function load({ params }) {
 こうすると、SvelteKit はレスポンスのステータスコードを 404 に設定し、[`+error.svelte`](routing#error) コンポーネントをレンダリングします。`$page.error` は `error(...)` に第二引数として渡されたオブジェクトです。
 
 ```svelte
-/// file: src/routes/+error.svelte
+<!--- file: src/routes/+error.svelte --->
 <script>
 	import { page } from '$app/stores';
 </script>

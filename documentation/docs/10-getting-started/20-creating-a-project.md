@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-最初のコマンドでは、TypeScript などの基本的なツールをセットアップするかどうか選択しながら、`my-app` ディレクトリに新しいプロジェクトを生成します。[追加のツールの設定に関するポイント](../faq#integrations) については FAQ をご覧ください。それ以降のコマンドでは、依存関係をインストールし、[localhost:5173](http://localhost:5173) でサーバーを起動します。
+最初のコマンドでは、TypeScript などの基本的なツールをセットアップするかどうか選択しながら、`my-app` ディレクトリに新しいプロジェクトを生成します。追加のツールの設定に関するポイントについては [Integrations](./integrations) をご覧ください。それ以降のコマンドでは、依存関係をインストールし、[localhost:5173](http://localhost:5173) でサーバーを起動します。
 
 SvelteKit には2つの基本的なコンセプトがあります:
 
@@ -20,6 +20,6 @@ SvelteKit には2つの基本的なコンセプトがあります:
 
 ファイルを編集して、どのように動作するのか確かめてみてください。
 
-## エディタのセットアップ
+## エディタのセットアップ <!--editor-setup-->
 
 [Visual Studio Code (通称 VS Code)](https://code.visualstudio.com/download) と [Svelte extension](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) のご使用をおすすめしますが、[他にも数多くのエディタをサポートしています](https://sveltesociety.dev/tools#editor-support)。

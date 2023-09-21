@@ -31,7 +31,7 @@ my-project/
 
 また、`.gitignore`、`.npmrc` などの共通ファイルもあります (もし `npm create svelte@latest` の実行時にオプションを選択した場合は `.prettierrc` や `.eslintrc.cjs` などもあるでしょう)。
 
-## プロジェクトファイル
+## プロジェクトファイル <!--project-files-->
 
 ### src
 
@@ -84,7 +84,7 @@ my-project/
 
 SvelteKit プロジェクトは実は、[`@sveltejs/kit/vite`](modules#sveltejs-kit-vite) プラグインと、その他の [Vite の設定](https://ja.vitejs.dev/config/) を一緒に使用した [Vite](https://ja.vitejs.dev) プロジェクトです。
 
-## その他のファイル
+## その他のファイル <!--other-files-->
 
 ### .svelte-kit
 

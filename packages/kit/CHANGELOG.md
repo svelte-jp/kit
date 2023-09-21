@@ -1,5 +1,81 @@
 # @sveltejs/kit
 
+## 1.25.0
+
+### Minor Changes
+
+- feat: add server endpoint catch-all method handler `fallback` ([#9755](https://github.com/sveltejs/kit/pull/9755))
+
+### Patch Changes
+
+- fix: allow calling `fetch` for any scheme ([#10699](https://github.com/sveltejs/kit/pull/10699))
+
+## 1.24.1
+
+### Patch Changes
+
+- fix: mark aborted/cancelled navigation as handled ([#10666](https://github.com/sveltejs/kit/pull/10666))
+
+## 1.24.0
+
+### Minor Changes
+
+- feat: onNavigate lifecycle function ([#9605](https://github.com/sveltejs/kit/pull/9605))
+
+### Patch Changes
+
+- fix: Use Proxy to track usage of client side load `event.route` ([#10576](https://github.com/sveltejs/kit/pull/10576))
+
+## 1.23.1
+
+### Patch Changes
+
+- fix: process globs in `pkg.workspaces` ([#10625](https://github.com/sveltejs/kit/pull/10625))
+
+## 1.23.0
+
+### Minor Changes
+
+- feat: add warning for mistyped route filenames ([#10558](https://github.com/sveltejs/kit/pull/10558))
+
+- feat: accept `URL` in `redirect` ([#10570](https://github.com/sveltejs/kit/pull/10570))
+
+### Patch Changes
+
+- fix: adjust the type of `Navigation["type"]` ([#10599](https://github.com/sveltejs/kit/pull/10599))
+
+- fix: allow logging `$page.url` during prerendering ([#10567](https://github.com/sveltejs/kit/pull/10567))
+
+## 1.22.6
+
+### Patch Changes
+
+- fix: correctly restore trailing slash in url pathname for data requests ([#10475](https://github.com/sveltejs/kit/pull/10475))
+
+- fix: load trailing slash option from server even when there's no load function ([#10475](https://github.com/sveltejs/kit/pull/10475))
+
+## 1.22.5
+
+### Patch Changes
+
+- fix: make server assets available during `vite preview` ([#10511](https://github.com/sveltejs/kit/pull/10511))
+
+- chore: upgrade `undici` to 5.23.0 ([#10240](https://github.com/sveltejs/kit/pull/10240))
+
+## 1.22.4
+
+### Patch Changes
+
+- fix: prevent duplicate module preload ([#10442](https://github.com/sveltejs/kit/pull/10442))
+
+- docs: Elaborate on credentialed `fetch` behaviour ([#10421](https://github.com/sveltejs/kit/pull/10421))
+
+## 1.22.3
+
+### Patch Changes
+
+- fix: gracefully handle server endpoints that return `Response`s with immutable `Headers` ([#10367](https://github.com/sveltejs/kit/pull/10367))
+
 ## 1.22.2
 
 ### Patch Changes

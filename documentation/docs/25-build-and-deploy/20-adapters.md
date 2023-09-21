@@ -15,7 +15,7 @@ SvelteKit アプリをデプロイする前に、それをデプロイ先の環�
 
 加えて、他のプラットフォーム向けに、[コミュニティによって提供されている adapter](https://sveltesociety.dev/components#adapters) もございます。
 
-## adapter を使用する
+## adapter を使用する <!--using-adapters-->
 
 adapter は `svelte.config.js` に指定します。
 
@@ -43,7 +43,7 @@ const config = {
 export default config;
 ```
 
-## プラットフォーム固有の情報
+## プラットフォーム固有の情報 <!--platform-specific-context-->
 
 adapter によっては、リクエストに関する追加情報にアクセスすることができます。例えば、Cloudflare Workers の場合は KV namespaces などを含む `env` オブジェクトにアクセスできます。これは [hooks](hooks) や [サーバールート(server routes)](routing#server) で使用される `RequestEvent` に、`platform` プロパティとして渡されます。詳しくは、各 adapter のドキュメントをご参照ください。
 

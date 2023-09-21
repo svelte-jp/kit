@@ -119,7 +119,7 @@ export interface Builder {
 	getClientDirectory(): string;
 	/** サーバーサイドコードがあるディレクトリへの完全に解決されたパスを取得します。 */
 	getServerDirectory(): string;
-	/** 設定された `base` パスを含むアプリケーションパス (例: `/my-base-path/_app`) を取得します。 */
+	/** 設定された `base` パスを含むアプリケーションパス (例: `my-base-path/_app`) を取得します。 */
 	getAppPath(): string;
 
 	/**
@@ -431,7 +431,7 @@ export interface KitConfig {
 		errorTemplate?: string;
 	};
 	/**
-	 * HTML の head の `<style>` ブロックの中のインライン CSS です。このオプションには、インライン化される CSS ファイルの最大長を数値で指定します。ページに必要な CSS ファイルで、この数値より小さいものは全てマージされ、`<style>` ブロックにインライン化されます。
+	 * HTML の head の `<style>` ブロックの CSS をインライン化します。このオプションには、インライン化される CSS ファイルの最大長を、UTF-16 コード単位、つまり [String.length](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length) プロパティで定める数値を指定します。ページに必要な CSS ファイルで、この数値より小さいものは全てマージされ、`<style>` ブロックにインライン化されます。
 	 *
 	 * > これによって初期リクエストが減り、[First Contentful Paint](https://web.dev/first-contentful-paint) スコアを改善することができます。しかし、より大きな HTML が生成され、ブラウザのキャッシュの有効性を低下させます。慎重にお使いください。
 	 * @default 0
@@ -700,10 +700,10 @@ export interface LoadEvent<
 	 * - ページリクエストの `cookie` と `authorization` ヘッダーを継承するため、サーバー上で認証情報付きのリクエストを行うのに使用することができます。
 	 * - サーバー上で相対パスのリクエストを行うことができます (通常、`fetch` は、サーバーのコンテキストで使用する場合 origin 付きの URL が必要です)
 	 * - サーバー上で実行されている場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は、直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません。
-	 * - サーバーサイドレンダリングでは、レスポンスはキャプチャされ、レンダリングされた HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) を介して明示的に含めない限り、シリアライズされないことにご注意ください。
+	 * - サーバーサイドレンダリングでは、レスポンスはキャプチャされ、`Response` オブジェクトの `text` や `json` メソッドにフックされ、レンダリングされる HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) を介して明示的に含めない限り、シリアライズされないことにご注意ください。
 	 * - ハイドレーションでは、レスポンスは HTML から読み取られるため、一貫性が保証され、追加のネットワークリクエストを防ぎます
 	 *
-	 * > Cookie は、ターゲットホストが Sveltekit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。
+	 * cookie を使用して機密情報を含むリクエストについてより学ぶには、[こちら](https://kit.svelte.jp/docs/load#cookies)をご覧ください
 	 */
 	fetch: typeof fetch;
 	/**
@@ -851,7 +851,7 @@ export interface Navigation {
 	 * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
 	 * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
 	 */
-	type: Omit<NavigationType, 'enter'>;
+	type: Exclude<NavigationType, 'enter'>;
 	/**
 	 * ナビゲーションの結果、ページがアンロードされるかどうか (すなわちクライアントサイドナビゲーションではない)
 	 */
@@ -860,6 +860,11 @@ export interface Navigation {
 	 * ヒストリーの 戻る/進む ナビゲーションの場合、戻る/進むのステップ数
 	 */
 	delta?: number;
+	/**
+	 * A promise that resolves once the navigation is complete, and rejects if the navigation
+	 * fails or is aborted. In the case of a `willUnload` navigation, the promise will never resolve
+	 */
+	complete: Promise<void>;
 }
 
 /**
@@ -873,9 +878,27 @@ export interface BeforeNavigate extends Navigation {
 }
 
 /**
+ * [`onNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-onnavigate) コールバックに渡される引数です。
+ */
+export interface OnNavigate extends Navigation {
+	/**
+	 * ナビゲーションのタイプ:
+	 * - `form`: ユーザーが `<form>` を送信した場合
+	 * - `link`: リンクがクリックされてナビゲーションがトリガーされた場合
+	 * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
+	 * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
+	 */
+	type: Exclude<NavigationType, 'enter' | 'leave'>;
+	/**
+	 * `onNavigate` コールバックはクライアントサイドナビゲーションの直前に呼び出されるため、ページをアンロードするナビゲーションでは呼び出されません。
+	 */
+	willUnload: false;
+}
+
+/**
  * [`afterNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-afternavigate) コールバックに渡される引数です。
  */
-export interface AfterNavigate extends Navigation {
+export interface AfterNavigate extends Omit<Navigation, 'type'> {
 	/**
 	 * ナビゲーションのタイプ:
 	 * - `enter`: アプリがハイドレーションされた場合
@@ -884,7 +907,7 @@ export interface AfterNavigate extends Navigation {
 	 * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
 	 * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
 	 */
-	type: Omit<NavigationType, 'leave'>;
+	type: Exclude<NavigationType, 'leave'>;
 	/**
 	 * `afterNavigate` はナビゲーションの完了後に呼び出されるため、ページをアンロードするナビゲーションでは決して呼び出されません。
 	 */
@@ -949,11 +972,13 @@ export interface RequestEvent<
 	/**
 	 * `fetch` は[ネイティブの `fetch` web API](https://developer.mozilla.org/ja/docs/Web/API/fetch) と同等ですが、いくつか機能が追加されています:
 	 *
-	 * - ページリクエストの `cookie` と `authorization` ヘッダーを継承しているため、サーバー上で認証情報付きのリクエストを行うのに使用することができます
+	 * - ページリクエストの `cookie` と `authorization` ヘッダーを継承するため、サーバー上で認証情報付きのリクエストを行うのに使用することができます。
 	 * - サーバー上で相対パスのリクエストを行うことができます (通常、`fetch` は、サーバーのコンテキストで使用する場合 origin 付きの URL が必要です)
-	 * - サーバー上で実行されている場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は、直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません
+	 * - サーバー上で実行されている場合、内部リクエスト (例えば `+server.js` ルート(routes)に対するリクエスト) は、直接ハンドラ関数を呼び出すので、HTTP を呼び出すオーバーヘッドがありません。
+	 * - サーバーサイドレンダリングでは、レスポンスはキャプチャされ、`Response` オブジェクトの `text` や `json` メソッドにフックされ、レンダリングされる HTML にインライン化されます。ヘッダーは、[`filterSerializedResponseHeaders`](https://kit.svelte.jp/docs/hooks#server-hooks-handle) を介して明示的に含めない限り、シリアライズされないことにご注意ください。
+	 * - ハイドレーションでは、レスポンスは HTML から読み取られるため、一貫性が保証され、追加のネットワークリクエストを防ぎます
 	 *
-	 * > Cookie は、ターゲットホストが SvelteKit アプリケーションと同じか、より明確・詳細(specific)なサブドメインである場合にのみ引き渡されます。
+	 * cookie を使用して機密情報を含むリクエストについてより学ぶには、[こちら](https://kit.svelte.jp/docs/load#cookies)をご覧ください
 	 */
 	fetch: typeof fetch;
 	/**
@@ -1059,15 +1084,15 @@ export interface ResolveOptions {
 export interface RouteDefinition<Config = any> {
 	id: string;
 	api: {
-		methods: HttpMethod[];
+		methods: Array<HttpMethod | '*'>;
 	};
 	page: {
-		methods: Extract<HttpMethod, 'GET' | 'POST'>[];
+		methods: Array<Extract<HttpMethod, 'GET' | 'POST'>>;
 	};
 	pattern: RegExp;
 	prerender: PrerenderOption;
 	segments: RouteSegment[];
-	methods: HttpMethod[];
+	methods: Array<HttpMethod | '*'>;
 	config: Config;
 }
 

@@ -225,6 +225,6 @@ export async function handleError({ error, event }) {
 
 > `handleError` 自体が決してエラーをスローしないようにしてください。
 
-## その他の参考資料
+## その他の参考資料 <!--further-reading-->
 
 - [Tutorial: Hooks](https://learn.svelte.jp/tutorial/handle)

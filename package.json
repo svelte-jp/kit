@@ -17,7 +17,8 @@
 		"textlint": "node -e \"var shell=require('shelljs');var files=shell.find(['./CONTRIBUTING_ja.md','./documentation/**/*.md']).join(' ');if(shell.exec('textlint -f pretty-error '+files).code!==0){shell.exit(1)};\"",
 		"changeset:version": "changeset version && pnpm -r generate:version && git add --all",
 		"changeset:release": "changeset publish",
-		"start": "cd sites/kit.svelte.dev && npm run dev"
+		"start": "cd sites/kit.svelte.dev && npm run dev",
+		"postinstall": "pnpm -r generate:types"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.26.1",
@@ -27,10 +28,10 @@
 		"@sveltejs/eslint-config": "^6.0.4",
 		"@svitejs/changesets-changelog-github-compact": "^1.1.0",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
-		"eslint": "^8.40.0",
-		"eslint-config-prettier": "^8.8.0",
+		"eslint": "^8.45.0",
+		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-svelte": "^2.31.0",
-		"eslint-plugin-unicorn": "^47.0.0",
+		"eslint-plugin-unicorn": "^48.0.0",
 		"playwright": "1.30.0",
 		"prettier": "^2.8.0",
 		"rollup": "^3.7.0",
@@ -42,7 +43,7 @@
 		"textlint-rule-preset-jtf-style": "^2.3.13",
 		"typescript": "^4.9.4"
 	},
-	"packageManager": "pnpm@8.6.5",
+	"packageManager": "pnpm@8.7.6",
 	"engines": {
 		"pnpm": "^8.0.0"
 	}
