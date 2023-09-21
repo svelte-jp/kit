@@ -119,7 +119,7 @@ export interface Builder {
 	getClientDirectory(): string;
 	/** サーバーサイドコードがあるディレクトリへの完全に解決されたパスを取得します。 */
 	getServerDirectory(): string;
-	/** 設定された `base` パスを含むアプリケーションパス (例: `/my-base-path/_app`) を取得します。 */
+	/** 設定された `base` パスを含むアプリケーションパス (例: `my-base-path/_app`) を取得します。 */
 	getAppPath(): string;
 
 	/**
@@ -851,7 +851,7 @@ export interface Navigation {
 	 * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
 	 * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
 	 */
-	type: Omit<NavigationType, 'enter'>;
+	type: Exclude<NavigationType, 'enter'>;
 	/**
 	 * ナビゲーションの結果、ページがアンロードされるかどうか (すなわちクライアントサイドナビゲーションではない)
 	 */
@@ -860,6 +860,11 @@ export interface Navigation {
 	 * ヒストリーの 戻る/進む ナビゲーションの場合、戻る/進むのステップ数
 	 */
 	delta?: number;
+	/**
+	 * A promise that resolves once the navigation is complete, and rejects if the navigation
+	 * fails or is aborted. In the case of a `willUnload` navigation, the promise will never resolve
+	 */
+	complete: Promise<void>;
 }
 
 /**
@@ -873,9 +878,27 @@ export interface BeforeNavigate extends Navigation {
 }
 
 /**
+ * [`onNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-onnavigate) コールバックに渡される引数です。
+ */
+export interface OnNavigate extends Navigation {
+	/**
+	 * ナビゲーションのタイプ:
+	 * - `form`: ユーザーが `<form>` を送信した場合
+	 * - `link`: リンクがクリックされてナビゲーションがトリガーされた場合
+	 * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
+	 * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
+	 */
+	type: Exclude<NavigationType, 'enter' | 'leave'>;
+	/**
+	 * `onNavigate` コールバックはクライアントサイドナビゲーションの直前に呼び出されるため、ページをアンロードするナビゲーションでは呼び出されません。
+	 */
+	willUnload: false;
+}
+
+/**
  * [`afterNavigate`](https://kit.svelte.jp/docs/modules#$app-navigation-afternavigate) コールバックに渡される引数です。
  */
-export interface AfterNavigate extends Navigation {
+export interface AfterNavigate extends Omit<Navigation, 'type'> {
 	/**
 	 * ナビゲーションのタイプ:
 	 * - `enter`: アプリがハイドレーションされた場合
@@ -884,7 +907,7 @@ export interface AfterNavigate extends Navigation {
 	 * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
 	 * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
 	 */
-	type: Omit<NavigationType, 'leave'>;
+	type: Exclude<NavigationType, 'leave'>;
 	/**
 	 * `afterNavigate` はナビゲーションの完了後に呼び出されるため、ページをアンロードするナビゲーションでは決して呼び出されません。
 	 */
@@ -1061,15 +1084,15 @@ export interface ResolveOptions {
 export interface RouteDefinition<Config = any> {
 	id: string;
 	api: {
-		methods: HttpMethod[];
+		methods: Array<HttpMethod | '*'>;
 	};
 	page: {
-		methods: Extract<HttpMethod, 'GET' | 'POST'>[];
+		methods: Array<Extract<HttpMethod, 'GET' | 'POST'>>;
 	};
 	pattern: RegExp;
 	prerender: PrerenderOption;
 	segments: RouteSegment[];
-	methods: HttpMethod[];
+	methods: Array<HttpMethod | '*'>;
 	config: Config;
 }
 

@@ -435,7 +435,7 @@ export function load({ locals }) {
 }
 ```
 
-> スローされた redirect をキャッチしないようにしてください、SvelteKit が処理するのを妨げてしまいます。
+> try-catch ブロックの中で `throw redirect()` を使用してはいけません。redirect がすぐにその catch ステートメントをトリガーしてしまうからです。
 
 ブラウザでは、[`$app.navigation`](modules#$app-navigation) からインポートできる [`goto`](modules#$app-navigation-goto) を使うことで、`load` 関数の外側でプログラム的にナビゲーションを行うことができます。
 

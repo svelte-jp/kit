@@ -412,10 +412,11 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 	/** @type {any} */
 	let error;
 
+	/** @param {{ currentTarget: EventTarget & HTMLFormElement}} event */
 	async function handleSubmit(event) {
-		const data = new FormData(this);
+		const data = new FormData(event.currentTarget);
 
-		const response = await fetch(this.action, {
+		const response = await fetch(event.currentTarget.action, {
 			method: 'POST',
 			body: data
 		});

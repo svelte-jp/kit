@@ -325,6 +325,31 @@ export async function POST({ request }) {
 
 > 一般的には、ブラウザからサーバーにデータを送信する方法としては [form actions](form-actions) のほうがより良い方法です。
 
+> If a `GET` handler is exported, a `HEAD` request will return the `content-length` of the `GET` handler's response body.
+
+### Fallback method handler
+
+Exporting the `fallback` handler will match any unhandled request methods, including methods like `MOVE` which have no dedicated export from `+server.js`.
+
+```js
+// @errors: 7031
+/// file: src/routes/api/add/+server.js
+import { json, text } from '@sveltejs/kit';
+
+export async function POST({ request }) {
+	const { a, b } = await request.json();
+	return json(a + b);
+}
+
+// This handler will respond to PUT, PATCH, DELETE, etc.
+/** @type {import('./$types').RequestHandler} */
+export async function fallback({ request }) {
+	return text(`I caught your ${request.method} request!`);
+}
+```
+
+> For `HEAD` requests, the `GET` handler takes precedence over the `fallback` handler.
+
 ### Content negotiation
 
 `+server.js` ファイルは `+page` ファイルと同じディレクトリに置くことができ、これによって同じルート(route)がページにも API エンドポイントにもなるようにすることができます。これがどちらなのか判断するために、SvelteKit は以下のルールを適用します:

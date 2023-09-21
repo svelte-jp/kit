@@ -29,6 +29,10 @@ export default {
 
 [Svelte Adders](https://sveltesociety.dev/templates#adders) は、Tailwind、PostCSS、Storybook、Firebase、GraphQL、mdsvexなど、様々な複雑なインテグレーションを1つのコマンドでセットアップできるようにしてくれます。Svelte と SvelteKitで利用可能なテンプレート、コンポーネント、ツールの全ての一覧については、 [sveltesociety.dev](https://sveltesociety.dev/) をご覧ください。
 
+## Vite plugins
+
+Since SvelteKit projects are built with Vite, you can use Vite plugins to enhance your project. See a list of available plugins at [`vitejs/awesome-vite`](https://github.com/vitejs/awesome-vite).
+
 ## Integration FAQs
 
 SvelteKit FAQ に [SvelteKit で X をする方法](./faq#how-do-i-use-x-with-sveltekit) があるので、もしまだ不明点があるようでしたら役に立つかもしれません。

@@ -46,9 +46,9 @@ export default {
 
 新しいプロジェクトではデフォルトで Node 16 が使用されます。しかし、少し前に作成したプロジェクトをアップグレードする場合、古いバージョンで止まってしまうかもしれません。手動で Node 16 以降を指定する場合、詳細は [Netlify のドキュメント](https://docs.netlify.com/configure-builds/manage-dependencies/#node-js-and-javascript)をご参照ください。
 
-## Netlify Edge Functions (beta)
+## Netlify Edge Functions
 
-SvelteKit は ベータリリースの [Netlify Edge Functions](https://docs.netlify.com/netlify-labs/experimental-features/edge-functions/) をサポートしています。`adapter` 関数に `edge: true` オプションを渡すと、サイト訪問者に近い場所にデプロイされる Deno ベースの edge function でサーバーサイドレンダリングが行われるようになります。`false` を設定した場合 (デフォルト)、サイトはスタンダードな Node ベースの Netlify Functions にデプロイされます。
+SvelteKit は [Netlify Edge Functions](https://docs.netlify.com/netlify-labs/experimental-features/edge-functions/) をサポートしています。`adapter` 関数に `edge: true` オプションを渡すと、サイト訪問者に近い場所にデプロイされる Deno ベースの edge function でサーバーサイドレンダリングが行われるようになります。`false` を設定した場合 (デフォルト)、サイトは Node ベースの Netlify Functions にデプロイされます。
 
 ```js
 // @errors: 2307

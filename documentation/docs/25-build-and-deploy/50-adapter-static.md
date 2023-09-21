@@ -109,7 +109,7 @@ const config = {
 GitHub actions を使用して、サイトが変更されたときに自動で GitHub Pages にデプロイすることができます。サンプルの workflow はこちらです:
 
 ```yaml
-/// file: .github/workflows/deploy.yml
+### file: .github/workflows/deploy.yml
 name: Deploy to GitHub Pages
 
 on:

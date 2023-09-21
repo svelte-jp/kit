@@ -63,6 +63,28 @@ const pkg = JSON.parse(readFileSync(path, 'utf8'));
 
 それでもまだ問題が解消されない場合は、[Vite の issue tracker](https://github.com/vitejs/vite/issues) と 該当のライブラリの issue tracker を検索することを推奨します。[`optimizeDeps`](https://vitejs.dev/config/#dep-optimization-options) や [`ssr`](https://vitejs.dev/config/#ssr-options) の設定値をいじることで問題を回避できる場合もありますが、これはあくまで一時的な回避策とし、問題のあるライブラリの修正を優先したほうが良いでしょう。
 
+## SvelteKit で view transitions API を使うにはどうすればよいですか？ <!--how-do-i-use-the-view-transitions-api-with-sveltekit-->
+
+SvelteKit では [view transitions](https://developer.chrome.com/docs/web-platform/view-transitions/) 向けの特別なインテグレーションはありませんが、[`onNavigate`](/docs/modules#$app-navigation-onnavigate) の中で `document.startViewTransition` を呼び出すことにより、ナビゲーション毎に view transition をトリガーすることができます。
+
+```js
+// @errors: 2339 2810
+import { onNavigate } from '$app/navigation';
+
+onNavigate((navigation) => {
+	if (!document.startViewTransition) return;
+
+	return new Promise((resolve) => {
+		document.startViewTransition(async () => {
+			resolve();
+			await navigation.complete;
+		});
+	});
+});
+```
+
+もっと詳しく知りたければ、Svelte ブログの ["Unlocking view transitions"](https://svelte.jp/blog/view-transitions) をご参照ください。
+
 ## SvelteKit で X を使うにはどうすればよいですか？ <!--how-do-i-use-x-with-sveltekit-->
 
 [ドキュメントのインテグレーションのセクション](./integrations) をしっかり読み込んでください。それでも問題が解決しない場合のために、よくある問題の解決策を以下に示します。
