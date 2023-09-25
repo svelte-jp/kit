@@ -315,8 +315,8 @@ importers:
         specifier: 1.30.0
         version: 1.30.0
       '@types/gitignore-parser':
-        specifier: ^0.0.0
-        version: 0.0.0
+        specifier: ^0.0.1
+        version: 0.0.1
       '@types/prettier':
         specifier: ^2.7.1
         version: 2.7.1
@@ -412,8 +412,8 @@ importers:
         specifier: ^0.2.9
         version: 0.2.9
       undici:
-        specifier: ~5.24.0
-        version: 5.24.0
+        specifier: ~5.25.0
+        version: 5.25.0
     devDependencies:
       '@playwright/test':
         specifier: 1.30.0
@@ -929,8 +929,8 @@ importers:
         specifier: ^0.2.9
         version: 0.2.9
       ts-morph:
-        specifier: ^19.0.0
-        version: 19.0.0
+        specifier: ^20.0.0
+        version: 20.0.0
       typescript:
         specifier: ^5.0.4
         version: 5.0.4
@@ -1028,11 +1028,11 @@ importers:
         specifier: workspace:^
         version: link:../../packages/kit
       '@sveltejs/site-kit':
-        specifier: 6.0.0-next.46
-        version: 6.0.0-next.46(@sveltejs/kit@packages+kit)(svelte@4.2.0)
+        specifier: 6.0.0-next.50
+        version: 6.0.0-next.50(@sveltejs/kit@packages+kit)(svelte@4.2.0)
       '@tomoam/site-kit':
-        specifier: 6.0.0-next.47
-        version: 6.0.0-next.47(@sveltejs/kit@packages+kit)(svelte@4.2.0)
+        specifier: 6.0.0-next.50
+        version: 6.0.0-next.50(@sveltejs/kit@packages+kit)(svelte@4.2.0)
       '@types/d3-geo':
         specifier: ^3.0.4
         version: 3.0.4
@@ -1871,8 +1871,8 @@ packages:
       typescript: 4.9.4
     dev: true
 
-  /@sveltejs/site-kit@6.0.0-next.46(@sveltejs/kit@packages+kit)(svelte@4.2.0):
-    resolution: {integrity: sha512-VgFKJ6G3gXqlbnjVeZTD6MPWidhZuu93D2WdfsOd4DLL6eFKaCbF60qZXtmWF2hLj7+WDk8+NAwj3V+UZ84k8A==}
+  /@sveltejs/site-kit@6.0.0-next.50(@sveltejs/kit@packages+kit)(svelte@4.2.0):
+    resolution: {integrity: sha512-kgJVREVGuhhNO1YfQwJelFsBqfJiPhP7J4ytGUg05FaYlNQn3jb+BMUo027fSRpLgAjCqoo0IzIwX6CSSqqyJg==}
     peerDependencies:
       '@sveltejs/kit': ^1.20.0
       svelte: ^4.0.0
@@ -2082,8 +2082,8 @@ packages:
     resolution: {integrity: sha512-eEi4j5vyQ0WRkfkBS+Sa2q1YQVo0B6cFXde2+TVpoDp7f8yPAb4wMv9jgQ23N+DpiafJVOhRQLyJdrITFwnmFw==}
     dev: true
 
-  /@tomoam/site-kit@6.0.0-next.47(@sveltejs/kit@packages+kit)(svelte@4.2.0):
-    resolution: {integrity: sha512-nUMKVG85372lKoxvFf7nz9dIGMj5992192CaccnKcP2QqU/3IFJJ3Yd81YIouI+PeHBCMRVeFE96N0CHrqqHxw==}
+  /@tomoam/site-kit@6.0.0-next.50(@sveltejs/kit@packages+kit)(svelte@4.2.0):
+    resolution: {integrity: sha512-0d+YVELv/W1czaOkSO9OulwDsjrN3YtpnzRJKJjdJKd9WhHYiGSTvn2B7dW8MBO5vmHu8vw1AGKeB+YnssvNFg==}
     peerDependencies:
       '@sveltejs/kit': ^1.20.0
       svelte: ^4.0.0
@@ -2094,8 +2094,8 @@ packages:
       svelte-local-storage-store: 0.6.0(svelte@4.2.0)
     dev: true
 
-  /@ts-morph/common@0.20.0:
-    resolution: {integrity: sha512-7uKjByfbPpwuzkstL3L5MQyuXPSKdoNG93Fmi2JoDcTf3pEP731JdRFAduRVkOs8oqxPsXKA+ScrWkdQ8t/I+Q==}
+  /@ts-morph/common@0.21.0:
+    resolution: {integrity: sha512-ES110Mmne5Vi4ypUKrtVQfXFDtCsDXiUiGxF6ILVlE90dDD4fdpC1LSjydl/ml7xJWKSDZwUYD2zkOePMSrPBA==}
     dependencies:
       fast-glob: 3.2.12
       minimatch: 7.4.6
@@ -2136,8 +2136,8 @@ packages:
     resolution: {integrity: sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==}
     dev: true
 
-  /@types/gitignore-parser@0.0.0:
-    resolution: {integrity: sha512-qxOKILdhl4e639fWdkMySS4tBkRYHkrU2ZNScsMu84EPicliFRr+gAXCLPrs7kTFWdDpgAIlxtUr+YCRtVjsKw==}
+  /@types/gitignore-parser@0.0.1:
+    resolution: {integrity: sha512-prmXF2Fi8T+s8TXcOMOobf3d5ra3n2BiNC3Z7HaRBeY1UMMk6kJ+x4v1pfQM3uS5pRYuF50irlXEIyR6Kvjg7w==}
     dev: true
 
   /@types/is-ci@3.0.0:
@@ -6938,10 +6938,10 @@ packages:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
     dev: true
 
-  /ts-morph@19.0.0:
-    resolution: {integrity: sha512-D6qcpiJdn46tUqV45vr5UGM2dnIEuTGNxVhg0sk5NX11orcouwj6i1bMqZIz2mZTZB1Hcgy7C3oEVhAT+f6mbQ==}
+  /ts-morph@20.0.0:
+    resolution: {integrity: sha512-JVmEJy2Wow5n/84I3igthL9sudQ8qzjh/6i4tmYCm6IqYyKFlNbJZi7oBdjyqcWSWYRu3CtL0xbT6fS03ESZIg==}
     dependencies:
-      '@ts-morph/common': 0.20.0
+      '@ts-morph/common': 0.21.0
       code-block-writer: 12.0.0
     dev: false
 
@@ -7044,8 +7044,8 @@ packages:
       which-boxed-primitive: 1.0.2
     dev: true
 
-  /undici@5.24.0:
-    resolution: {integrity: sha512-OKlckxBjFl0oXxcj9FU6oB8fDAaiRUq+D8jrFWGmOfI/gIyjk/IeS75LMzgYKUaeHzLUcYvf9bbJGSrUwTfwwQ==}
+  /undici@5.25.0:
+    resolution: {integrity: sha512-DgU98Ll+r1ssO8PcGFWIfj6kie0ttV20DSyE/CVYDVeHvfwBwQbjlsIYJIwAoU1WRhGuEEbj+jgZqcKPco5vkQ==}
     engines: {node: '>=14.0'}
     dependencies:
       busboy: 1.6.0
