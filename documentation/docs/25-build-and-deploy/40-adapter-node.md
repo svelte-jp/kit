@@ -171,7 +171,7 @@ node build
 
 この adapter は、ビルドのディレクトリに2つのファイルを作成します — `index.js` と `handler.js` です。デフォルトのビルドのディレクトリを使用している場合、`node build` などで `index.js` を実行すると、設定された port でサーバーが起動されます。
 
-別の方法として、[Express](https://github.com/expressjs/expressjs.com)、[Connect](https://github.com/senchalabs/connect)、[Polka](https://github.com/lukeed/polka) (またはビルトインの [`http.createServer`](https://nodejs.org/dist/latest/docs/api/http.html#httpcreateserveroptions-requestlistener)) を使用するためのハンドラーをエクスポートする `handler.js` ファイルをインポートし、独自のサーバーをセットアップすることもできます。
+別の方法として、[Express](https://github.com/expressjs/express)、[Connect](https://github.com/senchalabs/connect)、[Polka](https://github.com/lukeed/polka) (またはビルトインの [`http.createServer`](https://nodejs.org/dist/latest/docs/api/http.html#httpcreateserveroptions-requestlistener)) を使用するためのハンドラーをエクスポートする `handler.js` ファイルをインポートし、独自のサーバーをセットアップすることもできます。
 
 ```js
 // @errors: 2307 7006

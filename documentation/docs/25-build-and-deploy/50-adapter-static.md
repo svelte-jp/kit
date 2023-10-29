@@ -84,8 +84,6 @@ export default {
 
 GitHub Pages 向けにビルドするときは、[`paths.base`](configuration#paths) をあなたのリポジトリ名に合わせて更新するようにしてください。サイトが root からではなく <https://your-username.github.io/your-repo-name> から提供されるためです。
 
-GitHub が提供する Jekyll が、あなたのサイトを管理するのを防ぐために、空の `.nojekyll` ファイルを `static` フォルダに追加する必要があります。
-
 GitHub Pages 向けの設定は以下のようになるでしょう:
 
 ```js
@@ -93,17 +91,16 @@ GitHub Pages 向けの設定は以下のようになるでしょう:
 /// file: svelte.config.js
 import adapter from '@sveltejs/adapter-static';
 
-const dev = process.argv.includes('dev');
-
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		adapter: adapter(),
-		paths: {
-			base: dev ? '' : process.env.BASE_PATH,
-		}
+		adapter: adapter()
 	}
 };
+
+config.paths = { base: process.argv.includes('dev') ? '' : process.env.BASE_PATH }
+
+export default config;
 ```
 
 GitHub actions を使用して、サイトが変更されたときに自動で GitHub Pages にデプロイすることができます。サンプルの workflow はこちらです:
@@ -140,13 +137,12 @@ jobs:
 
       - name: build
         env:
-          BASE_PATH: '/your-repo-name'
+          BASE_PATH: '/${{ github.event.repository.name }}'
         run: |
           npm run build
-          touch build/.nojekyll
 
       - name: Upload Artifacts
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v2
         with:
           # this should match the `pages` option in your adapter-static options
           path: 'build/'
@@ -162,9 +158,9 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
+
     steps:
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v2
 ```

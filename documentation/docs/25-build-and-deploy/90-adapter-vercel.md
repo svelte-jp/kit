@@ -59,7 +59,7 @@ export const config = {
 
 そして以下のオプションは serverless function に適用されます:
 - `memory`: function で利用できるメモリ量です。デフォルトは `1024` Mb で、`128` Mb まで減らすことができます。また、Pro または Enterprise アカウントの場合は、`3008` Mb まで[増やす](https://vercel.com/docs/concepts/limits/overview#serverless-function-memory)ことができます。間隔は 64Mb 単位です。
-- `maxDuration`: function の最大実行時間。デフォルトで、Hobby アカウントの場合は `10` 秒、Pro の場合は `60`、Enterprise の場合は `900` です。
+- `maxDuration`: function の最大実行時間。デフォルトで、Hobby アカウントの場合は `10` 秒、Pro の場合は `15`、Enterprise の場合は `900` です。
 - `isr`: Incremental Static Regeneration の設定、詳細は後述
 
 function から特定の region のデータにアクセスする必要がある場合は、パフォーマンスを最適化するためそれと同じ region (またはその知覚) にデプロイすることをおすすめします。

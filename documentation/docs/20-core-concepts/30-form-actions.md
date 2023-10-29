@@ -333,11 +333,14 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 引数が無い場合、`use:enhance` は、ブラウザネイティブの動作を、フルページリロードを除いてエミュレートします。それは:
 
-- action が送信元のページと同じ場所にある場合に限り、成功レスポンスまたは不正なレスポンスに応じて、`form` プロパティと `$page.form` と `$page.status` を更新します。例えば、`<form action="/somewhere/else" ..>` というようなフォームの場合、`form` と `$page` は更新されません。これは、ネイティブのフォーム送信では action があるページにリダイレクトされるからです。どちらにしても更新させたい場合は、[`applyAction`](#progressive-enhancement-applyaction) を使用してください
-- 成功レスポンスの場合は、`<form>` 要素をリセットして `invalidateAll` で全てのデータを無効化・最新化(invalidate)します
+- action が送信元のページと同じ場所にある場合に限り、成功レスポンスまたは不正なレスポンスに応じて、`form` プロパティと `$page.form` と `$page.status` を更新します。例えば、`<form action="/somewhere/else" ..>` というようなフォームの場合、`form` と `$page` は更新されません。これは、ネイティブのフォーム送信では action があるページにリダイレクトされるからです。どちらにしても更新させたい場合は、[`applyAction`](#progressive-enhancement-customising-use-enhance) を使用してください
+- `<form>` 要素をリセットします
+- 成功レスポンスの場合は `invalidateAll` で全てのデータを無効化・最新化(invalidate)します
 - リダイレクトレスポンスの場合は `goto` を呼び出します
 - エラーが発生した場合はもっとも近くにある `+error` 境界をレンダリングします
 - 適切な要素に [フォーカスをリセット](accessibility#focus-management) します
+
+### use:enhance をカスタマイズする <!--customising-use-enhance-->
 
 この挙動をカスタマイズするために、form が送信される直前に実行される `SubmitFunction` 関数を提供することができます。そして (オプションで) `ActionResult` を引数に取るコールバックを返すことができます。もしコールバックを返す場合、上述のデフォルトの動作はトリガーされません。元に戻すには、`update` を呼び出してください。
 
@@ -361,9 +364,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 これらの関数を、ロード中の UI (loading UI) を表示したり隠したりすることなどに使用できます。
 
-### applyAction
-
-独自のコールバックを提供する場合は、最も近くにある `+error` 境界を表示するなど、デフォルトの `use:enhance` の一部を再現する必要があるでしょう。ほとんどの場合、コールバックに渡された `update` を呼び出すだけで十分です。もっとカスタマイズが必要な場合は、`applyAction` を使用してそれを行うことができます:
+コールバックを返す場合は `use:enhance` のデフォルトの動作の一部を再現させる必要があるかもしれませんが、成功レスポンスで全てのデータを無効化・最新化(invalidate)する必要はありません。このような場合には `applyAction` を使用するとよいでしょう:
 
 ```diff
 /// file: src/routes/login/+page.svelte
@@ -380,7 +381,9 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 
 		return async ({ result }) => {
 			// `result` は `ActionResult` オブジェクトです
-+			if (result.type === 'error') {
++			if (result.type === 'redirect') {
++				goto(result.location);
++			} else {
 +				await applyAction(result);
 +			}
 		};
@@ -391,7 +394,7 @@ form をプログレッシブに強化する最も簡単な方法は、`use:enha
 `applyAction(result)` の挙動は `result.type` に依存しています:
 
 - `success`, `failure` — `$page.status` を `result.status` に設定し、`form` と `$page.form` を `result.data` で更新します (`enhance` の `update` とは対照的に、送信元がどこかは関係ありません)
-- `redirect` — `goto(result.location)` を呼び出します
+- `redirect` — `goto(result.location, { invalidateAll: true })` を呼び出します
 - `error` — もっとも近くにある `+error` 境界を `result.error` でレンダリングします
 
 いずれの場合でも、[フォーカスはリセットされます](accessibility#focus-management)。
