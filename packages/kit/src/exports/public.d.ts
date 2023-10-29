@@ -1280,10 +1280,16 @@ export type SubmitFunction<
 			action: URL;
 			result: ActionResult<Success, Failure>;
 			/**
+<<<<<<< HEAD
 			 * これを呼び出すと、フォーム送信(form submission)のレスポンスのデフォルトの動作を取得することができます。
 			 * @param options 送信(submission)に成功したあとに `<form>` の値をリセットしたくない場合は、`reset: false` を設定します。
+=======
+			 * Call this to get the default behavior of a form submission response.
+			 * @param options Set `reset: false` if you don't want the `<form>` values to be reset after a successful submission.
+			 * @param invalidateAll Set `invalidateAll: false` if you don't want the action to call `invalidateAll` after submission.
+>>>>>>> sveltejs/master
 			 */
-			update(options?: { reset: boolean }): Promise<void>;
+			update(options?: { reset?: boolean; invalidateAll?: boolean }): Promise<void>;
 	  }) => void)
 >;
 

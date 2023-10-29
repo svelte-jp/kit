@@ -35,7 +35,7 @@
 		"playwright": "1.30.0",
 		"prettier": "^2.8.0",
 		"rollup": "^3.7.0",
-		"svelte": "^4.0.5",
+		"svelte": "^4.2.2",
 		"shelljs": "^0.8.5",
 		"textlint": "^13.3.2",
 		"textlint-rule-detect-bad-chars": "^1.0.2",
@@ -43,7 +43,7 @@
 		"textlint-rule-preset-jtf-style": "^2.3.13",
 		"typescript": "^4.9.4"
 	},
-	"packageManager": "pnpm@8.8.0",
+	"packageManager": "pnpm@8.9.2",
 	"engines": {
 		"pnpm": "^8.0.0"
 	}

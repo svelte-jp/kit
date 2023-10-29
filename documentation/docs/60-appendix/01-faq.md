@@ -141,21 +141,24 @@ onMount(() => {
 });
 ```
 
-一方、ライブラリに副作用があっても静的にインポートをしたい場合は、[vite-plugin-iso-import](https://github.com/bluwy/vite-plugin-iso-import) をチェックして `?client` インポートサフィックスをサポートしてください。このインポートは SSR ビルドでは取り除かれます。しかし、この手法を使用すると VS Code Intellisense が使用できなくなることにご注意ください。
+最後に、`{#await}` ブロックのご使用も検討してみてください:
+```svelte
+<!--- file: index.svelte --->
+<script>
+	import { browser } from '$app/environment';
 
-```js
-// @filename: ambient.d.ts
-// @lib: ES2015
-declare module 'some-browser-only-library?client';
+	const ComponentConstructor = browser ?
+		import('some-browser-only-library').then((module) => module.Component) :
+		new Promise(() => {});
+</script>
 
-// @filename: index.js
-// ---cut---
-import { onMount } from 'svelte';
-import { method } from 'some-browser-only-library?client';
-
-onMount(() => {
-	method('hello world');
-});
+{#await ComponentConstructor}
+	<p>Loading...</p>
+{:then component}
+	<svelte:component this={component} />
+{:catch error}
+	<p>Something went wrong: {error.message}</p>
+{/await}
 ```
 
 ### 別のバックエンド API サーバーを使用するにはどうすれば良いですか？ <!--how-do-i-use-a-different-backend-api-server-->
@@ -234,11 +237,11 @@ yarn set version berry
 yarn install
 ```
 
-**Yarn 3 global cache**
+#### Yarn 3 global cache
 
 Yarn Berry の興味深い機能の1つに、ディスク上のプロジェクトごとに複数のコピーを持つのではなく、パッケージ用に単一のグローバルキャッシュを持つことができる、というのがあります。しかし、`enableGlobalCache` の設定を true にするとビルドが失敗するため、`.yarnrc.yml` ファイルに以下を追加することを推奨します:
 
-```
+```yaml
 nodeLinker: node-modules
 ```
 
