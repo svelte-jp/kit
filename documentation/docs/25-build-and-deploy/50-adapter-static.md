@@ -82,7 +82,9 @@ export default {
 
 ## GitHub Pages
 
-GitHub Pages 向けにビルドするときは、[`paths.base`](configuration#paths) をあなたのリポジトリ名に合わせて更新するようにしてください。サイトが root からではなく <https://your-username.github.io/your-repo-name> から提供されるためです。
+[GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages) 向けにビルドするとき、あなたのリポジトリの名前が `your-username.github.io` と異なる場合は、[`config.kit.paths.base`](configuration#paths) をあなたのリポジトリの名前に更新してください。サイトが root からではなく `https://your-username.github.io/your-repo-name` から提供されるためです。
+
+GitHub Pages が提供するデフォルトの 404 ページを置き換えるためにフォールバック用の `404.html` ページを生成することもあるでしょう。
 
 GitHub Pages 向けの設定は以下のようになるでしょう:
 
@@ -94,11 +96,14 @@ import adapter from '@sveltejs/adapter-static';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		adapter: adapter()
+		adapter: adapter({
+			fallback: '404.html'
+		}),
+		paths: {
+			base: process.argv.includes('dev') ? '' : process.env.BASE_PATH
+		}
 	}
 };
-
-config.paths = { base: process.argv.includes('dev') ? '' : process.env.BASE_PATH }
 
 export default config;
 ```
