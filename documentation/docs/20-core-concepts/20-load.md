@@ -351,7 +351,7 @@ export async function load({ parent }) {
 <p>{data.a} + {data.b} = {data.c}</p>
 ```
 
-> `+page.js` の `load` 関数が、直接の親だけなく、両方のレイアウトの `load` 関数からマージされたたデータを受け取っていることにご注意ください。
+> `+page.js` の `load` 関数が、直接の親だけなく、両方のレイアウトの `load` 関数からマージされたデータを受け取っていることにご注意ください。
 
 `+page.server.js` と `+layout.server.js` の中では、`parent` は親の `+layout.server.js` ファイルからデータを取得します。
 
