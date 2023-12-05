@@ -1,78 +1,70 @@
 {
-  "projectName": "kit",
-  "projectOwner": "svelte-jp",
-  "repoType": "github",
-  "repoHost": "https://github.com",
-  "files": [
-    "README.md"
-  ],
-  "imageSize": 100,
-  "commit": false,
-  "commitConvention": "none",
-  "contributors": [
-    {
-      "login": "tomoam",
-      "name": "tomoam",
-      "avatar_url": "https://avatars.githubusercontent.com/u/29677552?v=4",
-      "profile": "https://github.com/tomoam",
-      "contributions": [
-        "doc"
-      ]
-    },
-    {
-      "login": "yamanoku",
-      "name": "Okuto Oyama",
-      "avatar_url": "https://avatars.githubusercontent.com/u/1996642?v=4",
-      "profile": "https://yamanoku.net/",
-      "contributions": [
-        "doc"
-      ]
-    },
-    {
-      "login": "myLifeAsaDog",
-      "name": "myLifeAsaDog",
-      "avatar_url": "https://avatars.githubusercontent.com/u/18300178?v=4",
-      "profile": "https://github.com/myLifeAsaDog",
-      "contributions": [
-        "doc"
-      ]
-    },
-    {
-      "login": "miily8310s",
-      "name": "miruoo",
-      "avatar_url": "https://avatars.githubusercontent.com/u/42486288?v=4",
-      "profile": "https://katanugramer.hatenablog.com/",
-      "contributions": [
-        "doc"
-      ]
-    },
-    {
-      "login": "oekazuma",
-      "name": "Kazuma Oe",
-      "avatar_url": "https://avatars.githubusercontent.com/u/29580221?v=4",
-      "profile": "https://qiita.com/oekazuma",
-      "contributions": [
-        "doc"
-      ]
-    },
-    {
-      "login": "dajiaji",
-      "name": "Ajitomi Daisuke",
-      "avatar_url": "https://avatars.githubusercontent.com/u/3192030?v=4",
-      "profile": "https://github.com/dajiaji",
-      "contributions": [
-        "doc"
-      ]
-    },
-    {
-      "login": "kimdj2",
-      "name": "bondee",
-      "avatar_url": "https://avatars.githubusercontent.com/u/38813699?v=4",
-      "profile": "https://github.com/kimdj2",
-      "contributions": [
-        "doc"
-      ]
-    }
-  ],
-  "contributorsPerLine": 7
+	"projectName": "kit",
+	"projectOwner": "svelte-jp",
+	"repoType": "github",
+	"repoHost": "https://github.com",
+	"files": ["README.md"],
+	"imageSize": 100,
+	"commit": false,
+	"commitConvention": "none",
+	"contributors": [
+		{
+			"login": "tomoam",
+			"name": "tomoam",
+			"avatar_url": "https://avatars.githubusercontent.com/u/29677552?v=4",
+			"profile": "https://github.com/tomoam",
+			"contributions": ["doc"]
+		},
+		{
+			"login": "yamanoku",
+			"name": "Okuto Oyama",
+			"avatar_url": "https://avatars.githubusercontent.com/u/1996642?v=4",
+			"profile": "https://yamanoku.net/",
+			"contributions": ["doc"]
+		},
+		{
+			"login": "myLifeAsaDog",
+			"name": "myLifeAsaDog",
+			"avatar_url": "https://avatars.githubusercontent.com/u/18300178?v=4",
+			"profile": "https://github.com/myLifeAsaDog",
+			"contributions": ["doc"]
+		},
+		{
+			"login": "miily8310s",
+			"name": "miruoo",
+			"avatar_url": "https://avatars.githubusercontent.com/u/42486288?v=4",
+			"profile": "https://katanugramer.hatenablog.com/",
+			"contributions": ["doc"]
+		},
+		{
+			"login": "oekazuma",
+			"name": "Kazuma Oe",
+			"avatar_url": "https://avatars.githubusercontent.com/u/29580221?v=4",
+			"profile": "https://qiita.com/oekazuma",
+			"contributions": ["doc"]
+		},
+		{
+			"login": "dajiaji",
+			"name": "Ajitomi Daisuke",
+			"avatar_url": "https://avatars.githubusercontent.com/u/3192030?v=4",
+			"profile": "https://github.com/dajiaji",
+			"contributions": ["doc"]
+		},
+		{
+			"login": "kimdj2",
+			"name": "bondee",
+			"avatar_url": "https://avatars.githubusercontent.com/u/38813699?v=4",
+			"profile": "https://github.com/kimdj2",
+			"contributions": ["doc"]
+		},
+		{
+			"login": "dito",
+			"name": "dito",
+			"avatar_url": "https://avatars.githubusercontent.com/u/4264269?v=4",
+			"profile": "https://github.com/dito",
+			"contributions": ["doc"]
+		}
+	],
+	"contributorsPerLine": 7
 }
+

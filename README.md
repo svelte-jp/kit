@@ -35,6 +35,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/dajiaji"><img src="https://avatars.githubusercontent.com/u/3192030?v=4?s=100" width="100px;" alt="Ajitomi Daisuke"/><br /><sub><b>Ajitomi Daisuke</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=dajiaji" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kimdj2"><img src="https://avatars.githubusercontent.com/u/38813699?v=4?s=100" width="100px;" alt="bondee"/><br /><sub><b>bondee</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=kimdj2" title="Documentation">📖</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dito"><img src="https://avatars.githubusercontent.com/u/4264269?v=4?s=100" width="100px;" alt="dito"/><br /><sub><b>dito</b></sub></a><br /><a href="https://github.com/svelte-jp/kit/commits?author=dito" title="Documentation">📖</a></td>
+    </tr>
   </tbody>
 </table>
 
