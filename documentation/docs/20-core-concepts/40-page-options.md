@@ -121,6 +121,7 @@ export const prerender = true;
 ```js
 /// file: +page.js
 export const ssr = false;
+// If both `ssr` and `csr` are `false`, nothing will be rendered!
 ```
 
 `export const ssr = false` を最上位(root)の `+layout.js` に追加した場合、アプリ全体がクライアントのみでレンダリングされるようになり、それはつまり、本質的にはアプリを SPA にする、ということを意味します。
@@ -132,9 +133,15 @@ export const ssr = false;
 ```js
 /// file: +page.js
 export const csr = false;
+// If both `csr` and `ssr` are `false`, nothing will be rendered!
 ```
 
-> `ssr` to `csr` の両方が `false` である場合は、何もレンダリングされません！
+CSR を無効にすると、クライアントに JavaScript が送信されません。つまり:
+
+* web ページは HTML と CSS だけで動作します。
+* すべての Svelte コンポーネントの `<script>` タグは削除されます。
+* `<form>` 要素を[プログレッシブ・エンハンスメント](form-actions#progressive-enhancement)にすることはできません。
+* リンクはブラウザによってフルページナビゲーションで処理されます。
 
 ## trailingSlash
 

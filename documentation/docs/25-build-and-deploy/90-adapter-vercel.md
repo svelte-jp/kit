@@ -18,7 +18,7 @@ import adapter from '@sveltejs/adapter-vercel';
 export default {
 	kit: {
 		adapter: adapter({
-			// 以下の 'デプロイメントの設定' セクションを参照
+			// ここで設定できるオプションについては以下を参照
 		})
 	}
 };
@@ -63,6 +63,18 @@ export const config = {
 - `isr`: Incremental Static Regeneration の設定、詳細は後述
 
 function から特定の region のデータにアクセスする必要がある場合は、パフォーマンスを最適化するためそれと同じ region (またはその知覚) にデプロイすることをおすすめします。
+
+## Image Optimization
+
+You may set the `images` config to control how Vercel builds your images. See the [image configuration reference](https://vercel.com/docs/build-output-api/v3/configuration#images) for full details. As an example, you may set:
+
+```
+{
+	sizes: [640, 828, 1200, 1920, 3840],
+	formats: ['image/avif', 'image/webp'],
+	minimumCacheTTL: 300
+}
+```
 
 ## Incremental Static Regeneration
 

@@ -2,6 +2,8 @@
 
 パブリックで動的な環境変数は全て、サーバーからクライアントに送られるため、より大きなネットワークリクエストを引き起こすことにご注意ください。可能であれば、代わりに `$env/static/public` をお使いください。
 
+Dynamic environment variables cannot be used during prerendering.
+
 ```ts
 import { env } from '$env/dynamic/public';
 console.log(env.PUBLIC_DEPLOYMENT_SPECIFIC_VARIABLE);

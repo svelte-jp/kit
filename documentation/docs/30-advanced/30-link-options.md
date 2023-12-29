@@ -122,10 +122,8 @@ SvelteKit はこの情報を使ってインポートするコードやそのペ�
 </div>
 ```
 
-条件によって要素に属性を適用する場合は、このようにします (`"true"` と `"false"` はどちらも使用することができます):
+条件によって要素に属性を適用する場合は、このようにします:
 
-```html
-<div data-sveltekit-reload={shouldReload ? '' : 'off'}>
+```svelte
+<div data-sveltekit-preload-data={condition ? 'hover' : false}>
 ```
-
-> HTML では `<element attribute>` と `<element attribute="">` が同等であるため、これがうまく動作します

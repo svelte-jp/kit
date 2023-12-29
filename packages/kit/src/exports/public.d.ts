@@ -2,7 +2,7 @@ import 'svelte'; // pick up `declare module "*.svelte"`
 import 'vite/client'; // pick up `declare module "*.jpg"`, etc.
 import '../types/ambient.js';
 
-import { CompileOptions } from 'svelte/types/compiler/interfaces';
+import { CompileOptions } from 'svelte/compiler';
 import {
 	AdapterEntry,
 	CspDirectives,
@@ -17,12 +17,10 @@ import {
 	RequestOptions,
 	RouteSegment
 } from '../types/private.js';
-import { ActionFailure } from '../runtime/control.js';
 import { BuildData, SSRNodeLoader, SSRRoute, ValidatedConfig } from 'types';
 import type { PluginOptions } from '@sveltejs/vite-plugin-svelte';
 
 export { PrerenderOption } from '../types/private.js';
-export { ActionFailure };
 
 /**
  * [Adapters](https://kit.svelte.jp/docs/adapters) は、本番向けビルドを、あなたが選んだプラットフォームにデプロイできる形式に変換する役割を担います。
@@ -39,20 +37,11 @@ export interface Adapter {
 	adapt(builder: Builder): MaybePromise<void>;
 }
 
-type AwaitedPropertiesUnion<input extends Record<string, any> | void> = input extends void
+export type LoadProperties<input extends Record<string, any> | void> = input extends void
 	? undefined // needs to be undefined, because void will break intellisense
 	: input extends Record<string, any>
-	  ? {
-				[key in keyof input]: Awaited<input[key]>;
-	    }
-	  : {} extends input // handles the any case
-	    ? input
-	    : unknown;
-
-export type AwaitedProperties<input extends Record<string, any> | void> =
-	AwaitedPropertiesUnion<input> extends Record<string, any>
-		? OptionalUnion<AwaitedPropertiesUnion<input>>
-		: AwaitedPropertiesUnion<input>;
+		? input
+		: unknown;
 
 export type AwaitedActions<T extends Record<string, (...args: any) => any>> = OptionalUnion<
 	{
@@ -67,11 +56,19 @@ type OptionalUnion<
 	A extends keyof U = U extends U ? keyof U : never
 > = U extends unknown ? { [P in Exclude<A, keyof U>]?: never } & U : never;
 
+declare const uniqueSymbol: unique symbol;
+
+export interface ActionFailure<T extends Record<string, unknown> | undefined = undefined> {
+	status: number;
+	data: T;
+	[uniqueSymbol]: true; // necessary or else UnpackValidationError could wrongly unpack objects with the same shape as ActionFailure
+}
+
 type UnpackValidationError<T> = T extends ActionFailure<infer X>
 	? X
 	: T extends void
-	  ? undefined // needs to be undefined, because void will corrupt union type
-	  : T;
+		? undefined // needs to be undefined, because void will corrupt union type
+		: T;
 
 /**
  * このオブジェクトは adapter の `adapt` 関数に渡されます。
@@ -103,6 +100,11 @@ export interface Builder {
 	 * 静的な web サーバーが、マッチするルート(route)がない場合に使用するフォールバックページ(fallback page)を生成します。シングルページアプリにとって有用です。
 	 */
 	generateFallback(dest: string): Promise<void>;
+
+	/**
+	 * Generate a module exposing build-time environment variables as `$env/dynamic/public`.
+	 */
+	generateEnvModule(): void;
 
 	/**
 	 * SvelteKit [サーバー](https://kit.svelte.jp/docs/types#public-types-server)を初期化するためのサーバーサイド manifest を生成します。
@@ -212,34 +214,42 @@ export interface Cookies {
 	 *
 	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており (http://localhost の場合は例外として `secure` は `false` です)、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。`sameSite` オプションのデフォルトは `lax` です。
 	 *
-	 * デフォルトでは、cookie の `path` は 現在のパス名の 'ディレクトリ' です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
-	 * @param name cookie の名前
-	 * @param value cookie の値
-	 * @param opts 直接 `cookie.serialize` に渡されるオプション。ドキュメントは[こちら](https://github.com/jshttp/cookie#cookieserializename-value-options)
+	 * You must specify a `path` for the cookie. In most cases you should explicitly set `path: '/'` to make the cookie available throughout your app. You can use relative paths, or set `path: ''` to make the cookie only available on the current path and its children
+	 * @param name the name of the cookie
+	 * @param value the cookie value
+	 * @param opts the options, passed directly to `cookie.serialize`. See documentation [here](https://github.com/jshttp/cookie#cookieserializename-value-options)
 	 */
-	set(name: string, value: string, opts?: import('cookie').CookieSerializeOptions): void;
+	set(
+		name: string,
+		value: string,
+		opts: import('cookie').CookieSerializeOptions & { path: string }
+	): void;
 
 	/**
 	 * 値に空文字列(empty string)を設定したり、有効期限(expiry date)を過去に設定することで、cookie を削除します。
 	 *
-	 * デフォルトでは、cookie の `path` は現在のパス名の 'ディレクトリ' です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
-	 * @param name cookie の名前
-	 * @param opts 直接 `cookie.serialize` に渡されるオプション。`path` はあなたが削除したい cookie の path と一致する必要があります。ドキュメントは[こちら](https://github.com/jshttp/cookie#cookieserializename-value-options)
+	 * You must specify a `path` for the cookie. In most cases you should explicitly set `path: '/'` to make the cookie available throughout your app. You can use relative paths, or set `path: ''` to make the cookie only available on the current path and its children
+	 * @param name the name of the cookie
+	 * @param opts the options, passed directly to `cookie.serialize`. The `path` must match the path of the cookie you want to delete. See documentation [here](https://github.com/jshttp/cookie#cookieserializename-value-options)
 	 */
-	delete(name: string, opts?: import('cookie').CookieSerializeOptions): void;
+	delete(name: string, opts: import('cookie').CookieSerializeOptions & { path: string }): void;
 
 	/**
 	 * cookie の名前と値のペアを Set-Cookie ヘッダー文字列にシリアライズします。ただし、それをレスポンスに適用しないでください。
 	 *
 	 * `httpOnly` と `secure` オプションはデフォルトで `true` となっており (http://localhost の場合は例外として `secure` は `false` です)、クライアントサイドの JavaScript で cookie を読み取ったり、HTTP 上で送信したりしたい場合は、明示的に無効にする必要があります。`sameSite` オプションのデフォルトは `lax` です。
 	 *
-	 * デフォルトでは、cookie の `path` は 現在のパス名です。ほとんどの場合、cookie をアプリ全体で利用可能にするには明示的に `path: '/'` を設定する必要があります。
+	 * You must specify a `path` for the cookie. In most cases you should explicitly set `path: '/'` to make the cookie available throughout your app. You can use relative paths, or set `path: ''` to make the cookie only available on the current path and its children
 	 *
 	 * @param name cookie の名前
 	 * @param value cookie の値
 	 * @param opts 直接 `cookie.serialize` に渡されるオプション。ドキュメントは[こちら](https://github.com/jshttp/cookie#cookieserializename-value-options)
 	 */
-	serialize(name: string, value: string, opts?: import('cookie').CookieSerializeOptions): string;
+	serialize(
+		name: string,
+		value: string,
+		opts: import('cookie').CookieSerializeOptions & { path: string }
+	): string;
 }
 
 export interface KitConfig {
@@ -279,7 +289,9 @@ export interface KitConfig {
 	 */
 	alias?: Record<string, string>;
 	/**
-	 * ビルドされた JS と CSS (とインポートされたアセット) が提供されるディレクトリで、`paths.assets` との相対です。(ファイル名にはそれ自体にコンテンツベースのハッシュが含まれるため、無期限にキャッシュすることができます)。先頭と末尾を `/` にすることはできません。
+	 * The directory where SvelteKit keeps its stuff, including static assets (such as JS and CSS) and internally-used routes.
+	 *
+	 * If `paths.assets` is specified, there will be two app directories — `${paths.assets}/${appDir}` and `${paths.base}/${appDir}`.
 	 * @default "_app"
 	 */
 	appDir?: string;
@@ -344,17 +356,7 @@ export interface KitConfig {
 		checkOrigin?: boolean;
 	};
 	/**
-	 * Here be dragons. Enable at your peril.
-	 */
-	dangerZone?: {
-		/**
-		 * Automatically add server-side `fetch`ed URLs to the `dependencies` map of `load` functions. This will expose secrets
-		 * to the client if your URL contains them.
-		 */
-		trackServerFetches?: boolean;
-	};
-	/**
-	 * アプリが別の大規模なアプリに埋め込まれているかどうか。もし `true` の場合、SvelteKit はナビゲーションなどに関係するイベントリスナーを、`window` の代わりに `%sveltekit.body%` の親に追加し、`params` を `location.pathname` から導くのではなく、サーバーから取得して渡します。
+	 * Whether or not the app is embedded inside a larger app. If `true`, SvelteKit will add its event listeners related to navigation etc on the parent of `%sveltekit.body%` instead of `window`, and will pass `params` from the server rather than inferring them from `location.pathname`.
 	 * @default false
 	 */
 	embedded?: boolean;
@@ -473,15 +475,20 @@ export interface KitConfig {
 		 */
 		base?: '' | `/${string}`;
 		/**
-		 * 相対アセットパスを使うかどうか。デフォルトでは、`paths.assets` が外部ではない場合、SvelteKit は `%sveltekit.assets%` を相対パスに置き換え、ビルド成果物の参照に対する相対パスを使用しますが、`$app/paths` からインポートする `base` と `assets` は、あなたの設定で指定された通りになります。
+		 * Whether to use relative asset paths.
 		 *
-		 * `true` の場合、`$app/paths` からインポートする `base` と `assets` は、サーバーサイドレンダリング中に相対アセットパスに置き換えられ、ポータブルな HTML になります。
-		 * `false` の場合、`%sveltekit.assets%` とビルド成果物への参照は、`paths.assets` が外部 URL でない限り、常にルート相対(root-relative)なパスとなります。
+		 * If `true`, `base` and `assets` imported from `$app/paths` will be replaced with relative asset paths during server-side rendering, resulting in more portable HTML.
+		 * If `false`, `%sveltekit.assets%` and references to build artifacts will always be root-relative paths, unless `paths.assets` is an external URL
 		 *
-		 * もしアプリで `<base>` 要素を使用している場合、これを `false` に設定してください。そうしないとアセットの URL が誤って現在のページではなく `<base>` URL に対して解決されてしまいます。
-		 * @default undefined
+		 * [Single-page app](https://kit.svelte.dev/docs/single-page-apps) fallback pages will always use absolute paths, regardless of this setting.
+		 *
+		 * If your app uses a `<base>` element, you should set this to `false`, otherwise asset URLs will incorrectly be resolved against the `<base>` URL rather than the current page.
+		 *
+		 * In 1.0, `undefined` was a valid value, which was set by default. In that case, if `paths.assets` was not external, SvelteKit would replace `%sveltekit.assets%` with a relative path and use relative paths to reference build artifacts, but `base` and `assets` imported from `$app/paths` would be as specified in your config.
+		 *
+		 * @default true
 		 */
-		relative?: boolean | undefined;
+		relative?: boolean;
 	};
 	/**
 	 * [プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender) をご覧ください。
@@ -498,7 +505,7 @@ export interface KitConfig {
 		 */
 		crawl?: boolean;
 		/**
-		 * プリレンダリングするページ、または (`crawl: true` の場合は) クローリングを開始するページの配列。`*` 文字列は、全ての動的でないルート(route) (つまり、`[parameters]` がないページです。なぜなら、SvelteKit は その parameters がどんな値を持つかわからないからです) が含まれます。
+		 * An array of pages to prerender, or start crawling from (if `crawl: true`). The `*` string includes all routes containing no required `[parameters]`  with optional parameters included as being empty (since SvelteKit doesn't know what value any parameters should have).
 		 * @default ["*"]
 		 */
 		entries?: Array<'*' | `/${string}`>;
@@ -650,6 +657,8 @@ export type Handle = (input: {
 export type HandleServerError = (input: {
 	error: unknown;
 	event: RequestEvent;
+	status: number;
+	message: string;
 }) => MaybePromise<void | App.Error>;
 
 /**
@@ -661,6 +670,8 @@ export type HandleServerError = (input: {
 export type HandleClientError = (input: {
 	error: unknown;
 	event: NavigationEvent;
+	status: number;
+	message: string;
 }) => MaybePromise<void | App.Error>;
 
 /**
@@ -779,7 +790,21 @@ export interface LoadEvent<
 	 * <button on:click={increase}>Increase Count</button>
 	 * ```
 	 */
-	depends(...deps: string[]): void;
+	depends(...deps: Array<`${string}:${string}`>): void;
+	/**
+	 * Use this function to opt out of dependency tracking for everything that is synchronously called within the callback. Example:
+	 *
+	 * ```js
+	 * /// file: src/routes/+page.server.js
+	 * export async function load({ untrack, url }) {
+	 * 	// Untrack url.pathname so that path changes don't trigger a rerun
+	 * 	if (untrack(() => url.pathname === '/')) {
+	 * 		return { message: 'Welcome!' };
+	 * 	}
+	 * }
+	 * ```
+	 */
+	untrack<T>(fn: () => T): T;
 }
 
 export interface NavigationEvent<
@@ -844,12 +869,12 @@ export interface Navigation {
 	 */
 	to: NavigationTarget | null;
 	/**
-	 * ナビゲーションのタイプ:
-	 * - `form`: ユーザーが `<form>` を送信した場合
-	 * - `leave`: ユーザーがタブを閉じようとしたり 戻る/進む ボタンで違うドキュメントに行こうとしてアプリから離れようとした場合
-	 * - `link`: リンクがクリックされてナビゲーションがトリガーされた場合
-	 * - `goto`: `goto(...)` をコール、またはリダイレクトによってナビゲーションがトリガーされた場合
-	 * - `popstate`: 戻る/進む によってナビゲーションがトリガーされた場合
+	 * The type of navigation:
+	 * - `form`: The user submitted a `<form>`
+	 * - `leave`: The app is being left either because the tab is being closed or a navigation to a different document is occurring
+	 * - `link`: Navigation was triggered by a link click
+	 * - `goto`: Navigation was triggered by a `goto(...)` call or a redirect
+	 * - `popstate`: Navigation was triggered by back/forward navigation
 	 */
 	type: Exclude<NavigationType, 'enter'>;
 	/**
@@ -951,7 +976,11 @@ export interface Page<
 	 */
 	data: App.PageData & Record<string, any>;
 	/**
-	 * form が送信された後にのみ注入される。詳細については [form actions](https://kit.svelte.jp/docs/form-actions) を参照。
+	 * The page state, which can be manipulated using the [`pushState`](https://kit.svelte.dev/docs/modules#$app-navigation-pushstate) and [`replaceState`](https://kit.svelte.dev/docs/modules#$app-navigation-replacestate) functions from `$app/navigation`.
+	 */
+	state: App.PageState;
+	/**
+	 * Filled only after a form submission. See [form actions](https://kit.svelte.dev/docs/form-actions) for more info.
 	 */
 	form: any;
 }
@@ -1181,6 +1210,20 @@ export interface ServerLoadEvent<
 	 * ```
 	 */
 	depends(...deps: string[]): void;
+	/**
+	 * Use this function to opt out of dependency tracking for everything that is synchronously called within the callback. Example:
+	 *
+	 * ```js
+	 * /// file: src/routes/+page.js
+	 * export async function load({ untrack, url }) {
+	 * 	// Untrack url.pathname so that path changes don't trigger a rerun
+	 * 	if (untrack(() => url.pathname === '/')) {
+	 * 		return { message: 'Welcome!' };
+	 * 	}
+	 * }
+	 * ```
+	 */
+	untrack<T>(fn: () => T): T;
 }
 
 /**
@@ -1247,17 +1290,7 @@ export type SubmitFunction<
 	Failure extends Record<string, unknown> | undefined = Record<string, any>
 > = (input: {
 	action: URL;
-	/**
-	 * use `formData` instead of `data`
-	 * @deprecated
-	 */
-	data: FormData;
 	formData: FormData;
-	/**
-	 * use `formElement` instead of `form`
-	 * @deprecated
-	 */
-	form: HTMLFormElement;
 	formElement: HTMLFormElement;
 	controller: AbortController;
 	submitter: HTMLElement | null;
@@ -1265,29 +1298,14 @@ export type SubmitFunction<
 }) => MaybePromise<
 	| void
 	| ((opts: {
-			/**
-			 * use `formData` instead of `data`
-			 * @deprecated
-			 */
-			data: FormData;
 			formData: FormData;
-			/**
-			 * use `formElement` instead of `form`
-			 * @deprecated
-			 */
-			form: HTMLFormElement;
 			formElement: HTMLFormElement;
 			action: URL;
 			result: ActionResult<Success, Failure>;
 			/**
-<<<<<<< HEAD
-			 * これを呼び出すと、フォーム送信(form submission)のレスポンスのデフォルトの動作を取得することができます。
-			 * @param options 送信(submission)に成功したあとに `<form>` の値をリセットしたくない場合は、`reset: false` を設定します。
-=======
 			 * Call this to get the default behavior of a form submission response.
 			 * @param options Set `reset: false` if you don't want the `<form>` values to be reset after a successful submission.
 			 * @param invalidateAll Set `invalidateAll: false` if you don't want the action to call `invalidateAll` after submission.
->>>>>>> sveltejs/master
 			 */
 			update(options?: { reset?: boolean; invalidateAll?: boolean }): Promise<void>;
 	  }) => void)

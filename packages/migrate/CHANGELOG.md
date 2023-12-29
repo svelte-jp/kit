@@ -1,5 +1,29 @@
 # svelte-migrate
 
+## 1.3.2
+
+### Patch Changes
+
+- fix: handle jsconfig.json ([#11325](https://github.com/sveltejs/kit/pull/11325))
+
+## 1.3.1
+
+### Patch Changes
+
+- chore: fix broken migration links ([#11320](https://github.com/sveltejs/kit/pull/11320))
+
+## 1.3.0
+
+### Minor Changes
+
+- feat: add sveltekit v2 migration ([#11294](https://github.com/sveltejs/kit/pull/11294))
+
+## 1.2.8
+
+### Patch Changes
+
+- chore(deps): update dependency ts-morph to v21 ([#11181](https://github.com/sveltejs/kit/pull/11181))
+
 ## 1.2.7
 
 ### Patch Changes

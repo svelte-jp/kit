@@ -31,7 +31,7 @@ export async function load({ params }) {
 	const post = await db.getPost(params.slug);
 
 	if (!post) {
-		throw error(404, {
+		error(404, {
 			message: 'Not found'
 		});
 	}
@@ -40,7 +40,7 @@ export async function load({ params }) {
 }
 ```
 
-こうすると、SvelteKit はレスポンスのステータスコードを 404 に設定し、[`+error.svelte`](routing#error) コンポーネントをレンダリングします。`$page.error` は `error(...)` に第二引数として渡されたオブジェクトです。
+これは SvelteKit が catch する例外をスローし、それによってレスポンスのステータスコードを 404 に設定し、[`+error.svelte`](routing#error) コンポーネントをレンダリングします。`$page.error` は `error(...)` に第二引数として渡されたオブジェクトです。
 
 ```svelte
 <!--- file: src/routes/+error.svelte --->
@@ -54,7 +54,7 @@ export async function load({ params }) {
 必要に応じて、エラーオブジェクトにプロパティを追加することができます…
 
 ```diff
-throw error(404, {
+error(404, {
 	message: 'Not found',
 +	code: 'NOT_FOUND'
 });
@@ -63,9 +63,11 @@ throw error(404, {
 …追加しない場合は、便宜上、文字列を第二引数に渡すことができます:
 
 ```diff
--throw error(404, { message: 'Not found' });
-+throw error(404, 'Not found');
+-error(404, { message: 'Not found' });
++error(404, 'Not found');
 ```
+
+> [SvelteKit 1.x 系では](migrating-to-sveltekit-2#redirect-and-error-are-no-longer-thrown-by-you)、ご自身で `error` を `throw` しなければいけませんでした。
 
 ## Unexpected errors
 
@@ -77,36 +79,7 @@ throw error(404, {
 { "message": "Internal Error" }
 ```
 
-予期せぬエラーは [`handleError`](hooks#shared-hooks-handleerror) hook を通ります。ここで、独自のエラーハンドリングを追加することができます。例えば、レポーティングサービスにエラーを送ったり、カスタムのエラーオブジェクトを返したりすることができます。
-
-```js
-/// file: src/hooks.server.js
-// @errors: 2322 1360 2571 2339
-// @filename: ambient.d.ts
-declare module '@sentry/node' {
-	export const init: (opts: any) => void;
-	export const captureException: (error: any, opts: any) => void;
-}
-
-// @filename: index.js
-// ---cut---
-import * as Sentry from '@sentry/node';
-
-Sentry.init({/*...*/})
-
-/** @type {import('@sveltejs/kit').HandleServerError} */
-export function handleError({ error, event }) {
-	// example integration with https://sentry.io/
-	Sentry.captureException(error, { extra: { event } });
-
-	return {
-		message: 'Whoops!',
-		code: error?.code ?? 'UNKNOWN'
-	};
-}
-```
-
-> `handleError` では*絶対に* error をスローしないでください
+予期せぬエラーは [`handleError`](hooks#shared-hooks-handleerror) hook を通ります。ここで、独自のエラーハンドリングを追加することができます。例えば、レポーティングサービスにエラーを送ったり、カスタムのエラーオブジェクト (これは `$page.error` になります) を返したりすることができます。
 
 ## Responses
 

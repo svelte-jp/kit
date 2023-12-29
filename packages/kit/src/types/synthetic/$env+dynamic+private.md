@@ -2,6 +2,8 @@
 
 このモジュールをクライアントサイドコードにインポートすることはできません。
 
+Dynamic environment variables cannot be used during prerendering.
+
 ```ts
 import { env } from '$env/dynamic/private';
 console.log(env.DEPLOYMENT_SPECIFIC_VARIABLE);

@@ -61,7 +61,7 @@ export function load({ params }) {
 		};
 	}
 
-	throw error(404, 'Not found');
+	error(404, 'Not found');
 }
 ```
 
@@ -104,7 +104,7 @@ export async function load({ params }) {
 		return post;
 	}
 
-	throw error(404, 'Not found');
+	error(404, 'Not found');
 }
 ```
 
@@ -250,7 +250,7 @@ export function load() {
 
 ページと同様に、`+server.js` ファイル (よく 'API ルート(API route)' または 'エンドポイント(endpoint)' とも呼ばれる) でルート(routes) を定義でき、これによってレスポンスを完全にコントロールすることができます。`+server.js` ファイル は `GET`、`POST`、`PATCH`、`PUT`、`DELETE`、`OPTIONS`、`HEAD` といった HTTP verbs に対応する関数をエクスポートします。これは `RequestEvent` を引数に取り、[`Response`](https://developer.mozilla.org/ja/docs/Web/API/Response) オブジェクトを返します。
 
-例えば、`GET` ハンドラーを使用した `/api/random-number` ルート(route)を作成できます:
+例えば、`GET` ハンドラを使用した `/api/random-number` ルート(route)を作成できます:
 
 ```js
 /// file: src/routes/api/random-number/+server.js
@@ -264,7 +264,7 @@ export function GET({ url }) {
 	const d = max - min;
 
 	if (isNaN(d) || d < 0) {
-		throw error(400, 'min and max must be numbers, and min must be less than max');
+		error(400, 'min and max must be numbers, and min must be less than max');
 	}
 
 	const random = min + Math.random() * d;
@@ -277,7 +277,7 @@ export function GET({ url }) {
 
 便宜上、`@sveltejs/kit` の [`error`](modules#sveltejs-kit-error)、[`redirect`](modules#sveltejs-kit-redirect)、[`json`](modules#sveltejs-kit-json) メソッドを使用することは可能です (ただし、使用する必要はありません)。
 
-エラーがスローされる場合 (`throw error(...)` によるスローや、予期せぬエラーがスローされるどちらでも)、レスポンスは `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズすることができるフォールバックエラーページとなります。この場合、[`+error.svelte`](#error) コンポーネントはレンダリングされません。エラーハンドリングに関する詳細は [こちら](errors) からお読み頂けます。
+エラーがスローされる場合 (`error(...)` の場合でも、予期せぬエラーの場合でもどちらでも)、レスポンスは `Accept` ヘッダーに応じて、そのエラーの JSON 表現か、`src/error.html` でカスタマイズすることができるフォールバックエラーページとなります。この場合、[`+error.svelte`](#error) コンポーネントはレンダリングされません。エラーハンドリングに関する詳細は [こちら](errors) からお読み頂けます。
 
 > `OPTIONS` ハンドラを作成する場合、Vite が `Access-Control-Allow-Origin` ヘッダーと `Access-Control-Allow-Methods` ヘッダーを注入することにご注意ください。本番環境では、あなたが明示的に追加しない限り注入されないはずです。
 
@@ -325,11 +325,11 @@ export async function POST({ request }) {
 
 > 一般的には、ブラウザからサーバーにデータを送信する方法としては [form actions](form-actions) のほうがより良い方法です。
 
-> If a `GET` handler is exported, a `HEAD` request will return the `content-length` of the `GET` handler's response body.
+> `GET` ハンドラがエクスポートされている場合、`HEAD` リクエストは `GET` ハンドラのレスポンスボディの `content-length` を返します。
 
 ### Fallback method handler
 
-Exporting the `fallback` handler will match any unhandled request methods, including methods like `MOVE` which have no dedicated export from `+server.js`.
+`fallback` ハンドラをエクスポートすると、ハンドリングされていないリクエスト (`+server.js` にそれ専用のエクスポートがない `MOVE` などのメソッドを含む) にマッチします。
 
 ```js
 // @errors: 7031
@@ -348,7 +348,7 @@ export async function fallback({ request }) {
 }
 ```
 
-> For `HEAD` requests, the `GET` handler takes precedence over the `fallback` handler.
+> `HEAD` リクエストの場合、`fallback` ハンドラより `GET` ハンドラが優先されます。
 
 ### Content negotiation
 

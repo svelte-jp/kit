@@ -58,7 +58,7 @@ wrangler login
 その後、アプリをビルドしデプロイすることができます:
 
 ```sh
-wrangler publish
+wrangler deploy
 ```
 
 ## カスタム設定 <!--custom-config-->

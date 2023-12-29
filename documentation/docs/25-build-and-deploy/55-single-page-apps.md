@@ -35,6 +35,8 @@ export default {
 
 ホスティング環境によっては `index.html` であったり全く別のものであったりします — 使いたいプラットフォームのドキュメントをご参照ください。
 
+> フォールバックページには [`paths.relative`](/docs/configuration#paths) の値に関係なく常にアセットの絶対パス (つまり `.` ではなく `/` で始まる) が含まれることにご注意ください。フォールバックページは任意のパスのリクエストに応答するために使用されるからです。
+
 ## Apache
 
 SPA を [Apache](https://httpd.apache.org/) で実行する場合は、`static/.htaccess` ファイルを追加し、リクエストをフォールバックページ(fallback page)にルーティングする必要があります:
