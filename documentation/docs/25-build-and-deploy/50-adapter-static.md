@@ -2,7 +2,7 @@
 title: Static site generation
 ---
 
-SvelteKit を static site generator (SSG) として使用するには、[`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使用します。
+SvelteKit を static site generator (SSG) として使用するには、[`adapter-static`](https://github.com/sveltejs/kit/tree/main/packages/adapter-static) を使用します。
 
 この adapter はサイト全体を静的なファイルのコレクションとしてプリレンダリングします。もし、一部のページのみをプリレンダリングして他のページは動的にサーバーでレンダリングしたい場合、別の adapter と [`prerender` オプション](page-options#prerender) を組み合わせて使用する必要があります。
 

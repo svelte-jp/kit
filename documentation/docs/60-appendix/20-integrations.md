@@ -4,7 +4,7 @@ title: Integrations
 
 ## Preprocessors
 
-プリプロセッサ(Preprocessors)は、`.svelte` ファイルをコンパイラに渡す前に変換します。例えば、`.svelte` ファイルに TypeScript と PostCSS が使用されている場合、それを最初に JavaScript と CSS に変換し、Svelte コンパイラが処理できるようにしなければなりません。多数の [プリプロセッサが使用可能](https://sveltesociety.dev/tools#preprocessors) です。The Svelte team maintains two official ones discussed below.
+プリプロセッサ(Preprocessors)は、`.svelte` ファイルをコンパイラに渡す前に変換します。例えば、`.svelte` ファイルに TypeScript と PostCSS が使用されている場合、それを最初に JavaScript と CSS に変換し、Svelte コンパイラが処理できるようにしなければなりません。多数の [プリプロセッサが使用可能](https://sveltesociety.dev/packages#preprocessors) です。The Svelte team maintains two official ones discussed below.
 
 ### `vitePreprocess`
 

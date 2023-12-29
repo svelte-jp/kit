@@ -31,7 +31,7 @@ export const prerender = false;
 export const prerender = 'auto';
 ```
 
-> もしアプリ全体がプリレンダリングに適している場合は、[`adapter-static`](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) を使うことで、任意の静的 Web サーバーで使用するのに適したファイルを出力することができます。
+> もしアプリ全体がプリレンダリングに適している場合は、[`adapter-static`](https://github.com/sveltejs/kit/tree/main/packages/adapter-static) を使うことで、任意の静的 Web サーバーで使用するのに適したファイルを出力することができます。
 
 プリレンダラはアプリの最上位(root)から開始され、プリレンダリング可能なページや `+server.js` ルート(routes)を見つけると、そのファイルを生成します。各ページは、プリレンダリングの候補である他のページを指し示す `<a>` 要素を見つけるためにスキャンされます。このため、通常はどのページにアクセスすべきか指定する必要はありません。もしプリレンダラがアクセスするページを指定する必要がある場合は、[`config.kit.prerender.entries`](configuration#prerender) で指定するか、動的なルート(route)から [`entries`](#entries) 関数をエクスポートします。
 

@@ -2,7 +2,7 @@
 title: Cloudflare Workers
 ---
 
-[Cloudflare Workers](https://workers.cloudflare.com/) にデプロイする場合は、[`adapter-cloudflare-workers`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers) を使用します。
+[Cloudflare Workers](https://workers.cloudflare.com/) にデプロイする場合は、[`adapter-cloudflare-workers`](https://github.com/sveltejs/kit/tree/main/packages/adapter-cloudflare-workers) を使用します。
 
 > Unless you have a specific reason to use `adapter-cloudflare-workers`, it's recommended that you use `adapter-cloudflare` instead. Both adapters have equivalent functionality, but Cloudflare Pages offers features like GitHub integration with automatic builds and deploys, preview deployments, instant rollback and so on.
 

@@ -38,7 +38,7 @@ SvelteKit は Sapper の後継であり、その設計の多くの要素を共�
 
 [こちら](configuration)に記載されている通り、`webpack.config.js` または `rollup.config.js` を `svelte.config.js` に置き換えてください。Svelte の preprocessor オプション は `config.preprocess` に移動してください。
 
-[adapter](adapters) を追加する必要があります。`sapper build` は [adapter-node](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) とおおよそ同じで、`sapper export` は [adapter-static](https://github.com/sveltejs/kit/tree/master/packages/adapter-static) とおおよそ同じですが、デプロイ先のプラットフォーム向けにデザインされた adapter を使用するのも良いでしょう。
+[adapter](adapters) を追加する必要があります。`sapper build` は [adapter-node](https://github.com/sveltejs/kit/tree/main/packages/adapter-node) とおおよそ同じで、`sapper export` は [adapter-static](https://github.com/sveltejs/kit/tree/main/packages/adapter-static) とおおよそ同じですが、デプロイ先のプラットフォーム向けにデザインされた adapter を使用するのも良いでしょう。
 
 [Vite](https://vitejs.dev) では自動的に処理されないファイルタイプのプラグインを使用している場合は、Vite において同等なことを行う方法を探し、[Vite config](project-structure#project-files-vite-config-js) に追加する必要があります。
 

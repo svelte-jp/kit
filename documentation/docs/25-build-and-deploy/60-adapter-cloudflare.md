@@ -2,7 +2,7 @@
 title: Cloudflare Pages
 ---
 
-[Cloudflare Pages](https://developers.cloudflare.com/pages/) にデプロイする場合は、[`adapter-cloudflare`](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare) を使用します。
+[Cloudflare Pages](https://developers.cloudflare.com/pages/) にデプロイする場合は、[`adapter-cloudflare`](https://github.com/sveltejs/kit/tree/main/packages/adapter-cloudflare) を使用します。
 
 This adapter will be installed by default when you use [`adapter-auto`](adapter-auto). If you plan on staying with Cloudflare Pages you can switch from [`adapter-auto`](adapter-auto) to using this adapter directly so that type declarations will be automatically applied and you can set Cloudflare-specific options.
 

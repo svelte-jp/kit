@@ -2,7 +2,7 @@
 title: adapter を書く
 ---
 
-あなたが使いたい環境向けの adapter がまだ存在しない場合は、ご自身で adapter を作成することができます。あなたが使いたい環境に似ているプラットフォームの [adapter のソースを見て](https://github.com/sveltejs/kit/tree/master/packages)、コピーするところから始めることをおすすめします。
+あなたが使いたい環境向けの adapter がまだ存在しない場合は、ご自身で adapter を作成することができます。あなたが使いたい環境に似ているプラットフォームの [adapter のソースを見て](https://github.com/sveltejs/kit/tree/main/packages)、コピーするところから始めることをおすすめします。
 
 Adapter パッケージは以下の API を実装しなければなりません。これによって `Adapter` が作られます:
 

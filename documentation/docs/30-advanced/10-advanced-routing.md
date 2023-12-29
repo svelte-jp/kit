@@ -10,14 +10,14 @@ title: 高度なルーティング
 /[org]/[repo]/tree/[branch]/[...file]
 ```
 
-…この場合、`/sveltejs/kit/tree/master/documentation/docs/04-advanced-routing.md` をリクエストすると、以下のパラメータをページで使うことができます:
+…この場合、`/sveltejs/kit/tree/main/documentation/docs/04-advanced-routing.md` をリクエストすると、以下のパラメータをページで使うことができます:
 
 ```js
 // @noErrors
 {
 	org: 'sveltejs',
 	repo: 'kit',
-	branch: 'master',
+	branch: 'main',
 	file: 'documentation/docs/04-advanced-routing.md'
 }
 ```

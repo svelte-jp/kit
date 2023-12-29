@@ -2,7 +2,7 @@
 title: Node サーバー
 ---
 
-スタンドアロンな Node サーバーを作る場合は、[`adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) を使います。
+スタンドアロンな Node サーバーを作る場合は、[`adapter-node`](https://github.com/sveltejs/kit/tree/main/packages/adapter-node) を使います。
 
 ## 使い方 <!--usage-->
 

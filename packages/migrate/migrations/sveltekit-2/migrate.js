@@ -67,7 +67,7 @@ export function update_tsconfig_content(content) {
 
 	if (content.includes('"paths":') || content.includes('"baseUrl":')) {
 		log_migration(
-			'`paths` and/or `baseUrl` detected in your tsconfig.json - remove it and use `kit.alias` instead: https://kit.svelte.dev/docs/migrating-to-sveltekit-2#generated-tsconfigjson-is-more-strict'
+			'`paths` and/or `baseUrl` detected in your tsconfig.json - remove it and use `kit.alias` instead: https://kit.svelte.dev/docs/migrating-to-sveltekit-2#generated-tsconfig-json-is-more-strict'
 		);
 	}
 
@@ -197,7 +197,7 @@ function add_cookie_note(file_path, source) {
 
 	const logger = log_on_ts_modification(
 		source,
-		'Remember to add the `path` option to `cookies.set/delete/serialize` calls: https://kit.svelte.dev/docs/migrating-to-sveltekit-2#path-is-now-a-required-option-for-cookies'
+		'Search codebase for `@migration` and manually add the `path` option to `cookies.set/delete/serialize` calls: https://kit.svelte.dev/docs/migrating-to-sveltekit-2#path-is-now-a-required-option-for-cookies'
 	);
 
 	const calls = [];
@@ -240,6 +240,7 @@ function add_cookie_note(file_path, source) {
 		if (
 			expression_text !== 'cookies' &&
 			(!expression_text.includes('.') ||
+				expression_text.split('.').pop() !== 'cookies' ||
 				!parent_function.getParameter(expression_text.split('.')[0]))
 		) {
 			continue;

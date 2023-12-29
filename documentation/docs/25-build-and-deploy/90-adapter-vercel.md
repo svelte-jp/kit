@@ -2,7 +2,7 @@
 title: Vercel
 ---
 
-Vercel にデプロイする場合は、[`adapter-vercel`](https://github.com/sveltejs/kit/tree/master/packages/adapter-vercel) を使用します。
+Vercel にデプロイする場合は、[`adapter-vercel`](https://github.com/sveltejs/kit/tree/main/packages/adapter-vercel) を使用します。
 
 [`adapter-auto`](adapter-auto) を使用している場合、この adapter は自動でインストールされますが、この adapter 自体をプロジェクトに追加すれば Vercel 固有のオプションを指定できるようになります。
 
@@ -50,7 +50,7 @@ export const config = {
 
 以下のオプションはすべての function に適用されます:
 
-- `runtime`: `'edge'`、`'nodejs16.x'`、`'nodejs18.x'`。デフォルトでは、プロジェクトの Node のバージョンに応じて adapter が `'nodejs16.x'` か `'nodejs18.x'` を選択します。プロジェクトの Node バージョンは Vercel のダッシュボードから設定することができます。
+- `runtime`: `'edge'`、`'nodejs18.x'`、`'nodejs20.x'`。デフォルトでは、adapter はプロジェクトの Node のバージョンに対応した `'nodejs<version>.x'` を選択します。プロジェクトの Node バージョンは Vercel のダッシュボードから設定することができます。
 - `regions`: [edge network regions](https://vercel.com/docs/concepts/edge-network/regions) の配列 (serverless functions のデフォルトは `["iad1"]`) か、`runtime` が `edge` (デフォルト) の場合は `'all'` です。serverless functions の場合の複数の regions のサポートは Enterprise Plan のみです。
 - `split`: `true` の場合、ルート(route)は個別の function としてデプロイされます。`split` を adapter レベルで `true` にする場合、すべてのルート(route)が個別の function としてデプロイされます。
 
@@ -151,7 +151,7 @@ Vercel でビルドする場合、これらの変数は全てビルド時と実�
 
 ### Node version
 
-ある時期より前に作成されたプロジェクトはデフォルトで Node 14 を使用していますが、SvelteKit には Node 16 以降が必要です。[プロジェクトの設定で Node のバージョンを変更する](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/node-js#node.js-version)ことができます。
+ある時期より前に作成されたプロジェクトは、SvelteKit に必要な Node バージョンより古い Node バージョンを使用しているかもしれません。[プロジェクトの設定で Node のバージョンを変更する](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/node-js#node.js-version)ことができます。
 
 ## トラブルシューティング <!--troubleshooting-->
 

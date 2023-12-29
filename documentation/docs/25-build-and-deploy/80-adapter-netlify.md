@@ -2,7 +2,7 @@
 title: Netlify
 ---
 
-Netlify にデプロイする場合は、[`adapter-netlify`](https://github.com/sveltejs/kit/tree/master/packages/adapter-netlify) を使用します。
+Netlify にデプロイする場合は、[`adapter-netlify`](https://github.com/sveltejs/kit/tree/main/packages/adapter-netlify) を使用します。
 
 [`adapter-auto`](adapter-auto) を使用している場合、この adapter は自動でインストールされますが、この adapter 自体をプロジェクトに追加すれば Netlify 固有のオプションを指定できるようになります。
 
@@ -44,7 +44,7 @@ export default {
 
 ### Node version
 
-新しいプロジェクトではデフォルトで Node 16 が使用されます。しかし、少し前に作成したプロジェクトをアップグレードする場合、古いバージョンで止まってしまうかもしれません。手動で Node 16 以降を指定する場合、詳細は [Netlify のドキュメント](https://docs.netlify.com/configure-builds/manage-dependencies/#node-js-and-javascript)をご参照ください。
+新しいプロジェクトではデフォルトで現時点の Node LTS バージョンが使用されます。しかし、少し前に作成したプロジェクトをアップグレードする場合、古いバージョンで止まってしまうかもしれません。手動で現時点の Node バージョンを指定する場合、詳細は [Netlify のドキュメント](https://docs.netlify.com/configure-builds/manage-dependencies/#node-js-and-javascript)をご参照ください。
 
 ## Netlify Edge Functions
 
