@@ -2,7 +2,7 @@
 title: Node サーバー
 ---
 
-スタンドアロンな Node サーバーを作る場合は、[`adapter-node`](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) を使います。
+スタンドアロンな Node サーバーを作る場合は、[`adapter-node`](https://github.com/sveltejs/kit/tree/main/packages/adapter-node) を使います。
 
 ## 使い方 <!--usage-->
 
@@ -131,8 +131,7 @@ export default {
 			// default options are shown
 			out: 'build',
 			precompress: false,
-			envPrefix: '',
-			polyfill: true
+			envPrefix: ''
 		})
 	}
 };
@@ -160,12 +159,6 @@ MY_CUSTOM_PORT=4000 \
 MY_CUSTOM_ORIGIN=https://my.site \
 node build
 ```
-
-### polyfill
-
-ビルドが存在しないモジュールの polyfill を読み込むかどうかをコントロールします。デフォルトは `true` で、Node 18.11 以降を使用している場合にのみ無効にしてください。
-
-注意事項: Node のビルトインの `crypto` global を Node 18 で使用するには、`--experimental-global-webcrypto` フラグを使用する必要があります。Node 20 ではこのフラグは必要ありません。
 
 ## カスタムサーバー <!--custom-server-->
 

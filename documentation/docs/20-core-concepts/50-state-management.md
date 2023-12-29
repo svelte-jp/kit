@@ -117,7 +117,7 @@ SSR を使用していない場合は、あるユーザーのデータを別の�
 
 SSR を使用していない場合 (そして将来的にも SSR を使用する必要がないという保証がある場合) は、context API を使用しなくても、共有されるモジュールの中で state を安全に保持することができます。
 
-## コンポーネントの state は保持される <!--component-state-is-preserved-->
+## コンポーネントとページの state は保持される <!--component-and-page-state-is-preserved-->
 
 アプリケーションの中を移動するとき、SvelteKit はすでに存在するレイアウトやページコンポーネントを再利用します。例えば、このようなルート(route)があるとして…
 
@@ -140,7 +140,7 @@ SSR を使用していない場合 (そして将来的にも SSR を使用する
 <div>{@html data.content}</div>
 ```
 
-…`/blog/my-short-post` から `/blog/my-long-post` への移動は、コンポーネントの破棄や再作成を引き起こしません。この `data` プロパティ (と `data.title` と `data.content`) は変更されますが、コードは再実行されないため、`estimatedReadingTime` は再計算されません。
+…`/blog/my-short-post` から `/blog/my-long-post` への移動は、レイアウトやページ、コンポーネントの破棄や再作成を引き起こしません。代わりに、この `data` prop (と `data.title` と `data.content`) は更新されますが (他の Svelte コンポーネントも同様に)、コードは再実行されないため、`onMount` や `onDestroy` のようなライフサイクルメソッドは再実行されず、`estimatedReadingTime` も再計算されません。
 
 代わりに、その値を [_リアクティブ_](https://learn.svelte.jp/tutorial/reactive-assignments) にする必要があります:
 
@@ -155,7 +155,9 @@ SSR を使用していない場合 (そして将来的にも SSR を使用する
 </script>
 ```
 
-このようにコンポーネントを再利用すると、サイドバースクロールの state などが保持され、変化する値の間で簡単にアニメーションを行うことができます。しかし、ナビゲーション時にコンポーネントを完全に破棄して再マウントする必要がある場合、このパターンを使用できます:
+> `onMount` や `onDestroy` にあるコードをナビゲーションのあとに再実行する必要がある場合は、[afterNavigate](modules#$app-navigation-afternavigate) や [beforeNavigate](modules#$app-navigation-beforenavigate) をそれぞれ使用します。
+
+このようにコンポーネントを再利用すると、サイドバースクロールの state などが保持され、変化する値の間で簡単にアニメーションを行うことができます。ナビゲーション時にコンポーネントを完全に破棄して再マウントする必要がある場合には、このパターンを使用できます:
 
 ```svelte
 {#key $page.url.pathname}

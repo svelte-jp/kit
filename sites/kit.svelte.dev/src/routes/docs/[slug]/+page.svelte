@@ -53,7 +53,7 @@
 
 	<a
 		class="edit"
-		href="https://github.com/svelte-jp/kit/edit/master/documentation/docs/{data.page.file}"
+		href="https://github.com/svelte-jp/kit/edit/main/documentation/docs/{data.page.file}"
 	>
 		<Icon size={50} name="edit" /> Edit this page on GitHub
 	</a>
