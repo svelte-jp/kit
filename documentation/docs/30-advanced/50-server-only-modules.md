@@ -8,6 +8,10 @@ title: Server-only modules
 
 [modules](modules) セクションで説明されている `$env/static/private` モジュールと `$env/dynamic/private` モジュールは、[`hooks.server.js`](hooks#server-hooks) や [`+page.server.js`](routing#page-page-server-js) のようなサーバー上でのみ実行されるモジュールにのみインポートすることが可能です。
 
+## Server-only utilities
+
+The [`$app/server`](/docs/modules#$app-server) module, which contains a `read` function for reading assets from the filesystem, can likewise only be imported by code that runs on the server.
+
 ## Your modules
 
 モジュールをサーバー専用にするには2通りの方法があります:

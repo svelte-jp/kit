@@ -63,7 +63,7 @@ HOST=127.0.0.1 PORT=4000 node build
 SOCKET_PATH=/tmp/socket node build
 ```
 
-### `ORIGIN`、`PROTOCOL_HEADER`、`HOST_HEADER` <!--origin-protocolheader-and-hostheader-->
+### `ORIGIN`、`PROTOCOL_HEADER`、`HOST_HEADER`、`PORT_HEADER` <!--origin-protocolheader-hostheader-and-port-header-->
 
 HTTP は SvelteKit に現在リクエストされている URL を知るための信頼できる方法を提供しません。アプリがホストされている場所を Sveltekit に伝える最も簡単な方法は、環境変数 `ORIGIN` を設定することです:
 
@@ -81,6 +81,8 @@ PROTOCOL_HEADER=x-forwarded-proto HOST_HEADER=x-forwarded-host node build
 ```
 
 > [`x-forwarded-proto`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Proto) と [`x-forwarded-host`](https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/X-Forwarded-Host) は事実上の標準となっているヘッダーで、リバースプロキシー (ロードバランサーや CDN などを考えてみてください) を使用している場合に、オリジナルのプロトコルとホストを転送します。これらの変数は、あなたのサーバーが信頼できるリバースプロキシーの後ろにある場合にのみ設定すべきです。そうしないと、クライアントがこれらのヘッダーを偽装することが可能になってしまいます。
+>
+> プロキシーを非標準の port でホストしていて、リバースプロキシ−が `x-forwarded-port` をサポートしている場合は、`PORT_HEADER=x-forwarded-port` を設定することもできます。
 
 `adapter-node` があなたのデプロイの URL を正しく判断することができない場合、[form actions](form-actions) を使用するとこのエラーが発生することがあります:
 
@@ -114,7 +116,7 @@ ADDRESS_HEADER=True-Client-IP node build
 
 ### `BODY_SIZE_LIMIT`
 
-ストリーミング中も含め、受け付けるリクエストボディの最大サイズを byte で指定します。デフォルトは 512kb です。もっと高度な設定が必要な場合は、このオプションの値を 0 にして無効化し、[`handle`](hooks#server-hooks-handle) にカスタムのチェックを実装することができます。
+ストリーミング中も含め、受け付けるリクエストボディの最大サイズを byte で指定します。デフォルトは 512kb です。もっと高度な設定が必要な場合は、このオプションの値を `Infinity` (adapter が古いバージョンの場合は 0) にして無効化し、[`handle`](hooks#server-hooks-handle) にカスタムのチェックを実装することができます。
 
 ## Options
 
@@ -191,7 +193,7 @@ app.listen(3000, () => {
 
 ### サーバーが終了する前にクリーンアップするための hook はありますか？ <!--is-there-a-hook-for-cleaning-up-before-the-server-exits-->
 
-SvelteKit にはこれに対応するためのビルトインで組み込まれているものはありません。なぜなら、このようなクリーンアップの hook はあなたの実行環境に大きく依存しているからです。Node の場合は、ビルトインの `process.on(..)` を使用して、サーバーが終了する前に実行されるコールバックを実装することができます:
+SvelteKit にはこれに対応するためのビルトインで組み込まれているものはありません。なぜなら、このようなクリーンアップの hook はあなたの実行環境に大きく依存しているからです。Node の場合は、ビルトインの `process.on(...)` を使用して、サーバーが終了する前に実行されるコールバックを実装することができます:
 
 ```js
 // @errors: 2304 2580

@@ -14,7 +14,7 @@ SEO で最も重要なのは、高品質なコンテンツを作ること、そ�
 
 ### パフォーマンス <!--performance-->
 
-[Core Web Vitals](https://web.dev/vitals/#core-web-vitals) のような指標は検索エンジンのランクに影響を与えます。Svelte と SvelteKit はオーバーヘッドが最小限であるため、ハイパフォーマンスなサイトを簡単に構築できです。Google の [PageSpeed Insights](https://pagespeed.web.dev/) や [Lighthouse](https://developers.google.com/web/tools/lighthouse) で、ご自身のサイトをテストすることができます。
+[Core Web Vitals](https://web.dev/vitals/#core-web-vitals) のような指標は検索エンジンのランクに影響を与えます。Svelte と SvelteKit はオーバーヘッドが最小限であるため、ハイパフォーマンスなサイトを簡単に構築できです。Google の [PageSpeed Insights](https://pagespeed.web.dev/) や [Lighthouse](https://developers.google.com/web/tools/lighthouse) で、ご自身のサイトをテストすることができます。詳細は [パフォーマンスのページ](performance) をお読みください。
 
 ### URLの正規化 <!--normalized-urls-->
 
@@ -26,31 +26,7 @@ SvelteKit は、末尾のスラッシュ(trailing slash)付きのパス名から
 
 全てのページで、よく練られたユニークな `<title>` と `<meta name="description">` を [`<svelte:head>`](https://svelte.jp/docs#template-syntax-svelte-head) の内側に置くべきです。説明的な title と description の書き方に関するガイダンスと、検索エンジンにとってわかりやすいコンテンツを作るためのその他の方法については、Google の [Lighthouse SEO audits](https://web.dev/lighthouse-seo/) のドキュメントで見つけることができます。
 
-> A common pattern is to return SEO-related `data` from page [`load`](load) functions, then use it (as [`$page.data`](modules#$app-stores)) in a `<svelte:head>` in your root [layout](routing#layout).
-
-### 構造化データ <!--structured-data-->
-
-[構造化データ](https://developers.google.com/search/docs/advanced/structured-data/intro-structured-data) は、検索エンジンがページのコンテンツを理解するのに役立ちます。[`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess) と一緒に構造化データを使用している場合は、明示的に `ld+json` データを保持する必要があります (これは [将来変更される可能性があります](https://github.com/sveltejs/svelte-preprocess/issues/305)):
-
-```js
-/// file: svelte.config.js
-// @filename: ambient.d.ts
-declare module 'svelte-preprocess';
-
-// @filename: index.js
-// ---cut---
-import preprocess from 'svelte-preprocess';
-
-/** @type {import('@sveltejs/kit').Config} */
-const config = {
-	preprocess: preprocess({
-		preserve: ['ld+json']
-		// ...
-	})
-};
-
-export default config;
-```
+> よくあるパターンとしては、ページの [`load`](load) 関数から SEO 関連の `data` を返し、それを最上位の[レイアウト](routing#layout)の `<svelte:head>` で ([`$page.data`](modules#$app-stores) として) 使用することです。
 
 ### サイトマップ <!--sitemaps-->
 
