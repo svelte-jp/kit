@@ -168,6 +168,8 @@ server `load` 関数は _常に_ サーバーで実行されます。
 
 デフォルトでは、universal `load` 関数は、ユーザーがはじめてページにアクセスしたときの SSR 中にサーバーで実行されます。そのあとのハイドレーション中に、[fetch リクエスト](#making-fetch-requests) で取得したレスポンスを再利用してもう一度実行されます。それ以降の universal `load` 関数の呼び出しは、すべてブラウザで行われます。この動作は [page options](page-options) によってカスタマイズすることができます。[サーバーサイドレンダリング](page-options#ssr) を無効にした場合、SPA となるため、universal `load` 関数は _常に_ クライアントで実行されるようになります。
 
+ルート(route)に universal と server の両方の `load` 関数が含まれている場合、server `load` が最初に実谷されます。
+
 `load` 関数は実行時に呼び出されます。ページを [プリレンダリング](page-options#prerender) する場合は、ビルド時に呼び出されます。
 
 ### Input
@@ -190,7 +192,29 @@ server `load` 関数は、データベースやファイルシステムからデ
 
 universal `load` 関数は、外部の API から データを `fetch` (取得) する必要があり、プライベートなクレデンシャルが必要ない場合に便利です。なぜなら、SvelteKit はあなたのサーバーを経由せずに、その API から直接データを取得することができるからです。また、Svelte コンポーネントコンストラクタのような、シリアライズできないものを返す必要がある場合にも便利です。
 
-まれに、両方を同時に使用する必要がある場合もあります。例えば、サーバーからのデータで初期化されたカスタムクラスのインスタンスを返す必要がある場合です。
+まれに、両方を同時に使用する必要がある場合もあります。例えば、サーバーからのデータで初期化されたカスタムクラスのインスタンスを返す必要がある場合です。両方を使用する場合は、server `load` の戻り値は直接ページには渡されず、universal `load` 関数に (`data` プロパティとして) 渡されます:
+
+```js
+/// file: src/routes/+page.server.js
+/** @type {import('./$types').PageServerLoad} */
+export async function load() {
+	return {
+		serverMessage: 'hello from server load function'
+	};
+}
+```
+
+```js
+/// file: src/routes/+page.js
+// @errors: 18047
+/** @type {import('./$types').PageLoad} */
+export async function load({ data }) {
+	return {
+		serverMessage: data.serverMessage,
+		universalMessage: 'hello from universal load function'
+	};
+}
+```
 
 ## URL data を使用する <!--using-url-data-->
 
@@ -510,7 +534,7 @@ export function load({ fetch }) {
 }
 ```
 
-> AWS Lambda のような ストリーミングをサポートしないプラットフォームでは、レスポンスはバッファされます。つまり、すべての promise が解決してからでないとページがレンダリングされないということです。もしプロキシ (例えば NGINX) を使用している場合は、プロキシされたサーバーからのレスポンスをバッファしないようにしてください。
+> AWS Lambda や Firebase のような ストリーミングをサポートしないプラットフォームでは、レスポンスはバッファされます。つまり、すべての promise が解決してからでないとページがレンダリングされないということです。もしプロキシ (例えば NGINX) を使用している場合は、プロキシされたサーバーからのレスポンスをバッファしないようにしてください。
 
 > ストリーミングデータは JavaScript が有効なときにのみ動作します。ページがサーバーでレンダリングされる場合、universal `load` 関数からは promise を返すのは避けたほうがよいでしょう、ストリーミングされないからです (代わりに、関数がブラウザで再実行されるときに promise が再作成されます)。
 

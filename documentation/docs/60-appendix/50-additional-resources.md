@@ -17,7 +17,7 @@ title: Additional resources
 - [`kit.svelte.dev`](https://github.com/sveltejs/kit/tree/main/sites/kit.svelte.dev)
 - [`svelte.dev`](https://github.com/sveltejs/svelte/tree/main/sites/svelte.dev)
 
-また、SvelteKit ユーザーが GitHub で [#sveltekit](https://github.com/topics/sveltekit) や [#sveltekit-template](https://github.com/topics/sveltekit-template) というトピックを付けて多くの例を公開しており、[Svelte Society のサイト](https://sveltesociety.dev/templates#svelte-kit) にも例が公開されています。なお、これらはメンテナーによって検証されておらず、最新ではない可能性もありますのでご注意ください。
+また、SvelteKit ユーザーが GitHub で [#sveltekit](https://github.com/topics/sveltekit) や [#sveltekit-template](https://github.com/topics/sveltekit-template) というトピックを付けて多くの例を公開しており、[Svelte Society のサイト](https://sveltesociety.dev/templates?category=sveltekit) にも例が公開されています。なお、これらはメンテナーによって検証されておらず、最新ではない可能性もありますのでご注意ください。
 
 ## サポート <!--support-->
 

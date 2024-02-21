@@ -108,4 +108,4 @@ Cloudflare Pages 固有の `_headers` ファイルと `_redirects` ファイル�
 
 ### ファイルシステムにアクセスする <!--accessing-the-file-system-->
 
-Serverless/Edge 環境では、`fs.readFileSync` などのメソッドでファイルシステムにアクセスすることはできません。もしこのような方法でファイルにアクセスする必要がある場合、アプリのビルド中に[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)でこれを行ってください。例えば、ブログを持っていて、CMS でコンテンツを管理したくない場合、コンテンツをプリレンダリングし (またはコンテンツを取得するエンドポイントをプリレンダリングし)、新しいコンテンツを追加するたびにブログを再デプロイする必要があります。
+Cloudflare Workers では `fs` を使用することはできません。そうする必要があるルート(route)については[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)する必要があります。

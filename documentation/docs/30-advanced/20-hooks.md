@@ -8,6 +8,7 @@ hooks ファイルは2つあり、どちらもオプションです:
 
 - `src/hooks.server.js` — アプリのサーバーの hooks
 - `src/hooks.client.js` — アプリのクライアントの hooks
+- `src/hooks.js` — サーバーとクライアントの両方で実行される hooks
 
 これらのモジュールのコードはアプリケーションの起動時に実行されるので、データベースクライアントの初期化などに有用です。
 
@@ -231,6 +232,41 @@ export async function handleError({ error, event, status, message }) {
 開発中、Svelte のコードの構文エラーでエラーが発生した場合、渡される error には、エラーの場所のハイライトが付与された `frame` プロパティがあります。
 
 > `handleError` 自体が決してエラーをスローしないようにしてください。
+
+## Universal hooks
+
+以下は `src/hooks.js` に追加することができます。universal hooks はサーバーとクライアントの両方で実行されます (shared hooks と混同しないようにしてください、shared hooks は環境依存です)。 
+
+### reroute
+
+この関数は `handle` より前に実行され、URL をルート(route)に変換する方法を変更することができます。戻り値の pathname (デフォルトは `url.pathname`) はルート(route)パラメータを選択するのに使用されます。
+
+例えば、`src/routes/[[lang]]/about/+page.svelte` というページがあるとして、`/en/about` や `/de/ueber-uns` や `/fr/a-propos` でアクセスできるようにしたいとします。この場合は `reroute` を使用して実装することができます:
+
+```js
+/// file: src/hooks.js
+// @errors: 2345
+// @errors: 2304
+
+/** @type {Record<string, string>} */
+const translated = {
+	'/en/about': '/en/about',
+	'/de/ueber-uns': '/de/about',
+	'/fr/a-propos': '/fr/about',
+};
+
+/** @type {import('@sveltejs/kit').Reroute} */
+export function reroute({ url }) {
+	if (url.pathname in translated) {
+		return translated[url.pathname];
+	}
+}
+```
+
+`lang` パラメータは戻り値の pathname から正しく導くことができます。
+
+`reroute` を使用してもブラウザのアドレスバーの内容や `event.url` の値は変更されません。
+
 
 ## その他の参考資料 <!--further-reading-->
 

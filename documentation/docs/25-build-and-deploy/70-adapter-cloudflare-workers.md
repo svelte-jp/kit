@@ -77,7 +77,14 @@ export default {
 };
 ```
 
-## 環境変数 <!--environment-variables-->
+[Node.js 互換](https://developers.cloudflare.com/workers/runtime-apis/nodejs/#enable-nodejs-from-the-cloudflare-dashboard) を有効化したい場合は、`wrangler.toml` で  "nodejs_compat" フラグを追加してください:
+
+```toml
+/// file: wrangler.toml
+compatibility_flags = [ "nodejs_compat" ]
+```
+
+## Bindings
 
 KV/DO namespaces などを含んでいる [`env`](https://developers.cloudflare.com/workers/runtime-apis/fetch-event#parameters) オブジェクトは、`context` や `caches` と一緒に `platform` プロパティ経由で SvelteKit に渡されます。つまり、hooks とエンドポイントの中でアクセスできるということです:
 
@@ -121,4 +128,4 @@ Workers にデプロイする場合、SvelteKit が生成したサーバーは1�
 
 ### ファイルシステムにアクセスする <!--accessing-the-file-system-->
 
-Serverless/Edge 環境では、`fs.readFileSync` などのメソッドでファイルシステムにアクセスすることはできません。もしこのような方法でファイルにアクセスする必要がある場合、アプリのビルド中に[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)でこれを行ってください。例えば、ブログを持っていて、CMS でコンテンツを管理したくない場合、コンテンツをプリレンダリングし (またはコンテンツを取得するエンドポイントをプリレンダリングし)、新しいコンテンツを追加するたびにブログを再デプロイする必要があります。
+Cloudflare Workers では `fs` を使用することはできません。そうする必要があるルート(route)については[プリレンダリング](https://kit.svelte.jp/docs/page-options#prerender)する必要があります。

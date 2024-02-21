@@ -7,6 +7,7 @@ title: adapter を書く
 Adapter パッケージは以下の API を実装しなければなりません。これによって `Adapter` が作られます:
 
 ```js
+// @errors: 2322
 // @filename: ambient.d.ts
 type AdapterSpecificOptions = any;
 
@@ -19,6 +20,21 @@ export default function (options) {
 		name: 'adapter-package-name',
 		async adapt(builder) {
 			// adapter implementation
+		},
+		async emulate() {
+			return {
+				async platform({ config, prerender }) {
+					// the returned object becomes `event.platform` during dev, build and
+					// preview. Its shape is that of `App.Platform`
+				}
+			}
+		},
+		supports: {
+			read: ({ config, route }) => {
+				// Return `true` if the route with the given `config` can use `read`
+				// from `$app/server` in production, return `false` if it can't.
+				// Or throw a descriptive error describing how to configure the deployment
+			}
 		}
 	};
 
@@ -26,7 +42,7 @@ export default function (options) {
 }
 ```
 
-`Adapter` の型とそのパラメータは [types/index.d.ts](https://github.com/sveltejs/kit/blob/master/packages/kit/types/index.d.ts) にて利用可能です。
+このうち、`name` と `adapt` は必須です。`emulate` と `supports` はオプションです。
 
 `adapt` メソッドの中で、adapter が行うべきことがいくつかあります:
 

@@ -13,7 +13,7 @@ SvelteKit アプリをデプロイする前に、それをデプロイ先の環�
 - [`@sveltejs/adapter-static`](adapter-static) for static site generation (SSG)
 - [`@sveltejs/adapter-vercel`](adapter-vercel) for Vercel
 
-加えて、他のプラットフォーム向けに、[コミュニティによって提供されている adapter](https://sveltesociety.dev/packages#svelte-kit-adapters) もございます。
+加えて、他のプラットフォーム向けに、[コミュニティによって提供されている adapter](https://sveltesociety.dev/packages?category=sveltekit-adapters) もございます。
 
 ## adapter を使用する <!--using-adapters-->
 
