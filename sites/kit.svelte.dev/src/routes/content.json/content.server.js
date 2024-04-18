@@ -1,13 +1,10 @@
 import { modules } from '$lib/generated/type-info.js';
+import { pages } from '$lib/server/docs/index.js';
 import {
-	extractFrontmatter,
 	markedTransform,
 	replaceExportTypePlaceholders,
 	slugify
 } from '@sveltejs/site-kit/markdown';
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-import glob from 'tiny-glob';
 
 const categories = [
 	{
@@ -25,27 +22,15 @@ export async function content() {
 	for (const category of categories) {
 		const breadcrumbs = category.label ? [category.label] : [];
 
-		for (const file of await glob('**/*.md', { cwd: `../../documentation/${category.slug}` })) {
-			const basename = path.basename(file);
-			const match = /\d{2}-(.+)\.md/.exec(basename);
-			if (!match) continue;
-
-			const slug = match[1];
-
-			const filepath = `../../documentation/${category.slug}/${file}`;
-			const markdown = await replaceExportTypePlaceholders(
-				await readFile(filepath, 'utf-8'),
-				modules
-			);
-
-			const { body, metadata } = extractFrontmatter(markdown);
+		for (const [slug, page] of Object.entries(pages)) {
+			const body = await replaceExportTypePlaceholders(page.body, modules);
 
 			const sections = body.trim().split(/^## /m);
 			const intro = sections.shift().trim();
-			const rank = +metadata.rank || undefined;
+			const rank = page.rank;
 
 			blocks.push({
-				breadcrumbs: [...breadcrumbs, metadata.title],
+				breadcrumbs: [...breadcrumbs, page.title],
 				href: category.href([slug]),
 				content: await plaintext(intro),
 				rank
@@ -66,7 +51,7 @@ export async function content() {
 				const intro = subsections.shift().trim();
 
 				blocks.push({
-					breadcrumbs: [...breadcrumbs, metadata.title, h3text],
+					breadcrumbs: [...breadcrumbs, page.title, h3text],
 					href: category.href([slug, h3slug]),
 					content: await plaintext(intro),
 					rank
@@ -80,7 +65,7 @@ export async function content() {
 					const h4slug = h4match[3] || slugify(h4);
 
 					blocks.push({
-						breadcrumbs: [...breadcrumbs, metadata.title, h3text, h4text],
+						breadcrumbs: [...breadcrumbs, page.title, h3text, h4text],
 						href: category.href([slug, h3slug, h4slug]),
 						content: await plaintext(lines.join('\n').trim()),
 						rank

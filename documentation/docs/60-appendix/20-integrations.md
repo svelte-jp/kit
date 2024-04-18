@@ -4,7 +4,7 @@ title: Integrations
 
 ## Preprocessors
 
-プリプロセッサ(Preprocessors)は、`.svelte` ファイルをコンパイラに渡す前に変換します。例えば、`.svelte` ファイルに TypeScript と PostCSS が使用されている場合、それを最初に JavaScript と CSS に変換し、Svelte コンパイラが処理できるようにしなければなりません。多数の [プリプロセッサが使用可能](https://sveltesociety.dev/packages#preprocessors) です。The Svelte team maintains two official ones discussed below.
+プリプロセッサ(Preprocessors)は、`.svelte` ファイルをコンパイラに渡す前に変換します。例えば、`.svelte` ファイルに TypeScript と PostCSS が使用されている場合、それを最初に JavaScript と CSS に変換し、Svelte コンパイラが処理できるようにしなければなりません。多数の [プリプロセッサが使用可能](https://sveltesociety.dev/packages?category=preprocessors) です。Svelte チームはオフィシャルとして以下の2つをメンテナンスしています。
 
 ### `vitePreprocess`
 
@@ -27,11 +27,11 @@ export default {
 
 ## Adders
 
-[Svelte Adders](https://sveltesociety.dev/templates#adders) は、Tailwind、PostCSS、Storybook、Firebase、GraphQL、mdsvexなど、様々な複雑なインテグレーションを1つのコマンドでセットアップできるようにしてくれます。Svelte と SvelteKitで利用可能なテンプレート、コンポーネント、ツールの全ての一覧については、 [sveltesociety.dev](https://sveltesociety.dev/) をご覧ください。
+[Svelte Adders](https://sveltesociety.dev/templates?category=svelte-add) は、Tailwind、PostCSS、Storybook、Firebase、GraphQL、mdsvexなど、様々な複雑なインテグレーションを1つのコマンドでセットアップできるようにしてくれます。Svelte と SvelteKitで利用可能なテンプレート、コンポーネント、ツールの全ての一覧については、 [sveltesociety.dev](https://sveltesociety.dev/) をご覧ください。
 
 ## Vite plugins
 
-Since SvelteKit projects are built with Vite, you can use Vite plugins to enhance your project. See a list of available plugins at [`vitejs/awesome-vite`](https://github.com/vitejs/awesome-vite).
+SvelteKit プロジェクトは Vite で構築されているため、Vite plugin を使用してプロジェクトを拡張することができます。利用可能な plugin のリストは [`vitejs/awesome-vite`](https://github.com/vitejs/awesome-vite) をご覧ください。
 
 ## Integration FAQs
 
