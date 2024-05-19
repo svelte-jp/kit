@@ -1,5 +1,69 @@
 # @sveltejs/kit
 
+## 2.5.9
+
+### Patch Changes
+
+- fix: yield main thread before navigating ([#12225](https://github.com/sveltejs/kit/pull/12225))
+
+- fix: correctly handle aliases to files in the `.svelte-kit` directory ([#12220](https://github.com/sveltejs/kit/pull/12220))
+
+## 2.5.8
+
+### Patch Changes
+
+- fix: prevent excessive Vite dependency optimizations on navigation ([#12182](https://github.com/sveltejs/kit/pull/12182))
+
+## 2.5.7
+
+### Patch Changes
+
+- chore(deps): update devalue to v5 ignore non-enumerable symbols during serialization ([#12141](https://github.com/sveltejs/kit/pull/12141))
+
+## 2.5.6
+
+### Patch Changes
+
+- fix: avoid incorrectly un- and re-escaping cookies collected during a server-side `fetch` ([#11904](https://github.com/sveltejs/kit/pull/11904))
+
+## 2.5.5
+
+### Patch Changes
+
+- fix: only hydrate when page is server-rendered ([#12050](https://github.com/sveltejs/kit/pull/12050))
+
+## 2.5.4
+
+### Patch Changes
+
+- fix: prevent navigation when `data-sveltekit-preload-data` fails to fetch due to network error ([#11944](https://github.com/sveltejs/kit/pull/11944))
+
+## 2.5.3
+
+### Patch Changes
+
+- fix: revert tsconfig change that includes svelte.config.js ([#11908](https://github.com/sveltejs/kit/pull/11908))
+
+- fix: exclude server worker from tsconfig again ([#11727](https://github.com/sveltejs/kit/pull/11727))
+
+## 2.5.2
+
+### Patch Changes
+
+- fix: tsconfig includes should cover svelte.config.js ([#11886](https://github.com/sveltejs/kit/pull/11886))
+
+## 2.5.1
+
+### Patch Changes
+
+- fix: prevent stale values after invalidation ([#11870](https://github.com/sveltejs/kit/pull/11870))
+
+- fix: prevent false positive `history.pushState` and `history.replaceState` warnings ([#11858](https://github.com/sveltejs/kit/pull/11858))
+
+- fix: relax status code types ([#11781](https://github.com/sveltejs/kit/pull/11781))
+
+- fix: `popstate` navigations take `pushState` navigations into account ([#11765](https://github.com/sveltejs/kit/pull/11765))
+
 ## 2.5.0
 
 ### Minor Changes

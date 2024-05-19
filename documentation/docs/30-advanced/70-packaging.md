@@ -197,6 +197,7 @@ import Foo from 'your-library/Foo.svelte';
 - `-i`/`--input` — パッケージの全てのファイルを含む入力ディレクトリ。デフォルトは `src/lib` です
 - `-o`/`--o` — 処理されたファイルが書き込まれる出力ディレクトリ。`package.json` の `exports` はここにあるファイルを指さなければならず、`files` の配列にはこのフォルダを含めなければいけません。デフォルトは `dist` です
 - `-t`/`--types` — 型定義 (`d.ts` ファイル) を作成するかどうか。エコシステムのライブラリの品質を向上させるため、作成することを強く推奨します。デフォルトは `true` です
+- `--tsconfig` - tsconfig または jsconfig へのパス。指定されない場合は、ワークスペースのパスで次の上位の tsconfig/jsconfig を検索します。
 
 ## 公開(Publishing)
 

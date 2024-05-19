@@ -1,5 +1,30 @@
 # @sveltejs/adapter-vercel
 
+## 5.3.0
+
+### Minor Changes
+
+- chore(deps): upgrade esbuild ([#12118](https://github.com/sveltejs/kit/pull/12118))
+
+### Patch Changes
+
+- Updated dependencies [[`bbab296f6fcc05af6b999182798bcdedabbaa4c9`](https://github.com/sveltejs/kit/commit/bbab296f6fcc05af6b999182798bcdedabbaa4c9)]:
+  - @sveltejs/kit@2.5.6
+
+## 5.2.0
+
+### Minor Changes
+
+- feat: add framework metadata in Vercel build output files ([#11800](https://github.com/sveltejs/kit/pull/11800))
+
+- feat: implement version skew protection ([#11987](https://github.com/sveltejs/kit/pull/11987))
+
+## 5.1.1
+
+### Patch Changes
+
+- fix: handle optional and rest routes for incremental static regeneration (ISR) correctly ([#11928](https://github.com/sveltejs/kit/pull/11928))
+
 ## 5.1.0
 
 ### Minor Changes

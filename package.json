@@ -30,7 +30,7 @@
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.35.1",
-		"eslint-plugin-unicorn": "^51.0.1",
+		"eslint-plugin-unicorn": "^53.0.0",
 		"playwright": "^1.41.0",
 		"prettier": "^3.1.1",
 		"rollup": "^3.29.4",
@@ -42,7 +42,7 @@
 		"textlint-rule-preset-jtf-style": "^2.3.13",
 		"typescript": "^5.3.3"
 	},
-	"packageManager": "pnpm@8.15.2",
+	"packageManager": "pnpm@8.15.7",
 	"engines": {
 		"pnpm": "^8.0.0"
 	}

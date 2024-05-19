@@ -32,6 +32,12 @@ node build
 
 [Rollup](https://rollupjs.org) を使うと開発用の依存関係(Development dependencies)もアプリにバンドルされます。パッケージをバンドルするか外部化するかコントロールするには、そのパッケージを `package.json` の `devDependencies` か `dependencies` にそれぞれ配置します。
 
+### レスポンスの圧縮 <!--compressing-responses-->
+
+通常、サーバーからのレスポンスを圧縮したいでしょう。SSL やロードバランシングのためにリバースプロキシの後ろにサーバーを配置している場合は、通常はそちらのレイヤーで圧縮を処理したほうがパフォーマンスの向上につながります。Node.js はシングルスレッドだからです。
+
+しかし、あなたが [custom server](#custom-server) を構築していて、そこに圧縮用のミドルウェアを追加したい場合は、[`@polka/compression`](https://www.npmjs.com/package/@polka/compression) を使用することをおすすめします。SvelteKit はレスポンスをストリーミングしますが、一般的な `compression` パッケージはストリーミングをサポートしていないため、使用するとエラーとなる可能性があります。
+
 ## 環境変数 <!--environment-variables-->
 
 `dev` と `preview` のときは、SvelteKit は `.env` ファイル (または `.env.local` や `.env.[mode]`、[Vite によって決定されているもの](https://vitejs.dev/guide/env-and-mode.html#env-files)) から環境変数を読み取ります。
@@ -118,6 +124,14 @@ ADDRESS_HEADER=True-Client-IP node build
 
 ストリーミング中も含め、受け付けるリクエストボディの最大サイズを byte で指定します。デフォルトは 512kb です。もっと高度な設定が必要な場合は、このオプションの値を `Infinity` (adapter が古いバージョンの場合は 0) にして無効化し、[`handle`](hooks#server-hooks-handle) にカスタムのチェックを実装することができます。
 
+### `SHUTDOWN_TIMEOUT`
+
+The number of seconds to wait before forcefully closing any remaining connections after receiving a `SIGTERM` or `SIGINT` signal. Defaults to `30`. Internally the adapter calls [`closeAllConnections`](https://nodejs.org/api/http.html#servercloseallconnections). See [Graceful shutdown](#graceful-shutdown) for more details.
+
+### `IDLE_TIMEOUT`
+
+When using systemd socket activation, `IDLE_TIMEOUT` specifies the number of seconds after which the app is automatically put to sleep when receiving no requests. If not set, the app runs continuously. See [Socket activation](#socket-activation) for more details.
+
 ## Options
 
 この adapter は様々なオプションで設定を行うことができます:
@@ -132,7 +146,7 @@ export default {
 		adapter: adapter({
 			// default options are shown
 			out: 'build',
-			precompress: false,
+			precompress: true,
 			envPrefix: ''
 		})
 	}
@@ -145,7 +159,7 @@ export default {
 
 ### precompress
 
-アセットやプリレンダリングされたページを gzip や brotli を使って事前圧縮(precompress)するのを有効にします。デフォルトは `false` です。
+アセットやプリレンダリングされたページを gzip や brotli を使って事前圧縮(precompress)するのを有効にします。デフォルトは `true` です。
 
 ### envPrefix
 
@@ -161,6 +175,46 @@ MY_CUSTOM_PORT=4000 \
 MY_CUSTOM_ORIGIN=https://my.site \
 node build
 ```
+
+## Graceful shutdown
+
+By default `adapter-node` gracefully shuts down the HTTP server when a `SIGTERM` or `SIGINT` signal is received. It will:
+
+1. reject new requests ([`server.close`](https://nodejs.org/api/http.html#serverclosecallback))
+2. wait for requests that have already been made but not received a response yet to finish and close connections once they become idle ([`server.closeIdleConnections`](https://nodejs.org/api/http.html#servercloseidleconnections))
+3. and finally, close any remaining connections that are still active after [`SHUTDOWN_TIMEOUT`](#environment-variables-shutdown-timeout) seconds. ([`server.closeAllConnections`](https://nodejs.org/api/http.html#servercloseallconnections))
+
+> If you want to customize this behaviour you can use a [custom server](#custom-server).
+
+## Socket activation
+
+Most Linux operating systems today use a modern process manager called systemd to start the server and run and manage services. You can configure your server to allocate a socket and start and scale your app on demand. This is called [socket activation](http://0pointer.de/blog/projects/socket-activated-containers.html). In this case, the OS will pass two environment variables to your app — `LISTEN_PID` and `LISTEN_FDS`. The adapter will then listen on file descriptor 3 which refers to a systemd socket unit that you will have to create.
+
+> You can still use [`envPrefix`](#options-envprefix) with systemd socket activation. `LISTEN_PID` and `LISTEN_FDS` are always read without a prefix.
+
+To take advantage of socket activation follow these steps.
+
+1. Run your app as a [systemd service](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html). It can either run directly on the host system or inside a container (using Docker or a systemd portable service for example). If you additionally pass an [`IDLE_TIMEOUT`](#environment-variables-idle-timeout) environment variable to your app it will gracefully shutdown if there are no requests for `IDLE_TIMEOUT` seconds. systemd will automatically start your app again when new requests are coming in.
+
+```ini
+/// file: /etc/systemd/system/myapp.service
+[Service]
+Environment=NODE_ENV=production IDLE_TIMEOUT=60
+ExecStart=/usr/bin/node /usr/bin/myapp/build
+```
+
+2. Create an accompanying [socket unit](https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html). The adapter only accepts a single socket.
+
+```ini
+/// file: /etc/systemd/system/myapp.socket
+[Socket]
+ListenStream=3000
+
+[Install]
+WantedBy=sockets.target
+```
+
+3. Make sure systemd has recognised both units by running `sudo systemctl daemon-reload`. Then enable the socket on boot and start it immediately using `sudo systemctl enable --now myapp.socket`. The app will then automatically start once the first request is made to `localhost:3000`.
 
 ## カスタムサーバー <!--custom-server-->
 
@@ -191,9 +245,9 @@ app.listen(3000, () => {
 
 ## トラブルシューティング <!--troubleshooting-->
 
-### サーバーが終了する前にクリーンアップするための hook はありますか？ <!--is-there-a-hook-for-cleaning-up-before-the-server-exits-->
+### アプリが終了する前にクリーンアップするための hook はありますか？ <!--is-there-a-hook-for-cleaning-up-before-the-app-exits-->
 
-SvelteKit にはこれに対応するためのビルトインで組み込まれているものはありません。なぜなら、このようなクリーンアップの hook はあなたの実行環境に大きく依存しているからです。Node の場合は、ビルトインの `process.on(...)` を使用して、サーバーが終了する前に実行されるコールバックを実装することができます:
+SvelteKit にはこれに対応するためのビルトインで組み込まれているものはありません。なぜなら、このようなクリーンアップの hook はあなたの実行環境に大きく依存しているからです。Node の場合は、ビルトインの `process.on(...)` を使用して、アプリが終了する前に実行されるコールバックを実装することができます:
 
 ```js
 // @errors: 2304 2580
@@ -202,6 +256,5 @@ function shutdownGracefully() {
 	db.shutdown();
 }
 
-process.on('SIGINT', shutdownGracefully);
-process.on('SIGTERM', shutdownGracefully);
+process.on('exit', shutdownGracefully);
 ```
