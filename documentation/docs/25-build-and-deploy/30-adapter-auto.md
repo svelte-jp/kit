@@ -9,6 +9,7 @@ title: ゼロコンフィグデプロイ
 - [`@sveltejs/adapter-vercel`](adapter-vercel) for [Vercel](https://vercel.com/)
 - [`svelte-adapter-azure-swa`](https://github.com/geoffrich/svelte-adapter-azure-swa) for [Azure Static Web Apps](https://docs.microsoft.com/en-us/azure/static-web-apps/)
 - [`svelte-kit-sst`](https://github.com/sst/sst/tree/master/packages/svelte-kit-sst) for [AWS via SST](https://docs.sst.dev/start/svelte)
+- [`@sveltejs/adapter-node`](https://kit.svelte.dev/docs/adapter-node) for [Google Cloud Run](https://cloud.google.com/run)
 
 デプロイするターゲットの環境が決まったら、`devDependencies` に適切な adapter をインストールすることを推奨します。これにより、lockfile に adapter が追加されるため、CI でのインストール時間が少し改善されます。
 

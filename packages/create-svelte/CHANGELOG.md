@@ -1,5 +1,35 @@
 # create-svelte
 
+## 6.1.2
+
+### Patch Changes
+
+- fix: set peerDependencies based on chosen Svelte version ([#12117](https://github.com/sveltejs/kit/pull/12117))
+
+## 6.1.1
+
+### Patch Changes
+
+- fix: go back to eslint 8 until typescript-eslint supports eslint 9 ([#12110](https://github.com/sveltejs/kit/pull/12110))
+
+## 6.1.0
+
+### Minor Changes
+
+- feat: upgrade eslint to v9 ([#12089](https://github.com/sveltejs/kit/pull/12089))
+
+## 6.0.10
+
+### Patch Changes
+
+- docs: update comment about path aliases ([#11788](https://github.com/sveltejs/kit/pull/11788))
+
+## 6.0.9
+
+### Patch Changes
+
+- chore: bump typescript-eslint to v7 ([#11845](https://github.com/sveltejs/kit/pull/11845))
+
 ## 6.0.8
 
 ### Patch Changes

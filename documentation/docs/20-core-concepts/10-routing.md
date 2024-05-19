@@ -205,6 +205,8 @@ SvelteKit は、ツリーを上がって (walk up the tree) 最も近いエラ�
 <slot></slot>
 ```
 
+`data` がどのように入力されるかは、すぐ下の次のセクションにある `+layout.js` の例を見ればわかります。
+
 デフォルトでは、各レイアウトはその上にあるレイアウトを継承します。そうしたくない場合は、[advanced layouts](advanced-routing#advanced-layouts) が役に立つでしょう。
 
 ### +layout.js

@@ -17,10 +17,25 @@ import adapter from '@sveltejs/adapter-cloudflare-workers';
 
 export default {
 	kit: {
-		adapter: adapter()
+		adapter: adapter({
+      config: '<your-wrangler-name>.toml',
+      platformProxy: {
+        persist: './your-custom-path'
+      }
+    })
 	}
 };
 ```
+
+## Options
+
+### config
+
+Path to your custom `wrangler.toml` config file.
+
+### platformProxy
+
+Preferences for the emulated `platform.env` local bindings. See the [getPlatformProxy](https://developers.cloudflare.com/workers/wrangler/api/#syntax) Wrangler API documentation for a full list of options.
 
 ## 基本設定 <!--basic-configuration-->
 
@@ -63,19 +78,7 @@ wrangler deploy
 
 ## カスタム設定 <!--custom-config-->
 
-`wrangler.toml` 以外の設定ファイルを使用したい場合は、以下のようにします:
-
-```js
-// @errors: 2307
-/// file: svelte.config.js
-import adapter from '@sveltejs/adapter-cloudflare-workers';
-
-export default {
-	kit: {
-		adapter: adapter({ config: '<your-wrangler-name>.toml' })
-	}
-};
-```
+If you would like to use a config file other than `wrangler.toml` you can specify so using the [`config` option](#options-config).
 
 [Node.js 互換](https://developers.cloudflare.com/workers/runtime-apis/nodejs/#enable-nodejs-from-the-cloudflare-dashboard) を有効化したい場合は、`wrangler.toml` で  "nodejs_compat" フラグを追加してください:
 
@@ -84,9 +87,9 @@ export default {
 compatibility_flags = [ "nodejs_compat" ]
 ```
 
-## Bindings
+## Runtime APIs
 
-KV/DO namespaces などを含んでいる [`env`](https://developers.cloudflare.com/workers/runtime-apis/fetch-event#parameters) オブジェクトは、`context` や `caches` と一緒に `platform` プロパティ経由で SvelteKit に渡されます。つまり、hooks とエンドポイントの中でアクセスできるということです:
+[`env`](https://developers.cloudflare.com/workers/runtime-apis/fetch-event#parameters) オブジェクトにはあなたのプロジェクトの [bindings](https://developers.cloudflare.com/pages/platform/functions/bindings/) が含まれており、KV/DO namespaces などで構成されています。これは `platform` プロパティを介して [`context`](https://developers.cloudflare.com/workers/runtime-apis/handlers/fetch/#contextwaituntil)、[`caches`](https://developers.cloudflare.com/workers/runtime-apis/cache/)、[`cf`](https://developers.cloudflare.com/workers/runtime-apis/request/#the-cf-property-requestinitcfproperties) と一緒に SvelteKit に渡されます。つまり、hooks とエンドポイントでこれらにアクセスできるということです:
 
 ```js
 // @errors: 7031
@@ -97,7 +100,7 @@ export async function POST({ request, platform }) {
 
 > 環境変数については、SvelteKit の組み込みの `$env` モジュールの使用を推奨します。
 
-これらの型をアプリで使えるようにするには、`src/app.d.ts` でこれらを参照します:
+バインディングの型宣言を含めるには、、`src/app.d.ts` でこれらを参照します:
 
 ```diff
 /// file: src/app.d.ts
@@ -117,8 +120,9 @@ export {};
 
 ### Testing Locally
 
-`platform.env` is only available in the final build and not in dev mode. For testing the build, you can use [wrangler](https://developers.cloudflare.com/workers/cli-wrangler). Once you have built your site, run `wrangler dev`. Ensure you have your [bindings](https://developers.cloudflare.com/workers/wrangler/configuration/#bindings) in your `wrangler.toml`. Wrangler version 3 is recommended.
-`platform.env` は最終的なビルドでのみ利用可能であり、開発モード (dev mode) では利用できません。ビルドをテストするには、[wrangler](https://developers.cloudflare.com/workers/cli-wrangler) をお使いいただけます。サイトをビルドし、`wrangler dev` を実行してください。[bindings](https://developers.cloudflare.com/workers/wrangler/configuration/#bindings) が `wrangler.toml` にあることを確認してください。Wrangler のバージョンは 3 を推奨します。
+Cloudflare Workers specific values in the `platform` property are emulated during dev and preview modes. Local [bindings](https://developers.cloudflare.com/workers/wrangler/configuration/#bindings) are created based on the configuration in your `wrangler.toml` file and are used to populate `platform.env` during development and preview. Use the adapter config [`platformProxy` option](#options-platformproxy) to change your preferences for the bindings.
+
+For testing the build, you should use [wrangler](https://developers.cloudflare.com/workers/cli-wrangler) **version 3**. Once you have built your site, run `wrangler dev`.
 
 ## トラブルシューティング <!--troubleshooting-->
 

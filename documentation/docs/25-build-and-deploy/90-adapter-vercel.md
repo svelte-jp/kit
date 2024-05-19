@@ -59,7 +59,7 @@ export const config = {
 
 そして以下のオプションは serverless function に適用されます:
 - `memory`: function で利用できるメモリ量です。デフォルトは `1024` Mb で、`128` Mb まで減らすことができます。また、Pro または Enterprise アカウントの場合は、`3008` Mb まで[増やす](https://vercel.com/docs/concepts/limits/overview#serverless-function-memory)ことができます。間隔は 64Mb 単位です。
-- `maxDuration`: function の最大実行時間。デフォルトで、Hobby アカウントの場合は `10` 秒、Pro の場合は `15`、Enterprise の場合は `900` です。
+- `maxDuration`: function の [最大実行時間(maximum execution duration)](https://vercel.com/docs/functions/runtimes#max-duration)。デフォルトで、Hobby アカウントの場合は `10` 秒、Pro の場合は `15`、Enterprise の場合は `900` です。
 - `isr`: Incremental Static Regeneration の設定、詳細は後述
 
 function から特定の region のデータにアクセスする必要がある場合は、パフォーマンスを最適化するためそれと同じ region (またはその知覚) にデプロイすることをおすすめします。
@@ -69,16 +69,26 @@ function から特定の region のデータにアクセスする必要がある
 You may set the `images` config to control how Vercel builds your images. See the [image configuration reference](https://vercel.com/docs/build-output-api/v3/configuration#images) for full details. As an example, you may set:
 
 ```
-{
-	sizes: [640, 828, 1200, 1920, 3840],
-	formats: ['image/avif', 'image/webp'],
-	minimumCacheTTL: 300
-}
+/// file: svelte.config.js
+import adapter from '@sveltejs/adapter-vercel';
+
+export default {
+	kit: {
+		adapter({
+			images: {
+				sizes: [640, 828, 1200, 1920, 3840],
+				formats: ['image/avif', 'image/webp'],
+				minimumCacheTTL: 300,
+				domains: ['example-app.vercel.app'],
+			}
+		})
+	}
+};
 ```
 
 ## Incremental Static Regeneration
 
-Vercel は [Incremental Static Regeneration](https://vercel.com/docs/concepts/incremental-static-regeneration/overview) (ISR) をサポートしており、これにより、プリレンダリングコンテンツが持つパフォーマンスとコストの利点と、ダイナミックレンダリングコンテンツが持つ柔軟性の両方を提供することができます。
+Vercel は [Incremental Static Regeneration](https://vercel.com/docs/incremental-static-regeneration) (ISR) をサポートしており、これにより、プリレンダリングコンテンツが持つパフォーマンスとコストの利点と、ダイナミックレンダリングコンテンツが持つ柔軟性の両方を提供することができます。
 
 ISR をルート(route)に追加するには、`config` オブジェクトに `isr` プロパティを含めます:
 
@@ -142,6 +152,14 @@ export function load() {
 ```
 
 Vercel でビルドする場合、これらの変数は全てビルド時と実行時で変わらないため、`$env/dynamic/private` ではなく、変数を静的に置換しデッドコードの削除などの最適化ができる `$env/static/private` の使用をおすすめします。
+
+## Skew protection
+
+When a new version of your app is deployed, assets belonging to the previous version may no longer be accessible. If a user is actively using your app when this happens, it can cause errors when they navigate — this is known as _version skew_. SvelteKit mitigates this by detecting errors resulting from version skew and causing a hard reload to get the latest version of the app, but this will cause any client-side state to be lost. (You can also proactively mitigate it by observing the [`updated`](/docs/modules#$app-stores-updated) store value, which tells clients when a new version has been deployed.)
+
+[Skew protection](https://vercel.com/docs/deployments/skew-protection) is a Vercel feature that routes client requests to their original deployment. When a user visits your app, a cookie is set with the deployment ID, and any subsequent requests will be routed to that deployment for as long as skew protection is active. When they reload the page, they will get the newest deployment. (The `updated` store is exempted from this behaviour, and so will continue to report new deployments.) To enable it, visit the Advanced section of your project settings on Vercel.
+
+Cookie-based skew protection comes with one caveat: if a user has multiple versions of your app open in multiple tabs, requests from older versions will be routed to the newer one, meaning they will fall back to SvelteKit's built-in skew protection.
 
 ## Notes
 
