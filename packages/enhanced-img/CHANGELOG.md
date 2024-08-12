@@ -1,5 +1,36 @@
 # @sveltejs/enhanced-img
 
+## 0.3.2
+### Patch Changes
+
+
+- chore: package provenance ([#12567](https://github.com/sveltejs/kit/pull/12567))
+
+
+- fix: ensure src attribute is properly formed ([`65931f276ac2102032e3032c864a472eee19b7bb`](https://github.com/sveltejs/kit/commit/65931f276ac2102032e3032c864a472eee19b7bb))
+
+## 0.3.1
+### Patch Changes
+
+
+- fix: make `*?enhanced` imports available in the ambient context ([#12363](https://github.com/sveltejs/kit/pull/12363))
+
+## 0.3.0
+
+### Minor Changes
+
+- breaking: return plugin synchronously from `enhancedImages()` ([#12297](https://github.com/sveltejs/kit/pull/12297))
+
+### Patch Changes
+
+- chore: add keywords for discovery in npm search ([#12330](https://github.com/sveltejs/kit/pull/12330))
+
+## 0.2.1
+
+### Patch Changes
+
+- fix: use correct type for `*?enhanced` imports ([#12224](https://github.com/sveltejs/kit/pull/12224))
+
 ## 0.2.0
 
 ### Minor Changes

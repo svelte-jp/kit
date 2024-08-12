@@ -96,7 +96,7 @@ export async function load({ params, fetch }) {
 }
 ```
 
-> これを動作させるためには、`tsconfig.json` または `jsconfig.json` が生成された `.svelte-kit/tsconfig.json` を継承する必要があります (`.svelte-kit` の場所は [`outDir`](configuration#outdir) です):
+> これを動作させるためには、`tsconfig.json` または `jsconfig.json` が生成された `.svelte-kit/tsconfig.json` を継承する必要があります (`.svelte-kit` の場所は [`outDir`](configuration#outdir) です)。そして、TypeScript を dependency としてインストールする必要があります:
 >
 > `{ "extends": "./.svelte-kit/tsconfig.json" }`
 

@@ -12,6 +12,12 @@ SvelteKit の中心は、 _ファイルシステムベースのルーター_ で
 
 ルート(route)のディレクトリはそれぞれ1つ以上の _ルートファイル(route files)_ を格納します。ルートファイル(route files)には `+` という接頭辞が付いているので、それで見分けることができます。
 
+We'll introduce these files in a moment in more detail, but here are a few simple rules to help you remember how SvelteKit's routing works:
+
+* All files can run on the server
+* All files run on the client except `+server` files
+* `+layout` and `+error` files apply to subdirectories as well as the directory they live in
+
 ## +page
 
 ### +page.svelte
