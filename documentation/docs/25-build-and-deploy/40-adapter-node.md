@@ -51,8 +51,15 @@ npm install dotenv
 …そしてビルドされたアプリを実行する前にそれを呼び出します:
 
 ```diff
--node build
-+node -r dotenv/config build
+- node build
++ node -r dotenv/config build
+```
+
+If you use Node.js v20.6+, you can use the [`--env-file`](https://nodejs.org/en/learn/command-line/how-to-read-environment-variables-from-nodejs) flag instead:
+
+```diff
+- node build
++ node --env-file=.env build
 ```
 
 ### `PORT`、`HOST`、`SOCKET_PATH` <!--port-host-and-socket-path-->
@@ -122,7 +129,7 @@ ADDRESS_HEADER=True-Client-IP node build
 
 ### `BODY_SIZE_LIMIT`
 
-ストリーミング中も含め、受け付けるリクエストボディの最大サイズを byte で指定します。デフォルトは 512kb です。もっと高度な設定が必要な場合は、このオプションの値を `Infinity` (adapter が古いバージョンの場合は 0) にして無効化し、[`handle`](hooks#server-hooks-handle) にカスタムのチェックを実装することができます。
+ストリーミング中も含め、受け付けるリクエストボディの最大サイズを byte で指定します。ボディサイズの指定には単位を使用することができます。キロバイトには (`K`)、メガバイトには (`M`)、ギガバイトには (`G`) です。例えば、`512K` や `1M` のようにします。デフォルトは 512キロバイト です。もっと高度な設定が必要な場合は、このオプションの値を `Infinity` (adapter が古いバージョンの場合は 0) にして無効化し、[`handle`](hooks#server-hooks-handle) にカスタムのチェックを実装することができます。
 
 ### `SHUTDOWN_TIMEOUT`
 
@@ -186,6 +193,22 @@ By default `adapter-node` gracefully shuts down the HTTP server when a `SIGTERM`
 
 > If you want to customize this behaviour you can use a [custom server](#custom-server).
 
+You can listen to the `sveltekit:shutdown` event which is emitted after the HTTP server has closed all connections. Unlike Node's `exit` event, the `sveltekit:shutdown` event supports asynchronous operations and is always emitted when all connections are closed even if the server has dangling work such as open database connections.
+
+```js
+// @errors: 2304
+process.on('sveltekit:shutdown', async (reason) => {
+  await jobs.stop();
+  await db.close();
+});
+```
+
+The parameter `reason` has one of the following values:
+
+- `SIGINT` - shutdown was triggered by a `SIGINT` signal
+- `SIGTERM` - shutdown was triggered by a `SIGTERM` signal
+- `IDLE` - shutdown was triggered by [`IDLE_TIMEOUT`](#environment-variables-idle-timeout)
+
 ## Socket activation
 
 Most Linux operating systems today use a modern process manager called systemd to start the server and run and manage services. You can configure your server to allocate a socket and start and scale your app on demand. This is called [socket activation](http://0pointer.de/blog/projects/socket-activated-containers.html). In this case, the OS will pass two environment variables to your app — `LISTEN_PID` and `LISTEN_FDS`. The adapter will then listen on file descriptor 3 which refers to a systemd socket unit that you will have to create.
@@ -241,20 +264,4 @@ app.use(handler);
 app.listen(3000, () => {
 	console.log('listening on port 3000');
 });
-```
-
-## トラブルシューティング <!--troubleshooting-->
-
-### アプリが終了する前にクリーンアップするための hook はありますか？ <!--is-there-a-hook-for-cleaning-up-before-the-app-exits-->
-
-SvelteKit にはこれに対応するためのビルトインで組み込まれているものはありません。なぜなら、このようなクリーンアップの hook はあなたの実行環境に大きく依存しているからです。Node の場合は、ビルトインの `process.on(...)` を使用して、アプリが終了する前に実行されるコールバックを実装することができます:
-
-```js
-// @errors: 2304 2580
-function shutdownGracefully() {
-	// anything you need to clean up manually goes in here
-	db.shutdown();
-}
-
-process.on('exit', shutdownGracefully);
 ```

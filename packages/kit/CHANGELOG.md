@@ -1,5 +1,89 @@
 # @sveltejs/kit
 
+## 2.5.21
+### Patch Changes
+
+
+- chore: package provenance ([#12567](https://github.com/sveltejs/kit/pull/12567))
+
+## 2.5.20
+### Patch Changes
+
+
+- fix: set revalidate cache header on 404'd static assets ([#12530](https://github.com/sveltejs/kit/pull/12530))
+
+## 2.5.19
+### Patch Changes
+
+
+- fix: Svelte 5 - ignore `binding_non_reactive` warning in generated root component (you also need to update to `svelte@5.0.0-next.204`) ([#12524](https://github.com/sveltejs/kit/pull/12524))
+
+## 2.5.18
+### Patch Changes
+
+
+- fix: respect HTML attributes `enctype` and `formenctype` for forms with `use:enhance` ([#12198](https://github.com/sveltejs/kit/pull/12198))
+
+
+- fix: prevent client import error when a `hooks.server` file imports a private environment variable ([#12195](https://github.com/sveltejs/kit/pull/12195))
+
+
+- fix: set default `Content-Type` header to `application/x-www-form-urlencoded` for `POST` form submissions with `use:enhance` to align with native form behaviour ([#12198](https://github.com/sveltejs/kit/pull/12198))
+
+## 2.5.17
+
+### Patch Changes
+
+- chore: update package description ([#11846](https://github.com/sveltejs/kit/pull/11846))
+
+## 2.5.16
+
+### Patch Changes
+
+- fix: determine local Svelte version more reliably ([#12350](https://github.com/sveltejs/kit/pull/12350))
+
+## 2.5.15
+
+### Patch Changes
+
+- fix: always decode asset URLs ([#12352](https://github.com/sveltejs/kit/pull/12352))
+
+## 2.5.14
+
+### Patch Changes
+
+- fix: read non-encoded data URIs ([#12347](https://github.com/sveltejs/kit/pull/12347))
+
+## 2.5.13
+
+### Patch Changes
+
+- fix: decode asset URLs in dev when reading them, but for real this time ([#12344](https://github.com/sveltejs/kit/pull/12344))
+
+## 2.5.12
+
+### Patch Changes
+
+- fix: decode asset URLs in dev when reading them ([#12341](https://github.com/sveltejs/kit/pull/12341))
+
+## 2.5.11
+
+### Patch Changes
+
+- fix: hrefs that start with `config.prerender.origin` are now crawled ([#12277](https://github.com/sveltejs/kit/pull/12277))
+
+- chore: add keywords for discovery in npm search ([#12330](https://github.com/sveltejs/kit/pull/12330))
+
+- fix: handle whitespace in HTTP Accept header ([#12292](https://github.com/sveltejs/kit/pull/12292))
+
+## 2.5.10
+
+### Patch Changes
+
+- fix: exclude server files from optimizeDeps.entries ([#12242](https://github.com/sveltejs/kit/pull/12242))
+
+- fix: bump import-meta-resolve to remove deprecation warnings ([#12240](https://github.com/sveltejs/kit/pull/12240))
+
 ## 2.5.9
 
 ### Patch Changes

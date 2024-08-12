@@ -71,21 +71,25 @@ optional のルートパラメータ(route parameter)は rest パラメータに
 
 ## マッチング(Matching)
 
-`src/routes/archive/[page]` のようなルート(route)は `/archive/3` にマッチしますが、`/archive/potato` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"3"` や `"potato"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
+`src/routes/fruits/[page]` というルート(route)は `/fruits/apple` にマッチしますが、`/fruits/rocketship` にもマッチしてしまいます。これを防ぎたい場合、パラメータ文字列(`"apple"` や `"rocketship"`)を引数に取ってそれが有効なら `true` を返す _matcher_ を [`params`](configuration#files) ディレクトリに追加することで、ルート(route)のパラメータを適切に定義することができます…
 
 ```js
-/// file: src/params/integer.js
-/** @type {import('@sveltejs/kit').ParamMatcher} */
+/// file: src/params/fruit.js
+/**
+ * @param {string} param
+ * @return {param is ('apple' | 'orange')}
+ * @satisfies {import('@sveltejs/kit').ParamMatcher}
+ */
 export function match(param) {
-	return /^\d+$/.test(param);
+	return param === 'apple' || param === 'orange';
 }
 ```
 
 …そしてルート(routes)を拡張します:
 
 ```diff
--src/routes/archive/[page]
-+src/routes/archive/[page=integer]
+-src/routes/fruits/[page]
++src/routes/fruits/[page=fruit]
 ```
 
 もしパス名がマッチしない場合、SvelteKit は (後述のソート順の指定に従って) 他のルートでマッチするか試行し、どれにもマッチしない場合は最終的に 404 を返します。

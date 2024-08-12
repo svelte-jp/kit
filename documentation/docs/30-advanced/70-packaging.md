@@ -126,6 +126,30 @@ import Foo from 'your-library/Foo.svelte';
 }
 ```
 
+### sideEffects
+
+The `sideEffects` field in `package.json` is used by bundlers to determine if a module may contain code that has side-effects. A module is considered to have side-effects if it makes changes that are observable from other scripts outside the module when it's imported. For example, side-effects include modifying global variables or the prototype of built-in JavaScript objects. Because a side-effect could potentially affect the behavior of other parts of the application, these files/modules will be included in the final bundle regardless of whether their exports are used in the application. It is a best practice to avoid side-effects in your code.
+
+Setting the `sideEffects` field in `package.json` can help the bundler to be more aggressive in eliminating unused exports from the final bundle, a process known as tree-shaking. This results in smaller and more efficient bundles. Different bundlers handle `sideEffects` in various manners. While not necessary for Vite, we recommend that libraries state that all CSS files have side-effects so that your library will be [compatible with webpack](https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free).
+
+```json
+/// file: package.json
+{
+	"sideEffects": ["**/*.css"]
+}
+```
+
+Make sure that `"sideEffects"` is correctly set. If a file with side effects is incorrectly marked as having no side effects, it can result in broken functionality. If your package has files with side effects, you can specify them in an array:
+
+```json
+/// file: package.json
+{
+    "sideEffects": ["**/*.css", "./src/sideEffectfulFile.js"]
+}
+```
+
+This will treat only the specified files as having side effects.
+
 ## TypeScript
 
 あなたが TypeScript を使用していないとしても、あなたのライブラリの型定義を公開したほうがよいでしょう。あなたのライブラリを使用する人が、適切なインテリセンスを得られるようになるからです。`@sveltejs/package` は型生成のプロセスをほとんど隠ぺい(opaque)してくれます。デフォルトでは、ライブラリをパッケージングする際、JavaScript、TypeScript、Svelte ファイル向けに型定義を自動生成します。あなたは [exports](#anatomy-of-a-package-json-exports) map の `types` condition が正しいファイルを指しているか確認するだけです。`npm create svelte@latest` でライブラリプロジェクトを初期化すると、root export に `types` condition が設定されます。
@@ -195,7 +219,7 @@ import Foo from 'your-library/Foo.svelte';
 
 - `-w`/`--watch` — `src/lib` にあるファイルの変更を関ししてパッケージを再ビルドします
 - `-i`/`--input` — パッケージの全てのファイルを含む入力ディレクトリ。デフォルトは `src/lib` です
-- `-o`/`--o` — 処理されたファイルが書き込まれる出力ディレクトリ。`package.json` の `exports` はここにあるファイルを指さなければならず、`files` の配列にはこのフォルダを含めなければいけません。デフォルトは `dist` です
+- `-o`/`--output` — 処理されたファイルが書き込まれる出力ディレクトリ。`package.json` の `exports` はここにあるファイルを指さなければならず、`files` の配列にはこのフォルダを含めなければいけません。デフォルトは `dist` です
 - `-t`/`--types` — 型定義 (`d.ts` ファイル) を作成するかどうか。エコシステムのライブラリの品質を向上させるため、作成することを強く推奨します。デフォルトは `true` です
 - `--tsconfig` - tsconfig または jsconfig へのパス。指定されない場合は、ワークスペースのパスで次の上位の tsconfig/jsconfig を検索します。
 

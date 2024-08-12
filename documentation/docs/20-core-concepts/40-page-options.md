@@ -76,11 +76,12 @@ export async function load({ fetch }) {
 
 ### Troubleshooting
 
-'The following routes were marked as prerenderable, but were not prerendered' というようなエラーが表示されたら、それは該当のルート (またはページの場合は親レイアウト) に `export const prerender = true` があるにもかかわらず実際にはそのページがプリレンダリングされていないことが原因です (プリレンダリングクローラーがそのページにアクセスしていないため)。
+'The following routes were marked as prerenderable, but were not prerendered' というようなエラーが表示されたら、それは該当のルート (またはページの場合は親レイアウト) に `export const prerender = true` があるにもかかわらず、プリレンダリングクローラーがそのページにアクセスせず、そのページがプリレンダリングされていないことが原因です。
 
-これらのルート(route)は動的にサーバーレンダリングできないため、該当のルート(route)にアクセスしようとしたときにエラーが発生します。それを解決するには、2つの方法があります:
+これらのルート(route)は動的にサーバーレンダリングできないため、該当のルート(route)にアクセスしようとしたときにエラーが発生します。それを解決するには、いくつか方法があります:
 
 * SvelteKit が [`config.kit.prerender.entries`](configuration#prerender) か [`entries`](#entries) ページオプションからのリンクを辿ってそのルート(route)を見つけられるようにしてください。動的なルート(例えば `[parameters]` を持つページ) へのリンクは、他のエントリーポイントをクローリングしても見つからない場合はこのオプションに追加してください。そうしないと、SvelteKit はその parameters が持つべき値がわからないので、プリレンダリングされません。プリレンダリング可能(prerenderable)なページとしてマークされていないページは無視され、そのページから他のページ(プリレンダリング可能なものも含む)へのリンクもクローリングされません。
+* サーバーサイドレンダリングが可能な別のプリレンダリングページで、該当のルートのリンクを検出できるようにしてください。
 * `export const prerender = true` から `export const prerender = 'auto'` に変更してください。`'auto'` になっているルート(route)は動的にサーバーレンダリングすることができます
 
 ## entries
@@ -142,6 +143,16 @@ CSR を無効にすると、クライアントに JavaScript が送信されま�
 * すべての Svelte コンポーネントの `<script>` タグは削除されます。
 * `<form>` 要素を[プログレッシブ・エンハンスメント](form-actions#progressive-enhancement)にすることはできません。
 * リンクはブラウザによってフルページナビゲーションで処理されます。
+* Hot Module Replacement (HMR) が無効になります。
+
+ (例えば HMR を活用したい場合に) 開発時に `csr` を有効にするには以下のようにします:
+
+```js
+/// file: +page.js
+import { dev } from '$app/environment';
+
+export const csr = dev;
+```
 
 ## trailingSlash
 
