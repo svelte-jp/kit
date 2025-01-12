@@ -5,9 +5,8 @@ title: プロジェクトを作成する
 SvelteKit アプリの構築を始めるのに最も簡単な方法は `npm create` を実行することです:
 
 ```bash
-npm create svelte@latest my-app
+npx sv create my-app
 cd my-app
-npm install
 npm run dev
 ```
 
