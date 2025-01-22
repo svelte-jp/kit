@@ -1,3 +1,11 @@
+> [!IMPORTANT]
+> **SvelteKit ドキュメントの日本語化プロジェクトは、以下のリポジトリに統合されました！**
+> 
+> https://github.com/svelte-jp/svelte.dev
+> 
+
+---
+
 # SvelteKitドキュメント日本語翻訳プロジェクト
 
 [SvelteKit](https://github.com/sveltejs/kit)のドキュメントサイト [kit.svelte.dev](https://kit.svelte.dev/) を日本語に翻訳するプロジェクトです。
