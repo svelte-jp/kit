@@ -168,7 +168,7 @@ server `load` 関数は _常に_ サーバーで実行されます。
 
 デフォルトでは、universal `load` 関数は、ユーザーがはじめてページにアクセスしたときの SSR 中にサーバーで実行されます。そのあとのハイドレーション中に、[fetch リクエスト](#making-fetch-requests) で取得したレスポンスを再利用してもう一度実行されます。それ以降の universal `load` 関数の呼び出しは、すべてブラウザで行われます。この動作は [page options](page-options) によってカスタマイズすることができます。[サーバーサイドレンダリング](page-options#ssr) を無効にした場合、SPA となるため、universal `load` 関数は _常に_ クライアントで実行されるようになります。
 
-ルート(route)に universal と server の両方の `load` 関数が含まれている場合、server `load` が最初に実谷されます。
+ルート(route)に universal と server の両方の `load` 関数が含まれている場合、server `load` が最初に実行されます。
 
 `load` 関数は実行時に呼び出されます。ページを [プリレンダリング](page-options#prerender) する場合は、ビルド時に呼び出されます。
 
